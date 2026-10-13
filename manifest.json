@@ -1,0 +1,40 @@
+{
+  "id": "./index.html",
+  "name": "WahrZentrale",
+  "short_name": "WahrZentrale",
+  "description": "Alle Wahr-Apps in einer App: Himmel, Unterwegs, Alltag sowie Spiel & Klang. 100 % lokal, ohne Konto, ohne Werbung, ohne Tracking.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1EEFA",
+  "theme_color": "#5A2FBE",
+  "categories": [
+    "utilities",
+    "lifestyle",
+    "travel",
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

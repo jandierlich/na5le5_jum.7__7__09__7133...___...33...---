@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Essen und Trinken">
+  <style>
+    @keyframes tf-steam { 0% { transform: translateY(0) scaleX(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translateY(-30px) scaleX(1.15); opacity: 0; } }
+    .tf-steam { animation: tf-steam 3s ease-in-out infinite; transform-origin: bottom center; }
+    @media (prefers-reduced-motion: reduce) { .tf-steam { animation: none; opacity: 0.5; } }
+  </style>
+  <rect width="800" height="160" fill="#fdf1de"/>
+  <g transform="translate(220,85)">
+    <rect x="-4" y="-45" width="8" height="70" rx="3" fill="#0B1440"/>
+    <rect x="-14" y="-45" width="4" height="30" fill="#0B1440"/>
+    <rect x="-6" y="-45" width="4" height="30" fill="#0B1440"/>
+    <rect x="2" y="-45" width="4" height="30" fill="#0B1440"/>
+    <rect x="10" y="-45" width="4" height="30" fill="#0B1440"/>
+  </g>
+  <g transform="translate(420,90)">
+    <path d="M0,-55 c-28,0 -40,28 -40,50 c0,18 10,32 26,37 v38 h28 v-38 c16,-5 26,-19 26,-37 c0,-22 -12,-50 -40,-50 Z" fill="#FF8C00"/>
+  </g>
+  <path class="tf-steam" d="M394,10 q-6,-10 0,-20 q6,-10 0,-20" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path class="tf-steam" d="M414,14 q-6,-10 0,-20 q6,-10 0,-20" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round" style="animation-delay:-1s"/>
+  <path class="tf-steam" d="M434,10 q-6,-10 0,-20 q6,-10 0,-20" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round" style="animation-delay:-2s"/>
+  <g transform="translate(600,95)" fill="none" stroke="#3355C8" stroke-width="4">
+    <circle cx="0" cy="0" r="34"/>
+    <line x1="-24" y1="24" x2="24" y2="-24"/>
+  </g>
+  <circle cx="120" cy="50" r="16" fill="#3355C8" opacity="0.8"/>
+  <circle cx="700" cy="45" r="12" fill="#FF8C00" opacity="0.7"/>
+</svg>

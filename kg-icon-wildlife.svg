@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Tier- und Pflanzenwelt">
+  <path d="M24,42 v-22" stroke="#0B1440" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24,20 C10,20 8,10 8,6 C14,6 24,10 24,20 Z" fill="#3355C8"/>
+  <path d="M24,26 C38,26 40,16 40,12 C34,12 24,16 24,26 Z" fill="#3355C8"/>
+  <ellipse cx="16" cy="40" rx="10" ry="3.2" fill="#FF8C00" opacity="0.35"/>
+  <path d="M8,36 q6,-6 12,0 q6,-6 12,0" stroke="#FF8C00" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+</svg>

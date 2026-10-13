@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="wz">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Quellen &amp; Lizenzen – WahrZentrale</title>
+<meta name="theme-color" content="#F1EEFA">
+<link rel="stylesheet" href="./wz-common.css">
+<style>
+  .lz-box { background: var(--wz-card); border: 1px solid var(--wz-line); border-radius: 16px; padding: 12px 16px 4px; margin: 0 0 12px; scroll-margin-top: 16px; }
+  .lz-box h3 { margin-top: 4px; }
+  h2 { scroll-margin-top: 16px; }
+  pre.lz { white-space: pre-wrap; font-size: 12.5px; line-height: 1.5; background: var(--wz-soft); border-radius: 12px; padding: 12px; overflow-x: auto; }
+  table.lz { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 16px; }
+  table.lz th, table.lz td { text-align: left; vertical-align: top; padding: 7px 6px; border-bottom: 1px solid var(--wz-line); }
+  @media (max-width: 600px) {
+    table.lz, table.lz tbody, table.lz tr, table.lz td { display: block; width: 100%; }
+    table.lz tr:first-child { display: none; }
+    table.lz tr { border-bottom: 1px solid var(--wz-line); padding: 8px 0; }
+    table.lz td { border: 0; padding: 2px 0; }
+    table.lz td:first-child { font-weight: 700; }
+    table.lz td:last-child { color: var(--wz-sub); font-size: 13px; }
+  }
+  table.lz td { overflow-wrap: anywhere; }
+  .lz-det{margin:8px 0}
+  .lz-det summary{cursor:pointer;font-weight:600;font-size:14px;padding:6px 0}
+  .lz-det pre.lz{max-height:340px;overflow:auto}
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body class="wz-doc">
+<main class="wz-doc-wrap">
+<nav class="wz-doc-nav" aria-label="Navigation">
+  <a href="./index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></g></svg> WahrZentrale</a>
+  <a href="./impressum.html">Impressum</a>
+  <a href="./datenschutz.html">Datenschutz</a>
+</nav>
+
+<h1>Quellen &amp; Lizenzen</h1>
+
+<h2 id="eigenes">Eigener Code und eigene Gestaltung</h2>
+<p>Programmcode, Gestaltung, Symbole, Illustrationen, Texte, Tarot-Kartenkunst, Spielgrafiken und alle Klänge der WahrZentrale und ihrer Apps: © 2026 Jan Dierlich. <strong>Alle Rechte vorbehalten.</strong> Der Quellcode ist auf GitHub öffentlich einsehbar, steht aber unter keiner Open-Source-Lizenz. Nutzung, Vervielfältigung, Veränderung oder Weiterverbreitung – auch auszugsweise – sind ohne vorherige schriftliche Zustimmung nicht gestattet. Die private Nutzung der App im Familien- und Freundeskreis ist ausdrücklich erlaubt.</p>
+<p>Es werden keine Web-Schriftarten (ausschließlich die Systemschriften des Geräts), keine Emojis als Grafik, keine Fotos, Logos oder Bilder Dritter und keine Klänge Dritter verwendet. Alle Symbole sind eigene, gezeichnete Vektorgrafiken; alle Töne werden im Programm erzeugt.</p>
+<p>Ausgenommen vom Urheberrecht sind Inhalte, die auf gemeinfreien amtlichen Werken beruhen (z. B. Verordnung (EG) Nr. 1333/2008, Verordnung (EU) Nr. 1169/2011, Verordnung (EG) Nr. 1223/2009, Verordnung (EG) Nr. 1907/2006). Die redaktionelle Auswahl, Formulierung, Struktur und Programmierung bleiben geschützt.</p>
+
+<h2 id="bibliotheken">Mitgelieferte Bibliotheken</h2>
+<div class="lz-box" id="leaflet"><h3>Leaflet 1.9.4</h3>
+<p>Kartenbibliothek, Dateien <code>lib-leaflet.js</code> und <code>lib-leaflet.css</code>, genutzt in NaviWahr, Keysglade, BelegParkWahr und StaunWahr. Unverändert bis auf die entfernten Verweise auf nicht genutzte Bilddateien. <a href="https://leafletjs.com" rel="noopener noreferrer" target="_blank">leafletjs.com</a></p>
+<pre class="lz">BSD 2-Clause License
+
+Copyright (c) 2010-2023, Vladimir Agafonkin
+Copyright (c) 2010-2011, CloudMade
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></div>
+
+<div class="lz-box" id="jspdf"><h3>jsPDF 2.5.1</h3>
+<p>PDF-Erzeugung auf dem Gerät, Datei <code>lib-jspdf.umd.min.js</code>, genutzt in BelegParkWahr, VorratsWahr und LabWahr. Unverändert bis auf eine entfernte Adresse eines fremden Servers, die zu einer hier nicht genutzten Vorschau-Funktion gehörte. <a href="https://github.com/parallax/jsPDF" rel="noopener noreferrer" target="_blank">github.com/parallax/jsPDF</a></p>
+<pre class="lz">MIT License
+
+Copyright
+(c) 2010-2021 James Hall, https://github.com/MrRio/jsPDF
+(c) 2015-2021 yWorks GmbH, https://www.yworks.com/
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre></div>
+
+<div class="lz-box" id="texterkennung"><h3>Texterkennung und Barcode-Erkennung (lokal mitgeliefert)</h3>
+<p>Diese Bestandteile liegen in der WahrZentrale selbst und werden erst beim ersten Scannen (im Scanner der Startseite, in ProduktWahr, VorratsWahr, BelegParkWahr oder QRWahr) auf dein Gerät geladen – von derselben Adresse wie die App, nicht von fremden Servern. Sie sind unverändert; die Barcode-Erkennung wurde lediglich aus ihrem veröffentlichten Quelltext zu einer Datei zusammengefügt.</p>
+<ul>
+  <li><strong>tesseract.js-core 5.1.1</strong> (Dateien <code>lib-ocr-core-5.1.1-simd-lstm.wasm.js</code>, <code>lib-ocr-core-5.1.1-lstm.wasm.js</code>) – die Texterkennung Tesseract als WebAssembly, © Project Naptha und Mitwirkende, Tesseract © Google/Tesseract-Mitwirkende, Apache License 2.0. <a href="https://github.com/naptha/tesseract.js-core" rel="noopener noreferrer" target="_blank">github.com/naptha/tesseract.js-core</a></li>
+  <li><strong>Sprachdaten „deu“ und „eng“</strong> (tessdata 4.0.0_best_int, Dateien <code>lib-ocr-deu-4.0.0-best-int.traineddata.gz</code>, <code>lib-ocr-eng-4.0.0-best-int.traineddata.gz</code>) – Tesseract-Mitwirkende, Apache License 2.0. <a href="https://github.com/naptha/tessdata" rel="noopener noreferrer" target="_blank">github.com/naptha/tessdata</a></li>
+  <li><strong>@zxing/library 0.21.3</strong> (Datei <code>lib-zxing-0.21.3.min.js</code>) – Barcode- und QR-Erkennung, © ZXing-Autoren, Apache License 2.0, mit <strong>ts-custom-error 3.3.1</strong> (© 2019 Adrien Gibrat, MIT-Lizenz). <a href="https://github.com/zxing-js/library" rel="noopener noreferrer" target="_blank">github.com/zxing-js/library</a></li>
+  <li>Im Tesseract-Kern enthalten: <strong>Leptonica</strong> (Leptonica-Lizenz, BSD-artig), <strong>libpng</strong> (PNG Reference Library License v2), <strong>libjpeg</strong> der Independent JPEG Group, <strong>libtiff</strong> (libtiff-Lizenz), <strong>libwebp</strong> (BSD-3-Clause), <strong>giflib</strong> (MIT), <strong>zlib</strong> (zlib-Lizenz) und <strong>OpenLibm</strong> (MIT/BSD/ISC).</li>
+</ul>
+<p>Diese Software beruht zum Teil auf der Arbeit der Independent JPEG Group („this software is based in part on the work of the Independent JPEG Group“).</p>
+<p>Die WahrZentrale-eigene Schnittstelle dazu (<code>wz-ocr.js</code>, <code>wz-ocr-worker.js</code>) ist eigener Code.</p>
+<details class="lz-det"><summary>Apache License 2.0 (Tesseract, tesseract.js-core, Sprachdaten, ZXing)</summary><pre class="lz">Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;[]&quot;
+      replaced with your own identifying information. (Don&#x27;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.</pre></details><details class="lz-det"><summary>MIT-Lizenz – ts-custom-error</summary><pre class="lz">The MIT License
+
+Copyright (c) 2019 Adrien Gibrat https://github.com/adriengibrat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre></details><details class="lz-det"><summary>Leptonica</summary><pre class="lz">/*====================================================================*
+ -  Copyright (C) 2001-2020 Leptonica.  All rights reserved.
+ -
+ -  Redistribution and use in source and binary forms, with or without
+ -  modification, are permitted provided that the following conditions
+ -  are met:
+ -  1. Redistributions of source code must retain the above copyright
+ -     notice, this list of conditions and the following disclaimer.
+ -  2. Redistributions in binary form must reproduce the above
+ -     copyright notice, this list of conditions and the following
+ -     disclaimer in the documentation and/or other materials
+ -     provided with the distribution.
+ -
+ -  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ -  ``AS IS&#x27;&#x27; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ -  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ -  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL ANY
+ -  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ -  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ -  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ -  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ -  OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ -  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ -  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *====================================================================*/</pre></details><details class="lz-det"><summary>libpng</summary><pre class="lz">COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
+=========================================
+
+PNG Reference Library License version 2
+---------------------------------------
+
+ * Copyright (c) 1995-2026 The PNG Reference Library Authors.
+ * Copyright (c) 2018-2026 Cosmin Truta.
+ * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
+ * Copyright (c) 1996-1997 Andreas Dilger.
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+
+The software is supplied &quot;as is&quot;, without warranty of any kind,
+express or implied, including, without limitation, the warranties
+of merchantability, fitness for a particular purpose, title, and
+non-infringement.  In no event shall the Copyright owners, or
+anyone distributing the software, be liable for any damages or
+other liability, whether in contract, tort or otherwise, arising
+from, out of, or in connection with the software, or the use or
+other dealings in the software, even if advised of the possibility
+of such damage.
+
+Permission is hereby granted to use, copy, modify, and distribute
+this software, or portions hereof, for any purpose, without fee,
+subject to the following restrictions:
+
+ 1. The origin of this software must not be misrepresented; you
+    must not claim that you wrote the original software.  If you
+    use this software in a product, an acknowledgment in the product
+    documentation would be appreciated, but is not required.
+
+ 2. Altered source versions must be plainly marked as such, and must
+    not be misrepresented as being the original software.
+
+ 3. This Copyright notice may not be removed or altered from any
+    source or altered source distribution.
+
+
+PNG Reference Library License version 1 (for libpng 0.5 through 1.6.35)
+-----------------------------------------------------------------------
+
+libpng versions 1.0.7, July 1, 2000, through 1.6.35, July 15, 2018 are
+Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson, are
+derived from libpng-1.0.6, and are distributed according to the same
+disclaimer and license as libpng-1.0.6 with the following individuals
+added to the list of Contributing Authors:
+
+    Simon-Pierre Cadieux
+    Eric S. Raymond
+    Mans Rullgard
+    Cosmin Truta
+    Gilles Vollant
+    James Yu
+    Mandar Sahastrabuddhe
+    Google Inc.
+    Vadim Barkov
+
+and with the following additions to the disclaimer:
+
+    There is no warranty against interference with your enjoyment of
+    the library or against infringement.  There is no warranty that our
+    efforts or the library will fulfill any of your particular purposes
+    or needs.  This library is provided with all faults, and the entire
+    risk of satisfactory quality, performance, accuracy, and effort is
+    with the user.
+
+Some files in the &quot;contrib&quot; directory and some configure-generated
+files that are distributed with libpng have other copyright owners, and
+are released under other open source licenses.
+
+libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
+Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
+libpng-0.96, and are distributed according to the same disclaimer and
+license as libpng-0.96, with the following individuals added to the
+list of Contributing Authors:
+
+    Tom Lane
+    Glenn Randers-Pehrson
+    Willem van Schaik
+
+libpng versions 0.89, June 1996, through 0.96, May 1997, are
+Copyright (c) 1996-1997 Andreas Dilger, are derived from libpng-0.88,
+and are distributed according to the same disclaimer and license as
+libpng-0.88, with the following individuals added to the list of
+Contributing Authors:
+
+    John Bowler
+    Kevin Bracey
+    Sam Bushell
+    Magnus Holmgren
+    Greg Roelofs
+    Tom Tanner
+
+Some files in the &quot;scripts&quot; directory have other copyright owners,
+but are released under this license.
+
+libpng versions 0.5, May 1995, through 0.88, January 1996, are
+Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+
+For the purposes of this copyright and license, &quot;Contributing Authors&quot;
+is defined as the following set of individuals:
+
+    Andreas Dilger
+    Dave Martindale
+    Guy Eric Schalnat
+    Paul Schmidt
+    Tim Wegner
+
+The PNG Reference Library is supplied &quot;AS IS&quot;.  The Contributing
+Authors and Group 42, Inc. disclaim all warranties, expressed or
+implied, including, without limitation, the warranties of
+merchantability and of fitness for any purpose.  The Contributing
+Authors and Group 42, Inc. assume no liability for direct, indirect,
+incidental, special, exemplary, or consequential damages, which may
+result from the use of the PNG Reference Library, even if advised of
+the possibility of such damage.
+
+Permission is hereby granted to use, copy, modify, and distribute this
+source code, or portions hereof, for any purpose, without fee, subject
+to the following restrictions:
+
+ 1. The origin of this source code must not be misrepresented.
+
+ 2. Altered versions must be plainly marked as such and must not
+    be misrepresented as being the original source.
+
+ 3. This Copyright notice may not be removed or altered from any
+    source or altered source distribution.
+
+The Contributing Authors and Group 42, Inc. specifically permit,
+without fee, and encourage the use of this source code as a component
+to supporting the PNG file format in commercial products.  If you use
+this source code in a product, acknowledgment is not required but would
+be appreciated.</pre></details><details class="lz-det"><summary>libjpeg (Independent JPEG Group)</summary><pre class="lz">LEGAL ISSUES, below.
+
+This software is the work of Tom Lane, Guido Vollbeding, Philip Gladstone,
+Bill Allombert, Jim Boucher, Lee Crocker, Bob Friesenhahn, Ben Jackson,
+Julian Minguillon, Luis Ortiz, George Phillips, Davide Rossi, Ge&#x27; Weijers,
+and other members of the Independent JPEG Group.
+
+IJG is not affiliated with the ISO/IEC JTC1/SC29/WG1 standards committee
+(previously known as JPEG, together with ITU-T SG16).</pre></details><details class="lz-det"><summary>libtiff</summary><pre class="lz"># LibTIFF license
+
+Copyright © 1988-1997 Sam Leffler\
+Copyright © 1991-1997 Silicon Graphics, Inc.
+
+Permission to use, copy, modify, distribute, and sell this software and 
+its documentation for any purpose is hereby granted without fee, provided
+that (i) the above copyright notices and this permission notice appear in
+all copies of the software and related documentation, and (ii) the names of
+Sam Leffler and Silicon Graphics may not be used in any advertising or
+publicity relating to the software without the specific, prior written
+permission of Sam Leffler and Silicon Graphics.
+
+THE SOFTWARE IS PROVIDED &quot;AS-IS&quot; AND WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY 
+WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+
+IN NO EVENT SHALL SAM LEFFLER OR SILICON GRAPHICS BE LIABLE FOR
+ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF 
+LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE 
+OF THIS SOFTWARE.
+
+# Lempel-Ziv &amp; Welch Compression (tif_lzw.c) license
+The code of tif_lzw.c is derived from the compress program whose code is
+derived from software contributed to Berkeley by James A. Woods,
+derived from original work by Spencer Thomas and Joseph Orost.
+
+The original Berkeley copyright notice appears below in its entirety:
+
+Copyright (c) 1985, 1986 The Regents of the University of California.
+All rights reserved.
+
+This code is derived from software contributed to Berkeley by
+James A. Woods, derived from original work by Spencer Thomas
+and Joseph Orost.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by the University of California, Berkeley.  The name of the
+University may not be used to endorse or promote products derived
+from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS&#x27;&#x27; AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</pre></details><details class="lz-det"><summary>libwebp</summary><pre class="lz">Copyright (c) 2010, Google Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+
+  * Neither the name of Google nor the names of its contributors may
+    be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></details><details class="lz-det"><summary>giflib</summary><pre class="lz">The GIFLIB distribution is Copyright (c) 1997  Eric S. Raymond
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre></details><details class="lz-det"><summary>zlib</summary><pre class="lz">Copyright notice:
+
+ (C) 1995-2026 Jean-loup Gailly and Mark Adler
+
+  This software is provided &#x27;as-is&#x27;, without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+  Jean-loup Gailly        Mark Adler
+  jloup@gzip.org          madler@alumni.caltech.edu</pre></details><details class="lz-det"><summary>OpenLibm</summary><pre class="lz">## OpenLibm
+
+OpenLibm contains code that is covered by various licenses.
+
+The OpenLibm code derives from the FreeBSD msun and OpenBSD libm
+implementations, which in turn derives from FDLIBM 5.3. As a result, it
+has a number of fixes and updates that have accumulated over the years
+in msun, and also optimized assembly versions of many functions. These
+improvements are provided under the BSD and ISC licenses. The msun
+library also includes work placed under the public domain, which is
+noted in the individual files. Further work on making a standalone
+OpenLibm library from msun, as part of the Julia project is covered
+under the MIT license. The test files, test-double.c and test-float.c
+are under the LGPL.
+
+## Parts copyrighted by the Julia project (MIT License)
+
+&gt;       Copyright (c) 2011-14 The Julia Project.
+&gt;       https://github.com/JuliaMath/openlibm/graphs/contributors
+&gt;
+&gt;       Permission is hereby granted, free of charge, to any person obtaining
+&gt;       a copy of this software and associated documentation files (the
+&gt;       &quot;Software&quot;), to deal in the Software without restriction, including
+&gt;       without limitation the rights to use, copy, modify, merge, publish,
+&gt;       distribute, sublicense, and/or sell copies of the Software, and to
+&gt;       permit persons to whom the Software is furnished to do so, subject to
+&gt;       the following conditions:
+&gt;
+&gt;       The above copyright notice and this permission notice shall be
+&gt;       included in all copies or substantial portions of the Software.
+&gt;
+&gt;       THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+&gt;       EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+&gt;       MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+&gt;       NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+&gt;       LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+&gt;       OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+&gt;       WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Parts copyrighted by Stephen L. Moshier (ISC License)
+
+&gt; Copyright (c) 2008 Stephen L. Moshier &lt;steve@moshier.net&gt;
+&gt;
+&gt; Permission to use, copy, modify, and distribute this software for any
+&gt; purpose with or without fee is hereby granted, provided that the above
+&gt; copyright notice and this permission notice appear in all copies.
+&gt;
+&gt; THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+&gt; WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+&gt; MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+&gt; ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+&gt; WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+&gt; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+&gt; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+## FREEBSD MSUN (FreeBSD/2-clause BSD/Simplified BSD License)
+
+&gt;       Copyright 1992-2011 The FreeBSD Project. All rights reserved.
+&gt;
+&gt;       Redistribution and use in source and binary forms, with or without
+&gt;       modification, are permitted provided that the following conditions are
+&gt;       met:
+&gt;
+&gt;       1. Redistributions of source code must retain the above copyright
+&gt;       notice, this list of conditions and the following disclaimer.
+&gt;
+&gt;       2. Redistributions in binary form must reproduce the above copyright
+&gt;       notice, this list of conditions and the following disclaimer in the
+&gt;       documentation and/or other materials provided with the distribution.
+&gt;       THIS SOFTWARE IS PROVIDED BY THE FREEBSD PROJECT ``AS IS&#x27;&#x27; AND ANY
+&gt;       EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+&gt;       IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+&gt;       PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FREEBSD PROJECT OR
+&gt;       CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+&gt;       EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+&gt;       PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+&gt;       PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+&gt;       LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+&gt;       NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+&gt;       SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+&gt;
+&gt;       The views and conclusions contained in the software and documentation
+&gt;       are those of the authors and should not be interpreted as representing
+&gt;       official policies, either expressed or implied, of the FreeBSD
+&gt;       Project.
+
+## FDLIBM
+
+&gt;      Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+&gt;
+&gt;      Developed at SunPro, a Sun Microsystems, Inc. business.
+&gt;      Permission to use, copy, modify, and distribute this
+&gt;      software is freely granted, provided that this notice
+&gt;      is preserved.
+
+## Tests
+
+&gt;   Copyright (C) 1997, 1999 Free Software Foundation, Inc.
+&gt;   This file is part of the GNU C Library.
+&gt;   Contributed by Andreas Jaeger &lt;aj@suse.de&gt;, 1997.
+&gt;
+&gt;   The GNU C Library is free software; you can redistribute it and/or
+&gt;   modify it under the terms of the GNU Lesser General Public
+&gt;   License as published by the Free Software Foundation; either
+&gt;   version 2.1 of the License, or (at your option) any later version.
+&gt;
+&gt;   The GNU C Library is distributed in the hope that it will be useful,
+&gt;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+&gt;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+&gt;   Lesser General Public License for more details.
+&gt;
+&gt;   You should have received a copy of the GNU Lesser General Public
+&gt;   License along with the GNU C Library; if not, write to the Free
+&gt;   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+&gt;   02111-1307 USA.</pre></details>
+<p>Tabellendatei (XLSX)en erzeugt die WahrZentrale mit einem eigenen, schlanken Programmteil (<code>wz-xlsx.js</code>) – es wird dafür keine fremde Bibliothek geladen.</p></div>
+
+<h2 id="daten">Daten und Dienste</h2>
+<table class="lz">
+  <tr><th>Quelle</th><th>Lizenz / Hinweis</th><th>Genutzt in</th></tr>
+  <tr><td>Open-Meteo.com – Wetter, Luftqualität, Pollen, Höhe, Ortssuche</td><td>Daten unter CC BY 4.0 (<a href="https://open-meteo.com/en/license" rel="noopener noreferrer" target="_blank">open-meteo.com/en/license</a>); Werte wurden umgerechnet, gerundet, ausgewählt und für eigene Schätzungen weiterverarbeitet. Ortssuche: GeoNames (CC BY 4.0). Luftqualität und Pollen enthalten modifizierte Copernicus Atmosphere Monitoring Service-Informationen 2026; weder die Europäische Kommission noch das ECMWF sind für deren Verwendung verantwortlich. Geländehöhen beruhen auf dem Copernicus DEM GLO-90: © DLR e.V. 2010–2014 und © Airbus Defence and Space GmbH 2014–2018, bereitgestellt im Rahmen von COPERNICUS durch die Europäische Union und die ESA.</td><td>Zentrale, HimmelsWahr, KompassWahr, HorizontWahr, NaviWahr, Keysglade</td></tr>
+  <tr><td>OpenStreetMap – Kartenkacheln (FOSSGIS e.V., tile.openstreetmap.de), Ortssuche Photon (komoot), Overpass, OSRM-Routing (FOSSGIS)</td><td>Kartendaten © OpenStreetMap-Mitwirkende, Open Database License (ODbL), <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">openstreetmap.org/copyright</a>. Kachel-, Such- und Routing-Nutzung nach den Richtlinien der Betreiber, ohne zugesicherte Verfügbarkeit.</td><td>Zentrale (Ortsname im Kopfbereich), NaviWahr, Keysglade, BelegParkWahr, KompassWahr, HorizontWahr (Objekte am Horizont über Overpass; auf dem Gerät gemerkt und nur dort angezeigt), StaunWahr (Karte in PlanetenWahr)</td></tr>
+  <tr><td>Open Food Facts, Open Beauty Facts, Open Products Facts</td><td>Datenbank unter ODbL, Inhalte unter Database Contents License; Quelle wird im Ergebnis angezeigt. Nährwerte, Nutri-Score, NOVA und Öko-Score unverändert übernommen.</td><td>ProduktWahr</td></tr>
+  <tr><td>Natural Earth – Ländergrenzen, Regionen, Orte, Gewässer</td><td>Gemeinfrei (Public Domain), „Made with Natural Earth“. De-facto-Grenzen ohne politische Wertung. Vereinfacht und kompakt kodiert (<code>wow-world.json</code>, <code>wow-hi.json</code>, <code>wow-regions.json</code>, <code>wow-places.json</code>, <code>wow-water.json</code>).</td><td>WowarWahr, StaunWahr (Ländergrenzen und Orte für Gegenpunkt und Erdkugel)</td></tr>
+  <tr><td>GeoNames – ca. 150.000 Orte ab ca. 1.000 Einwohnern</td><td>CC BY 4.0, <a href="https://www.geonames.org" rel="noopener noreferrer" target="_blank">geonames.org</a>, bezogen über die Aufbereitung „cities1000“ (github.com/lutangar/cities.json). Auf Name, Koordinaten und Land reduziert, Dubletten entfernt, Koordinaten gerundet (<code>wow-places-plus.json</code>).</td><td>WowarWahr, StaunWahr (Ortswahl, offline)</td></tr>
+</table>
+
+<h2 id="verfahren">Berechnungsverfahren</h2>
+<p>Alle Verfahren sind selbst umgesetzt; es wurde kein fremder Quellcode übernommen.</p>
+<ul>
+  <li>Sonne, Mond, Nutation, Präzession, Sternzeit, Parallaxe, Refraktion, Mondphasen, Finsternisse: Jean Meeus, <em>Astronomical Algorithms</em>, 2. Aufl., Willmann-Bell 1998.</li>
+  <li>Planeten: E. M. Standish, <em>Keplerian Elements for Approximate Positions of the Major Planets</em>, NASA/JPL (gültig 1800–2050); Grundlagen-Bereich von AstroWahr zusätzlich nach Paul Schlyter, <em>How to compute planetary positions</em> (gemeinfrei).</li>
+  <li>Sonnenauf- und -untergang auf der Startseite: Verfahren des NOAA Solar Calculator (U.&nbsp;S. National Oceanic and Atmospheric Administration, gemeinfrei) auf Grundlage von Meeus.</li>
+  <li>Delta T: Polynomnäherungen nach F. Espenak und J. Meeus (NASA). Galaktische Koordinaten: IAU-Standarddefinition (J2000).</li>
+  <li>Sternschnuppenströme: veröffentlichte Almanachdaten der International Meteor Organization (IMO).</li>
+  <li>Bahngeschwindigkeit der Erde (StaunWahr): Vis-viva-Gleichung der Himmelsmechanik mit der Sonnenentfernung nach Meeus; Gegenpunkt, Tunnel durch die Erde und Schichtlängen: Kugelgeometrie, eigene Umsetzung. Planeten- und Mondentfernungen für Lichtlaufzeiten aus denselben Verfahren wie oben.</li>
+  <li>Sternentfernungen (StaunWahr, Sternenhimmel): gerundete, allgemein veröffentlichte Messwerte aus Parallaxenmessungen; als Tatsachen übernommen, ohne Kopie eines geschützten Katalogs.</li>
+  <li>Sternpositionen und Helligkeiten (ca. 300 helle Sterne), Sternbildlinien und Sternschnuppen-Tabellen sind eigene Zusammenstellungen allgemein bekannter astronomischer Tatsachen; es wurde kein geschützter Katalog kopiert.</li>
+</ul>
+
+<h2 id="inhalte">Weitere Inhalte</h2>
+<ul>
+  <li><strong>ProduktWahr:</strong> Zusatzstoffe nach VO (EG) Nr. 1333/2008, Allergene nach Anhang II VO (EU) Nr. 1169/2011, Kosmetik/INCI nach VO (EG) Nr. 1223/2009 und REACH (VO (EG) Nr. 1907/2006, Anhang XVII, Eintrag 78). Kurzbewertungen sind eigene, neutrale Zusammenfassungen auf Basis öffentlicher Quellen (u. a. EFSA, ECHA, SCCS), Stand 08/2026.</li>
+  <li><strong>Tarot (AstroWahr):</strong> Kartentexte und -bilder sind eigene Erstellungen ohne Bezug zu bestehenden Decks.</li>
+  <li><strong>Keysglade:</strong> Beschreibungen der Reiseziele, Tipps und Illustrationen sind eigene Texte und Grafiken.</li>
+  <li><strong>LautstärkeWahr:</strong> Richtwerte typischer Lautstärken sind allgemein bekannte, gerundete Orientierungswerte.</li>
+  <li><strong>MessWahr:</strong> Rechenwege (Winkelfunktionen, Umschlagmessung) sind allgemeines Fachwissen, eigene Umsetzung. Vergleichswerte zu Gefällen sind allgemein übliche, gerundete Richtwerte ohne Bezug auf Normtexte. Gewitter-Peiler: Schallgeschwindigkeit nach der allgemein bekannten Näherung c = 331,3 m/s · √(1 + T/273,15 K); Donnererkennung (Pegelanstieg im Tieftonbereich mit der im Browser eingebauten Web Audio API), Zug- und Frontberechnung (lineare Regression, Hauptachsen der Blitzverteilung) sowie Lagebericht-Texte sind eigene Umsetzungen; die 30/30-Faustregel ist eine allgemein verbreitete Sicherheitsregel, das Frontsymbol eine allgemein übliche Wetterkarten-Darstellung, eigene Zeichnung.</li>
+  <li><strong>LosDenkWahr, ZahlenturmWahr, Korvanthiel, HerzKaroDrei, PartikelWahr, StrömungsWahr und BeatWahr:</strong> enthalten keine fremden Bestandteile; Programmcode, Grafiken, Texte und Töne sind vollständig eigene Erstellungen (siehe „Eigener Code und eigene Gestaltung“).</li>
+  <li><strong>KlangWahr:</strong> Tonhöhenerkennung nach dem veröffentlichten YIN-Verfahren (de Cheveigné &amp; Kawahara, 2002), eigene Umsetzung; Spektrum mit der im Browser eingebauten Web Audio API. Notennamen in deutscher Schreibweise.</li>
+  <li><strong>HimmelsWahr „Heute lohnt sich …“ und Antworten im Suchfeld:</strong> Regenbogen-Bedingung (Sonnenhöhe unter 42°, Bogen gegenüber der Sonne) sowie Taupunkt- und Frostregeln sind allgemein bekannte physikalische Zusammenhänge und eigene, vereinfachte Näherungen; keine amtliche Vorhersage. Die Erkennung von Fragen arbeitet mit eigenen Stichwortlisten, ohne KI-Dienst.</li>
+  <li><strong>AufwindWahr:</strong> Das Grundprinzip eines Würfel-Laufspiels mit Feldern, die vor- oder zurückführen, ist jahrhundertealt und frei. Regeln (Schubkarten, Mond, Wurmloch, Raumstation, faire Zufallsbretter mit Nummer), Spielfiguren, Brett, Symbole, Texte und Töne sind eigene Erstellungen ohne Bezug zu bestehenden Spielausgaben oder deren Namen und Gestaltung.</li>
+  <li><strong>LabWahr:</strong> Versuchsbeschreibungen, Skizzen, Wissensfragen und Symbole sind eigene Erstellungen. Die verwendeten Formeln (Fadenpendel, Kreisbewegung, Abstandsgesetz, Sabine-Formel, Helmholtz-Resonator, Doppler-Effekt, Eratosthenes-Verfahren) sind allgemeines physikalisches Fachwissen; Sonnenstand und Zeitgleichung nach dem veröffentlichten NOAA-Verfahren, Tonhöhe nach dem YIN-Verfahren (de Cheveigné &amp; Kawahara, 2002), jeweils eigene Umsetzung. Literatur- und Vergleichswerte sind allgemein bekannte, gerundete Richtwerte. PDF-Protokolle mit der beiliegenden Bibliothek jsPDF (MIT-Lizenz).</li>
+  <li><strong>StaunWahr:</strong> Texte, Erklärungen, Zeichnungen (Erdschnitt, Erdkugel, Lichtblase, Sonnensystem, Tacho, Zeitraffer-Szenen, Röntgenblick) und Symbole sind eigene Erstellungen. Werte zum Erdinneren (Schichtgrenzen, Temperaturen, Druck) folgen allgemein anerkannten Erdmodellen und sind gerundet; Planetendaten, Rekordgeschwindigkeiten und historische Bezüge sind allgemein bekannte, gerundete Tatsachen.</li>
+  <li><strong>HorizontWahr:</strong> Angenommene Höhen bei fehlenden OSM-Angaben, Lichtbrechungsfaktor 0,13 und Sichtweitenformel sind allgemein übliche Näherungen, eigene Umsetzung.</li>
+</ul>
+
+<h2 id="grenzen">Genauigkeit und Grenzen</h2>
+<ul>
+  <li>Wetter-, Luft- und Himmelswerte sind Vorhersagen bzw. Näherungen. Für Sicherheitsentscheidungen gelten ausschließlich die amtlichen Unwetterwarnungen.</li>
+  <li>Blicke niemals ohne geeigneten, zertifizierten Sonnenfilter (z. B. nach ISO 12312-2) in die Sonne – auch nicht bei einer Finsternis und nicht durch Kamera, Fernglas oder Fernrohr.</li>
+  <li>Kompasse in Mobilgeräten weichen oft um einige Grad ab und werden durch Metall und Elektronik gestört.</li>
+  <li>dB-Werte in LautstärkeWahr sind unkalibrierte Schätzungen, kein Messgerät im technischen Sinne.</li>
+  <li>Höhen, Neigungen und Winkel in MessWahr sind Orientierungswerte aus dem Lagesensor, keine Vermessung und kein geeichtes Messgerät.</li>
+  <li>Der Gewitter-Peiler in MessWahr liefert Schätzungen und ist keine Unwetterwarnung; Donnererkennung, Kompass und Reaktionszeit beeinflussen das Ergebnis. Peile nur von einem geschützten Ort aus.</li>
+  <li>Pegel in KlangWahr sind relativ (dBFS) und unkalibriert; der Frequenzlauf des Tongenerators ist kein Hörtest.</li>
+  <li>Messwerte in LabWahr stammen aus unkalibrierten Smartphone-Sensoren; sie dienen dem Lernen und ersetzen keine geeichten Messgeräte. Der Gleichgewichtsversuch ist keine medizinische Untersuchung.</li>
+  <li>Werte in StaunWahr sind gerundete Näherungen: Sternentfernungen haben Messunsicherheiten (bei sehr fernen Sternen wie Deneb oder Beteigeuze erheblich), Temperaturen und Drücke im Erdinneren sind Modellwerte, Geschwindigkeiten ab „Zu den Nachbarsternen“ gerundete Messwerte. Der Planetenweg in PlanetenWahr ist nicht zur Navigation geeignet.</li>
+  <li>HorizontWahr ist nicht zur Navigation geeignet; Lage, Namen und Höhen stammen aus OpenStreetMap und können unvollständig sein.</li>
+  <li>ProduktWahr ist kein Medizinprodukt und keine ernährungswissenschaftliche oder kosmetische Fachberatung.</li>
+  <li>Astrologische und Tarot-Inhalte dienen der Unterhaltung und Selbstreflexion.</li>
+  <li>Kilometerpauschalen und Beträge in BelegParkWahr und AlltagWahr sind Hilfen ohne steuerliche Beratung.</li>
+</ul>
+</main>
+</body>
+</html>

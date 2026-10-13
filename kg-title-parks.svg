@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Freizeitparks">
+  <style>
+    @keyframes tp-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .tp-wheel-spin { animation: tp-spin 14s linear infinite; transform-origin: 0 0; }
+    @keyframes tp-flag { 0%,100% { transform: skewX(0deg); } 50% { transform: skewX(6deg); } }
+    .tp-flag1 { animation: tp-flag 2.6s ease-in-out infinite; transform-origin: 0% 50%; }
+    .tp-flag2 { animation: tp-flag 2.6s ease-in-out infinite; animation-delay: -1.3s; transform-origin: 0% 50%; }
+    @media (prefers-reduced-motion: reduce) {
+      .tp-wheel-spin, .tp-flag1, .tp-flag2 { animation: none; }
+    }
+  </style>
+  <rect width="800" height="160" fill="#fbe8c8"/>
+  <!-- Riesenrad -->
+  <g transform="translate(160,95)">
+    <g class="tp-wheel-spin">
+      <circle cx="0" cy="0" r="55" fill="none" stroke="#1E2A78" stroke-width="4"/>
+      <line x1="0" y1="0" x2="0" y2="-55" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="0" y2="55" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="55" y2="0" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="-55" y2="0" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="39" y2="-39" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="-39" y2="39" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="39" y2="39" stroke="#1E2A78" stroke-width="2"/>
+      <line x1="0" y1="0" x2="-39" y2="-39" stroke="#1E2A78" stroke-width="2"/>
+      <circle cx="0" cy="-55" r="5" fill="#FF8C00"/>
+      <circle cx="55" cy="0" r="5" fill="#3355C8"/>
+      <circle cx="0" cy="55" r="5" fill="#FF8C00"/>
+      <circle cx="-55" cy="0" r="5" fill="#3355C8"/>
+    </g>
+    <circle cx="0" cy="0" r="6" fill="#0B1440"/>
+    <rect x="-3" y="55" width="6" height="30" fill="#0B1440"/>
+  </g>
+  <!-- Achterbahn -->
+  <g transform="translate(480,140)" fill="none" stroke="#FF8C00" stroke-width="5" stroke-linecap="round">
+    <path id="tp-coaster-path" d="M0,0 C40,-70 80,-70 120,-10 C150,35 190,10 210,-40 C225,-75 260,-75 280,-20"/>
+    <circle r="6" fill="#0B1440" stroke="none">
+      <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
+        <mpath href="#tp-coaster-path"/>
+      </animateMotion>
+    </circle>
+  </g>
+  <rect x="0" y="152" width="800" height="8" fill="#3355C8" opacity="0.5"/>
+  <!-- Flaggen -->
+  <g>
+    <line x1="700" y1="150" x2="700" y2="60" stroke="#0B1440" stroke-width="3"/>
+    <polygon class="tp-flag1" points="700,60 730,68 700,76" fill="#FF8C00"/>
+    <line x1="740" y1="150" x2="740" y2="80" stroke="#0B1440" stroke-width="3"/>
+    <polygon class="tp-flag2" points="740,80 765,86 740,92" fill="#1E2A78"/>
+  </g>
+</svg>

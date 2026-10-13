@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Wetter">
+  <defs>
+    <linearGradient id="twSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5b9fd6"/>
+      <stop offset="100%" stop-color="#bcdcef"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes tw-drift1 { from { transform: translateX(0); } to { transform: translateX(50px); } }
+    @keyframes tw-drift2 { from { transform: translateX(0); } to { transform: translateX(-35px); } }
+    @keyframes tw-sun-glow { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.05); } }
+    @keyframes tw-rain { 0% { transform: translateY(0); opacity: 0.9; } 100% { transform: translateY(22px); opacity: 0; } }
+    .tw-cloud1 { animation: tw-drift1 11s ease-in-out infinite alternate; }
+    .tw-cloud2 { animation: tw-drift2 9s ease-in-out infinite alternate; }
+    .tw-sun { animation: tw-sun-glow 4s ease-in-out infinite; transform-origin: center; }
+    .tw-drop { animation: tw-rain 1.1s linear infinite; }
+    @media (prefers-reduced-motion: reduce) {
+      .tw-cloud1, .tw-cloud2, .tw-sun, .tw-drop { animation: none; }
+    }
+  </style>
+  <rect width="800" height="160" fill="url(#twSky)"/>
+  <circle class="tw-sun" cx="130" cy="55" r="34" fill="#f4c04d"/>
+  <g class="tw-cloud1" fill="#ffffff" opacity="0.95">
+    <ellipse cx="480" cy="70" rx="55" ry="28"/>
+    <ellipse cx="530" cy="60" rx="45" ry="24"/>
+    <ellipse cx="430" cy="65" rx="40" ry="22"/>
+  </g>
+  <g class="tw-cloud2" fill="#ffffff" opacity="0.8">
+    <ellipse cx="650" cy="95" rx="45" ry="22"/>
+    <ellipse cx="690" cy="88" rx="35" ry="18"/>
+  </g>
+  <g stroke="#E4E8FB" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <line class="tw-drop" x1="640" y1="118" x2="632" y2="130"/>
+    <line class="tw-drop" x1="660" y1="118" x2="652" y2="130" style="animation-delay:-0.4s"/>
+    <line class="tw-drop" x1="680" y1="118" x2="672" y2="130" style="animation-delay:-0.8s"/>
+  </g>
+</svg>

@@ -1,0 +1,275 @@
+/* ============================================================
+   wz-common.css — Gemeinsame Gestaltungsschicht für die gesamte
+   WahrZentrale. Wird in JEDER Seite als letztes Stylesheet geladen
+   und sorgt dafür, dass wiederkehrende Bausteine überall exakt
+   gleich aussehen:
+
+   1. Farb-Tokens (Nachthimmel-Palette, hell/dunkel)
+   2. Kopfbereich (.wz-hero) – im Dunkelmodus echtes Nachthimmel-Blau
+   3. Runde Kopf-Buttons (.wz-hbtn): Start, Hell/Dunkel, Einstellungen …
+   4. Einführung (.wz-onb-*), siehe wz-onboarding.js
+   5. Textseiten (body.wz-doc): Impressum, Datenschutz
+   6. Fußzeilen-Links (.wz-footer)
+   7. Bedienbarkeit: Fokus-Rahmen, 16-px-Eingabefelder, weniger Bewegung
+   ============================================================ */
+
+/* ---------- 1. Tokens ---------- */
+:root {
+  --wz-bg: var(--wzp-f1eefa, #F1EEFA);
+  --wz-card: var(--wzp-f8f6fc, #F8F6FC);
+  --wz-text: var(--wzp-241e3f, #241E3F);
+  --wz-sub: var(--wzp-524370, #524370);
+  --wz-line: var(--wzp-dac7f2, #DAC7F2);
+  --wz-accent: var(--wzp-5a2fbe, #5A2FBE);
+  --wz-accent-text: #FFFFFF;
+  --wz-soft: var(--wzp-e6ddf7, #E6DDF7);
+  --wz-hdr-a: var(--wzp-5a2fbe, #5A2FBE);
+  --wz-hdr-b: var(--wzp-241748, #241748);
+  --wz-hbtn-bg: rgba(255, 255, 255, .78);
+  --wz-hbtn-fg: var(--wzp-2b2150, #2B2150);
+  --wz-hbtn-line: rgba(255, 255, 255, .55);
+  --wz-font: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --wz-font-round: ui-rounded, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+html.theme-dark {
+  --wz-bg: var(--wzp-1e1b2e, #1E1B2E);
+  --wz-card: var(--wzp-2a2440, #2A2440);
+  --wz-text: var(--wzp-eeeaf8, #EEEAF8);
+  --wz-sub: var(--wzp-c3b2f0, #C3B2F0);
+  --wz-line: var(--wzp-4a3d6b, #4A3D6B);
+  --wz-accent: var(--wzp-b9a6f5, #B9A6F5);
+  --wz-accent-text: var(--wzp-1e1b2e, #1E1B2E);
+  --wz-soft: var(--wzp-362c52, #362C52);
+  --wz-hdr-a: var(--wzp-3b2585, #3B2585);
+  --wz-hdr-b: var(--wzp-15102a, #15102A);
+  --wz-hbtn-bg: rgba(255, 255, 255, .12);
+  --wz-hbtn-fg: var(--wzp-f1ecff, #F1ECFF);
+  --wz-hbtn-line: rgba(255, 255, 255, .16);
+}
+
+/* ---------- 2. Kopfbereich ---------- */
+.wz-hero {
+  background: linear-gradient(150deg, var(--wz-hdr-a) 0%, var(--wz-hdr-b) 100%) !important;
+}
+/* Dunkelmodus: echtes Nachthimmel-Blau mit feinem Sternenglanz */
+html.theme-dark .wz-hero {
+  background:
+    radial-gradient(1.3px 1.3px at 16% 24%, rgba(255,255,255,.55) 50%, transparent 52%),
+    radial-gradient(1px 1px at 71% 16%, rgba(255,255,255,.5) 50%, transparent 52%),
+    radial-gradient(1.4px 1.4px at 88% 62%, rgba(255,255,255,.35) 50%, transparent 52%),
+    radial-gradient(1px 1px at 32% 78%, rgba(255,255,255,.35) 50%, transparent 52%),
+    radial-gradient(1px 1px at 56% 44%, rgba(255,255,255,.22) 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 8% 60%, rgba(255,255,255,.3) 50%, transparent 52%),
+    linear-gradient(150deg, var(--wz-hdr-a) 0%, var(--wz-hdr-b) 100%) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .35) !important;
+}
+
+/* Logo-Variante passend zum Modus (helles bzw. dunkles App-Symbol) */
+.wz-logo-dark { display: none !important; }
+html.theme-dark .wz-logo-light { display: none !important; }
+html.theme-dark .wz-logo-dark { display: block !important; }
+
+/* ---------- 3. Runde Kopf-Buttons ---------- */
+.wz-hbtn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--wz-hbtn-line) !important;
+  background: var(--wz-hbtn-bg) !important;
+  color: var(--wz-hbtn-fg) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: 0 4px 14px rgba(var(--wzq-140c32, 20, 12, 50), .22) !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  font-size: 17px !important;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: transform .12s ease, background-color .2s ease;
+}
+.wz-hbtn svg { width: 19px; height: 19px; }
+.wz-hbtn:active { transform: scale(.9); }
+.wz-hbtn[hidden], .wz-hbtn.kw-hidden, .wz-hbtn.hidden { display: none !important; }
+
+/* ---------- 4. Einführung ---------- */
+.wz-onb {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(var(--wzq-100a24, 16, 10, 36), .0);
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  transition: background-color .22s ease, backdrop-filter .22s ease;
+  font-family: var(--wz-font);
+}
+.wz-onb[hidden] { display: none !important; }
+.wz-onb.open {
+  background: rgba(var(--wzq-100a24, 16, 10, 36), .48);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.wz-onb-sheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--wz-card);
+  color: var(--wz-text);
+  border-radius: 28px 28px 0 0;
+  padding: 30px 24px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  box-shadow: 0 -12px 40px rgba(var(--wzq-0a061e, 10, 6, 30), .3);
+  transform: translateY(40px);
+  opacity: 0;
+  transition: transform .26s cubic-bezier(.2, .8, .2, 1), opacity .2s ease;
+}
+.wz-onb.open .wz-onb-sheet { transform: none; opacity: 1; }
+.wz-onb-sheet:focus { outline: none; }
+@media (min-width: 640px) {
+  .wz-onb { align-items: center; }
+  .wz-onb-sheet { border-radius: 28px; padding-bottom: 24px; }
+}
+.wz-onb-slide { text-align: center; min-height: 228px; display: flex; flex-direction: column; align-items: center; }
+.wz-onb-anim { animation: wzOnbIn .3s ease; }
+@keyframes wzOnbIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.wz-onb-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(150deg, var(--wz-hdr-a), var(--wz-hdr-b));
+  color: #fff;
+  font-size: 30px;
+  margin: 0 auto 18px;
+  box-shadow: 0 10px 24px rgba(var(--wzq-3a1e8c, 58, 30, 140), .35);
+}
+.wz-onb-icon svg { width: 32px; height: 32px; --wzi-bg: var(--wz-hdr-a); }
+.wz-onb-title {
+  font-family: var(--wz-font-round);
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--wz-text);
+}
+.wz-onb-text { font-size: 15.5px; line-height: 1.55; color: var(--wz-sub); max-width: 340px; }
+.wz-onb-text p { margin: 0; }
+.wz-onb-text .wz-onb-row { display: flex; align-items: flex-start; gap: 10px; text-align: left; margin: 8px 0; }
+.wz-onb-text .wz-onb-row svg { flex-shrink: 0; margin-top: 2px; }
+.wz-onb-text b { color: var(--wz-text); font-weight: 650; }
+.wz-onb-dots { display: flex; justify-content: center; gap: 7px; margin: 18px 0 20px; }
+.wz-onb-dots span { width: 7px; height: 7px; border-radius: 4px; background: var(--wz-line); transition: width .2s ease, background-color .2s ease; }
+.wz-onb-dots span.on { width: 20px; background: var(--wz-accent); }
+.wz-onb-actions { display: flex; gap: 10px; }
+.wz-onb-actions button {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  border-radius: 16px;
+  padding: 15px 18px;
+  cursor: pointer;
+  border: none;
+  transition: transform .12s ease;
+}
+.wz-onb-actions button:active { transform: scale(.97); }
+.wz-onb-skip { background: transparent; color: var(--wz-sub); flex: 0 0 auto; }
+.wz-onb-next { background: var(--wzp-dac7f2, #DAC7F2); color: var(--wzp-241e3f, #241E3F); font-weight: 700 !important; flex: 1; }
+html.theme-dark .wz-onb-next { background: var(--wzp-3a2e52, #3A2E52); color: var(--wzp-eeeaf8, #EEEAF8); }
+
+/* ---------- 5. Textseiten (Impressum, Datenschutz) ---------- */
+body.wz-doc {
+  margin: 0;
+  background: var(--wz-bg);
+  color: var(--wz-text);
+  font-family: var(--wz-font);
+  font-size: 15.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+html:has(body.wz-doc) { background: var(--wz-bg); }
+.wz-doc-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px calc(env(safe-area-inset-bottom, 0px) + 48px);
+}
+.wz-doc-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.wz-doc-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--wz-card);
+  border: 1px solid var(--wz-line);
+  color: var(--wz-text);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.wz-doc-nav a:active { transform: scale(.97); }
+.wz-doc-nav svg { width: 18px; height: 18px; }
+.wz-doc-wrap h1 {
+  font-family: var(--wz-font-round);
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  margin: 0 0 18px;
+}
+.wz-doc-wrap h2 { font-size: 17px; line-height: 1.35; margin: 28px 0 8px; }
+.wz-doc-wrap h3 { font-size: 15.5px; margin: 20px 0 6px; }
+.wz-doc-wrap p, .wz-doc-wrap li { color: var(--wz-text); }
+.wz-doc-wrap p { margin: 0 0 14px; }
+.wz-doc-wrap p strong:first-child { display: inline-block; margin-top: 10px; font-size: 16px; }
+.wz-doc-wrap ul, .wz-doc-wrap ol { padding-left: 22px; }
+.wz-doc-wrap li { margin-bottom: 6px; }
+.wz-doc-wrap a { color: var(--wz-accent); text-underline-offset: 2px; word-break: break-word; }
+.wz-doc-wrap code { font-size: .92em; background: var(--wz-soft); padding: 1px 6px; border-radius: 6px; }
+.wz-doc-wrap .wzi { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -.2em; fill: currentColor; }
+.wz-doc-wrap .legal, .wz-doc-wrap .legal * { max-width: 100%; }
+
+/* ---------- 6. Fußzeilen-Links ---------- */
+.wz-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 6px;
+  padding: 22px 0 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.wz-footer a, .wz-footer button {
+  color: var(--wz-sub) !important;
+  text-decoration: none !important;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+.wz-footer a:active, .wz-footer button:active { background: var(--wz-soft); }
+.wz-footer .sep { color: var(--wz-line); padding: 6px 0; }
+
+/* ---------- 7. Bedienbarkeit ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body, a, button, [role="button"], input, select, textarea, label { touch-action: manipulation; }
+:focus-visible { outline: 2.5px solid var(--wzp-8b6cf0, #8B6CF0); outline-offset: 2px; border-radius: 6px; }
+/* das System zoomt beim Antippen in Eingabefelder unter 16 px hinein – das verhindern wir so */
+@supports (-webkit-touch-callout: none) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 16px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wz-onb, .wz-onb-sheet, .wz-onb-anim, .wz-hbtn { transition: none !important; animation: none !important; }
+}
+.wz-sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

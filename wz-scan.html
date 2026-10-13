@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="wz" data-wz-fixed="dark">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Scanner – WahrZentrale</title>
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#15102A">
+<link rel="icon" href="./icon-192.png">
+<style>
+  @view-transition{navigation:auto}
+  [hidden]{display:none!important}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--v:var(--wzp-5a2fbe,#5A2FBE);--v2:var(--wzp-7c5cff,#7C5CFF);--lav:var(--wzp-b9a6f5,#B9A6F5);--ink:var(--wzp-eeeaf8,#EEEAF8);--sub:var(--wzp-c3b2f0,#C3B2F0);--night:var(--wzp-15102a,#15102A);--card:var(--wzp-2a2440,#2A2440);--line:var(--wzp-4a3d6b,#4A3D6B)}
+  html,body{margin:0;height:100%;background:#0b0820;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+  .stage{position:fixed;inset:0;display:flex;flex-direction:column;background:#0b0820}
+  .cam{position:relative;flex:1;min-height:0;overflow:hidden;background:radial-gradient(120% 80% at 50% 20%,#2a1f55 0%,#15102A 55%,#0b0820 100%)}
+  .cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .frame{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:min(78vw,330px);height:min(56vw,236px);border-radius:26px;box-shadow:0 0 0 2000px rgba(11,8,32,.42);pointer-events:none}
+  .frame i{position:absolute;width:34px;height:34px;border:3px solid #fff;opacity:.95}
+  .frame i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0;border-radius:26px 0 0 0}
+  .frame i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0;border-radius:0 26px 0 0}
+  .frame i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0;border-radius:0 0 0 26px}
+  .frame i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0;border-radius:0 0 26px 0}
+  .frame b{position:absolute;left:10%;right:10%;top:50%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--lav),transparent);animation:sweep 2.4s ease-in-out infinite}
+  @keyframes sweep{0%,100%{transform:translateY(-70px);opacity:.25}50%{transform:translateY(70px);opacity:.9}}
+  @media (prefers-reduced-motion:reduce){.frame b{animation:none}}
+  .top{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 26px;background:linear-gradient(180deg,rgba(11,8,32,.78),rgba(11,8,32,0))}
+  .top h1{flex:1;margin:0;font:700 19px/1.2 -apple-system,sans-serif;letter-spacing:-.01em}
+  .top h1 small{display:block;font:500 12.5px/1.3 -apple-system,sans-serif;color:var(--sub);letter-spacing:0;margin-top:2px}
+  .rb{width:42px;height:42px;flex:0 0 auto;border-radius:21px;border:1px solid rgba(255,255,255,.26);background:rgba(21,16,42,.55);color:#fff;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;padding:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .rb svg{width:20px;height:20px}
+  .rb.on{background:#fff;color:var(--night)}
+  .hint{position:absolute;left:0;right:0;bottom:14px;text-align:center;padding:0 26px;font-size:14.5px;line-height:1.4;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+  .dock{flex:0 0 auto;padding:14px 20px calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(180deg,#15102A,#0b0820)}
+  .kinds{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+  .kinds span{font-size:12px;font-weight:600;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+  .legal{margin:12px 0 0;text-align:center;font-size:12.5px;display:flex;justify-content:center;gap:8px;color:var(--sub)}
+  .legal a{color:var(--sub);text-decoration:underline;padding:4px 2px}
+  .side{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;color:var(--ink);font:600 12px -apple-system,sans-serif;cursor:pointer;padding:6px 10px}
+  .side span{width:46px;height:46px;border-radius:16px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--lav)}
+  .side svg{width:22px;height:22px}
+  .shot{width:76px;height:76px;border-radius:38px;border:4px solid #fff;background:transparent;padding:5px;cursor:pointer}
+  .shot::before{content:"";display:block;width:100%;height:100%;border-radius:50%;background:linear-gradient(150deg,var(--v2),var(--v))}
+  .shot:active::before{transform:scale(.92)}
+  .shot[disabled]{opacity:.45}
+  .busy{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(11,8,32,.78);font-size:15px;font-weight:600;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .spin{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.22);border-top-color:#fff;animation:sp 0.9s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(11,8,32,.5)}
+  .sheet{width:100%;max-width:520px;max-height:86%;overflow-y:auto;background:var(--card);border-radius:26px 26px 0 0;padding:18px 20px calc(env(safe-area-inset-bottom,0px) + 20px);box-shadow:0 -14px 44px rgba(0,0,0,.5);animation:up .22s ease;-webkit-user-select:text;user-select:text}
+  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  .sheet .k{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--lav);margin:0 0 6px}
+  .sheet .k svg{width:17px;height:17px}
+  .sheet h2{margin:0 0 10px;font:700 21px/1.25 -apple-system,sans-serif;letter-spacing:-.01em}
+  .sheet .val{margin:0 0 6px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;max-height:150px;overflow-y:auto}
+  .sheet .note{margin:8px 2px 14px;font-size:13px;line-height:1.45;color:var(--sub)}
+  .btn{display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:16px;padding:13px 14px;margin:0 0 9px;font:700 15.5px -apple-system,sans-serif;text-align:left;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.07);border:1px solid var(--line)}
+  .btn small{display:block;font:500 12.5px/1.35 -apple-system,sans-serif;color:var(--sub);margin-top:2px}
+  .btn .ic{width:40px;height:40px;flex:0 0 auto;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)}
+  .btn .ic img{width:40px;height:40px;border-radius:13px;display:block}
+  .btn .ic svg{width:21px;height:21px}
+  .btn.pri{background:linear-gradient(150deg,var(--v2),var(--v));border-color:transparent;color:#fff;box-shadow:0 10px 24px rgba(90,47,190,.45)}
+  .btn.pri small{color:rgba(255,255,255,.85)}
+  .btn.flat{justify-content:center;text-align:center;background:none;border-color:transparent;color:var(--lav);margin-top:2px}
+  .sheet h3{margin:16px 2px 8px;font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.05em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="cam" id="cam">
+    <video id="video" muted playsinline autoplay></video>
+    <img class="still" id="still" alt="" hidden>
+    <div class="frame" id="frame" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+    <div class="top">
+      <a class="rb" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5L12 5l8 6.5M6.5 10v9h11v-9"/></svg></a>
+      <h1>Scanner<small>Ein Blick – die passende App öffnet sich</small></h1>
+      <button type="button" class="rb" id="torch" aria-label="Licht ein- oder ausschalten" title="Licht" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h3l-6 12 1-8H8z"/></svg></button>
+    </div>
+    <p class="hint" id="hint" role="status">Kamera wird gestartet …</p>
+    <div class="busy" id="busy" hidden><div class="spin" aria-hidden="true"></div><span id="busyText">Text wird erkannt …</span></div>
+  </div>
+  <div class="dock">
+    <div class="kinds" aria-hidden="true"><span>Barcode</span><span>QR-Code</span><span>Kassenbon</span><span>Parkschein</span><span>Etikett</span><span>Zutaten</span></div>
+    <div class="ctl">
+      <button type="button" class="side" id="pick"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4.5 17l4.5-4 3.5 3 3-2.5 4 3.5"/></svg></span>Foto wählen</button>
+      <button type="button" class="shot" id="shot" aria-label="Foto aufnehmen und Text erkennen" disabled></button>
+      <span></span>
+    </div>
+    <input type="file" id="file" accept="image/*" hidden>
+    <p class="legal"><a href="./impressum.html">Impressum</a><span aria-hidden="true">·</span><a href="./datenschutz.html">Datenschutz</a></p>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var KEY = "wz_scan_handoff";
+  try { sessionStorage.removeItem(KEY); } catch(e){}
+  var $ = function(id){ return document.getElementById(id); };
+  var video = $("video"), still = $("still"), hintEl = $("hint"), busy = $("busy"), shot = $("shot");
+  var reader = null, paused = false, camOk = false, sheetEl = null;
+  var HINT = "Codes werden von selbst erkannt. Für Bons, Etiketten und Zutaten den Auslöser tippen.";
+
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function hint(t){ hintEl.textContent = t; }
+  function loadScript(src){ return new Promise(function(res, rej){ var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+  function loadZXing(){ return window.ZXing ? Promise.resolve() : loadScript("./lib-zxing-0.21.3.min.js"); }
+  function loadOcr(){ return window.Tesseract ? Promise.resolve() : loadScript("./wz-ocr.js"); }
+
+  /* ---------- Kamera und Live-Erkennung von Codes ---------- */
+  // Nur Formate mit Prüfziffer bzw. Fehlerkorrektur – sonst „erkennt“ der Scanner Codes in gedrucktem Text
+  function start(){
+    loadZXing().then(function(){
+      var F = ZXing.BarcodeFormat, hints = new Map();
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [F.QR_CODE, F.EAN_13, F.EAN_8, F.UPC_A]);
+      reader = new ZXing.BrowserMultiFormatReader(hints);
+      return reader.decodeFromConstraints({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } }, video, function(result){
+        if (result && !paused) confirmLive(result.getText(), result.getBarcodeFormat());
+      });
+    }).then(function(){
+      camOk = true; shot.disabled = false; hint(HINT); setupTorch();
+    }).catch(function(){
+      camOk = false; shot.disabled = true;
+      hint("Kein Kamerazugriff. Erlaube die Kamera in den Einstellungen deines Geräts – oder wähle unten ein Foto.");
+    });
+  }
+  // Strichcodes müssen mehrfach hintereinander gleich gelesen werden (kurze EAN-8 dreimal),
+  // damit Muster in Text oder Stoff nicht als Code durchgehen. QR-Codes sind fehlerkorrigiert und gelten sofort.
+  var seenText = "", seenN = 0, seenAt = 0;
+  function confirmLive(text, format){
+    if (format === ZXing.BarcodeFormat.QR_CODE) { onCode(text, format); return; }
+    var now = Date.now();
+    if (text === seenText && now - seenAt < 2500) seenN++; else { seenText = text; seenN = 1; }
+    seenAt = now;
+    if (seenN >= (text.length <= 8 ? 3 : 2)) { seenN = 0; seenText = ""; onCode(text, format); }
+  }
+  function stop(){ if (reader) { try { reader.reset(); } catch(e){} reader = null; } }
+  function track(){ var s = video.srcObject; return s && s.getVideoTracks ? s.getVideoTracks()[0] : null; }
+  function setupTorch(){
+    var t = track(), caps = t && t.getCapabilities ? t.getCapabilities() : {};
+    if (!caps.torch) return;
+    var b = $("torch"); b.hidden = false;
+    b.addEventListener("click", function(){
+      var on = !b.classList.contains("on");
+      t.applyConstraints({ advanced: [{ torch: on }] }).then(function(){ b.classList.toggle("on", on); }).catch(function(){});
+    });
+  }
+
+  /* ---------- Einordnen ---------- */
+  function codeKind(text, format){
+    var F = window.ZXing ? ZXing.BarcodeFormat : {};
+    if (format === F.QR_CODE || format === F.DATA_MATRIX) return "qr";
+    if (/^\d{8}$|^\d{12,13}$/.test(text)) return "barcode";
+    return "code";
+  }
+  // Text aus der Texterkennung: wozu passt er am ehesten?
+  function textKind(text){
+    var t = text.toLowerCase().replace(/\d{1,2}[.\/]\d{1,2}[.\/]\d{2,4}/g, " ").replace(/\d{1,2}:\d{2}/g, " "); // Datum und Uhrzeit sind keine Beträge
+    var n = function(re){ var m = t.match(re); return m ? m.length : 0; };
+    var money = n(/\d{1,4}[.,]\d{2}(?!\d)/g);
+    var park = n(/park(schein|zeit|dauer|geb|haus|platz|ticket)|parken|h[oö]chstparkdauer|ende der parkzeit/g);
+    var bon = n(/summe|gesamt|mwst|ust\b|steuer|kasse|bon\b|beleg|quittung|rechnung|bar\b|zahlung|ec-karte|girocard|kartenzahlung|netto|brutto|tankstelle|€|eur\b/g);
+    var zut = n(/zutaten|ingredients|inhaltsstoffe|kann spuren|enth[aä]lt|emulgator|s[aä]uerungsmittel|konservierungsstoff|farbstoff|aroma|antioxidationsmittel|aqua|parfum|glycerin|\be ?\d{3}[a-z]?\b/g);
+    if (park >= 1 && (money >= 1 || park >= 2)) return "park";
+    if (zut >= 2) return "zutaten";
+    if (bon >= 2 && money >= 2) return "beleg";
+    if (zut >= 1 && money === 0) return "zutaten";
+    if (bon >= 1 && money >= 1) return "beleg";
+    return "vorrat";
+  }
+
+  /* ---------- Ergebnis-Dialog ---------- */
+  var IC = {
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 00-2-2h-7a2 2 0 00-2 2v7a2 2 0 002 2h2"/></svg>',
+    qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><path d="M14 14h2.5v2.5M20 14v6h-6v-1.5"/></svg>',
+    bar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M5 6v12M8.5 6v12M11 6v12M14.5 6v12M17 6v12M19.5 6v12"/></svg>',
+    txt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5h9l3.5 3.5v11.5H6z"/><path d="M9 11h6M9 14.5h6"/></svg>'
+  };
+  var T = {
+    qr:      { href: "./qr-index.html", img: "qr-icon-192.png", title: "In QRWahr ansehen", sub: "Inhalt prüfen – nichts öffnet sich von selbst" },
+    barcode: { href: "./pw-index.html", img: "pw-icon-192.png", title: "In ProduktWahr nachschlagen", sub: "Der Barcode geht dafür an Open Food Facts, bei Bedarf auch an Open Beauty Facts und Open Products Facts" },
+    zutaten: { href: "./pw-index.html", img: "pw-icon-192.png", title: "Zutaten in ProduktWahr prüfen", sub: "Zusatzstoffe und Inhaltsstoffe bewerten" },
+    vorrat:  { href: "./vw-index.html", img: "vw-icon-192.png", title: "Als Vorrat in VorratsWahr", sub: "Neuer Eintrag mit dem erkannten Text" },
+    park:    { href: "./bp-app.html",   img: "bp-icon-192.png", title: "Als Parkschein in BelegParkWahr", sub: "Foto, Datum und Betrag werden übernommen" },
+    beleg:   { href: "./bp-app.html",   img: "bp-icon-192.png", title: "Als Beleg in BelegParkWahr", sub: "Nebenkosten mit Foto und Betrag" }
+  };
+  var LABEL = { park: "Sieht aus wie ein Parkschein", beleg: "Sieht aus wie ein Kassenbon", zutaten: "Sieht aus wie eine Zutatenliste", vorrat: "Sieht aus wie ein Etikett" };
+  function targetBtn(t, pri){ var d = T[t]; return '<button type="button" class="btn' + (pri ? " pri" : "") + '" data-to="' + t + '"><span class="ic"><img src="./' + d.img + '" alt="" width="40" height="40"></span><span>' + d.title + "<small>" + d.sub + "</small></span></button>"; }
+  function closeSheet(){ if (sheetEl) { sheetEl.remove(); sheetEl = null; } }
+  function resume(){ closeSheet(); still.hidden = true; still.removeAttribute("src"); $("frame").hidden = false; paused = false; hint(camOk ? HINT : "Wähle unten ein Foto."); if (!reader && !document.hidden) start(); }
+  function show(html, payload){
+    closeSheet(); paused = true;
+    sheetEl = document.createElement("div"); sheetEl.className = "sheet-wrap"; sheetEl.setAttribute("role", "dialog"); sheetEl.setAttribute("aria-modal", "true");
+    sheetEl.innerHTML = '<div class="sheet">' + html + '<button type="button" class="btn flat" data-again>Weiter scannen</button></div>';
+    document.body.appendChild(sheetEl);
+    sheetEl.addEventListener("click", function(e){ if (e.target === sheetEl) resume(); });
+    sheetEl.querySelector("[data-again]").addEventListener("click", resume);
+    Array.prototype.forEach.call(sheetEl.querySelectorAll("[data-to]"), function(b){
+      b.addEventListener("click", function(){ handoff(b.getAttribute("data-to"), payload); });
+    });
+    var cp = sheetEl.querySelector("[data-copy]");
+    if (cp) cp.addEventListener("click", function(){
+      var done = function(ok){ cp.querySelector("small").textContent = ok ? "Kopiert" : "Kopieren nicht möglich"; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(payload.text).then(function(){ done(true); }, function(){ done(false); }); else done(false);
+    });
+    var first = sheetEl.querySelector(".btn"); if (first) { try { first.focus({ preventScroll: true }); } catch(e){} }
+  }
+  var copyBtn = '<button type="button" class="btn" data-copy><span class="ic">' + IC.copy + '</span><span>Kopieren<small>In die Zwischenablage</small></span></button>';
+
+  function onCode(text, format){
+    if (paused) return;
+    var kind = codeKind(text, format), p = { text: text };
+    if (kind === "qr") show('<p class="k">' + IC.qr + 'QR-Code erkannt</p><div class="val">' + esc(text) + '</div><p class="note">Der Inhalt wird nur angezeigt. Links öffnest du erst in QRWahr – auf deinen Tipp.</p>' + targetBtn("qr", true) + copyBtn, p);
+    else if (kind === "barcode") show('<p class="k">' + IC.bar + 'Barcode erkannt</p><div class="val">' + esc(text) + '</div><p class="note">Bis hierhin wurde nichts gesendet. Erst beim Nachschlagen fragt ProduktWahr die freien Produktdatenbanken ab.</p>' + targetBtn("barcode", true) + copyBtn, p);
+    else show('<p class="k">' + IC.bar + 'Code erkannt</p><div class="val">' + esc(text) + '</div><p class="note">Dieser Code gehört zu keiner Produktdatenbank. Du kannst den Inhalt kopieren.</p>' + copyBtn, p);
+  }
+  function onText(text, photo){
+    text = (text || "").replace(/[ \t]+\n/g, "\n").trim();
+    var useful = text.replace(/[^A-Za-zÄÖÜäöüß0-9]/g, "").length >= 6;
+    if (!useful) {
+      show('<p class="k">' + IC.txt + 'Kein Text erkannt</p><h2>Das Bild war nicht lesbar</h2><p class="note">Halte das Smartphone ruhig, achte auf gutes Licht und fülle den Rahmen mit dem Text. Als Beleg kannst du das Foto trotzdem übernehmen.</p>' + targetBtn("park") + targetBtn("beleg"), { text: "", photo: photo });
+      return;
+    }
+    var kind = textKind(text), order = [kind].concat(["park", "beleg", "vorrat", "zutaten"].filter(function(k){ return k !== kind; }));
+    show('<p class="k">' + IC.txt + 'Text erkannt</p><h2>' + LABEL[kind] + '</h2><div class="val">' + esc(text.slice(0, 600)) + (text.length > 600 ? " …" : "") + "</div><p class=\"note\">Die Erkennung lief auf deinem Smartphone. Es wurde nichts gesendet und nichts gespeichert.</p>" +
+      targetBtn(order[0], true) + "<h3>Oder woanders hin</h3>" + order.slice(1).map(function(k){ return targetBtn(k); }).join("") + copyBtn, { text: text, photo: photo });
+  }
+  function handoff(type, p){
+    var data = { t: type, text: p.text || "", ts: Date.now() };
+    if ((type === "park" || type === "beleg") && p.photo) data.photo = p.photo;
+    try { sessionStorage.setItem(KEY, JSON.stringify(data)); }
+    catch(e){ try { delete data.photo; sessionStorage.setItem(KEY, JSON.stringify(data)); } catch(e2){} }
+    stop();
+    location.href = T[type].href;
+  }
+
+  /* ---------- Foto: aufnehmen oder wählen, dann Text erkennen ---------- */
+  function toCanvas(src, w, h, max){
+    var k = Math.min(1, max / Math.max(w, h)), c = document.createElement("canvas");
+    c.width = Math.round(w * k); c.height = Math.round(h * k);
+    c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+  function recognise(canvas){
+    var photo = canvas.toDataURL("image/jpeg", 0.82);
+    paused = true; still.src = photo; still.hidden = false; $("frame").hidden = true;
+    $("busyText").textContent = "Text wird erkannt …"; busy.hidden = false;
+    loadOcr().then(function(){ return Tesseract.recognize(canvas, "deu+eng"); })
+      .then(function(r){ busy.hidden = true; onText(r && r.data ? r.data.text : "", photo); })
+      .catch(function(){ busy.hidden = true; onText("", photo); });
+  }
+  shot.addEventListener("click", function(){
+    if (paused || !video.videoWidth) return;
+    recognise(toCanvas(video, video.videoWidth, video.videoHeight, 1600));
+  });
+  $("pick").addEventListener("click", function(){ if (!paused) $("file").click(); });
+  $("file").addEventListener("change", function(){
+    var f = this.files && this.files[0]; this.value = "";
+    if (!f) return;
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function(){
+      var c = toCanvas(img, img.naturalWidth, img.naturalHeight, 1600);
+      URL.revokeObjectURL(url);
+      // zuerst nach einem Code im Foto suchen, sonst Text erkennen
+      paused = true; $("busyText").textContent = "Foto wird geprüft …"; busy.hidden = false;
+      loadZXing().then(function(){
+        var F = ZXing.BarcodeFormat, hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [F.QR_CODE, F.EAN_13, F.EAN_8, F.UPC_A]);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+        var one = new ZXing.BrowserMultiFormatReader(hints);
+        function read(scale){
+          var cc = scale === 1 ? c : toCanvas(c, c.width, c.height, Math.round(Math.max(c.width, c.height) * scale)), probe = new Image();
+          probe.src = cc.toDataURL("image/jpeg", 0.9);
+          return new Promise(function(res){ probe.onload = res; probe.onerror = res; }).then(function(){ return one.decodeFromImageElement(probe); });
+        }
+        // Strichcode im Foto nur gelten lassen, wenn er in zwei Größen gleich gelesen wird
+        return read(1).then(function(r1){
+          if (r1.getBarcodeFormat() === F.QR_CODE) return r1;
+          return read(0.72).then(function(r2){ if (r2.getText() !== r1.getText()) throw new Error("unsicher"); return r1; });
+        });
+      }).then(function(result){
+        busy.hidden = true; paused = false;
+        still.src = c.toDataURL("image/jpeg", 0.7); still.hidden = false; $("frame").hidden = true;
+        onCode(result.getText(), result.getBarcodeFormat());
+      }).catch(function(){ busy.hidden = true; paused = false; recognise(c); });
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); hint("Dieses Bild konnte nicht gelesen werden."); };
+    img.src = url;
+  });
+
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden) { stop(); }
+    else if (!reader && !sheetEl) { start(); }
+  });
+  window.addEventListener("pagehide", stop);
+  window.addEventListener("pageshow", function(e){ if (e.persisted) { resume(); if (!reader) start(); } });
+  start();
+})();
+</script>
+</body>
+</html>

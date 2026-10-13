@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="wz">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Sichern &amp; Wiederherstellen – WahrZentrale</title>
+<meta name="theme-color" content="#F1EEFA">
+<link rel="stylesheet" href="./wz-common.css">
+<style>
+  .bk-card { background: var(--wz-card); border: 1px solid var(--wz-line); border-radius: 20px; padding: 16px; margin: 0 0 14px; }
+  .bk-card h2 { margin: 0 0 6px; font-size: 18px; scroll-margin-top: 16px; }
+  .bk-card p { margin: 0 0 12px; font-size: 14.5px; color: var(--wz-sub); line-height: 1.55; }
+  .bk-btn { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; padding: 14px 12px;
+    font: 700 15.5px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; background: var(--wz-accent); color: var(--wz-accent-text); text-decoration: none; }
+  .bk-btn.sec { background: var(--wz-soft); color: var(--wz-text); }
+  .bk-btn.danger { background: #B3261E; color: #fff; }
+  .bk-btn[disabled] { opacity: .55; cursor: default; }
+  .bk-btn + .bk-btn { margin-top: 10px; }
+  .bk-btn svg { width: 19px; height: 19px; }
+  .bk-status { margin-top: 12px; font-size: 14px; line-height: 1.5; min-height: 1em; }
+  .bk-status.err { color: #B3261E; }
+  html.theme-dark .bk-status.err { color: #F2A09A; }
+  .bk-status.ok { color: var(--wz-accent); font-weight: 600; }
+  .bk-list { list-style: none; padding: 0; margin: 6px 0 12px; font-size: 14px; }
+  .bk-list li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--wz-line); }
+  .bk-list li span:last-child { color: var(--wz-sub); text-align: right; }
+  .bk-steps { margin: 0 0 8px; padding-left: 20px; font-size: 14.5px; }
+  .bk-steps li { margin: 0 0 8px; }
+  details.bk-app { border-top: 1px solid var(--wz-line); padding: 10px 0; }
+  details.bk-app summary { font-weight: 700; cursor: pointer; font-size: 15px; }
+  details.bk-app p { margin: 8px 0 0; font-size: 14px; }
+  .bk-progress { height: 6px; border-radius: 3px; background: var(--wz-soft); overflow: hidden; margin-top: 12px; }
+  .bk-progress > i { display: block; height: 100%; width: 0; background: var(--wz-accent); transition: width .2s ease; }
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body class="wz-doc">
+<main class="wz-doc-wrap">
+<nav class="wz-doc-nav" aria-label="Navigation">
+  <a href="./index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></g></svg> WahrZentrale</a>
+  <a href="./wz-einstellungen.html">Einstellungen</a>
+</nav>
+
+<h1>Sichern &amp; Wiederherstellen</h1>
+
+<section class="bk-card">
+  <h2>Alles sichern</h2>
+  <p>Erstellt eine Datei mit den Daten <strong>aller</strong> Apps – Einträge, Einstellungen, Fotos und Sprachnotizen. Speichere sie über das Teilen-Menü z. B. in deiner Dateiablage oder einem Cloud-Speicher. Die Datei entsteht nur auf diesem Gerät; nichts wird hochgeladen.</p>
+  <ul class="bk-list" id="summary"><li><span>Wird gezählt …</span><span></span></li></ul>
+  <button type="button" class="bk-btn" id="exportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v11M7.8 10.3L12 14.5l4.2-4.2"/><path d="M4 14.5v3.3a2.2 2.2 0 002.2 2.2h11.6a2.2 2.2 0 002.2-2.2v-3.3"/></svg>Sicherung erstellen</button>
+  <div class="bk-progress" id="exportProg" hidden><i></i></div>
+  <div class="bk-status" id="exportStatus" role="status"></div>
+</section>
+
+<section class="bk-card">
+  <h2>Wiederherstellen</h2>
+  <p>Liest eine Sicherungsdatei der WahrZentrale wieder ein. <strong>Achtung:</strong> Alle Daten auf diesem Gerät werden dabei durch den Stand der Sicherung ersetzt. Sichere vorher, falls du unsicher bist. Auch Sicherungsdateien der früheren FunWahr-Sammlung werden hier angenommen.</p>
+  <button type="button" class="bk-btn sec" id="importBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14.5v-11M7.8 7.7L12 3.5l4.2 4.2"/><path d="M4 14.5v3.3a2.2 2.2 0 002.2 2.2h11.6a2.2 2.2 0 002.2-2.2v-3.3"/></svg>Sicherung einlesen</button>
+  <input type="file" id="fileIn" accept=".zip,.json,application/zip,application/json" hidden>
+  <div id="preview" hidden>
+    <ul class="bk-list" id="previewList"></ul>
+    <button type="button" class="bk-btn danger" id="restoreBtn">Jetzt wiederherstellen</button>
+    <button type="button" class="bk-btn sec" id="cancelBtn">Abbrechen</button>
+  </div>
+  <div class="bk-progress" id="importProg" hidden><i></i></div>
+  <div class="bk-status" id="importStatus" role="status"></div>
+</section>
+
+<p style="text-align:center;font-size:13px;margin:22px 0 0"><a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html">Datenschutz</a> · <a href="./lizenzen.html">Lizenzen</a></p>
+</main>
+
+<script src="./wz-backup.js"></script>
+</body>
+</html>

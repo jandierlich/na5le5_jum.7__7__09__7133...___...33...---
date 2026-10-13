@@ -1,0 +1,325 @@
+/* ============================================================
+   wz-unify.css — Ein Erscheinungsbild für die ganze WahrZentrale
+   Wird in JEDER Seite als letztes Stylesheet geladen.
+
+   Idee: Jede App hat ihre Farben als CSS-Variablen. Diese Datei legt
+   für jede App fest, welche Variable welche Farbe der gemeinsamen
+   "Nachthimmel"-Palette bekommt – hell und dunkel. Dadurch sehen alle
+   Apps gleich aus, ohne dass ihr Code umgebaut werden muss.
+
+   Bewusst unverändert bleiben:
+   - Ampelfarben (rot/gelb/grün) für Bewertungen
+   - inhaltliche Farben: echter Himmel in HimmelsWahr/ZeitHimmel,
+     Kartenrouten, Spielsteine und Effekte in den Spielen
+   - Gold als Stern-/Sonnen-Akzent (AstroWahr, LosDenkWahr)
+
+   Gemeinsame Palette (siehe wz-common.css):
+   hell:   Grund #F1EEFA · Karte #F8F6FC · Text #241E3F · Neben #524370
+           Linie #DAC7F2 · Akzent #5A2FBE · Fläche #E6DDF7 · Kopf #5A2FBE→#241748
+   dunkel: Grund #1E1B2E · Karte #2A2440 · Text #EEEAF8 · Neben #C3B2F0
+           Linie #4A3D6B · Akzent #B9A6F5 · Fläche #362C52 · Kopf #3B2585→#15102A
+   ============================================================ */
+
+/* ---------- Grundlagen für alle Seiten ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { touch-action: manipulation; }
+:root {
+  --wz-bg: var(--wzp-f1eefa, #F1EEFA); --wz-card: var(--wzp-f8f6fc, #F8F6FC); --wz-card-solid: #FFFFFF; --wz-text: var(--wzp-241e3f, #241E3F); --wz-sub: var(--wzp-524370, #524370);
+  --wz-faint: var(--wzp-8a7fa8, #8A7FA8); --wz-line: var(--wzp-dac7f2, #DAC7F2); --wz-accent: var(--wzp-5a2fbe, #5A2FBE); --wz-accent-2: var(--wzp-7c5cff, #7C5CFF); --wz-accent-text: #FFFFFF;
+  --wz-soft: var(--wzp-e6ddf7, #E6DDF7); --wz-hdr-a: var(--wzp-5a2fbe, #5A2FBE); --wz-hdr-b: var(--wzp-241748, #241748);
+  --wz-shadow-d: rgba(var(--wzq-5a4696, 90, 70, 150), .16); --wz-shadow-l: rgba(255, 255, 255, .8);
+}
+html.theme-dark {
+  --wz-bg: var(--wzp-1e1b2e, #1E1B2E); --wz-card: var(--wzp-2a2440, #2A2440); --wz-card-solid: var(--wzp-2a2440, #2A2440); --wz-text: var(--wzp-eeeaf8, #EEEAF8); --wz-sub: var(--wzp-c3b2f0, #C3B2F0);
+  --wz-faint: var(--wzp-9a8fc0, #9A8FC0); --wz-line: var(--wzp-4a3d6b, #4A3D6B); --wz-accent: var(--wzp-b9a6f5, #B9A6F5); --wz-accent-2: var(--wzp-8e75f0, #8E75F0); --wz-accent-text: var(--wzp-1e1b2e, #1E1B2E);
+  --wz-soft: var(--wzp-362c52, #362C52); --wz-hdr-a: var(--wzp-3b2585, #3B2585); --wz-hdr-b: var(--wzp-15102a, #15102A);
+  --wz-shadow-d: rgba(0, 0, 0, .45); --wz-shadow-l: rgba(255, 255, 255, .04);
+}
+/* feste Nachtansicht (Spiele, LosDenkWahr): immer die dunklen Werte */
+html[data-wz-fixed="dark"] {
+  --wz-bg: var(--wzp-1e1b2e, #1E1B2E); --wz-card: var(--wzp-2a2440, #2A2440); --wz-card-solid: var(--wzp-2a2440, #2A2440); --wz-text: var(--wzp-eeeaf8, #EEEAF8); --wz-sub: var(--wzp-c3b2f0, #C3B2F0);
+  --wz-faint: var(--wzp-9a8fc0, #9A8FC0); --wz-line: var(--wzp-4a3d6b, #4A3D6B); --wz-accent: var(--wzp-b9a6f5, #B9A6F5); --wz-accent-2: var(--wzp-8e75f0, #8E75F0); --wz-accent-text: var(--wzp-1e1b2e, #1E1B2E);
+  --wz-soft: var(--wzp-362c52, #362C52); --wz-hdr-a: var(--wzp-3b2585, #3B2585); --wz-hdr-b: var(--wzp-15102a, #15102A);
+}
+
+/* ---------- Heimknopf zur Zentrale (wz-core.js) ---------- */
+.wz-home {
+  position: fixed; z-index: 9000; width: 38px; height: 38px; border-radius: 19px;
+  display: inline-flex; align-items: center; justify-content: center; text-decoration: none;
+  background: rgba(255, 255, 255, .82); color: var(--wzp-2b2150, #2B2150); border: 1px solid rgba(var(--wzq-5a2fbe, 90, 47, 190), .18);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: 0 4px 14px rgba(var(--wzq-140c32, 20, 12, 50), .20); transition: transform .12s ease;
+}
+.wz-home:active { transform: scale(.9); }
+.wz-home:focus-visible { outline: 2px solid var(--wz-accent); outline-offset: 2px; }
+html.theme-dark .wz-home, html[data-wz-fixed="dark"] .wz-home { background: rgba(var(--wzq-2a2440, 42, 36, 64), .82); color: var(--wzp-f1ecff, #F1ECFF); border-color: rgba(255, 255, 255, .14); }
+.wz-home-tl { top: calc(env(safe-area-inset-top, 0px) + 10px); left: 12px; }
+.wz-home-tr { top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; }
+.wz-home-bl { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); left: 12px; }
+.wz-home-br { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); right: 12px; }
+@media print { .wz-home { display: none !important; } }
+
+/* ---------- Karten-Einwilligung (wz-core.js) ---------- */
+.wz-consent { position: fixed; inset: 0; z-index: 100001; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(var(--wzq-100a24, 16, 10, 36), .48); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.wz-consent-sheet { width: 100%; max-width: 480px; background: var(--wz-card); color: var(--wz-text);
+  border-radius: 26px 26px 0 0; padding: 24px 22px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  box-shadow: 0 -12px 40px rgba(var(--wzq-0a061e, 10, 6, 30), .3); }
+.wz-consent-sheet h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; }
+.wz-consent-sheet p { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--wz-sub); }
+.wz-consent-btns { display: flex; gap: 10px; }
+.wz-consent-btns button { flex: 1; border: none; border-radius: 14px; padding: 13px 10px; font: 700 15px -apple-system, sans-serif; cursor: pointer; }
+.wz-consent-yes { background: var(--wz-accent); color: var(--wz-accent-text); }
+.wz-consent-no { background: var(--wz-soft); color: var(--wz-text); }
+.wz-consent-more { display: block; margin-top: 12px; text-align: center; font-size: 13px; color: var(--wz-sub); }
+@media (min-width: 640px) { .wz-consent { align-items: center; } .wz-consent-sheet { border-radius: 26px; } }
+
+/* ---------- Auswahlblatt (Querverbindungen) ---------- */
+.wz-sheet-actions { display: flex; flex-direction: column; gap: 10px; }
+.wz-sheet-btn { display: block; width: 100%; box-sizing: border-box; text-align: center; border: none; border-radius: 14px;
+  padding: 14px 12px; font: 700 15px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; text-decoration: none;
+  background: var(--wz-soft); color: var(--wz-text); }
+.wz-sheet-btn.primary { background: var(--wz-accent); color: var(--wz-accent-text); }
+.wz-sheet-btn.ghost { background: transparent; color: var(--wz-sub); font-weight: 600; }
+
+/* ---------- Hinweis auf neue Version ---------- */
+.wz-update { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+  z-index: 99990; display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px); padding: 10px 10px 10px 16px;
+  border-radius: 16px; background: rgba(var(--wzq-241748, 36, 23, 72), .95); color: #fff; font: 500 14px -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .28); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.wz-update-go { border: 0; border-radius: 11px; padding: 8px 14px; background: #fff; color: var(--wzp-241748, #241748); font: 700 14px -apple-system, sans-serif; cursor: pointer; }
+.wz-update-x { border: 0; background: none; color: rgba(255, 255, 255, .75); padding: 4px 6px; cursor: pointer; display: flex; }
+
+/* ---------- Heimknopf innerhalb einer App-Kopfleiste ---------- */
+.wz-inline-home { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 18px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--wz-accent); background: var(--wz-card); border: 1px solid var(--wz-line); text-decoration: none;
+  box-shadow: 0 2px 8px var(--wz-shadow-d); transition: transform .12s ease; }
+.wz-inline-home:active { transform: scale(.9); }
+.wz-inline-home svg { width: 18px; height: 18px; }
+
+/* ---------- Kartenmarkierung im Nachthimmel-Violett ---------- */
+.wz-pin { width: 26px; height: 34px; position: relative; }
+.wz-pin::before { content: ""; position: absolute; left: 1px; top: 0; width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); background: linear-gradient(150deg, var(--wzp-7c5cff, #7C5CFF), var(--wzp-5a2fbe, #5A2FBE)); border: 2.5px solid #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, .3); }
+.wz-pin::after { content: ""; position: absolute; left: 10px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+
+/* =============================================================
+   App-Zuordnungen
+   ============================================================= */
+
+/* ---------- HimmelsWahr ---------- */
+html[data-wz-app="hw"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --card: var(--wzp-f8f6fc, #F8F6FC); --card-soft: var(--wzp-efe9fa, #EFE9FA); --card-solid: #FFFFFF;
+  --text: var(--wzp-241e3f, #241E3F); --text-secondary: var(--wzp-524370, #524370); --accent: var(--wzp-5a2fbe, #5A2FBE); --accent-strong: var(--wzp-241748, #241748); --accent-contrast: #FFFFFF;
+  --border: rgba(var(--wzq-5a2fbe, 90, 47, 190), .16);
+}
+html[data-wz-app="hw"][data-theme="dark"] {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --card: var(--wzp-2a2440, #2A2440); --card-soft: var(--wzp-251f3a, #251F3A); --card-solid: var(--wzp-2a2440, #2A2440); --glass: rgba(var(--wzq-221c38, 34, 28, 56), .70);
+  --text: var(--wzp-eeeaf8, #EEEAF8); --text-secondary: var(--wzp-c3b2f0, #C3B2F0); --accent: var(--wzp-b9a6f5, #B9A6F5); --accent-strong: var(--wzp-d8ccfa, #D8CCFA); --accent-contrast: var(--wzp-1e1b2e, #1E1B2E);
+  --border: rgba(var(--wzq-b9a6f5, 185, 166, 245), .20);
+}
+
+/* ---------- AstroWahr ---------- */
+html[data-wz-app="as"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --bg-2: var(--wzp-ece6f8, #ECE6F8); --bg-radial-a: var(--wzp-e6ddf7, #E6DDF7); --card: var(--wzp-f8f6fc, #F8F6FC); --card-2: var(--wzp-efe9fa, #EFE9FA);
+  --border: rgba(var(--wzq-5a2fbe, 90, 47, 190), .14); --border-strong: rgba(var(--wzq-5a2fbe, 90, 47, 190), .26);
+  --text: var(--wzp-241e3f, #241E3F); --text-dim: var(--wzp-524370, #524370); --text-faint: var(--wzp-8a7fa8, #8A7FA8); --accent: var(--wzp-5a2fbe, #5A2FBE);
+  --grad-1: linear-gradient(135deg, var(--wzp-5a2fbe, #5A2FBE), var(--wzp-7c5cff, #7C5CFF)); --grad-3: linear-gradient(135deg, var(--wzp-5a2fbe, #5A2FBE), #C98A1F);
+  --header-bg-a: rgba(var(--wzq-f1eefa, 241, 238, 250), .94); --header-bg-b: rgba(var(--wzq-f1eefa, 241, 238, 250), .80); --nav-bg: rgba(var(--wzq-f8f6fc, 248, 246, 252), .88);
+  --good: var(--wzp-5a2fbe, #5A2FBE);
+}
+html[data-wz-app="as"][data-theme="dark"] {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --bg-2: var(--wzp-221e36, #221E36); --bg-radial-a: var(--wzp-2a2440, #2A2440); --card: var(--wzp-2a2440, #2A2440); --card-2: var(--wzp-251f3a, #251F3A);
+  --border: rgba(var(--wzq-b9a6f5, 185, 166, 245), .18); --border-strong: rgba(var(--wzq-b9a6f5, 185, 166, 245), .30);
+  --text: var(--wzp-eeeaf8, #EEEAF8); --text-dim: var(--wzp-c3b2f0, #C3B2F0); --text-faint: var(--wzp-9a8fc0, #9A8FC0); --accent: var(--wzp-b9a6f5, #B9A6F5);
+  --grad-1: linear-gradient(135deg, var(--wzp-8e75f0, #8E75F0), var(--wzp-b9a6f5, #B9A6F5)); --grad-3: linear-gradient(135deg, var(--wzp-b9a6f5, #B9A6F5), #F0C583);
+  --header-bg-a: rgba(var(--wzq-1e1b2e, 30, 27, 46), .94); --header-bg-b: rgba(var(--wzq-1e1b2e, 30, 27, 46), .80); --nav-bg: rgba(var(--wzq-2a2440, 42, 36, 64), .90);
+  --good: var(--wzp-b9a6f5, #B9A6F5);
+}
+
+/* ---------- ZeitHimmel (Sternenhimmel) ---------- */
+html[data-wz-app="zh"]:not(.red) {
+  --panel: rgba(var(--wzq-f8f6fc, 248, 246, 252), .88); --panel-solid: var(--wzp-f8f6fc, #F8F6FC); --panel-2: rgba(var(--wzq-5a2fbe, 90, 47, 190), .07);
+  --line: rgba(var(--wzq-5a2fbe, 90, 47, 190), .16); --line-2: rgba(var(--wzq-5a2fbe, 90, 47, 190), .26);
+  --text: var(--wzp-241e3f, #241E3F); --muted: var(--wzp-524370, #524370); --dim: var(--wzp-8a7fa8, #8A7FA8); --accent: var(--wzp-5a2fbe, #5A2FBE); --accent-2: var(--wzp-7c5cff, #7C5CFF);
+}
+html[data-wz-app="zh"][data-theme="dark"]:not(.red) {
+  --panel: rgba(var(--wzq-2a2440, 42, 36, 64), .88); --panel-solid: var(--wzp-2a2440, #2A2440); --panel-2: rgba(var(--wzq-b9a6f5, 185, 166, 245), .10);
+  --line: rgba(var(--wzq-b9a6f5, 185, 166, 245), .20); --line-2: rgba(var(--wzq-b9a6f5, 185, 166, 245), .32);
+  --text: var(--wzp-eeeaf8, #EEEAF8); --muted: var(--wzp-c3b2f0, #C3B2F0); --dim: var(--wzp-9a8fc0, #9A8FC0); --accent: var(--wzp-b9a6f5, #B9A6F5); --accent-2: var(--wzp-8e75f0, #8E75F0); --accent-ink: var(--wzp-1e1b2e, #1E1B2E);
+}
+
+/* ---------- NaviWahr ---------- */
+html[data-wz-app="wk"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --card: var(--wzp-f8f6fc, #F8F6FC); --text: var(--wzp-241e3f, #241E3F); --text-soft: var(--wzp-524370, #524370);
+  --accent: var(--wzp-5a2fbe, #5A2FBE); --accent2: var(--wzp-241748, #241748); --accent-soft: var(--wzp-e6ddf7, #E6DDF7); --btn-warm: var(--wzp-ede7f8, #EDE7F8); --border: var(--wzp-dac7f2, #DAC7F2);
+  --brand-a: var(--wzp-5a2fbe, #5A2FBE); --brand-b: var(--wzp-241748, #241748); --on-brand: #FFFFFF;
+}
+html[data-wz-app="wk"][data-theme="dark"], html[data-wz-app="wk"] [data-theme="dark"] {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --card: var(--wzp-2a2440, #2A2440); --text: var(--wzp-eeeaf8, #EEEAF8); --text-soft: var(--wzp-c3b2f0, #C3B2F0);
+  --accent: var(--wzp-b9a6f5, #B9A6F5); --accent2: var(--wzp-8e75f0, #8E75F0); --accent-soft: var(--wzp-362c52, #362C52); --btn-warm: var(--wzp-2f2848, #2F2848); --border: var(--wzp-4a3d6b, #4A3D6B);
+  --brand-a: var(--wzp-3b2585, #3B2585); --brand-b: var(--wzp-15102a, #15102A); --on-brand: #FFFFFF;
+}
+
+/* ---------- Keysglade ---------- */
+html[data-wz-app="kg"] {
+  --blue: var(--wzp-5a2fbe, #5A2FBE); --blue-dark: var(--wzp-241748, #241748); --teal: var(--wzp-7c5cff, #7C5CFF); --teal-text: var(--wzp-5a2fbe, #5A2FBE); --fill-start: var(--wzp-5a2fbe, #5A2FBE);
+  --bg: var(--wzp-f1eefa, #F1EEFA); --surface: var(--wzp-f8f6fc, #F8F6FC); --border: var(--wzp-dac7f2, #DAC7F2); --text: var(--wzp-241e3f, #241E3F); --text-muted: var(--wzp-524370, #524370); --heading: var(--wzp-241e3f, #241E3F);
+  --shadow-dark: rgba(var(--wzq-7864b4, 120, 100, 180), .45); --shadow-light: rgba(255, 255, 255, .9);
+  --shadow-dark-soft: rgba(var(--wzq-7864b4, 120, 100, 180), .26); --shadow-light-soft: rgba(255, 255, 255, .75);
+}
+html[data-wz-app="kg"][data-theme="dark"] {
+  --blue: var(--wzp-b9a6f5, #B9A6F5); --blue-dark: var(--wzp-15102a, #15102A); --teal: var(--wzp-8e75f0, #8E75F0); --teal-text: var(--wzp-b9a6f5, #B9A6F5); --fill-start: var(--wzp-5a2fbe, #5A2FBE);
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --surface: var(--wzp-2a2440, #2A2440); --border: var(--wzp-4a3d6b, #4A3D6B); --text: var(--wzp-eeeaf8, #EEEAF8); --text-muted: var(--wzp-c3b2f0, #C3B2F0); --heading: var(--wzp-eeeaf8, #EEEAF8);
+  --shadow-dark: rgba(0, 0, 0, .55); --shadow-light: rgba(255, 255, 255, .05);
+  --shadow-dark-soft: rgba(0, 0, 0, .4); --shadow-light-soft: rgba(255, 255, 255, .035);
+}
+
+/* ---------- WowarWahr ---------- */
+html[data-wz-app="wow"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --card: var(--wzp-f8f6fc, #F8F6FC); --ink: var(--wzp-241e3f, #241E3F); --ink-2: var(--wzp-3f3560, #3F3560); --muted: var(--wzp-524370, #524370);
+  --line: var(--wzp-dac7f2, #DAC7F2); --line-2: var(--wzp-ede7f8, #EDE7F8); --accent: var(--wzp-5a2fbe, #5A2FBE); --accent-d: var(--wzp-241748, #241748); --accent-soft: var(--wzp-e6ddf7, #E6DDF7);
+}
+html[data-wz-app="wow"][data-theme="dark"] {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --card: var(--wzp-2a2440, #2A2440); --ink: var(--wzp-eeeaf8, #EEEAF8); --ink-2: var(--wzp-d6ccf5, #D6CCF5); --muted: var(--wzp-c3b2f0, #C3B2F0);
+  --line: var(--wzp-4a3d6b, #4A3D6B); --line-2: var(--wzp-342b4e, #342B4E); --accent: var(--wzp-8e75f0, #8E75F0); --accent-d: var(--wzp-b9a6f5, #B9A6F5); --accent-soft: var(--wzp-362c52, #362C52);
+}
+html[data-wz-app="wow"][data-theme="dark"] .tabbar { background: rgba(var(--wzq-221d34, 34, 29, 52), .92); }
+html[data-wz-app="wow"][data-theme="dark"] .brand-chip,
+html[data-wz-app="wow"][data-theme="dark"] .gl-title,
+html[data-wz-app="wow"][data-theme="dark"] .fm-end { background: rgba(var(--wzq-2a2440, 42, 36, 64), .95); }
+html[data-wz-app="wow"][data-theme="dark"] .chips button.on,
+html[data-wz-app="wow"][data-theme="dark"] .year-pill.on { color: var(--wzp-1e1b2e, #1E1B2E); }
+
+/* ---------- BelegParkWahr ---------- */
+html[data-wz-app="bp"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --card: var(--wzp-f8f6fc, #F8F6FC); --ink: var(--wzp-241e3f, #241E3F); --sub: var(--wzp-524370, #524370); --violet: var(--wzp-5a2fbe, #5A2FBE); --violet-deep: var(--wzp-241748, #241748);
+  --teal: var(--wzp-7c5cff, #7C5CFF); --line: var(--wzp-dac7f2, #DAC7F2); --amount: var(--wzp-241748, #241748);
+  --shadow-dark: rgba(var(--wzq-7864b4, 120, 100, 180), .45); --shadow-light: rgba(255, 255, 255, .9);
+  --shadow-dark-soft: rgba(var(--wzq-7864b4, 120, 100, 180), .26); --shadow-light-soft: rgba(255, 255, 255, .75);
+}
+html[data-wz-app="bp"] body.dark {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --card: var(--wzp-2a2440, #2A2440); --ink: var(--wzp-eeeaf8, #EEEAF8); --sub: var(--wzp-c3b2f0, #C3B2F0); --line: var(--wzp-4a3d6b, #4A3D6B); --amount: var(--wzp-b9a6f5, #B9A6F5);
+  --violet: var(--wzp-b9a6f5, #B9A6F5); --violet-deep: var(--wzp-5a2fbe, #5A2FBE); --teal: var(--wzp-8e75f0, #8E75F0);
+  --shadow-dark: rgba(0, 0, 0, .55); --shadow-light: rgba(255, 255, 255, .05);
+  --shadow-dark-soft: rgba(0, 0, 0, .4); --shadow-light-soft: rgba(255, 255, 255, .035);
+}
+
+/* ---------- LosDenkWahr (Nachtansicht) ---------- */
+html[data-wz-app="ld"] {
+  --navy-deep: var(--wzp-15102a, #15102A); --navy: var(--wzp-1e1b2e, #1E1B2E); --navy-soft: var(--wzp-3b2585, #3B2585); --lavender: var(--wzp-b9a6f5, #B9A6F5); --ink: var(--wzp-eee9f8, #EEE9F8); --ink-dim: var(--wzp-c9beea, #C9BEEA);
+}
+
+/* ---------- Spiele & Klang (FunWahr) ---------- */
+html[data-wz-app="zw"] {
+  --bg-deep: var(--wzp-1e1b2e, #1E1B2E); --bg-mid: var(--wzp-2a2440, #2A2440); --bg-panel: var(--wzp-2a2440, #2A2440); --silo-wall: var(--wzp-2f2848, #2F2848); --silo-wall-dark: var(--wzp-15102a, #15102A);
+  --text-primary: var(--wzp-eeeaf8, #EEEAF8); --text-muted: var(--wzp-c3b2f0, #C3B2F0); --line: var(--wzp-4a3d6b, #4A3D6B);
+}
+html[data-wz-app="zw"][data-theme="light"] {
+  --bg-deep: var(--wzp-f1eefa, #F1EEFA); --bg-mid: #FFFFFF; --bg-panel: var(--wzp-f8f6fc, #F8F6FC); --silo-wall: var(--wzp-e6ddf7, #E6DDF7); --silo-wall-dark: var(--wzp-d4c6f0, #D4C6F0);
+  --text-primary: var(--wzp-241e3f, #241E3F); --text-muted: var(--wzp-524370, #524370); --line: rgba(var(--wzq-5a2fbe, 90, 47, 190), .14);
+}
+html[data-wz-app="kv"] { --bg-deep: var(--wzp-15102a, #15102A); }
+html[data-wz-app="hk"] { --felt-dark: var(--wzp-15102a, #15102A); --felt: var(--wzp-1e1b2e, #1E1B2E); --felt-light: var(--wzp-2a2440, #2A2440); --felt-edge: var(--wzp-15102a, #15102A); --wood: var(--wzp-2a2440, #2A2440); --wood-light: var(--wzp-2a2440, #2A2440); --cream: var(--wzp-eeeaf8, #EEEAF8); --cream-dim: var(--wzp-c3b2f0, #C3B2F0); --ink: var(--wzp-1e1b2e, #1E1B2E); --line: var(--wzp-4a3d6b, #4A3D6B); }
+html[data-wz-app="pk"] { --bg: var(--wzp-0b0921, #0B0921); --panel: rgba(var(--wzq-2a2440, 42, 36, 64), .78); --text: var(--wzp-eeeaf8, #EEEAF8); --text-dim: var(--wzp-c3b2f0, #C3B2F0); }
+html[data-wz-app="st"] { --bg: var(--wzp-0b0921, #0B0921); --panel: var(--wzp-2a2440, #2A2440); --panel-line: var(--wzp-4a3d6b, #4A3D6B); --ink: var(--wzp-eeeaf8, #EEEAF8); --ink-dim: var(--wzp-c3b2f0, #C3B2F0); }
+html[data-wz-app="bw"] {
+  --bg: var(--wzp-f1eefa, #F1EEFA); --bg-raised: #FFFFFF; --bg-track: var(--wzp-dcd2f0, #DCD2F0); --line: var(--wzp-c4b4e6, #C4B4E6); --text: var(--wzp-241e3f, #241E3F); --text-dim: var(--wzp-524370, #524370);
+  --accent: var(--wzp-5a2fbe, #5A2FBE); --accent-text: var(--wzp-5a2fbe, #5A2FBE); --accent-soft: var(--wzp-e6ddf7, #E6DDF7);
+}
+html[data-wz-app="bw"][data-theme="dark"] {
+  --bg: var(--wzp-1e1b2e, #1E1B2E); --bg-raised: var(--wzp-2a2440, #2A2440); --bg-track: var(--wzp-362c52, #362C52); --line: var(--wzp-4a3d6b, #4A3D6B); --text: var(--wzp-eeeaf8, #EEEAF8); --text-dim: var(--wzp-c3b2f0, #C3B2F0);
+  --accent: var(--wzp-7c5cff, #7C5CFF); --accent-text: var(--wzp-b9a6f5, #B9A6F5); --accent-soft: var(--wzp-362c52, #362C52);
+}
+
+/* HimmelsWahr: Platz für den Heimknopf in der Kopfzeile */
+html[data-wz-app="hw"] .hw-topbar .hw-brand img { display: none; }
+html[data-wz-app="hw"] .hw-topbar { gap: 8px; }
+
+/* BelegParkWahr im Dunkelmodus: farbige Flächen mit weißer Schrift im kräftigen Violett (gut lesbar) */
+html[data-wz-app="bp"] body.dark .header,
+html[data-wz-app="bp"] body.dark .fab,
+html[data-wz-app="bp"] body.dark .btn-primary,
+html[data-wz-app="bp"] body.dark .total-strip,
+html[data-wz-app="bp"] body.dark .entry-badge,
+html[data-wz-app="bp"] body.dark .segment-btn.active,
+html[data-wz-app="bp"] body.dark .photo-capture,
+html[data-wz-app="bp"] body.dark [style*="gradient(135deg,var(--violet),var(--violet-deep))"],
+html[data-wz-app="bp"] body.dark [style*="gradient(135deg, var(--violet), var(--violet-deep))"] {
+  background: linear-gradient(135deg, var(--wzp-6e4fe0, #6E4FE0) 0%, var(--wzp-3b2585, #3B2585) 100%) !important;
+}
+html[data-wz-app="bp"] body.dark .app-modal-btn-primary { background: var(--wzp-6e4fe0, #6E4FE0); }
+
+/* Zurück zur vorherigen App (wz-core.js): Der Haus-Knopf der App wird zum Zurück-Pfeil –
+   gleiche Stelle, gleiche Größe, nur Symbol und Akzentfarbe wechseln. Nichts schwebt über dem Inhalt. */
+a[data-wz-back]:not(.wz-back-chip) { background: var(--wzp-5a2fbe, #5A2FBE) !important; color: #fff !important; border-color: transparent !important; }
+a[data-wz-back] .wz-back-ico { display: flex; align-items: center; justify-content: center; line-height: 0; }
+html.theme-dark a[data-wz-back]:not(.wz-back-chip), html[data-wz-fixed="dark"] a[data-wz-back]:not(.wz-back-chip) { background: var(--wzp-b9a6f5, #B9A6F5) !important; color: var(--wzp-1e1b2e, #1E1B2E) !important; }
+/* Seiten ohne Haus-Knopf: kleine Zeile im Seitenkopf, im Textfluss */
+.wz-back-row { display: block; margin: 0 0 12px; text-align: left; }
+.wz-back-row-top { padding: calc(env(safe-area-inset-top, 0px) + 10px) 14px 0; margin: 0; }
+.wz-back-chip { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px 8px 10px; border-radius: 999px; text-decoration: none;
+  background: var(--wzp-5a2fbe, #5A2FBE); color: #fff; font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-shadow: none; max-width: 100%; }
+.wz-back-chip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wz-back-chip:active { opacity: .75; }
+html.theme-dark .wz-back-chip, html[data-wz-fixed="dark"] .wz-back-chip { background: var(--wzp-b9a6f5, #B9A6F5); color: var(--wzp-1e1b2e, #1E1B2E); }
+@media print { .wz-back-row { display: none !important; } }
+/* In den Kameraansichten weichen Haus- und Hell/Dunkel-Knopf, sonst verdecken sie den Licht-Knopf oben rechts. */
+html:has(.scanner-view:not(.hidden), .live-stage:not(.hidden)) .wz-hbtn { display: none !important; }
+.wz-doc-nav a.wz-doc-back { background: var(--wz-accent); color: var(--wz-accent-text); border-color: var(--wz-accent); }
+
+/* =============================================================
+   Kräftige Hauptknöpfe (hell und dunkel gleich)
+   Regel: Die wichtigste Aktion eines Bildschirms ist immer kräftig
+   violett mit weißer Schrift. Nebenaktionen bleiben blass.
+   Kontrast Weiß auf #6E4FE0 ≈ 5,4 : 1 (WCAG AA).
+   Bewusst NICHT geändert: Spielfarben (z. B. Türkis in HerzKaroDrei,
+   Korvanthiel), Ampelfarben, Löschen-Knöpfe.
+   ============================================================= */
+:root {
+  --wz-primary-bg: linear-gradient(150deg, var(--wzp-6e4fe0, #6E4FE0) 0%, var(--wzp-5a2fbe, #5A2FBE) 100%);
+  --wz-primary-fg: #FFFFFF;
+  --wz-primary-shadow: 0 8px 20px rgba(var(--wzq-5a2fbe, 90, 47, 190), .32), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+html.theme-dark, html[data-wz-fixed="dark"] {
+  --wz-primary-shadow: 0 8px 22px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06) inset, inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.wz-onb-next,
+html.theme-dark .wz-onb-next,
+.wz-consent-yes,
+.wz-sheet-btn.primary,
+.bk-btn:not(.sec):not(.danger),
+.fw-primary,
+html[data-wz-app="zw"] .btn-primary,
+html[data-wz-app="hw"] .hw-btn.primary,
+html[data-wz-app="wow"] .btn.primary,
+html[data-wz-app="zh"]:not(.red) .btn:not(.ghost):not(.small),
+html[data-wz-app="lw"] .cta:not(.secondary):not(.danger),
+html[data-wz-app="qr"] .cta:not(.secondary):not(.danger),
+html[data-wz-app="vw"] #btnScanLive,
+html[data-wz-app="pw"] #btnLiveTextScan {
+  background: var(--wz-primary-bg) !important;
+  color: var(--wz-primary-fg) !important;
+  border-color: transparent !important;
+  box-shadow: var(--wz-primary-shadow) !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .12);
+}
+.wz-onb-next svg, .fw-primary svg, .bk-btn:not(.sec):not(.danger) svg { color: inherit; }
+/* aktive Auswahl in Segmenten (ProduktWahr, VorratsWahr) */
+html[data-wz-app="pw"] .mode-btn.active,
+html[data-wz-app="vw"] .mode-btn.active {
+  background: var(--wz-primary-bg) !important; color: #fff !important; border-color: transparent !important;
+}
+html[data-wz-app="pw"] .mode-btn.active .wzi,
+html[data-wz-app="vw"] .mode-btn.active .wzi { --wzi-bg: var(--wzp-5a2fbe, #5A2FBE); }
+
+/* App-Symbol im Dunkelmodus: Es gibt keine eigenen Dunkel-Varianten der Symbole. Fehlt die Dunkel-Variante,
+   bleibt das helle Symbol sichtbar – sonst verschwindet es und der Titel rutscht unter die Kopf-Knöpfe. */
+html.theme-dark:root img.wz-logo-light.wz-logo-light:not(:has(~ .wz-logo-dark)),
+html.theme-dark:root img.app-logo-light.app-logo-light:not(:has(~ .app-logo-dark)) { display: block !important; }
+
+/* Statusleiste: Kopfzeilen mit data-wz-sbclip bleiben fest, geben aber beim Scrollen den Streifen
+   hinter der Statusleiste frei (Scrollweg --wz-sy aus wz-core.js, höchstens bis zur Statusleistenhöhe).
+   Seiten, Schatten und Bereiche unterhalb der Kopfzeile bleiben unbeschnitten. */
+[data-wz-sbclip] { -webkit-clip-path: inset(min(var(--wz-sy, 0px), env(safe-area-inset-top, 0px)) -100vmax -100vmax -100vmax); clip-path: inset(min(var(--wz-sy, 0px), env(safe-area-inset-top, 0px)) -100vmax -100vmax -100vmax); }

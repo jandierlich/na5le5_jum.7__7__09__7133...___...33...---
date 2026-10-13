@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="st" data-wz-fixed="dark">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>StrömungsWahr</title>
+<meta name="description" content="Eine lebendige Strömungssimulation, die auf jede Berührung reagiert.">
+<meta name="theme-color" content="#0d0a1c">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="st-icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<style>
+  :root{
+    --bg:var(--wzp-0d0a1c, #0d0a1c);
+    --panel:var(--wzp-1b1638, #1b1638);
+    --panel-line:var(--wzp-2c2555, #2c2555);
+    --ink:var(--wzp-f1eefb, #f1eefb);
+    --ink-dim:var(--wzp-a79fd0, #a79fd0);
+    --accent:#00e5ff;
+    --font-head: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; width:100%; height:var(--wz-vh, 100%);
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+    overflow:hidden;
+    overscroll-behavior:none;
+    -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
+  }
+  #glcanvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    display:block; touch-action:none;
+    -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
+  }
+  #intro{
+    position:fixed; inset:0; z-index:19;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:0 28px; padding-bottom:env(safe-area-inset-bottom);
+    background:linear-gradient(180deg, rgba(var(--wzq-0d0a1c, 13, 10, 28),0) 0%, rgba(var(--wzq-0d0a1c, 13, 10, 28),0.55) 45%, rgba(var(--wzq-0d0a1c, 13, 10, 28),0.86) 100%);
+    text-align:center;
+    transition:opacity .9s ease;
+  }
+  #intro.hidden{ opacity:0; pointer-events:none; }
+  #intro h1{
+    font-family:var(--font-head); font-style:normal; font-weight:800;
+    font-size:34px; letter-spacing:.01em; line-height:1.15;
+    background:linear-gradient(90deg, #00e5ff, var(--wzp-a742ff, #a742ff) 50%, #ff3caa);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin:0 0 10px 0;
+  }
+  #intro p{
+    margin:0 0 26px 0; font-size:15px; line-height:1.55; color:var(--ink-dim);
+    max-width:300px;
+  }
+  #intro button{
+    appearance:none; border:1px solid rgba(var(--wzq-f1eefb, 241, 238, 251),.28);
+    background:rgba(var(--wzq-f1eefb, 241, 238, 251),.06);
+    color:var(--ink); font-size:15px; font-weight:600;
+    padding:13px 26px; border-radius:100px; letter-spacing:.01em;
+  }
+  #intro button:active{ background:rgba(var(--wzq-f1eefb, 241, 238, 251),.16); }
+
+  #topbar{
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:calc(14px + env(safe-area-inset-top)) 14px 14px 14px;
+    pointer-events:none;
+  }
+  #topbar .brand{
+    font-family:var(--font-head); font-style:normal; font-weight:600;
+    font-size:13px; letter-spacing:0; color:rgba(var(--wzq-f1eefb, 241, 238, 251),.9);
+    min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:0 1 auto;
+    pointer-events:none;
+  }
+  .iconbtn{
+    pointer-events:auto;
+    width:40px; height:40px; border-radius:50%;
+    background:rgba(var(--wzq-1b1638, 27, 22, 56),.55); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.10);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink); text-decoration:none;
+  }
+  .iconbtn:active{ background:rgba(var(--wzq-1b1638, 27, 22, 56),.8); }
+  .iconbtn svg{ width:19px; height:19px; }
+
+  .sheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:25;
+    background:rgba(var(--wzq-1b1638, 27, 22, 56),.92); backdrop-filter:blur(18px);
+    border-top:1px solid var(--panel-line);
+    border-radius:20px 20px 0 0;
+    padding:6px 22px calc(22px + env(safe-area-inset-bottom)) 22px;
+    transform:translateY(100%);
+    transition:transform .32s cubic-bezier(.32,.72,0,1);
+    max-height:78vh; overflow-y:auto;
+  }
+  .sheet.open{ transform:translateY(0); }
+  .grabber{ width:44px; height:14px; margin:12px auto 10px auto; opacity:.55; }
+  .sheet h2{ font-size:16px; margin:0 0 4px 0; font-weight:700; }
+  .sheet .sub{ font-size:12.5px; color:var(--ink-dim); margin:0 0 18px 0; line-height:1.5;}
+  .helplist{ list-style:none; margin:0 0 6px 0; padding:0; }
+  .helplist li{
+    display:flex; gap:14px; align-items:flex-start;
+    padding:13px 0; border-top:1px solid var(--panel-line);
+  }
+  .helplist li:first-child{ border-top:none; }
+  .helplist .h-ico{
+    flex-shrink:0; width:34px; height:34px; border-radius:50%;
+    background:rgba(0,229,255,.14); border:1px solid rgba(0,229,255,.4);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; color:var(--accent);
+  }
+  .helplist .h-title{ font-size:14px; margin-bottom:2px; }
+  .helplist .h-desc{ font-size:12.5px; color:var(--ink-dim); line-height:1.4; }
+  .row{ margin-bottom:18px; }
+  .row label{ display:flex; justify-content:space-between; font-size:13.5px; color:var(--ink-dim); margin-bottom:8px; }
+  .row label span.val{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:4px; border-radius:2px;
+    background:#23241f; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+    background:var(--ink); border:none;
+    box-shadow:0 1px 4px rgba(0,0,0,.4);
+  }
+  .segrow{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .seg{
+    flex:1; min-width:76px; text-align:center; padding:10px 6px; border-radius:12px;
+    background:#14150f; border:1px solid var(--panel-line);
+    font-size:12.5px; color:var(--ink-dim);
+  }
+  .seg.active{ background:rgba(0,229,255,.14); border-color:rgba(0,229,255,.55); color:var(--ink); }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .toggle-row .t-label{ font-size:14px; }
+  .toggle-row .t-desc{ font-size:12px; color:var(--ink-dim); margin-top:2px; }
+  .switch{ position:relative; width:46px; height:27px; border-radius:20px; background:#23241f; flex-shrink:0; margin-left:14px; }
+  .switch.on{ background:var(--accent); }
+  .switch::after{
+    content:""; position:absolute; top:2px; left:2px; width:23px; height:23px;
+    border-radius:50%; background:#fff; transition:transform .18s ease;
+  }
+  .switch.on::after{ transform:translateX(19px); }
+  .cal-btn{
+    appearance:none; flex-shrink:0; margin-left:14px;
+    border:1px solid rgba(var(--wzq-f1eefb, 241, 238, 251),.28); background:rgba(var(--wzq-f1eefb, 241, 238, 251),.06);
+    color:var(--ink); font-size:12.5px; font-weight:600;
+    padding:9px 16px; border-radius:100px; letter-spacing:.01em;
+    white-space:nowrap; transition:background .18s ease, border-color .18s ease;
+  }
+  .cal-btn:active{ background:rgba(var(--wzq-f1eefb, 241, 238, 251),.16); }
+  .cal-btn.done{ background:rgba(0,229,255,.18); border-color:rgba(0,229,255,.6); }
+  .sheet .footlinks{ display:flex; gap:18px; margin-top:6px; padding-top:14px; border-top:1px solid var(--panel-line); }
+  .sheet .footlinks a{ font-size:12px; color:var(--ink-dim); text-decoration:none; }
+  #gyrobtn{ display:none; }
+  #intro .legal{
+    display:flex; gap:22px; margin-top:26px;
+  }
+  #intro .legal a{
+    font-size:13px; color:rgba(var(--wzq-f1eefb, 241, 238, 251),.6); text-decoration:none;
+  }
+  /* Größere Tippfläche für kleine Links/Knöpfe, ohne das Layout zu verändern */
+  .fw-hit{position:relative;}
+  .fw-hit::after{content:'';position:absolute;inset:-12px -6px;}
+
+  #hint{
+    position:fixed; left:50%; bottom:calc(28px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+    z-index:15; font-size:12.5px; color:rgba(var(--wzq-f1eefb, 241, 238, 251),.5);
+    background:rgba(var(--wzq-1b1638, 27, 22, 56),.5); backdrop-filter:blur(8px);
+    padding:8px 14px; border-radius:100px; border:1px solid rgba(255,255,255,.06);
+    opacity:0; transition:opacity .6s ease; pointer-events:none;
+  }
+  #hint.show{ opacity:1; }
+
+  #musicDock{
+    position:fixed; top:0; left:0; right:0; z-index:22;
+    display:flex; align-items:center; gap:10px;
+    padding:calc(64px + env(safe-area-inset-top)) 16px 12px 16px;
+    background:linear-gradient(180deg, rgba(var(--wzq-0d0a1c, 13, 10, 28),.92) 0%, rgba(var(--wzq-0d0a1c, 13, 10, 28),.7) 75%, rgba(var(--wzq-0d0a1c, 13, 10, 28),0) 100%);
+    transform:translateY(-100%); transition:transform .3s cubic-bezier(.32,.72,0,1);
+    pointer-events:none;
+  }
+  #musicDock.open{ transform:translateY(0); pointer-events:auto; }
+  #musicDock .file-label{
+    flex-shrink:0; font-size:12.5px; font-weight:600; padding:9px 14px; border-radius:100px;
+    background:rgba(var(--wzq-f1eefb, 241, 238, 251),.08); border:1px solid rgba(255,255,255,.14); color:var(--ink);
+  }
+  #musicDock .file-label:active{ background:rgba(var(--wzq-f1eefb, 241, 238, 251),.16); }
+  #musicName{
+    flex:1; min-width:0; font-size:12.5px; color:var(--ink-dim);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  #musicDock .mbtn{
+    flex-shrink:0; width:38px; height:38px; border-radius:50%;
+    background:rgba(var(--wzq-f1eefb, 241, 238, 251),.1); border:1px solid rgba(255,255,255,.14);
+    color:var(--ink); font-size:14px; display:flex; align-items:center; justify-content:center;
+  }
+  #musicDock .mbtn:disabled{ opacity:.35; }
+  #musicDock .mbtn:active:not(:disabled){ background:rgba(var(--wzq-f1eefb, 241, 238, 251),.2); }
+</style>
+<style id="fw-familie">
+.fw-i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto;}
+
+/* FunWahr-Familienstil – bewusst in jede App kopiert (keine gemeinsame Datei),
+   damit jede App technisch eigenständig bleibt. */
+.fw-home{width:38px!important;height:38px!important;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;
+  background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;text-decoration:none!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);flex:0 0 auto;padding:0!important;font-size:0!important;backdrop-filter:none!important;}
+.fw-home svg{width:18px!important;height:18px!important;display:block;}
+.fw-home:active{transform:scale(.92);}
+.fw-title{background:linear-gradient(90deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-a742ff, #a742ff) 50%,#ff3caa)!important;-webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent;white-space:nowrap;text-shadow:none!important;}
+.fw-primary{background:linear-gradient(150deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-8e75f0, #8E75F0))!important;color:var(--wzp-0d0a1c, #0d0a1c)!important;border:none!important;text-shadow:none!important;
+  font-weight:800!important;box-shadow:0 6px 14px rgba(var(--wzq-5a2fbe, 90, 47, 190),.35)!important;}
+.fw-primary *{color:var(--wzp-0d0a1c, #0d0a1c)!important;}
+.fw-nowrap{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+/* ===== FunWahr-Startstandard (in jeder App identisch) =====
+   Home oben links, App-Aktionen oben rechts, App-Icon + Titel + einzeiliger Untertitel,
+   einheitlicher Hauptknopf, „Impressum · Datenschutz“ unten. */
+.fw-s-bar{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;right:16px;z-index:70;
+  display:flex;align-items:center;justify-content:space-between;}
+.fw-s-bar .fw-s-actions{display:flex;gap:8px;}
+.fw-s-hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+.fw-s-icon{width:68px;height:68px;border-radius:17px;display:block;margin:0 auto 14px;
+  box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);}
+.fw-s-title{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif!important;
+  font-size:34px!important;font-weight:800!important;font-style:normal!important;letter-spacing:.005em!important;
+  line-height:1.15!important;margin:0 0 8px!important;padding:0!important;text-transform:none!important;text-align:center;}
+.fw-s-sub{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif!important;
+  font-size:15px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  color:rgba(var(--wzq-f1eefb, 241, 238, 251),.68)!important;margin:0 0 26px!important;line-height:1.45!important;
+  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+.fw-s-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:320px;
+  margin:0 auto!important;padding:15px 20px!important;border-radius:14px!important;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;font-size:16px!important;
+  font-weight:800!important;letter-spacing:.01em!important;text-transform:none!important;text-decoration:none!important;
+  white-space:nowrap;box-sizing:border-box;cursor:pointer;}
+.fw-s-btn:active{transform:scale(.98);}
+.fw-s-ghost{background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;
+  box-shadow:none!important;font-weight:700!important;text-shadow:none!important;}
+.fw-s-stack{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin:0 auto;}
+.fw-s-legal{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:auto;padding-top:22px;}
+.fw-s-legal--fixed{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:65;margin:0;padding:0;}
+.fw-s-legal a,.fw-s-legal button{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.6)!important;text-decoration:none!important;background:none!important;
+  border:none!important;box-shadow:none!important;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  padding:12px 6px!important;margin:0!important;min-height:0!important;width:auto!important;cursor:pointer;}
+.fw-s-legal span{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.32);font-size:13px;}
+html[data-theme="light"] .fw-s-sub{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal a,html[data-theme="light"] .fw-s-legal button{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal span{color:#9aa3c4;}
+html[data-theme="light"] .fw-s-ghost{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;}
+
+/* StrömungsWahr-Startbildschirm im Standard: auf dem Startbildschirm nur Home, Einstellungen, Hilfe */
+#topbar{padding:calc(12px + env(safe-area-inset-top)) 16px 12px 16px!important;}
+#topbar .brand,#topbar #musicBtn,#topbar #snapshotBtn{transition:opacity .6s ease;}
+body:has(#intro:not(.hidden)) #topbar .brand,
+body:has(#intro:not(.hidden)) #topbar #musicBtn,
+body:has(#intro:not(.hidden)) #topbar #snapshotBtn{opacity:0;pointer-events:none!important;}
+#intro .fw-s-btn{max-width:280px;}
+#hint{white-space:nowrap;}
+body:has(#intro:not(.hidden)) #hint{display:none;}
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+
+<canvas id="glcanvas"></canvas>
+
+<div id="topbar">
+  <div style="display:flex; align-items:center; gap:7px; pointer-events:none; min-width:0; flex:1 1 auto;">
+    <a class="iconbtn fw-home" id="hubBtn" href="./index.html#spiel" aria-label="Zur WahrZentrale">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 11.5 12 4l9 7.5"/>
+        <path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6h3a1 1 0 0 0 1-1v-9"/>
+      </svg>
+    </a>
+    <div class="brand">StrömungsWahr</div>
+  </div>
+  <div style="display:flex; gap:6px; pointer-events:none; flex:0 0 auto;">
+    <button class="iconbtn" id="musicBtn" aria-label="Musik">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l11-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="17" cy="16" r="3"></circle>
+      </svg>
+    </button>
+    <button class="iconbtn" id="snapshotBtn" aria-label="Bild speichern">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 8h2.6l1.2-2h8.4l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"></path>
+        <circle cx="12" cy="13.5" r="3.4"></circle>
+      </svg>
+    </button>
+    <button class="iconbtn" id="settingsBtn" aria-label="Einstellungen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path fill="currentColor" fill-rule="evenodd" stroke="currentColor" stroke-width=".9" stroke-linejoin="round" d="M10.12 4.33L10.37 1.93A10.20 10.20 0 0 1 13.63 1.93L13.88 4.33A7.90 7.90 0 0 1 16.10 5.25L17.97 3.73A10.20 10.20 0 0 1 20.27 6.03L18.75 7.90A7.90 7.90 0 0 1 19.67 10.12L22.07 10.37A10.20 10.20 0 0 1 22.07 13.63L19.67 13.88A7.90 7.90 0 0 1 18.75 16.10L20.27 17.97A10.20 10.20 0 0 1 17.97 20.27L16.10 18.75A7.90 7.90 0 0 1 13.88 19.67L13.63 22.07A10.20 10.20 0 0 1 10.37 22.07L10.12 19.67A7.90 7.90 0 0 1 7.90 18.75L6.03 20.27A10.20 10.20 0 0 1 3.73 17.97L5.25 16.10A7.90 7.90 0 0 1 4.33 13.88L1.93 13.63A10.20 10.20 0 0 1 1.93 10.37L4.33 10.12A7.90 7.90 0 0 1 5.25 7.90L3.73 6.03A10.20 10.20 0 0 1 6.03 3.73L7.90 5.25A7.90 7.90 0 0 1 10.12 4.33ZM8.40 12a3.60 3.60 0 1 0 7.20 0a3.60 3.60 0 1 0 -7.20 0Z"/>
+      </svg>
+    </button>
+    <button class="iconbtn" id="helpBtn" aria-label="Anleitung">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9.2"></circle>
+        <path d="M9.3 9.3a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.2 1-1.2 1.9v.3"></path>
+        <circle cx="12" cy="16.9" r=".25" fill="currentColor"></circle>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div id="hint">Berühre die Fläche</div>
+
+<div id="musicDock">
+  <input type="file" id="musicFile" accept="audio/*,.mp3" hidden>
+  <label for="musicFile" class="file-label">Song wählen</label>
+  <span id="musicName">Kein Song geladen</span>
+  <button class="mbtn" id="musicPlay" disabled aria-label="Abspielen"><svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg></button>
+  <button class="mbtn" id="musicStop" disabled aria-label="Stopp"><svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/></svg></button>
+</div>
+
+<div id="helpPanel" class="sheet">
+  <svg class="grabber" viewBox="0 0 44 14" fill="none">
+    <path d="M2 8c4-6 8-6 11 0s7 6 11 0 8-6 11 0 7 6 9 3" stroke="var(--ink-dim)" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>
+  <h2>Anleitung</h2>
+  <p class="sub">So bringst du die Strömung in Bewegung.</p>
+  <ul class="helplist">
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7.5"/></svg></div>
+      <div>
+        <div class="h-title">Berühren</div>
+        <div class="h-desc">Ein kurzer Tipp erzeugt einen Funken in der Strömung.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c3-5 6 1 9-4s6-1 9-5"/><path d="M17 5.5l4 .5-.6 4"/></svg></div>
+      <div>
+        <div class="h-title">Ziehen</div>
+        <div class="h-desc">Der Finger auf der Fläche lenkt die Strömung entlang der Bewegung.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4.5h-4.5"/></svg></div>
+      <div>
+        <div class="h-title">Gedrückt halten</div>
+        <div class="h-desc">Ein Finger ruhig auf der Fläche lassen – es entsteht ein kleiner Strudel.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></div>
+      <div>
+        <div class="h-title">Doppeltipp</div>
+        <div class="h-desc">Zwei schnelle Tipps an derselben Stelle lösen eine Supernova aus.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12h17"/><path d="M7.2 8.3 3.5 12l3.7 3.7M16.8 8.3 20.5 12l-3.7 3.7"/></svg></div>
+      <div>
+        <div class="h-title">Zwei Finger auseinander- oder zusammenziehen</div>
+        <div class="h-desc">Die Strömung strömt nach außen oder wird nach innen gesogen.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4a8 8 0 1 1-7.4 5"/><path d="M4 4.5v4.8h4.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></div>
+      <div>
+        <div class="h-title">Zwei Finger kurz halten und loslassen</div>
+        <div class="h-desc">Zwischen den Fingern entsteht ein kräftiger Wirbel.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v17"/><path d="M8.3 7.2 12 3.5l3.7 3.7M8.3 16.8 12 20.5l3.7-3.7"/></svg></div>
+      <div>
+        <div class="h-title">Neigungssteuerung</div>
+        <div class="h-desc">In den Einstellungen aktivierbar – das Neigen des Geräts lenkt die Strömung zusätzlich.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></div>
+      <div>
+        <div class="h-title">Musik laden</div>
+        <div class="h-desc">Über das Noten-Symbol einen Song wählen – die Strömung reagiert dann auf die Musik.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+      <div>
+        <div class="h-title">Foto-Symbol</div>
+        <div class="h-desc">Speichert den aktuellen Stand der Strömung als Bild.</div>
+      </div>
+    </li>
+    <li>
+      <div class="h-ico"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" stroke="currentColor" stroke-width=".9" stroke-linejoin="round" d="M10.12 4.33L10.37 1.93A10.20 10.20 0 0 1 13.63 1.93L13.88 4.33A7.90 7.90 0 0 1 16.10 5.25L17.97 3.73A10.20 10.20 0 0 1 20.27 6.03L18.75 7.90A7.90 7.90 0 0 1 19.67 10.12L22.07 10.37A10.20 10.20 0 0 1 22.07 13.63L19.67 13.88A7.90 7.90 0 0 1 18.75 16.10L20.27 17.97A10.20 10.20 0 0 1 17.97 20.27L16.10 18.75A7.90 7.90 0 0 1 13.88 19.67L13.63 22.07A10.20 10.20 0 0 1 10.37 22.07L10.12 19.67A7.90 7.90 0 0 1 7.90 18.75L6.03 20.27A10.20 10.20 0 0 1 3.73 17.97L5.25 16.10A7.90 7.90 0 0 1 4.33 13.88L1.93 13.63A10.20 10.20 0 0 1 1.93 10.37L4.33 10.12A7.90 7.90 0 0 1 5.25 7.90L3.73 6.03A10.20 10.20 0 0 1 6.03 3.73L7.90 5.25A7.90 7.90 0 0 1 10.12 4.33ZM8.40 12a3.60 3.60 0 1 0 7.20 0a3.60 3.60 0 1 0 -7.20 0Z"/></svg></div>
+      <div>
+        <div class="h-title">Einstellungen</div>
+        <div class="h-desc">Kraft, Nachwirkung, Verwirbelung, Farbpalette und Modi lassen sich dort feinjustieren.</div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div id="panel" class="sheet">
+  <svg class="grabber" viewBox="0 0 44 14" fill="none">
+    <path d="M2 8c4-6 8-6 11 0s7 6 11 0 8-6 11 0 7 6 9 3" stroke="var(--ink-dim)" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>
+  <h2>Strömung</h2>
+  <p class="sub">Feine Einstellungen für Kraft, Farbe und Verhalten der Simulation.</p>
+
+  <div class="segrow" id="modeRow">
+    <div class="seg" data-mode="ruhig">Ruhig</div>
+    <div class="seg active" data-mode="balance">Ausgewogen</div>
+    <div class="seg" data-mode="wild">Wild</div>
+    <div class="seg" data-mode="minimal">Minimal</div>
+  </div>
+
+  <div class="row">
+    <label>Intensität <span class="val" id="valForce">1.0</span></label>
+    <input type="range" id="rangeForce" min="0.3" max="2.5" step="0.05" value="1.0">
+  </div>
+  <div class="row">
+    <label>Nachwirkung <span class="val" id="valDissipation">0.94</span></label>
+    <input type="range" id="rangeDissipation" min="0.85" max="0.99" step="0.001" value="0.94">
+  </div>
+  <div class="row">
+    <label>Verwirbelung <span class="val" id="valCurl">22</span></label>
+    <input type="range" id="rangeCurl" min="0" max="60" step="1" value="22">
+  </div>
+
+  <div class="segrow" id="paletteRow">
+    <div class="seg active" data-palette="ember">Glut</div>
+    <div class="seg" data-palette="ocean">Ozean</div>
+    <div class="seg" data-palette="aurora">Aurora</div>
+    <div class="seg" data-palette="mono">Monochrom</div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="t-label">Leuchten (Bloom)</div>
+      <div class="t-desc">Helle Stellen strahlen weich in die Umgebung aus</div>
+    </div>
+    <div class="switch on" id="toggleBloom"></div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="t-label">Klang</div>
+      <div class="t-desc">Selbst erzeugter Klangteppich, reagiert auf die Bewegung</div>
+    </div>
+    <div class="switch" id="toggleSound"></div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="t-label">Automatische Strömung</div>
+      <div class="t-desc">Erzeugt von selbst sanfte Bewegung, wenn nichts berührt wird</div>
+    </div>
+    <div class="switch" id="toggleIdle"></div>
+  </div>
+
+  <div class="toggle-row" id="gyroRow">
+    <div>
+      <div class="t-label">Neigungssteuerung</div>
+      <div class="t-desc">Neige das Gerät, um die Strömung zu lenken</div>
+    </div>
+    <div class="switch" id="toggleGyro"></div>
+  </div>
+
+  <div class="toggle-row" id="calibrateRow" style="display:none;">
+    <div>
+      <div class="t-label">Neigung kalibrieren</div>
+      <div class="t-desc" id="calibrateDesc">Halte das Gerät in deiner gewohnten Haltung und tippe auf „Kalibrieren“</div>
+    </div>
+    <button class="cal-btn" id="calibrateBtn">Kalibrieren</button>
+  </div>
+
+  <div class="footlinks">
+    <a href="./impressum.html">Impressum</a>
+    <a href="./datenschutz.html#st">Datenschutz</a>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="fw-s-hero">
+    <img class="fw-s-icon" src="st-icon-192.png" alt="" width="68" height="68">
+    <h1 class="fw-title fw-s-title">StrömungsWahr</h1>
+    <p class="fw-s-sub">Berühre, wirble, beobachte.</p>
+  </div>
+  <button id="startBtn" class="fw-primary fw-s-btn">Starten</button>
+  <nav class="fw-s-legal fw-s-legal--fixed" aria-label="Rechtliches">
+    <a href="./impressum.html">Impressum</a><span>·</span><a href="./datenschutz.html#st">Datenschutz</a>
+  </nav>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Canvas & GL setup ----------
+  const canvas = document.getElementById('glcanvas');
+  const gl = canvas.getContext('webgl2', { antialias:false, alpha:false, depth:false, stencil:false, preserveDrawingBuffer:true });
+  if(!gl){
+    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#eee;line-height:1.5;">Dieses Gerät unterstützt leider kein WebGL2, das diese Simulation benötigt.</div>';
+    return;
+  }
+  gl.getExtension('EXT_color_buffer_float');
+  gl.getExtension('EXT_color_buffer_half_float');
+  const linearExt = gl.getExtension('OES_texture_half_float_linear') || gl.getExtension('OES_texture_float_linear');
+
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.floor(window.innerWidth * dpr);
+    const vh = (window.wzVH ? window.wzVH() : window.innerHeight);
+    const h = Math.floor(vh * dpr);
+    if(canvas.width !== w || canvas.height !== h){
+      canvas.width = w; canvas.height = h;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = vh + 'px';
+      return true;
+    }
+    return false;
+  }
+  resize();
+
+  // ---------- Shader helpers ----------
+  function compile(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.error(gl.getShaderInfoLog(s));
+    }
+    return s;
+  }
+  function program(vsSrc, fsSrc){
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, vsSrc));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fsSrc));
+    gl.linkProgram(p);
+    if(!gl.getProgramParameter(p, gl.LINK_STATUS)){
+      console.error(gl.getProgramInfoLog(p));
+    }
+    const uniforms = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for(let i=0;i<n;i++){
+      const info = gl.getActiveUniform(p, i);
+      uniforms[info.name] = gl.getUniformLocation(p, info.name);
+    }
+    return { program:p, uniforms };
+  }
+
+  const baseVS = `#version 300 es
+    precision highp float;
+    in vec2 aPos;
+    out vec2 vUv;
+    out vec2 vL, vR, vT, vB;
+    uniform vec2 texelSize;
+    void main(){
+      vUv = aPos * 0.5 + 0.5;
+      vL = vUv - vec2(texelSize.x, 0.0);
+      vR = vUv + vec2(texelSize.x, 0.0);
+      vT = vUv + vec2(0.0, texelSize.y);
+      vB = vUv - vec2(0.0, texelSize.y);
+      gl_Position = vec4(aPos, 0.0, 1.0);
+    }`;
+
+  const quadBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+  function bindQuad(prog){
+    const loc = gl.getAttribLocation(prog, 'aPos');
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  }
+
+  function drawQuad(){
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  // ---------- Fragment shaders ----------
+  const splatFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv;
+    uniform sampler2D uTarget;
+    uniform float aspectRatio;
+    uniform vec3 color;
+    uniform vec2 point;
+    uniform float radius;
+    out vec4 fragColor;
+    void main(){
+      vec2 p = vUv - point.xy;
+      p.x *= aspectRatio;
+      vec3 splat = exp(-dot(p,p) / radius) * color;
+      vec3 base = texture(uTarget, vUv).xyz;
+      fragColor = vec4(base + splat, 1.0);
+    }`;
+
+  const advectionFS = `#version 300 es
+    precision highp float;
+    precision highp sampler2D;
+    in vec2 vUv;
+    uniform sampler2D uVelocity;
+    uniform sampler2D uSource;
+    uniform vec2 texelSize;
+    uniform float dt;
+    uniform float dissipation;
+    uniform float clampMax;
+    out vec4 fragColor;
+    void main(){
+      vec2 coord = vUv - dt * texture(uVelocity, vUv).xy * texelSize;
+      vec4 result = texture(uSource, coord);
+      float decay = 1.0 + dissipation * dt;
+      result = result / decay;
+      if(clampMax > 0.0){
+        result.rgb = min(result.rgb, vec3(clampMax));
+      }
+      fragColor = result;
+    }`;
+
+  const divergenceFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uVelocity;
+    out vec4 fragColor;
+    void main(){
+      float L = texture(uVelocity, vL).x;
+      float R = texture(uVelocity, vR).x;
+      float T = texture(uVelocity, vT).y;
+      float B = texture(uVelocity, vB).y;
+      vec2 c = texture(uVelocity, vUv).xy;
+      if(vL.x < 0.0) L = -c.x;
+      if(vR.x > 1.0) R = -c.x;
+      if(vT.y > 1.0) T = -c.y;
+      if(vB.y < 0.0) B = -c.y;
+      float div = 0.5 * (R - L + T - B);
+      fragColor = vec4(div, 0.0, 0.0, 1.0);
+    }`;
+
+  const curlFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uVelocity;
+    out vec4 fragColor;
+    void main(){
+      float L = texture(uVelocity, vL).y;
+      float R = texture(uVelocity, vR).y;
+      float T = texture(uVelocity, vT).x;
+      float B = texture(uVelocity, vB).x;
+      float vort = R - L - T + B;
+      fragColor = vec4(0.5 * vort, 0.0, 0.0, 1.0);
+    }`;
+
+  const vorticityFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uVelocity;
+    uniform sampler2D uCurl;
+    uniform float curlStrength;
+    uniform float dt;
+    out vec4 fragColor;
+    void main(){
+      float L = texture(uCurl, vL).x;
+      float R = texture(uCurl, vR).x;
+      float T = texture(uCurl, vT).x;
+      float B = texture(uCurl, vB).x;
+      float C = texture(uCurl, vUv).x;
+      vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
+      force /= length(force) + 0.0001;
+      force *= curlStrength * C;
+      force.y *= -1.0;
+      vec2 vel = texture(uVelocity, vUv).xy;
+      vel += force * dt;
+      vel = clamp(vel, -1000.0, 1000.0);
+      fragColor = vec4(vel, 0.0, 1.0);
+    }`;
+
+  const pressureFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uPressure;
+    uniform sampler2D uDivergence;
+    out vec4 fragColor;
+    void main(){
+      float L = texture(uPressure, vL).x;
+      float R = texture(uPressure, vR).x;
+      float T = texture(uPressure, vT).x;
+      float B = texture(uPressure, vB).x;
+      float C = texture(uPressure, vUv).x;
+      float div = texture(uDivergence, vUv).x;
+      float p = (L + R + B + T - div) * 0.25;
+      fragColor = vec4(p, 0.0, 0.0, 1.0);
+    }`;
+
+  const gradientSubtractFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uPressure;
+    uniform sampler2D uVelocity;
+    out vec4 fragColor;
+    void main(){
+      float L = texture(uPressure, vL).x;
+      float R = texture(uPressure, vR).x;
+      float T = texture(uPressure, vT).x;
+      float B = texture(uPressure, vB).x;
+      vec2 vel = texture(uVelocity, vUv).xy;
+      vel -= vec2(R - L, T - B);
+      fragColor = vec4(vel, 0.0, 1.0);
+    }`;
+
+  const clearFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv;
+    uniform sampler2D uTexture;
+    uniform float value;
+    out vec4 fragColor;
+    void main(){ fragColor = value * texture(uTexture, vUv); }`;
+
+  const bloomPrefilterFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv;
+    uniform sampler2D uTexture;
+    uniform float threshold;
+    uniform float knee;
+    out vec4 fragColor;
+    void main(){
+      vec3 c = texture(uTexture, vUv).rgb;
+      float brightness = max(c.r, max(c.g, c.b));
+      float soft = brightness - threshold + knee;
+      soft = clamp(soft, 0.0, 2.0 * knee);
+      soft = soft * soft / (4.0 * knee + 0.0001);
+      float contribution = max(soft, brightness - threshold) / max(brightness, 0.0001);
+      fragColor = vec4(c * contribution, 1.0);
+    }`;
+
+  const bloomBlurFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uTexture;
+    out vec4 fragColor;
+    void main(){
+      vec4 sum = texture(uTexture, vUv) * 4.0;
+      sum += texture(uTexture, vL);
+      sum += texture(uTexture, vR);
+      sum += texture(uTexture, vT);
+      sum += texture(uTexture, vB);
+      fragColor = sum / 8.0;
+    }`;
+
+  const displayFS = `#version 300 es
+    precision highp float;
+    in vec2 vUv; in vec2 vL; in vec2 vR; in vec2 vT; in vec2 vB;
+    uniform sampler2D uDye;
+    uniform sampler2D uVelocity;
+    uniform sampler2D uBloom;
+    uniform float bloomEnabled;
+    uniform float bloomIntensity;
+    uniform float ditherSeed;
+    out vec4 fragColor;
+    void main(){
+      vec3 col = texture(uDye, vUv).rgb;
+      if(bloomEnabled > 0.5){
+        col += texture(uBloom, vUv).rgb * bloomIntensity;
+      }
+      // saturation boost so individual streams read as distinct, saturated color rather than a pastel haze
+      float lum = dot(col, vec3(0.299,0.587,0.114));
+      col = mix(vec3(lum), col, 1.35);
+      // black-point crush: faint residual haze drops to true black, keeping the background pure
+      col = max(col - 0.05, 0.0) / (1.0 - 0.05);
+      // filmic roll-off for the highlights, then a contrast curve that darkens the low end further
+      col = vec3(1.0) - exp(-col * 1.55);
+      col = pow(col, vec3(1.28));
+      // gentle edge darkening (kept multiplicative so it never lifts the black floor)
+      vec2 centered = vUv - 0.5;
+      float vig = 1.0 - dot(centered,centered) * 0.32;
+      col *= mix(1.0, vig, 0.6);
+      // Dithering: bricht 8-Bit-Quantisierungsstufen (sichtbar als konzentrische
+      // Ringe beim Abklingen heller Stellen, siehe Vignette oben) mit einem
+      // pro Frame leicht wandernden Rauschen auf, statt an den Pixeln zu kleben.
+      float dither = fract(sin(dot(gl_FragCoord.xy + ditherSeed, vec2(12.9898,78.233))) * 43758.5453);
+      col += (dither - 0.5) / 255.0;
+      fragColor = vec4(col, 1.0);
+    }`;
+
+  const P_splat = program(baseVS, splatFS);
+  const P_advection = program(baseVS, advectionFS);
+  const P_divergence = program(baseVS, divergenceFS);
+  const P_curl = program(baseVS, curlFS);
+  const P_vorticity = program(baseVS, vorticityFS);
+  const P_pressure = program(baseVS, pressureFS);
+  const P_gradSub = program(baseVS, gradientSubtractFS);
+  const P_clear = program(baseVS, clearFS);
+  const P_bloomPrefilter = program(baseVS, bloomPrefilterFS);
+  const P_bloomBlur = program(baseVS, bloomBlurFS);
+  const P_display = program(baseVS, displayFS);
+
+  // ---------- FBO helpers ----------
+  function createFBO(w, h, internalFormat, format, type, filtering){
+    gl.activeTexture(gl.TEXTURE0);
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filtering);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filtering);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
+    const fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    gl.viewport(0, 0, w, h);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    return { tex, fbo, w, h, attach(id){ gl.activeTexture(gl.TEXTURE0+id); gl.bindTexture(gl.TEXTURE_2D, tex); return id; } };
+  }
+  function createDoubleFBO(w,h,internalFormat,format,type,filtering){
+    let fbo1 = createFBO(w,h,internalFormat,format,type,filtering);
+    let fbo2 = createFBO(w,h,internalFormat,format,type,filtering);
+    return {
+      w,h,
+      get read(){ return fbo1; }, set read(v){ fbo1 = v; },
+      get write(){ return fbo2; }, set write(v){ fbo2 = v; },
+      swap(){ const tmp = fbo1; fbo1 = fbo2; fbo2 = tmp; }
+    };
+  }
+
+  const filtering = linearExt ? gl.LINEAR : gl.NEAREST;
+  const texType = gl.HALF_FLOAT;
+
+  let simRes = 192;
+
+  const QUALITY_STEPS = [
+    { simRes: 120, dyeScale: 1.3, dyeBoost: 1.0 },
+    { simRes: 156, dyeScale: 1.6, dyeBoost: 1.25 },
+    { simRes: 192, dyeScale: 1.9, dyeBoost: 1.5 }
+  ];
+  let qualityLevel = 2;
+  let dyeRes = 0; // computed on resize
+
+  function getResolution(res){
+    const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
+    const a = aspect < 1 ? 1/aspect : aspect;
+    const min = Math.round(res);
+    const max = Math.round(res * a);
+    return gl.drawingBufferWidth > gl.drawingBufferHeight ? {w:max,h:min} : {w:min,h:max};
+  }
+
+  let velocity, dye, divergenceFBO, curlFBO, pressure;
+  let bloomLevels = [];
+  const BLOOM_LEVELS = 3;
+
+  function initBloomFBOs(baseW, baseH){
+    bloomLevels = [];
+    let w = Math.max(2, Math.floor(baseW/2));
+    let h = Math.max(2, Math.floor(baseH/2));
+    for(let i=0;i<BLOOM_LEVELS;i++){
+      bloomLevels.push(createFBO(w, h, gl.RGBA16F, gl.RGBA, texType, gl.LINEAR));
+      w = Math.max(2, Math.floor(w/2));
+      h = Math.max(2, Math.floor(h/2));
+    }
+  }
+
+  function initFBOs(){
+    const q = QUALITY_STEPS[qualityLevel];
+    simRes = q.simRes;
+    const simSize = getResolution(simRes);
+    const dyeSize = getResolution(simRes * q.dyeScale * (dpr>1 ? q.dyeBoost : 1.0));
+    velocity = createDoubleFBO(simSize.w, simSize.h, gl.RG16F, gl.RG, texType, filtering);
+    dye = createDoubleFBO(dyeSize.w, dyeSize.h, gl.RGBA16F, gl.RGBA, texType, filtering);
+    divergenceFBO = createFBO(simSize.w, simSize.h, gl.R16F, gl.RED, texType, gl.NEAREST);
+    curlFBO = createFBO(simSize.w, simSize.h, gl.R16F, gl.RED, texType, gl.NEAREST);
+    pressure = createDoubleFBO(simSize.w, simSize.h, gl.R16F, gl.RED, texType, gl.NEAREST);
+    initBloomFBOs(dyeSize.w, dyeSize.h);
+  }
+  initFBOs();
+
+  function useProgram(p){ gl.useProgram(p.program); bindQuad(p.program); return p.uniforms; }
+
+  function blit(target){
+    if(target == null){
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0,0,gl.drawingBufferWidth, gl.drawingBufferHeight);
+    } else {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+      gl.viewport(0,0,target.w, target.h);
+    }
+    drawQuad();
+  }
+
+  // ---------- Settings ----------
+  const settings = {
+    force: 1.0,
+    dissipation: 0.94,
+    curl: 22,
+    idle: false,
+    gyro: false,
+    bloom: true,
+    sound: false,
+    palette: 'ember',
+    mode: 'balance',
+    radiusScale: 1.0,
+    idleMag: 1.0,
+    wanderMag: 1.0,
+    eventMin: 16,
+    eventMax: 30,
+    velDiss: 0.5
+  };
+
+  const MODES = {
+    ruhig:   { curl: 10, dissipation: 0.90, radiusScale: 0.8,  idleMag: 0.45, wanderMag: 0.4,  eventMin: 24, eventMax: 40, velDiss: 0.85 },
+    balance: { curl: 22, dissipation: 0.94, radiusScale: 1.0,  idleMag: 1.0,  wanderMag: 1.0,  eventMin: 16, eventMax: 30, velDiss: 0.5 },
+    wild:    { curl: 40, dissipation: 0.96, radiusScale: 1.2,  idleMag: 1.7,  wanderMag: 1.8,  eventMin: 7,  eventMax: 15, velDiss: 0.3 },
+    minimal: { curl: 14, dissipation: 0.87, radiusScale: 0.6,  idleMag: 0.2,  wanderMag: 0.15, eventMin: 34, eventMax: 55, velDiss: 1.2 }
+  };
+
+  function applyMode(name){
+    const m = MODES[name];
+    if(!m) return;
+    settings.mode = name;
+    settings.curl = m.curl;
+    settings.dissipation = m.dissipation;
+    settings.radiusScale = m.radiusScale;
+    settings.idleMag = m.idleMag;
+    settings.wanderMag = m.wanderMag;
+    settings.eventMin = m.eventMin;
+    settings.eventMax = m.eventMax;
+    settings.velDiss = m.velDiss;
+    rangeCurl.value = m.curl; valCurl.textContent = Math.round(m.curl);
+    rangeDiss.value = m.dissipation; valDiss.textContent = m.dissipation.toFixed(3);
+    document.querySelectorAll('#modeRow .seg').forEach(el=>{
+      el.classList.toggle('active', el.dataset.mode === name);
+    });
+  }
+
+  const PALETTES = {
+    ember: [ [1.0,0.35,0.15], [1.0,0.62,0.18], [0.95,0.15,0.35] ],
+    ocean: [ [0.10,0.55,0.95], [0.05,0.85,0.75], [0.25,0.25,0.85] ],
+    aurora:[ [0.15,0.95,0.55], [0.55,0.25,0.95], [0.10,0.75,0.95] ],
+    mono:  [ [0.85,0.87,0.95], [0.55,0.58,0.70], [0.95,0.95,1.00] ]
+  };
+
+  let simTime = 0;
+
+  function hueRotate(rgb, deg){
+    let [r,g,b] = rgb;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2, d = max-min;
+    if(d === 0){ h = 0; s = 0; }
+    else{
+      s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+      if(max === r) h = (g-b)/d + (g<b?6:0);
+      else if(max === g) h = (b-r)/d + 2;
+      else h = (r-g)/d + 4;
+      h /= 6;
+    }
+    h = ((h + deg/360) % 1 + 1) % 1;
+    function hue2rgb(p,q,t){
+      if(t<0) t+=1; if(t>1) t-=1;
+      if(t<1/6) return p+(q-p)*6*t;
+      if(t<1/2) return q;
+      if(t<2/3) return p+(q-p)*(2/3-t)*6;
+      return p;
+    }
+    if(s === 0) return [l,l,l];
+    const q = l < 0.5 ? l*(1+s) : l+s-l*s;
+    const p = 2*l - q;
+    return [hue2rgb(p,q,h+1/3), hue2rgb(p,q,h), hue2rgb(p,q,h-1/3)];
+  }
+
+  function pickColor(){
+    const p = PALETTES[settings.palette];
+    const base = p[Math.floor(Math.random()*p.length)];
+    const jitter = 0.12;
+    let col = [
+      Math.max(0, base[0] + (Math.random()-0.5)*jitter),
+      Math.max(0, base[1] + (Math.random()-0.5)*jitter),
+      Math.max(0, base[2] + (Math.random()-0.5)*jitter)
+    ];
+    if(settings.palette !== 'mono'){
+      col = hueRotate(col, (simTime * 2.4) % 360);
+    }
+    return col;
+  }
+
+  // ---------- Simulation step ----------
+  let lastTime = performance.now();
+
+  function splat(x, y, dx, dy, color){
+    const aspect = canvas.width/canvas.height;
+    energy = Math.min(1, energy + Math.hypot(dx,dy) / 9000);
+    chimeFromMovement(x, y, dx, dy);
+
+    let u = useProgram(P_splat);
+    gl.viewport(0,0,velocity.w, velocity.h);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+    gl.uniform1i(u.uTarget, velocity.read.attach(0));
+    gl.uniform1f(u.aspectRatio, aspect);
+    gl.uniform2f(u.point, x, y);
+    gl.uniform3f(u.color, dx, dy, 0.0);
+    gl.uniform1f(u.radius, 0.0013 * settings.radiusScale);
+    drawQuad();
+    velocity.swap();
+
+    gl.viewport(0,0,dye.w, dye.h);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dye.write.fbo);
+    gl.uniform1i(u.uTarget, dye.read.attach(0));
+    gl.uniform3f(u.color, color[0], color[1], color[2]);
+    gl.uniform1f(u.radius, 0.0019 * settings.radiusScale);
+    drawQuad();
+    dye.swap();
+  }
+
+  function step(dt){
+    gl.disable(gl.BLEND);
+
+    let u = useProgram(P_curl);
+    gl.viewport(0,0,curlFBO.w, curlFBO.h);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+    blit(curlFBO);
+
+    u = useProgram(P_vorticity);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+    gl.uniform1i(u.uCurl, curlFBO.attach(1));
+    gl.uniform1f(u.curlStrength, settings.curl * (1.0 + 0.22*Math.sin(simTime*0.015)));
+    gl.uniform1f(u.dt, dt);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+    gl.viewport(0,0,velocity.w, velocity.h);
+    drawQuad();
+    velocity.swap();
+
+    u = useProgram(P_divergence);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+    blit(divergenceFBO);
+
+    u = useProgram(P_clear);
+    gl.uniform1i(u.uTexture, pressure.read.attach(0));
+    gl.uniform1f(u.value, 0.8);
+    gl.viewport(0,0,pressure.w, pressure.h);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.write.fbo);
+    drawQuad();
+    pressure.swap();
+
+    u = useProgram(P_pressure);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uDivergence, divergenceFBO.attach(1));
+    for(let i=0;i<22;i++){
+      gl.uniform1i(u.uPressure, pressure.read.attach(0));
+      gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.write.fbo);
+      gl.viewport(0,0,pressure.w, pressure.h);
+      drawQuad();
+      pressure.swap();
+    }
+
+    u = useProgram(P_gradSub);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uPressure, pressure.read.attach(0));
+    gl.uniform1i(u.uVelocity, velocity.read.attach(1));
+    gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+    gl.viewport(0,0,velocity.w, velocity.h);
+    drawQuad();
+    velocity.swap();
+
+    u = useProgram(P_advection);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+    gl.uniform1i(u.uSource, velocity.read.attach(0));
+    gl.uniform1f(u.dt, dt);
+    gl.uniform1f(u.dissipation, settings.velDiss);
+    gl.uniform1f(u.clampMax, 0.0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+    gl.viewport(0,0,velocity.w, velocity.h);
+    drawQuad();
+    velocity.swap();
+
+    u = useProgram(P_advection);
+    gl.uniform2f(u.texelSize, 1.0/velocity.w, 1.0/velocity.h);
+    gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+    gl.uniform1i(u.uSource, dye.read.attach(1));
+    gl.uniform1f(u.dt, dt);
+    gl.uniform1f(u.dissipation, (1.0-settings.dissipation)*1.4);
+    gl.uniform1f(u.clampMax, 1.5);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dye.write.fbo);
+    gl.viewport(0,0,dye.w, dye.h);
+    drawQuad();
+    dye.swap();
+  }
+
+  function applyBloom(){
+    if(!settings.bloom) return;
+    let u = useProgram(P_bloomPrefilter);
+    gl.uniform1i(u.uTexture, dye.read.attach(0));
+    gl.uniform1f(u.threshold, 0.85);
+    gl.uniform1f(u.knee, 0.22);
+    blit(bloomLevels[0]);
+
+    // downsample + blur chain
+    for(let i=1;i<bloomLevels.length;i++){
+      const src = bloomLevels[i-1];
+      const dst = bloomLevels[i];
+      u = useProgram(P_bloomBlur);
+      gl.uniform2f(u.texelSize, 1.0/src.w, 1.0/src.h);
+      gl.uniform1i(u.uTexture, src.attach(0));
+      blit(dst);
+    }
+
+    // additive upsample chain back to level 0
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE);
+    for(let i=bloomLevels.length-2;i>=0;i--){
+      const src = bloomLevels[i+1];
+      const dst = bloomLevels[i];
+      u = useProgram(P_bloomBlur);
+      gl.uniform2f(u.texelSize, 1.0/src.w, 1.0/src.h);
+      gl.uniform1i(u.uTexture, src.attach(0));
+      blit(dst);
+    }
+    gl.disable(gl.BLEND);
+  }
+
+  function render(){
+    applyBloom();
+    let u = useProgram(P_display);
+    gl.uniform1i(u.uDye, dye.read.attach(0));
+    gl.uniform1i(u.uVelocity, velocity.read.attach(1));
+    gl.uniform1i(u.uBloom, bloomLevels[0].attach(2));
+    gl.uniform1f(u.bloomEnabled, settings.bloom ? 1.0 : 0.0);
+    gl.uniform1f(u.bloomIntensity, 0.3);
+    gl.uniform1f(u.ditherSeed, simTime * 60.0);
+    blit(null);
+  }
+
+  // ---------- Energy tracking (drives sound, no GPU readback needed) ----------
+  let energy = 0; // 0..1 smoothed activity level
+
+  // ---------- Procedural melodic chimes (WebAudio, fully synthesized) ----------
+  // Warm, bright, bell-like tones triggered by the movement of the flow patterns —
+  // no constant drone. Notes are picked from a pentatonic scale so they always sound
+  // pleasant together, pitch follows vertical position, pan follows horizontal position.
+  let audioCtx = null, masterGain, warmthFilter, reverbDelay, reverbFeedback, reverbFilter, reverbWet;
+  let audioReady = false;
+
+  // Warm major-pentatonic across ~2.5 octaves (C4…E6) — bright on top, warm on the bottom.
+  const CHIME_SCALE = [261.63, 293.66,329.63,392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
+
+  function initAudio(){
+    if(audioReady) return;
+    audioReady = true;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0; // gated on/off smoothly by updateAudio()
+    masterGain.connect(audioCtx.destination);
+
+    // gentle overall lowpass so the highest partials stay warm rather than harsh
+    warmthFilter = audioCtx.createBiquadFilter();
+    warmthFilter.type = 'lowpass';
+    warmthFilter.frequency.value = 7200;
+    warmthFilter.Q.value = 0.4;
+    warmthFilter.connect(masterGain);
+
+    // soft shimmer/echo tail so single chime hits feel like they float over the water
+    reverbDelay = audioCtx.createDelay(1.2);
+    reverbDelay.delayTime.value = 0.27;
+    reverbFeedback = audioCtx.createGain();
+    reverbFeedback.gain.value = 0.34;
+    reverbFilter = audioCtx.createBiquadFilter();
+    reverbFilter.type = 'lowpass';
+    reverbFilter.frequency.value = 3200;
+    reverbWet = audioCtx.createGain();
+    reverbWet.gain.value = 0.24;
+    reverbDelay.connect(reverbFilter);
+    reverbFilter.connect(reverbFeedback);
+    reverbFeedback.connect(reverbDelay);
+    reverbDelay.connect(reverbWet);
+    reverbWet.connect(warmthFilter);
+  }
+
+  function updateAudio(dt){
+    if(!audioReady || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const duck = musicPlaying ? 0.35 : 1.0;
+    const targetGain = settings.sound ? duck : 0;
+    masterGain.gain.setTargetAtTime(targetGain, t, 0.3);
+    // a touch more shimmer when the patterns are more active
+    reverbWet.gain.setTargetAtTime(0.18 + energy*0.22, t, 0.4);
+  }
+
+  // A single warm bell/chime tone: quick soft attack, long musical decay, a couple of
+  // gently detuned partials for warmth and a faint high partial for brightness/sparkle.
+  function playChime(freq, vel, pan){
+    if(!audioReady || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const decay = 1.5 + (1 - Math.min(1, freq/1000)) * 1.2; // lower notes ring a little longer
+    const v = Math.max(0.05, Math.min(1, vel));
+
+    const voiceGain = audioCtx.createGain();
+    voiceGain.gain.setValueAtTime(0, t);
+    voiceGain.gain.linearRampToValueAtTime(0.001, t); // avoid clicks
+
+    const panner = (audioCtx.createStereoPanner) ? audioCtx.createStereoPanner() : null;
+    if(panner){ panner.pan.value = Math.max(-0.85, Math.min(0.85, pan)); }
+
+    const toneFilter = audioCtx.createBiquadFilter();
+    toneFilter.type = 'lowpass';
+    toneFilter.frequency.value = Math.min(6500, freq * 5.5);
+    toneFilter.Q.value = 0.5;
+
+    function partial(mult, gainAmt, type, dur){
+      const osc = audioCtx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq * mult;
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(gainAmt * v, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+      osc.connect(g); g.connect(toneFilter);
+      osc.start(t);
+      osc.stop(t + dur + 0.05);
+    }
+
+    partial(1.0, 0.34, 'sine', decay);            // warm fundamental
+    partial(2.006, 0.14, 'triangle', decay*0.65);  // soft bell shimmer, slightly detuned
+    partial(3.01, 0.05, 'sine', decay*0.35);       // faint bright sparkle on top
+
+    toneFilter.connect(voiceGain);
+    if(panner){ voiceGain.connect(panner); panner.connect(warmthFilter); panner.connect(reverbDelay); }
+    else { voiceGain.connect(warmthFilter); voiceGain.connect(reverbDelay); }
+    voiceGain.gain.linearRampToValueAtTime(v, t + 0.012);
+  }
+
+  // Movement → melody: called from splat() so the tones truly follow the moving patterns.
+  let lastChimeTime = 0;
+  function chimeFromMovement(x, y, dx, dy){
+    if(!settings.sound || !audioReady) return;
+    const mag = Math.hypot(dx, dy);
+    if(mag < 55) return;
+    const t = audioCtx.currentTime;
+    if(t - lastChimeTime < 0.085) return;
+    const prob = Math.min(1, mag / 1600);
+    if(Math.random() > prob) return;
+    lastChimeTime = t;
+
+    const idx = Math.max(0, Math.min(CHIME_SCALE.length - 1, Math.floor(y * CHIME_SCALE.length)));
+    const freq = CHIME_SCALE[idx];
+    const vel = 0.3 + Math.min(0.6, mag / 3200);
+    const pan = (x - 0.5) * 1.7;
+    playChime(freq, vel, pan);
+  }
+
+  function audioBurst(strength){
+    if(!audioReady || !audioCtx || !settings.sound) return;
+    // a small bright arpeggio of chime notes for taps / pops / bursts
+    const notes = [7, 9, 11, 12];
+    const count = 2 + Math.floor(strength * 2);
+    for(let i=0;i<count;i++){
+      const idx = notes[Math.min(notes.length-1, i)] % CHIME_SCALE.length;
+      const freq = CHIME_SCALE[idx];
+      const delayS = i * 0.05;
+      setTimeout(()=> playChime(freq, 0.4 + strength*0.4, (Math.random()-0.5)*1.2), delayS*1000);
+    }
+  }
+
+  // ---------- Song upload & playback (own file, processed fully locally) ----------
+  let audioEl = null, mediaSource = null, analyser = null, freqData = null;
+  let musicPlaying = false, bassAvg = 0, lastBeatTime = 0, beatAngle = 0;
+  let musicBass = 0, musicMid = 0, musicTreble = 0;
+
+  const musicBtn = document.getElementById('musicBtn');
+  const musicDock = document.getElementById('musicDock');
+  const musicFileInput = document.getElementById('musicFile');
+  const musicNameEl = document.getElementById('musicName');
+  const musicPlayBtn = document.getElementById('musicPlay');
+  const musicStopBtn = document.getElementById('musicStop');
+
+  musicBtn.addEventListener('click', ()=>{ if(!audioReady) initAudio(); musicDock.classList.toggle('open'); });
+
+  function loadMusicFile(file){
+    if(!audioReady) initAudio();
+    if(audioEl){
+      audioEl.pause();
+      try{ mediaSource.disconnect(); analyser.disconnect(); }catch(e){}
+      URL.revokeObjectURL(audioEl.src);
+    }
+    audioEl = new Audio();
+    audioEl.loop = true;
+    audioEl.src = URL.createObjectURL(file);
+    mediaSource = audioCtx.createMediaElementSource(audioEl);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.82;
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    mediaSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    musicNameEl.textContent = file.name.length > 26 ? file.name.slice(0,24)+'…' : file.name;
+    musicPlayBtn.disabled = false;
+    musicStopBtn.disabled = false;
+    playMusic();
+  }
+
+  function playMusic(){
+    if(!audioEl) return;
+    audioCtx.resume();
+    audioEl.play().catch(()=>{});
+    musicPlaying = true;
+    musicPlayBtn.innerHTML = '<svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>';
+    musicPlayBtn.setAttribute('aria-label','Pause');
+  }
+  function pauseMusic(){
+    if(!audioEl) return;
+    audioEl.pause();
+    musicPlaying = false;
+    musicPlayBtn.innerHTML = '<svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>';
+    musicPlayBtn.setAttribute('aria-label','Abspielen');
+  }
+  function stopMusic(){
+    if(!audioEl) return;
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    musicPlaying = false;
+    bassAvg = 0; musicBass = musicMid = musicTreble = 0;
+    musicPlayBtn.innerHTML = '<svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>';
+    musicPlayBtn.setAttribute('aria-label','Abspielen');
+  }
+
+  musicFileInput.addEventListener('change', e=>{ const f = e.target.files[0]; if(f) loadMusicFile(f); });
+  musicPlayBtn.addEventListener('click', ()=>{ musicPlaying ? pauseMusic() : playMusic(); });
+  musicStopBtn.addEventListener('click', stopMusic);
+
+  function onBeat(strength){
+    beatAngle += 0.7 + Math.random()*0.6;
+    const x = 0.5 + Math.cos(beatAngle)*0.22;
+    const y = 0.5 + Math.sin(beatAngle)*0.22;
+    const mag = 1300 + strength*2200;
+    const c = pickColor();
+    splat(x, y, Math.cos(beatAngle+Math.PI/2)*mag, Math.sin(beatAngle+Math.PI/2)*mag, c);
+    splat(x, y, Math.cos(beatAngle-Math.PI/2)*mag*0.6, Math.sin(beatAngle-Math.PI/2)*mag*0.6, c);
+  }
+
+  function updateMusicAnalysis(dt){
+    if(!analyser || !musicPlaying){ musicBass*=0.9; musicMid*=0.9; musicTreble*=0.9; return; }
+    analyser.getByteFrequencyData(freqData);
+    const n = freqData.length;
+    const bassEnd = Math.max(1, Math.floor(n*0.06));
+    const midEnd = Math.floor(n*0.35);
+    let bassSum=0, midSum=0, trebleSum=0;
+    for(let i=0;i<bassEnd;i++) bassSum += freqData[i];
+    for(let i=bassEnd;i<midEnd;i++) midSum += freqData[i];
+    for(let i=midEnd;i<n;i++) trebleSum += freqData[i];
+    const bass = bassSum/(bassEnd*255);
+    const mid = midSum/Math.max(1,(midEnd-bassEnd)*255);
+    const treble = trebleSum/Math.max(1,(n-midEnd)*255);
+    musicBass = musicBass*0.6 + bass*0.4;
+    musicMid = musicMid*0.6 + mid*0.4;
+    musicTreble = musicTreble*0.6 + treble*0.4;
+
+    bassAvg = bassAvg*0.94 + bass*0.06;
+    const now = performance.now();
+    if(bass > bassAvg*1.4 && bass > 0.26 && now-lastBeatTime > 180){
+      lastBeatTime = now;
+      onBeat(bass);
+    }
+
+    energy = Math.min(1, energy + (musicBass*0.5+musicMid*0.3+musicTreble*0.2) * dt * 2.2);
+
+    if(Math.random() < musicTreble*0.5){
+      const ang = Math.random()*Math.PI*2;
+      const r = 0.15+Math.random()*0.3;
+      const x = 0.5+Math.cos(ang)*r, y = 0.5+Math.sin(ang)*r;
+      splat(x, y, Math.cos(ang)*400*musicTreble, Math.sin(ang)*400*musicTreble, pickColor());
+    }
+  }
+
+  // ---------- Pointer interaction ----------
+  const pointers = {};
+  let hintTimer = null;
+
+  const hintPhrases = [
+    'Berühre die Fläche',
+    'Doppeltipp für eine Supernova',
+    'Zwei Finger, kurz halten, für einen Wirbel',
+    'Zusammen- und auseinanderziehen',
+    'Gedrückt halten für einen Strudel'
+  ];
+  let hintIndex = 0;
+  function showHint(){
+    const el = document.getElementById('hint');
+    el.textContent = hintPhrases[hintIndex % hintPhrases.length];
+    hintIndex++;
+    el.classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+  }
+  setTimeout(showHint, 900);
+  const hintCycle = setInterval(()=>{
+    if(Object.keys(pointers).length === 0 && hintIndex < hintPhrases.length) showHint();
+    if(hintIndex >= hintPhrases.length) clearInterval(hintCycle);
+  }, 5200);
+
+  let lastTapTime = 0, lastTapX = 0, lastTapY = 0;
+  let gestureTwoActive = false, gestureTwoIds = [], gestureLastDist = 0, gestureBothStationary = true;
+  let longPressAngleAccum = 0;
+
+  function twoFingerDistance(){
+    const a = pointers[gestureTwoIds[0]], b = pointers[gestureTwoIds[1]];
+    if(!a || !b) return 0;
+    const aspect = canvas.width/canvas.height;
+    return Math.hypot((a.x-b.x)*aspect, a.y-b.y);
+  }
+
+  function spark(x, y){
+    splat(x, y, (Math.random()-0.5)*350, (Math.random()-0.5)*350, pickColor());
+  }
+
+  function popBurst(x, y){
+    const c = pickColor();
+    for(let i=0;i<6;i++){
+      const ang = (i/6)*Math.PI*2 + Math.random()*0.3;
+      const mag = 1500 + Math.random()*500;
+      splat(x, y, Math.cos(ang)*mag, Math.sin(ang)*mag, c);
+    }
+    audioBurst(0.25);
+  }
+
+  function vortexBurst(mx, my, strength){
+    const colors = [pickColor(), pickColor()];
+    const rays = 9, R = 0.045;
+    for(let i=0;i<rays;i++){
+      const ang = (i/rays)*Math.PI*2;
+      const px = mx + Math.cos(ang)*R, py = my + Math.sin(ang)*R;
+      const tangent = ang + Math.PI/2;
+      const mag = 1500 * strength;
+      splat(px, py, Math.cos(tangent)*mag, Math.sin(tangent)*mag, colors[i%2]);
+    }
+    audioBurst(0.4);
+  }
+
+  function radialField(mx, my, outward, magnitude){
+    const c = pickColor();
+    const rays = 6, R = 0.035;
+    for(let i=0;i<rays;i++){
+      const ang = (i/rays)*Math.PI*2 + Math.random()*0.2;
+      const px = mx + Math.cos(ang)*R, py = my + Math.sin(ang)*R;
+      const dir = outward ? ang : ang + Math.PI;
+      splat(px, py, Math.cos(dir)*magnitude, Math.sin(dir)*magnitude, c);
+    }
+  }
+
+  function updateLongPress(dt){
+    const ids = Object.keys(pointers);
+    if(ids.length !== 1){ return; }
+    const ptr = pointers[ids[0]];
+    if(!ptr || ptr.moved) return;
+    const held = performance.now() - ptr.startTime;
+    if(held > 550){
+      ptr.longPress = true;
+      longPressAngleAccum += dt * 3.2;
+      const R = 0.03;
+      const ang = longPressAngleAccum;
+      const px = ptr.x + Math.cos(ang)*R, py = ptr.y + Math.sin(ang)*R;
+      const dirIn = ang + Math.PI, tangent = ang + Math.PI/2;
+      const mag = 620;
+      splat(px, py,
+        Math.cos(dirIn)*mag*0.65 + Math.cos(tangent)*mag*0.45,
+        Math.sin(dirIn)*mag*0.65 + Math.sin(tangent)*mag*0.45,
+        ptr.color);
+    }
+  }
+
+  function normPos(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (clientX - rect.left) / rect.width,
+      y: 1.0 - (clientY - rect.top) / rect.height
+    };
+  }
+
+  function supernova(x, y){
+    const colors = [pickColor(), pickColor(), pickColor()];
+    const rays = 10;
+    for(let i=0;i<rays;i++){
+      const ang = (i/rays) * Math.PI*2 + Math.random()*0.3;
+      const mag = 2600 + Math.random()*1800;
+      splat(x, y, Math.cos(ang)*mag, Math.sin(ang)*mag, colors[i%colors.length]);
+    }
+    splat(x, y, 0, 0.001, colors[0]);
+    audioBurst(Math.random());
+  }
+
+  function handleStart(id, clientX, clientY){
+    if(!audioReady) initAudio();
+    const p = normPos(clientX, clientY);
+    pointers[id] = { x:p.x, y:p.y, color: pickColor(), moved:false, longPress:false, startTime: performance.now() };
+    document.getElementById('hint').classList.remove('show');
+
+    const now = performance.now();
+    const dist = Math.hypot(clientX-lastTapX, clientY-lastTapY);
+    if(now - lastTapTime < 320 && dist < 40){
+      supernova(p.x, p.y);
+      lastTapTime = 0;
+    } else {
+      lastTapTime = now; lastTapX = clientX; lastTapY = clientY;
+    }
+
+    const ids = Object.keys(pointers);
+    if(ids.length === 2){
+      gestureTwoActive = true;
+      gestureTwoIds = ids;
+      gestureBothStationary = true;
+      gestureLastDist = twoFingerDistance();
+    } else if(ids.length > 2){
+      gestureTwoActive = false;
+    }
+  }
+  function handleMove(id, clientX, clientY){
+    const ptr = pointers[id];
+    if(!ptr) return;
+    const p = normPos(clientX, clientY);
+    let dx = (p.x - ptr.x) * 4200 * settings.force;
+    let dy = (p.y - ptr.y) * 4200 * settings.force;
+    const mag = Math.hypot(dx,dy);
+    const MAX_MAG = 4800;
+    if(mag > MAX_MAG){ dx = dx/mag*MAX_MAG; dy = dy/mag*MAX_MAG; }
+    const dist = Math.hypot(p.x-ptr.x, p.y-ptr.y);
+    if(dist > 0.0005){
+      ptr.moved = true;
+      splat(p.x, p.y, dx, dy, ptr.color);
+    }
+    ptr.x = p.x; ptr.y = p.y;
+
+    if(gestureTwoActive && Object.keys(pointers).length === 2){
+      const d = twoFingerDistance();
+      const delta = d - gestureLastDist;
+      if(Math.abs(delta) > 0.014){
+        const ids = gestureTwoIds;
+        const a = pointers[ids[0]], b = pointers[ids[1]];
+        if(a && b){
+          const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+          radialField(mx, my, delta > 0, 1200 + Math.min(Math.abs(delta)*32000, 2200));
+        }
+        gestureLastDist = d;
+      }
+      if(dist > 0.006) gestureBothStationary = false;
+    }
+  }
+  function handleEnd(id){
+    const ptr = pointers[id];
+    if(ptr){
+      const heldDuration = performance.now() - ptr.startTime;
+      const countBefore = Object.keys(pointers).length;
+
+      if(ptr.longPress){
+        popBurst(ptr.x, ptr.y);
+      } else if(countBefore === 2 && gestureTwoActive && gestureBothStationary && heldDuration < 450){
+        const otherId = gestureTwoIds[0] === id ? gestureTwoIds[1] : gestureTwoIds[0];
+        const other = pointers[otherId];
+        if(other){
+          vortexBurst((ptr.x+other.x)/2, (ptr.y+other.y)/2, 1.0);
+          other.moved = true;
+        }
+        gestureTwoActive = false;
+      } else if(countBefore === 1 && !ptr.moved && heldDuration < 280){
+        spark(ptr.x, ptr.y);
+      }
+    }
+    delete pointers[id];
+    if(Object.keys(pointers).length < 2) gestureTwoActive = false;
+  }
+
+  canvas.addEventListener('pointerdown', e=>{ canvas.setPointerCapture(e.pointerId); handleStart(e.pointerId, e.clientX, e.clientY); });
+  canvas.addEventListener('pointermove', e=>{ if(pointers[e.pointerId]!==undefined) handleMove(e.pointerId, e.clientX, e.clientY); });
+  canvas.addEventListener('pointerup', e=> handleEnd(e.pointerId));
+  canvas.addEventListener('pointercancel', e=> handleEnd(e.pointerId));
+
+  // ---------- Idle auto-flow ----------
+  let idleTimer = 0;
+  let spontaneousTimer = 8 + Math.random()*6;
+  let wanderTimer = 0;
+
+  function idleSplat(dt){
+    idleTimer -= dt;
+    if(idleTimer <= 0 && settings.idle && Object.keys(pointers).length === 0){
+      idleTimer = 2.2 + Math.random()*2.0;
+      const x = 0.18 + Math.random()*0.64;
+      const y = 0.18 + Math.random()*0.64;
+      const ang = Math.random()*Math.PI*2;
+      const mag = (500 + Math.random()*700) * settings.idleMag;
+      const c = pickColor();
+      splat(x, y, Math.cos(ang)*mag, Math.sin(ang)*mag, c);
+    }
+  }
+
+  function wanderingFlow(dt){
+    if(!settings.idle || Object.keys(pointers).length > 0) return;
+    wanderTimer -= dt;
+    if(wanderTimer > 0) return;
+    wanderTimer = 0.9 + Math.random()*0.5;
+    const seeds = [
+      { fx:0.13, fy:0.087, px:0.31, py:0.41, mag:210 },
+      { fx:0.091, fy:0.152, px:1.7,  py:2.9,  mag:180 }
+    ];
+    for(const s of seeds){
+      const x = 0.5 + Math.sin(simTime*s.fx + s.px) * 0.32;
+      const y = 0.5 + Math.cos(simTime*s.fy + s.py) * 0.32;
+      const dx = Math.cos(simTime*s.fy + s.py + Math.PI/2) * s.mag * settings.wanderMag;
+      const dy = -Math.sin(simTime*s.fx + s.px + Math.PI/2) * s.mag * settings.wanderMag;
+      const c = pickColor().map(v => v * 0.4);
+      splat(x, y, dx, dy, c);
+    }
+  }
+
+  function spontaneousEvent(dt){
+    if(!settings.idle || Object.keys(pointers).length > 0){ spontaneousTimer = settings.eventMin + Math.random()*(settings.eventMax-settings.eventMin); return; }
+    spontaneousTimer -= dt;
+    if(spontaneousTimer <= 0){
+      spontaneousTimer = settings.eventMin + Math.random()*(settings.eventMax-settings.eventMin);
+      const x = 0.28 + Math.random()*0.44;
+      const y = 0.28 + Math.random()*0.44;
+      const kind = Math.floor(Math.random()*3);
+      if(kind === 0) vortexBurst(x, y, 0.7*settings.idleMag);
+      else if(kind === 1) radialField(x, y, true, 1400*settings.idleMag);
+      else supernova(x, y);
+    }
+  }
+
+  // ---------- Gyroscope ----------
+  let gyroForce = {x:0, y:0};
+  let calGamma = 0, calBeta = 40; // neutral baseline (device flat-ish in hand by default)
+  let lastRawGamma = 0, lastRawBeta = 40;
+  try{
+    const savedCal = JSON.parse(localStorage.getItem('stroemungswahr_tiltcal')||'null');
+    if(savedCal && typeof savedCal.gamma === 'number' && typeof savedCal.beta === 'number'){
+      calGamma = savedCal.gamma; calBeta = savedCal.beta;
+    }
+  }catch(e){}
+  function onOrientation(e){
+    lastRawGamma = e.gamma||0;
+    lastRawBeta = e.beta||0;
+    if(!settings.gyro) return;
+    const gamma = (lastRawGamma - calGamma)/45; // left-right, -1..1
+    const beta = (lastRawBeta - calBeta)/45; // front-back tilt relative to calibrated holding angle
+    gyroForce.x = Math.max(-1,Math.min(1,gamma));
+    gyroForce.y = Math.max(-1,Math.min(1,-beta));
+  }
+  let gyroTimer = 0;
+  function applyGyro(dt){
+    if(!settings.gyro) return;
+    gyroTimer -= dt;
+    if(gyroTimer <= 0 && (Math.abs(gyroForce.x)>0.06 || Math.abs(gyroForce.y)>0.06)){
+      gyroTimer = 0.12;
+      splat(0.5 + gyroForce.x*0.3, 0.5 + gyroForce.y*0.3, gyroForce.x*2600, gyroForce.y*2600, pickColor());
+    }
+  }
+
+  const gyroToggle = document.getElementById('toggleGyro');
+  const gyroRow = document.getElementById('gyroRow');
+  const calibrateRow = document.getElementById('calibrateRow');
+  const calibrateBtn = document.getElementById('calibrateBtn');
+  const calibrateDesc = document.getElementById('calibrateDesc');
+  function enableGyro(){
+    settings.gyro = true;
+    gyroToggle.classList.add('on');
+    window.addEventListener('deviceorientation', onOrientation);
+    calibrateRow.style.display = 'flex';
+  }
+  gyroToggle.addEventListener('click', ()=>{
+    if(settings.gyro){
+      settings.gyro = false;
+      gyroToggle.classList.remove('on');
+      window.removeEventListener('deviceorientation', onOrientation);
+      calibrateRow.style.display = 'none';
+      return;
+    }
+    if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(state=>{
+        if(state === 'granted') enableGyro();
+      }).catch(()=>{});
+    } else {
+      enableGyro();
+    }
+  });
+  if(!('DeviceOrientationEvent' in window)){
+    gyroRow.style.display = 'none';
+    calibrateRow.style.display = 'none';
+  }
+
+  let calibrateFeedbackTimer = null;
+  calibrateBtn.addEventListener('click', ()=>{
+    calGamma = lastRawGamma;
+    calBeta = lastRawBeta;
+    try{ localStorage.setItem('stroemungswahr_tiltcal', JSON.stringify({gamma:calGamma, beta:calBeta})); }catch(e){}
+    calibrateBtn.classList.add('done');
+    calibrateBtn.textContent = 'Gespeichert';
+    calibrateDesc.textContent = 'Diese Haltung ist jetzt deine Nullstellung';
+    if(calibrateFeedbackTimer) clearTimeout(calibrateFeedbackTimer);
+    calibrateFeedbackTimer = setTimeout(()=>{
+      calibrateBtn.classList.remove('done');
+      calibrateBtn.textContent = 'Kalibrieren';
+      calibrateDesc.textContent = 'Halte das Gerät in deiner gewohnten Haltung und tippe auf „Kalibrieren“';
+    }, 2200);
+  });
+
+  // ---------- UI wiring ----------
+  const settingsBtn = document.getElementById('settingsBtn');
+  const panel = document.getElementById('panel');
+  settingsBtn.addEventListener('click', ()=> panel.classList.toggle('open'));
+  const helpPanel = document.getElementById('helpPanel');
+  document.getElementById('helpBtn').addEventListener('click', ()=> helpPanel.classList.toggle('open'));
+  document.getElementById('glcanvas').addEventListener('pointerdown', ()=>{ panel.classList.remove('open'); musicDock.classList.remove('open'); helpPanel.classList.remove('open'); });
+
+  // das System: langes Berühren der Fläche soll keinen Screenshot-/Speichern-Kontextmenü mehr öffnen
+  canvas.addEventListener('contextmenu', e=> e.preventDefault());
+  document.addEventListener('contextmenu', e=>{ if(e.target === canvas) e.preventDefault(); });
+
+  const rangeForce = document.getElementById('rangeForce');
+  const valForce = document.getElementById('valForce');
+  rangeForce.addEventListener('input', ()=>{ settings.force = parseFloat(rangeForce.value); valForce.textContent = settings.force.toFixed(2); });
+
+  const rangeDiss = document.getElementById('rangeDissipation');
+  const valDiss = document.getElementById('valDissipation');
+  rangeDiss.addEventListener('input', ()=>{ settings.dissipation = parseFloat(rangeDiss.value); valDiss.textContent = settings.dissipation.toFixed(3); });
+
+  const rangeCurl = document.getElementById('rangeCurl');
+  const valCurl = document.getElementById('valCurl');
+  rangeCurl.addEventListener('input', ()=>{ settings.curl = parseFloat(rangeCurl.value); valCurl.textContent = Math.round(settings.curl); });
+
+  document.querySelectorAll('#paletteRow .seg').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('#paletteRow .seg').forEach(s=>s.classList.remove('active'));
+      el.classList.add('active');
+      settings.palette = el.dataset.palette;
+    });
+  });
+
+  document.querySelectorAll('#modeRow .seg').forEach(el=>{
+    el.addEventListener('click', ()=> applyMode(el.dataset.mode));
+  });
+
+  const toggleIdle = document.getElementById('toggleIdle');
+  toggleIdle.addEventListener('click', ()=>{
+    settings.idle = !settings.idle;
+    toggleIdle.classList.toggle('on', settings.idle);
+  });
+
+  const toggleBloom = document.getElementById('toggleBloom');
+  toggleBloom.addEventListener('click', ()=>{
+    settings.bloom = !settings.bloom;
+    toggleBloom.classList.toggle('on', settings.bloom);
+  });
+
+  const toggleSound = document.getElementById('toggleSound');
+  toggleSound.addEventListener('click', ()=>{
+    settings.sound = !settings.sound;
+    toggleSound.classList.toggle('on', settings.sound);
+    if(settings.sound && !audioReady) initAudio();
+  });
+
+  document.getElementById('snapshotBtn').addEventListener('click', ()=>{
+    canvas.toBlob(blob=>{
+      if(!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'stroemungswahr-' + Date.now() + '.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    }, 'image/png');
+  });
+
+  // ---------- Intro ----------
+  const intro = document.getElementById('intro');
+  document.getElementById('startBtn')?.addEventListener('click', ()=>{
+    intro.classList.add('hidden');
+    setTimeout(()=> intro.remove(), 1000);
+  });
+
+  // ---------- Resize handling ----------
+  window.addEventListener('resize', ()=>{
+    if(resize()) initFBOs();
+  });
+  window.addEventListener('orientationchange', ()=>{
+    setTimeout(()=>{ if(resize()) initFBOs(); }, 250);
+  });
+
+  // ---------- Boot ----------
+  applyMode('balance');
+
+  // ---------- Adaptive quality: protects against performance regressions ----------
+  let perfWindowStart = performance.now();
+  let perfFrameCount = 0;
+  let perfWarmupWindows = 2;
+  let perfLowStreak = 0;
+
+  function checkPerformance(){
+    perfFrameCount++;
+    const now = performance.now();
+    const elapsed = now - perfWindowStart;
+    if(elapsed < 1800) return;
+    const fps = (perfFrameCount / elapsed) * 1000;
+    perfFrameCount = 0;
+    perfWindowStart = now;
+    if(perfWarmupWindows > 0){ perfWarmupWindows--; return; }
+    if(fps < 40){
+      perfLowStreak++;
+      if(perfLowStreak >= 2 && qualityLevel > 0){
+        qualityLevel -= 1;
+        initFBOs();
+        perfLowStreak = 0;
+      }
+    } else {
+      perfLowStreak = 0;
+    }
+  }
+
+  // ---------- Main loop ----------
+  function frame(){
+    const now = performance.now();
+    let dt = Math.min((now - lastTime)/1000, 0.0166);
+    lastTime = now;
+
+    simTime += dt;
+    idleSplat(dt);
+    wanderingFlow(dt);
+    spontaneousEvent(dt);
+    applyGyro(dt);
+    updateLongPress(dt);
+    updateMusicAnalysis(dt);
+    energy = Math.max(0, energy - dt*0.35);
+    updateAudio(dt);
+    step(dt);
+    render();
+    checkPerformance();
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- Service worker ----------
+
+})();
+</script>
+
+<script>/* FunWahr: Zeitstempel für „Zuletzt gespielt“ auf der Startseite (nur dieser eine Wert) */try{localStorage.setItem('funwahr-zuletzt-st',String(Date.now()));}catch(e){}</script>
+</body>
+</html>

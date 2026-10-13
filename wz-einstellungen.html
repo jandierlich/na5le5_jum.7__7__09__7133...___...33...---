@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="wz">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Einstellungen – WahrZentrale</title>
+<meta name="theme-color" content="#F1EEFA">
+<link rel="stylesheet" href="./wz-common.css">
+<style>
+  .st-card { background: var(--wz-card); border: 1px solid var(--wz-line); border-radius: 20px; padding: 16px; margin: 0 0 14px; scroll-margin-top: 16px; }
+  .st-card h2 { margin: 0 0 6px; font-size: 18px; }
+  .st-card p { margin: 0 0 12px; font-size: 14.5px; color: var(--wz-sub); line-height: 1.55; }
+  .seg { display: flex; background: var(--wz-soft); border-radius: 14px; padding: 4px; gap: 4px; }
+  .seg button { flex: 1; border: 0; border-radius: 11px; padding: 11px 8px; background: transparent; color: var(--wz-text); font: 700 14.5px -apple-system, sans-serif; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--wz-card-solid); color: var(--wz-accent); box-shadow: 0 2px 8px var(--wz-shadow-d); }
+  .st-btn { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; padding: 13px 12px;
+    font: 700 15px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; background: var(--wz-accent); color: var(--wz-accent-text); text-decoration: none; }
+  .st-btn.sec { background: var(--wz-soft); color: var(--wz-text); }
+  .st-btn.danger { background: #B3261E; color: #fff; }
+  .st-btn + .st-btn { margin-top: 10px; }
+  .st-now { font-size: 14.5px; margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--wz-soft); }
+  .st-now b { color: var(--wz-accent); }
+  .st-meter { height: 8px; border-radius: 4px; background: var(--wz-soft); overflow: hidden; margin: -4px 0 10px; }
+  .st-meter i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--wz-accent); }
+  .st-meter.warn i { background: #C8372D; }
+  .st-search { display: flex; gap: 8px; margin: 10px 0 0; }
+  .st-search input { flex: 1; min-width: 0; height: 46px; border-radius: 12px; border: 1.5px solid var(--wz-line); background: var(--wz-card-solid); color: var(--wz-text); font: 500 16px -apple-system, sans-serif; padding: 0 12px; }
+  .st-search button { flex: 0 0 auto; width: auto; padding: 0 16px; }
+  .st-results { list-style: none; margin: 8px 0 0; padding: 0; }
+  .st-results li button { width: 100%; text-align: left; border: 0; background: transparent; color: var(--wz-text); padding: 11px 6px; border-bottom: 1px solid var(--wz-line); font: 500 15px -apple-system, sans-serif; cursor: pointer; }
+  .st-results li button small { color: var(--wz-sub); }
+  .st-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; font-weight: 600; }
+  .sw { position: relative; width: 52px; height: 32px; flex: 0 0 auto; }
+  .sw input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; z-index: 1; }
+  .sw span { position: absolute; inset: 0; border-radius: 16px; background: var(--wz-line); transition: background .2s; }
+  .sw span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); transition: transform .2s; }
+  .sw input:checked + span { background: var(--wz-accent); }
+  .sw input:checked + span::after { transform: translateX(20px); }
+  .sw input:focus-visible + span { outline: 2px solid var(--wz-accent); outline-offset: 2px; }
+  .st-msg { font-size: 14px; margin-top: 10px; min-height: 1em; color: var(--wz-accent); font-weight: 600; }
+  .st-msg.err { color: #B3261E; }
+  html.theme-dark .st-msg.err { color: #F2A09A; }
+  .st-small { font-size: 12.5px; color: var(--wz-sub); margin-top: 8px; }
+  .st-sub { margin: 18px 0 4px; font-size: 16px; scroll-margin-top: 16px; }
+  .pal { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .palc { margin-top: 14px; padding: 14px 14px 6px; border-radius: 16px; background: var(--wz-soft); }
+  .palc-l { display: flex; justify-content: space-between; align-items: baseline; font-size: 14.5px; font-weight: 700; margin: 0 0 6px; }
+  .palc-l output { font-weight: 700; color: var(--wz-accent); font-variant-numeric: tabular-nums; }
+  .palc-r { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 34px; margin: 0 0 14px; padding: 0; background: transparent; touch-action: pan-y; }
+  .palc-r::-webkit-slider-runnable-track { height: 12px; border-radius: 6px; background: var(--palc-track, var(--wz-line)); }
+  .palc-r::-moz-range-track { height: 12px; border-radius: 6px; background: var(--palc-track, var(--wz-line)); }
+  .palc-r::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin-top: -9px; border-radius: 50%; background: #fff; border: 3px solid var(--wz-accent); box-shadow: 0 3px 10px rgba(20, 10, 50, .3); }
+  .palc-r::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 3px solid var(--wz-accent); box-shadow: 0 3px 10px rgba(20, 10, 50, .3); }
+  .pal button { border: 2px solid var(--wz-line); border-radius: 16px; padding: 10px 6px 9px; background: var(--wz-card-solid); color: var(--wz-text);
+    font: 700 13.5px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .pal button[aria-checked="true"] { border-color: var(--wz-accent); box-shadow: 0 0 0 2px var(--wz-accent) inset; }
+  .pal .sw3 { display: flex; }
+  .pal .sw3 i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--wz-card-solid); margin-left: -6px; display: block; }
+  .pal .sw3 i:first-child { margin-left: 0; }
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body class="wz-doc">
+<main class="wz-doc-wrap">
+<nav class="wz-doc-nav" aria-label="Navigation">
+  <a href="./index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></g></svg> WahrZentrale</a>
+  <a href="./wz-sichern.html">Sichern</a>
+</nav>
+
+<h1>Einstellungen</h1>
+
+<section class="st-card" id="darstellung">
+  <h2>Darstellung</h2>
+  <p>Gilt für alle Apps. Beim ersten Start ist immer der Hellmodus aktiv.</p>
+  <div class="seg" role="group" aria-label="Darstellung">
+    <button type="button" id="thLight" aria-pressed="false">Hell</button>
+    <button type="button" id="thDark" aria-pressed="false">Dunkel</button>
+  </div>
+  <h3 class="st-sub" id="farbwelt">Farbwelt</h3>
+  <p>„Nachthimmel“ ist das Farbbild der WahrZentrale. Unter „Eigene Farbwelt“ mischst du dir mit zwei Reglern ein eigenes – es gilt für alle Apps. Ampelfarben und inhaltliche Farben (z. B. Himmel, Karten, Spielsteine) bleiben unverändert.</p>
+  <div class="pal" id="palList" role="radiogroup" aria-label="Farbwelt"></div>
+  <div class="palc" id="palCustom" hidden>
+    <label class="palc-l" for="palHue"><span>Farbton</span><output id="palHueV" for="palHue"></output></label>
+    <input type="range" class="palc-r" id="palHue" min="0" max="359" step="1" aria-label="Farbton">
+    <label class="palc-l" for="palSat"><span>Farbstärke</span><output id="palSatV" for="palSat"></output></label>
+    <input type="range" class="palc-r" id="palSat" min="0" max="120" step="1" aria-label="Farbstärke">
+    <p class="st-small">Die Regler färben nur die violetten Töne der Oberfläche um. Schrift, Helligkeit und Kontraste bleiben, wie sie sind – es kann nichts unleserlich werden.</p>
+  </div>
+  <h3 class="st-sub" id="startseite">Startseite</h3>
+  <p>Reihenfolge und Sichtbarkeit der Bereiche, Inhalte von „Heute“, Anordnung der Apps, Farben und Schrift.</p>
+  <a class="st-btn sec" href="./index.html?anpassen=1" style="text-decoration:none;box-sizing:border-box">Startseite anpassen</a>
+  <h3 class="st-sub" id="einfuehrung">Einführung</h3>
+  <p>Die kurze Tour durch die Startseite – Suchen, Fragen, Eintragen, „Heute“ und „Hier merken“ – noch einmal ansehen.</p>
+  <a class="st-btn sec" href="./index.html?einfuehrung=1" style="text-decoration:none;box-sizing:border-box">Einführung anzeigen</a>
+</section>
+
+<section class="st-card" id="standort">
+  <h2>Standort</h2>
+  <p>Ein Standort für HimmelsWahr, Sternenhimmel, AstroWahr, KompassWahr, HorizontWahr, StaunWahr und die Startseite. Automatisch nutzt die Ortung deines Smartphones, sobald eine App sie braucht – oder du legst einen festen Ort fest.</p>
+  <div class="st-now" id="locNow">–</div>
+  <button type="button" class="st-btn sec" id="locAuto">Automatisch (Ortung des Geräts)</button>
+  <form class="st-search" id="locForm" autocomplete="off">
+    <input type="search" id="locQ" placeholder="Ort suchen, z. B. Tangstedt" aria-label="Ort suchen" enterkeyhint="search">
+    <button type="submit" class="st-btn">Suchen</button>
+  </form>
+  <ul class="st-results" id="locRes"></ul>
+  <p class="st-small">Für die Suche wird der eingegebene Text an die Ortssuche von Open-Meteo (geocoding-api.open-meteo.com) gesendet. Ortsdaten: GeoNames, CC BY 4.0.</p>
+  <div class="st-msg" id="locMsg" role="status"></div>
+</section>
+
+<section class="st-card" id="wetter">
+  <h2>Wetter und Ortsname auf der Startseite</h2>
+  <div class="st-toggle"><span>Wetter in „Heute“ anzeigen</span><label class="sw"><input type="checkbox" id="wxToggle" aria-label="Wetter in Heute anzeigen"><span></span></label></div>
+  <p class="st-small">Wenn eingeschaltet, wird beim Öffnen der Startseite der bekannte Standort (auf ca. 1 km gerundet) an Open-Meteo gesendet.</p>
+  <div class="st-toggle"><span>Ortsname im Kopfbereich</span><label class="sw"><input type="checkbox" id="placeToggle" aria-label="Ortsnamen im Kopfbereich anzeigen"><span></span></label></div>
+  <p class="st-small">Ist nur ein GPS-Standort ohne Namen bekannt, wird der Ortsname einmalig bei Photon (komoot GmbH mit Sitz in Deutschland) nachgeschlagen – mit auf ca. 1 km gerundeten Koordinaten – und danach nur noch lokal verwendet. Ausgeschaltet steht dort „dein Standort“.</p>
+</section>
+
+<section class="st-card" id="karten">
+  <h2>Karten</h2>
+  <p>Kartenbilder kommen vom OpenStreetMap-Kartenserver des FOSSGIS e.V. (gemeinnütziger Verein mit Sitz in Deutschland). Die Entscheidung gilt für NaviWahr, Keysglade, BelegParkWahr und PlanetenWahr in StaunWahr.</p>
+  <div class="st-now" id="mapNow">–</div>
+  <button type="button" class="st-btn" id="mapYes">Karten erlauben</button>
+  <button type="button" class="st-btn sec" id="mapNo">Keine Karten laden</button>
+  <button type="button" class="st-btn sec" id="mapReset">Beim nächsten Mal wieder fragen</button>
+</section>
+
+<section class="st-card" id="hinweise">
+  <h2>Bestätigte Hinweise</h2>
+  <p>KompassWahr fragt vor der ersten Ortssuche, der Ortsnamen-Ermittlung und der Umgebungssuche einmal nach. Hier kannst du diese Bestätigungen zurücksetzen.</p>
+  <button type="button" class="st-btn sec" id="kwReset">Bestätigungen zurücksetzen</button>
+  <div class="st-msg" id="kwMsg" role="status"></div>
+</section>
+
+<section class="st-card" id="speicher">
+  <h2>Speicher</h2>
+  <div class="st-now" id="storeNow">Wird ermittelt …</div>
+  <div class="st-now" id="lsNow">Kleiner Speicher: wird ermittelt …</div>
+  <div class="st-meter" id="lsMeter" role="img" aria-label="Füllstand des kleinen Speichers" hidden><i id="lsBar"></i></div>
+  <p class="st-small" id="lsTop" style="margin-top:0;margin-bottom:12px"></p>
+  <p class="st-small" style="margin-top:0;margin-bottom:12px">Listen, Einträge und Einstellungen aller Apps teilen sich einen kleinen Speicher mit fester Obergrenze. Fotos, Belege und Kartendaten liegen im großen Speicher und zählen hier nicht mit.</p>
+  <button type="button" class="st-btn sec" id="persistBtn">Speicher dauerhaft behalten</button>
+  <p class="st-small">Bittet das System, die Daten der WahrZentrale nicht automatisch zu löschen, wenn der Speicher knapp wird. Eine regelmäßige <a href="./wz-sichern.html">Sicherung</a> bleibt trotzdem sinnvoll.</p>
+  <div class="st-msg" id="persistMsg" role="status"></div>
+</section>
+
+<section class="st-card" id="loeschen">
+  <h2>Alle Daten löschen</h2>
+  <p>Löscht die Einträge, Fotos, Einstellungen und den Offline-Speicher <strong>aller</strong> Apps auf diesem Gerät. Das lässt sich nicht rückgängig machen – außer mit einer Sicherung.</p>
+  <button type="button" class="st-btn danger" id="wipeBtn">Alle Daten löschen …</button>
+  <div class="st-msg" id="wipeMsg" role="status"></div>
+</section>
+
+<p class="st-small" style="text-align:center">WahrZentrale<span id="wzVersion"></span> · Stand 13. Oktober 2026 · <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html">Datenschutz</a> · <a href="./lizenzen.html">Lizenzen</a></p>
+</main>
+<script>
+  // Versionsanzeige: Build-Kennung des Offline-Speichers anhängen (hilft bei Fehlermeldungen)
+  (function () {
+    try {
+      if (!window.caches) return;
+      caches.keys().then(function (keys) {
+        var k = keys.filter(function (x) { return /^wahrzentrale-(?!libs-|wowdata-)/.test(x); })[0];
+        var n = k ? (k.match(/(\d+)/) || [])[1] : "";
+        if (n) document.getElementById("wzVersion").textContent = " · Fassung " + n;
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function msg(id, t, err) { var e = $(id); e.textContent = t || ""; e.className = "st-msg" + (err ? " err" : ""); }
+
+  /* Darstellung */
+  function paintTheme() { var d = wzTheme.isDark(); $("thLight").setAttribute("aria-pressed", String(!d)); $("thDark").setAttribute("aria-pressed", String(d)); }
+  $("thLight").addEventListener("click", function () { wzTheme.set(false); paintTheme(); });
+  $("thDark").addEventListener("click", function () { wzTheme.set(true); paintTheme(); });
+  paintTheme();
+
+  /* Farbwelt: Nachthimmel oder eine eigene, mit zwei Reglern gemischte Farbwelt */
+  var BASE = ["#5A2FBE", "#241748", "#B9A6F5", "#F1EEFA"];
+  function palTrack(el, fn) {
+    var stops = []; for (var i = 0; i <= 12; i++) stops.push(wzTheme.shiftColor("#6E4FE0", null, fn(i / 12)) + " " + Math.round(i / 12 * 100) + "%");
+    el.style.setProperty("--palc-track", "linear-gradient(90deg," + stops.join(",") + ")");
+  }
+  function paintCustom() {
+    var c = wzTheme.customPalette(), hue = $("palHue"), sat = $("palSat");
+    hue.value = String(c.hue); sat.value = String(Math.round(c.sat * 100));
+    $("palHueV").textContent = c.hue + "°"; $("palSatV").textContent = Math.round(c.sat * 100) + " %";
+    palTrack(hue, function (f) { return { hue: Math.min(359, Math.round(f * 359)), sat: Math.max(.35, c.sat) }; });
+    palTrack(sat, function (f) { return { hue: c.hue, sat: f * 1.2 }; });
+  }
+  function paintPalettes() {
+    var cur = wzTheme.palette(), cust = wzTheme.customPalette();
+    $("palList").innerHTML = wzTheme.palettes().map(function (p) {
+      var dots = BASE.map(function (c) { return '<i style="background:' + (p.id === "eigene" ? wzTheme.shiftColor(c, null, cust) : c) + '"></i>'; }).join("");
+      return '<button type="button" role="radio" aria-checked="' + (p.id === cur) + '" data-pal="' + p.id + '"><span class="sw3" aria-hidden="true">' + dots + "</span>" + esc(p.name) + "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("palList").querySelectorAll("[data-pal]"), function (b) {
+      b.addEventListener("click", function () { wzTheme.setPalette(b.getAttribute("data-pal")); paintPalettes(); });
+    });
+    $("palCustom").hidden = cur !== "eigene";
+    if (cur === "eigene") paintCustom();
+  }
+  var palRaf = 0;
+  function palInput() {
+    if (palRaf) return;
+    palRaf = requestAnimationFrame(function () {
+      palRaf = 0;
+      wzTheme.setCustomPalette({ hue: +$("palHue").value, sat: +$("palSat").value / 100 });
+      paintCustom();
+      var cust = wzTheme.customPalette(), dots = $("palList").querySelectorAll('[data-pal="eigene"] .sw3 i');
+      Array.prototype.forEach.call(dots, function (d, i) { d.style.background = wzTheme.shiftColor(BASE[i], null, cust); });
+    });
+  }
+  $("palHue").addEventListener("input", palInput);
+  $("palSat").addEventListener("input", palInput);
+  paintPalettes();
+
+  /* Standort */
+  function paintLoc() {
+    var c = wzCore.location();
+    $("locNow").innerHTML = c.mode === "manual"
+      ? "Fester Ort: <b>" + esc(c.name || (c.lat.toFixed(3) + ", " + c.lon.toFixed(3))) + "</b>"
+      : "<b>Automatisch</b> – die Apps nutzen die Ortung des Geräts.";
+  }
+  $("locAuto").addEventListener("click", function () { wzCore.setAutoLocation(); paintLoc(); msg("locMsg", "Automatischer Standort ist aktiv."); });
+  $("locForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var q = $("locQ").value.trim();
+    if (q.length < 2) { msg("locMsg", "Bitte mindestens zwei Buchstaben eingeben.", true); return; }
+    msg("locMsg", "Suche …");
+    fetch("https://geocoding-api.open-meteo.com/v1/search?count=8&language=de&format=json&name=" + encodeURIComponent(q))
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (d) {
+        var list = (d && d.results) || [];
+        msg("locMsg", list.length ? "" : "Kein Ort gefunden.", !list.length);
+        $("locRes").innerHTML = list.map(function (p, i) {
+          var sub = [p.admin1, p.country].filter(Boolean).join(", ");
+          return '<li><button type="button" data-i="' + i + '">' + esc(p.name) + (sub ? " <small>· " + esc(sub) + "</small>" : "") + "</button></li>";
+        }).join("");
+        Array.prototype.forEach.call($("locRes").querySelectorAll("button"), function (b) {
+          b.addEventListener("click", function () {
+            var p = list[+b.getAttribute("data-i")];
+            wzCore.setManualLocation(p.latitude, p.longitude, p.name);
+            $("locRes").innerHTML = ""; $("locQ").value = "";
+            paintLoc(); msg("locMsg", "Ort gespeichert – gilt jetzt für alle Himmels-Apps.");
+          });
+        });
+      })
+      .catch(function () { msg("locMsg", "Die Ortssuche ist gerade nicht erreichbar.", true); });
+  });
+  paintLoc();
+
+  /* Wetter */
+  $("wxToggle").checked = localStorage.getItem("wz_today_weather") === "on";
+  $("wxToggle").addEventListener("change", function () {
+    if (this.checked) localStorage.setItem("wz_today_weather", "on");
+    else { localStorage.removeItem("wz_today_weather"); localStorage.removeItem("wz_today_wx"); }
+  });
+
+  $("placeToggle").checked = localStorage.getItem("wz_place_name") !== "off";
+  $("placeToggle").addEventListener("change", function () {
+    if (this.checked) localStorage.removeItem("wz_place_name");
+    else { localStorage.setItem("wz_place_name", "off"); localStorage.removeItem("wz_place_name_cache"); }
+  });
+
+  /* Karten */
+  function paintMap() {
+    var c = wzCore.mapConsent();
+    $("mapNow").innerHTML = c === "granted" ? "Karten sind <b>erlaubt</b>." : c === "declined" ? "Karten werden <b>nicht geladen</b>." : "Noch nicht entschieden – die erste Karte fragt nach.";
+  }
+  $("mapYes").addEventListener("click", function () { wzCore.setMapConsent("granted"); paintMap(); });
+  $("mapNo").addEventListener("click", function () { wzCore.setMapConsent("declined"); paintMap(); });
+  $("mapReset").addEventListener("click", function () { wzCore.setMapConsent(null); paintMap(); });
+  paintMap();
+
+  /* Hinweise KompassWahr */
+  $("kwReset").addEventListener("click", function () {
+    ["kw-consent-geo", "kw-consent-geo-reverse", "kw-consent-overpass", "kw-consent-nominatim", "kw-consent-nominatim-reverse"].forEach(function (k) { localStorage.removeItem(k); });
+    msg("kwMsg", "Zurückgesetzt.");
+  });
+
+  /* Speicher */
+  function paintStore() {
+    if (!navigator.storage || !navigator.storage.estimate) { $("storeNow").textContent = "Der Browser gibt keine Auskunft über den Speicher."; return; }
+    Promise.all([navigator.storage.estimate(), navigator.storage.persisted ? navigator.storage.persisted() : Promise.resolve(false)]).then(function (r) {
+      var used = r[0].usage || 0;
+      $("storeNow").innerHTML = "Großer Speicher: <b>" + (used > 1e6 ? (used / 1e6).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " MB" : Math.round(used / 1e3) + " kB") + " belegt</b>" +
+        (r[1] ? " · dauerhaft geschützt" : "");
+    }).catch(function () { $("storeNow").textContent = "Nicht ermittelbar."; });
+  }
+  $("persistBtn").addEventListener("click", function () {
+    if (!navigator.storage || !navigator.storage.persist) { msg("persistMsg", "Wird von diesem Browser nicht unterstützt.", true); return; }
+    navigator.storage.persist().then(function (ok) { msg("persistMsg", ok ? "Erledigt – der Speicher bleibt erhalten." : "Das System hat es nicht bestätigt. Am besten die WahrZentrale über den Home-Bildschirm nutzen und regelmäßig sichern.", !ok); paintStore(); });
+  });
+  paintStore();
+
+  /* Kleiner Speicher (localStorage): Belegung zählen und den freien Platz messen.
+     Gemessen wird mit einem Probe-Eintrag, der sofort wieder entfernt wird. */
+  var LS_APPS = [
+    [/^hw-/, "HimmelsWahr"], [/^astrowahr\./, "AstroWahr"], [/^zh:/, "Sternenhimmel"], [/^kw-/, "KompassWahr"], [/^wk[-_]/, "NaviWahr"],
+    [/^fk_|^kg_|^zahlen(turm|fusion)-|^reisewahr-/, "Keysglade"], [/^alltagwahr_/, "AlltagWahr"], [/^sw_/, "ProduktWahr"], [/^vw_/, "VorratsWahr"],
+    [/^qr_/, "QRWahr"], [/^lw_/, "LautstärkeWahr"], [/^losgedacht_|^losdenkwahr_/, "LosDenkWahr"], [/^ztw-/, "ZahlenturmWahr"],
+    [/^korvanthiel/, "Korvanthiel"], [/^herzkarodrei_/, "HerzKaroDrei"], [/^partikelwahr-/, "PartikelWahr"], [/^stroemungswahr_/, "StrömungsWahr"],
+    [/^beatwahr_/, "BeatWahr"], [/^horizontwahr_/, "HorizontWahr"], [/^staunwahr_/, "StaunWahr"], [/^messwahr_/, "MessWahr"], [/^klangwahr_/, "KlangWahr"], [/^labwahr_/, "LabWahr"], [/^funwahr-/, "Spiel & Klang"], [/^wz_/, "WahrZentrale"]
+  ];
+  function lsUsage() {
+    var total = 0, per = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i); if (!k || k === "wz_probe") continue;
+      var n = k.length + (localStorage.getItem(k) || "").length, app = "Sonstiges";
+      for (var j = 0; j < LS_APPS.length; j++) if (LS_APPS[j][0].test(k)) { app = LS_APPS[j][1]; break; }
+      total += n; per[app] = (per[app] || 0) + n;
+    }
+    return { total: total, per: per };
+  }
+  function lsFree() {
+    var K = "wz_probe", lo = 0, hi = 12 * 1024 * 1024, fits = function (n) { try { localStorage.setItem(K, new Array(n + 1).join("x")); return true; } catch (e) { return false; } };
+    try {
+      if (fits(hi)) return hi; // keine erkennbare Grenze
+      while (hi - lo > 16384) { var mid = (lo + hi) >> 1; if (fits(mid)) lo = mid; else hi = mid; }
+      return lo;
+    } finally { try { localStorage.removeItem(K); } catch (e) { } }
+  }
+  function paintSmallStore() {
+    try {
+      try { localStorage.removeItem("wz_probe"); } catch (e) { }
+      var u = lsUsage(), free = lsFree(), cap = u.total + free;
+      var mb = function (chars) { return (chars * 2 / 1048576).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " MB"; };
+      var pct = cap > 0 ? Math.min(100, Math.round(u.total / cap * 100)) : 0;
+      var open = free >= 12 * 1024 * 1024;
+      $("lsNow").innerHTML = "Kleiner Speicher: <b>" + (open ? mb(u.total) + " belegt" : pct + " % belegt") + "</b>" + (open ? "" : " (" + mb(u.total) + " von " + mb(cap) + ")") +
+        (pct >= 80 && !open ? " · fast voll" : "");
+      $("lsMeter").hidden = open; $("lsMeter").className = "st-meter" + (pct >= 80 ? " warn" : ""); $("lsBar").style.width = Math.max(pct, u.total ? 1 : 0) + "%";
+      var top = Object.keys(u.per).map(function (a) { return [a, u.per[a]]; }).sort(function (a, b) { return b[1] - a[1]; })
+        .filter(function (x) { return u.total >= 50000 && x[1] / u.total >= 0.05; }).slice(0, 3)
+        .map(function (x) { return x[0] + " " + Math.round(x[1] / u.total * 100) + " %"; });
+      $("lsTop").textContent = top.length ? "Davon: " + top.join(" · ") : "";
+      $("lsTop").style.display = top.length ? "" : "none";
+    } catch (e) { $("lsNow").textContent = "Kleiner Speicher: nicht ermittelbar."; $("lsTop").style.display = "none"; }
+  }
+  setTimeout(paintSmallStore, 250);
+
+  /* Alles löschen */
+  var armed = false;
+  $("wipeBtn").addEventListener("click", function () {
+    if (!armed) { armed = true; this.textContent = "Wirklich alles löschen? Nochmal tippen"; msg("wipeMsg", "Tipp ein zweites Mal, um endgültig zu löschen.", true); setTimeout(function () { armed = false; $("wipeBtn").textContent = "Alle Daten löschen …"; }, 6000); return; }
+    this.disabled = true;
+    var dbs = ["parken-und-belege", "wowarwahr", "keysglade-diary", "naviwahr"];
+    var listP = indexedDB.databases ? indexedDB.databases().then(function (l) { (l || []).forEach(function (d) { if (d.name && dbs.indexOf(d.name) === -1) dbs.push(d.name); }); }).catch(function () { }) : Promise.resolve();
+    listP.then(function () {
+      return Promise.all(dbs.map(function (n) { return new Promise(function (res) { var r = indexedDB.deleteDatabase(n); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; }); }));
+    }).then(function () {
+      try { localStorage.clear(); sessionStorage.clear(); } catch (e) { }
+      return window.caches ? caches.keys().then(function (k) { return Promise.all(k.map(function (x) { return caches.delete(x); })); }) : null;
+    }).then(function () {
+      msg("wipeMsg", "Alle Daten wurden gelöscht.");
+      setTimeout(function () { location.href = "./index.html"; }, 1200);
+    });
+  });
+
+  if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(function () { t.scrollIntoView({ block: "start" }); }, 0); }
+})();
+</script>
+</body>
+</html>

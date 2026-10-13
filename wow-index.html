@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de" data-wz-app="wow">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>WowarWahr</title>
+<meta name="description" content="Wo war ich? – Deine Reisen, Orte und Fotos auf der Weltkarte. Privat und offline.">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#F1EEFA">
+<script>
+/* Gemeinsamer Hell-/Dunkelmodus mit Startseite der WahrZentrale und Keysglade.
+   Läuft vor dem ersten Zeichnen, damit nichts aufblitzt. */
+(function () {
+  var t = "light";
+  try { if (localStorage.getItem("reisewahr-theme") === "dark") t = "dark"; } catch (e) {}
+  document.documentElement.setAttribute("data-theme", t);
+  if (t === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1E1B2E");
+})();
+</script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="format-detection" content="telephone=no">
+<!-- Ein gemeinsames Home-Bildschirm-Icon für ReiseWahr (gemeinsamer Speicher aller Apps) -->
+<link rel="icon" type="image/png" href="wow-icon-192.png">
+<link rel="stylesheet" href="wow-app.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div id="app">
+  <main id="view-home" class="view scroll active"></main>
+  <main id="view-map" class="view">
+    <canvas id="map" aria-label="Weltkarte"></canvas>
+    <div id="map-top" class="map-top"></div>
+    <div id="map-onboard" class="onboard card" hidden></div>
+    <div class="crosshair" aria-hidden="true"><i></i></div>
+    <div id="pick-bar" class="pick-bar card" hidden></div>
+  </main>
+  <main id="view-trips" class="view scroll"></main>
+  <main id="view-stats" class="view scroll"></main>
+  <main id="view-wish" class="view scroll"></main>
+  <main id="view-more" class="view scroll"></main>
+  <nav id="tabbar" class="tabbar" aria-label="Navigation"></nav>
+</div>
+<div id="sheets"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="splash"><div class="sp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><path d="M3.5 12h17"/></svg></div><b>WowarWahr</b><small>Wo war ich?</small></div>
+<div id="rotate"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="3" width="10" height="18" rx="2.5"/></svg><p>Bitte das Smartphone ins Hochformat drehen.</p></div></div>
+<noscript><p style="padding:24px">WowarWahr benötigt JavaScript.</p></noscript>
+<script type="module" src="wow-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="af" data-wz-fixed="dark" data-theme="dark">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<!-- AufwindWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<title>AufwindWahr</title>
+<meta name="description" content="AufwindWahr – mit Aufwinden von der Erde zu den Sternen, in 100 Feldern. Gegen den Computer oder gemeinsam an einem Gerät. Offline spielbar.">
+<meta name="theme-color" content="#0a0724">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="af-icon-192.png" type="image/png">
+<script>
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) { e.preventDefault(); } }, { passive: false });
+</script>
+<style id="fw-familie">
+/* FunWahr-Familienstil (wie in den übrigen Spielen) */
+.fw-i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto;}
+
+.topbar-actions{gap:8px;}
+/* FunWahr-Familienstil – bewusst in jede App kopiert (keine gemeinsame Datei),
+   damit jede App technisch eigenständig bleibt. */
+.fw-home{width:38px!important;height:38px!important;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;
+  background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;text-decoration:none!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);flex:0 0 auto;padding:0!important;font-size:0!important;backdrop-filter:none!important;}
+.fw-home svg{width:18px!important;height:18px!important;display:block;}
+.fw-home:active{transform:scale(.92);}
+.fw-s-bar .fw-home{margin:0!important;}
+.fw-title{background:linear-gradient(90deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-a742ff, #a742ff) 50%,#ff3caa)!important;-webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent;white-space:nowrap;text-shadow:none!important;}
+.fw-primary{background:linear-gradient(150deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-8e75f0, #8E75F0))!important;color:var(--wzp-0d0a1c, #0d0a1c)!important;border:none!important;text-shadow:none!important;
+  font-weight:800!important;box-shadow:0 6px 14px rgba(var(--wzq-5a2fbe, 90, 47, 190),.35)!important;}
+.fw-primary *{color:var(--wzp-0d0a1c, #0d0a1c)!important;}
+.fw-nowrap{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+html[data-theme="light"] .fw-home{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;box-shadow:0 3px 10px rgba(20,30,70,.12);}
+/* ===== FunWahr-Startstandard (in jeder App identisch) =====
+   Home oben links, App-Aktionen oben rechts, App-Icon + Titel + einzeiliger Untertitel,
+   einheitlicher Hauptknopf, „Impressum · Datenschutz“ unten. */
+.fw-s-bar{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;right:16px;z-index:70;
+  display:flex;align-items:center;justify-content:space-between;}
+.fw-s-bar .fw-s-actions{display:flex;gap:8px;}
+.fw-s-hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+.fw-s-icon{width:68px;height:68px;border-radius:17px;display:block;margin:0 auto 14px;
+  box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);}
+.fw-s-title{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif!important;
+  font-size:34px!important;font-weight:800!important;font-style:normal!important;letter-spacing:.005em!important;
+  line-height:1.15!important;margin:0 0 8px!important;padding:0!important;text-transform:none!important;text-align:center;}
+.fw-s-sub{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif!important;
+  font-size:15px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  color:rgba(var(--wzq-f1eefb, 241, 238, 251),.68)!important;margin:0 0 26px!important;line-height:1.45!important;
+  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+.fw-s-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:320px;
+  margin:0 auto!important;padding:15px 20px!important;border-radius:14px!important;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;font-size:16px!important;
+  font-weight:800!important;letter-spacing:.01em!important;text-transform:none!important;text-decoration:none!important;
+  white-space:nowrap;box-sizing:border-box;cursor:pointer;}
+.fw-s-btn:active{transform:scale(.98);}
+.fw-s-ghost{background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;
+  box-shadow:none!important;font-weight:700!important;text-shadow:none!important;}
+.fw-s-stack{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin:0 auto;}
+.fw-s-legal{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:auto;padding-top:22px;}
+.fw-s-legal--fixed{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:65;margin:0;padding:0;}
+.fw-s-legal a,.fw-s-legal button{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.6)!important;text-decoration:none!important;background:none!important;
+  border:none!important;box-shadow:none!important;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  padding:12px 6px!important;margin:0!important;min-height:0!important;width:auto!important;cursor:pointer;}
+.fw-s-legal span{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.32);font-size:13px;}
+html[data-theme="light"] .fw-s-sub{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal a,html[data-theme="light"] .fw-s-legal button{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal span{color:#9aa3c4;}
+html[data-theme="light"] .fw-s-ghost{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;}
+
+</style>
+<link rel="stylesheet" href="af-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="af-stars" id="af-stars" aria-hidden="true"></div>
+
+<!-- ================= Startseite ================= -->
+<section class="af-screen" id="s-start" aria-labelledby="af-title">
+  <div class="fw-s-bar">
+    <a class="icon-btn fw-home" href="./index.html#spiel" title="Zur WahrZentrale" aria-label="Zur WahrZentrale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
+    <div class="fw-s-actions">
+      <button type="button" class="icon-btn fw-home" id="b-rules-start" aria-label="Spielregeln"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".7" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+
+  <div class="af-start">
+    <div class="fw-s-hero af-hero">
+      <img class="fw-s-icon" src="af-icon-192.png" alt="" width="68" height="68">
+      <h1 class="fw-title fw-s-title" id="af-title">AufwindWahr</h1>
+      <p class="fw-s-sub">Mit Aufwind von der Erde zu den Sternen.</p>
+    </div>
+
+    <div class="af-card af-continue" id="continue" hidden>
+      <div class="af-continue-txt"><strong>Spiel fortsetzen</strong><span id="continue-sub"></span></div>
+      <button type="button" class="af-btn af-btn-main af-btn-small" id="b-continue">Weiter</button>
+    </div>
+
+    <div class="af-label-row"><span class="af-label">Mitspieler</span><span class="af-hint">2 bis 4, reihum an einem Gerät</span></div>
+    <div id="setup-players" class="af-setup-list"></div>
+    <button type="button" class="af-add" id="b-add-player"></button>
+
+    <div class="af-label-row"><span class="af-label">Brett</span><span class="af-hint" id="board-hint">jedes Spiel ein neues Brett</span></div>
+    <div class="af-boardpick" role="radiogroup" aria-label="Brett wählen">
+      <button type="button" role="radio" class="af-pick" id="pick-new" aria-checked="true"><strong>Neues Brett</strong><span>zufällig und fair</span></button>
+      <button type="button" role="radio" class="af-pick" id="pick-same" aria-checked="false"><strong>Brett-Nummer</strong><span id="pick-same-sub">für eine Revanche</span></button>
+    </div>
+    <div class="af-boardno" id="boardno-row" hidden>
+      <label for="boardno">Brett-Nummer</label>
+      <input id="boardno" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+    </div>
+
+    <button type="button" class="af-btn af-btn-main af-start-btn" id="b-start">Los geht's!</button>
+    <p class="af-start-msg" id="start-msg" role="status"></p>
+
+    <nav class="fw-s-legal" aria-label="Rechtliches">
+      <a href="./impressum.html">Impressum</a><span>·</span><a href="./datenschutz.html#af">Datenschutz</a><span>·</span><a href="./lizenzen.html">Lizenzen</a>
+    </nav>
+  </div>
+</section>
+
+<!-- ================= Spiel ================= -->
+<section class="af-screen" id="s-game" hidden aria-label="Spielbrett">
+  <header class="af-top">
+    <button type="button" class="af-iconbtn" id="b-back" aria-label="Zurück zur Startseite von AufwindWahr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="af-top-title"><strong>AufwindWahr</strong><span id="top-sub"></span></div>
+    <button type="button" class="af-iconbtn" id="b-menu" aria-label="Menü" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/></svg></button>
+  </header>
+
+  <div class="af-chips" id="chips"></div>
+
+  <div class="af-turn" id="turn" aria-live="polite"><span class="af-turn-fig" id="turn-fig"></span><span class="af-turn-txt" id="turn-txt"></span></div>
+
+  <div class="af-boardwrap" id="boardwrap">
+    <div class="af-board" id="board">
+      <div class="af-board-bg" aria-hidden="true"></div>
+      <svg class="af-board-deco" viewBox="0 0 378 378" preserveAspectRatio="none" aria-hidden="true">
+        <circle cx="312" cy="46" r="27" fill="#E9B872"/>
+        <path d="M312 32 a27 27 0 0 1 23 31" fill="none" stroke="#F6D49B" stroke-width="5" stroke-linecap="round" stroke-opacity="0.6"/>
+        <ellipse cx="312" cy="48" rx="46" ry="10" fill="none" stroke="#F4E2BE" stroke-width="4" transform="rotate(-16 312 48)"/>
+        <circle cx="64" cy="114" r="15" fill="#8FC7FF"/>
+        <circle cx="60" cy="109" r="4" fill="#C9E6FF"/>
+        <circle cx="208" cy="156" r="9" fill="#FF9EC0"/>
+        <path d="M42 34l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#FFE59A"/>
+        <path d="M176 78l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#FFFFFF"/>
+        <path d="M344 176l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#FFE59A"/>
+        <path d="M20 274 q14 -18 32 -6 q10 -14 26 -4 q16 0 16 12 z" fill="#FFFFFF" fill-opacity="0.35"/>
+        <path d="M240 246 q12 -15 28 -5 q9 -12 22 -3 q14 0 14 10 z" fill="#FFFFFF" fill-opacity="0.3"/>
+        <path d="M0 364 h28 v-14 l10 -8 10 8 v14 h14 v-22 h18 v22 h20 v-10 l12 -9 12 9 v10 h24 v-18 h14 v18 h26 v-12 q10 -12 20 0 v12 h30 v-16 l10 -7 10 7 v16 h24 v-24 h12 v24 h56 v14 h-378 z" fill="#2A1B4E"/>
+      </svg>
+      <div class="af-cells" id="cells"></div>
+      <svg class="af-links" id="links" viewBox="0 0 378 378" aria-hidden="true"></svg>
+      <div class="af-tokens" id="tokens" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="af-legend" aria-hidden="true">
+    <span><i class="lg-up"></i>Aufwind</span>
+    <span><i class="lg-down"></i>Meteorit</span>
+    <span><svg viewBox="0 0 24 24"><path d="M18.5 15.2A8 8 0 1 1 10.3 4.1a6.4 6.4 0 1 0 8.2 11.1Z" fill="#FFE7A3"/></svg>Mond</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="#F4B8FF" stroke-width="2.6" stroke-linecap="round"><path d="M12 12m-1.5 0a1.5 1.5 0 1 0 3 0a3.5 3.5 0 1 0 -7 0a5.5 5.5 0 1 0 11 0"/></svg>Wurmloch</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="#B5EEFF" stroke-width="2.6" stroke-linecap="round"><rect x="9" y="9" width="6" height="6" rx="1.2"/><path d="M3 12h6M15 12h6"/></svg>Station</span>
+  </div>
+
+  <div class="af-bottom">
+    <button type="button" class="af-card-btn c-schub" id="c-schub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span>±1</span></button>
+    <button type="button" class="af-card-btn c-neu" id="c-neu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg><span>Neu</span></button>
+    <button type="button" class="af-card-btn c-schild" id="c-schild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg><span>Schild</span></button>
+    <div class="af-flex"></div>
+    <button type="button" class="af-roll" id="b-roll"><span class="af-die" id="die" aria-hidden="true"></span><span id="roll-label">Würfeln</span></button>
+  </div>
+</section>
+
+<!-- ================= Fenster ================= -->
+<div class="af-sheet-back" id="sheet" hidden>
+  <div class="af-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="af-grip" aria-hidden="true"></div>
+    <div id="sheet-art" class="af-sheet-art"></div>
+    <div class="af-sheet-kicker" id="sheet-kicker"></div>
+    <h2 id="sheet-title"></h2>
+    <div id="sheet-body" class="af-sheet-body"></div>
+    <div id="sheet-actions" class="af-sheet-actions"></div>
+  </div>
+</div>
+
+<div class="af-toast" id="toast" role="status" hidden></div>
+
+<script src="af-game.js"></script>
+<script>/* FunWahr: Zeitstempel für „Zuletzt gespielt“ auf der Startseite (nur dieser eine Wert) */try{localStorage.setItem('funwahr-zuletzt-af',String(Date.now()));}catch(e){}</script>
+</body>
+</html>

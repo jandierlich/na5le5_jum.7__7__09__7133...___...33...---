@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="as">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="theme-color" content="#f7f6fc">
+<meta name="description" content="AstroWahr – Astronomie und Astrologie: Geburtshoroskop, Tageshoroskop, Transite, Kompatibilität, Mondkalender, Tarot sowie ein live berechneter Sternenhimmel mit Zeitreise, Planeten-Fakten und Sonnenzeiten, komplett offline berechnet.">
+<title>AstroWahr</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Statusleiste: im hellen Design dunkle Schrift auf hellem Grund („default"), im dunklen Design helle Schrift („black"). -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="statusBarMeta">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<link rel="icon" href="as-icon-192.png" type="image/png">
+<link rel="stylesheet" href="as-style.css">
+<script>
+(function () {
+  try {
+    var pref = localStorage.getItem('astrowahr.theme') || 'light';
+    var effective = pref === 'system' ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : pref;
+    if (effective === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('statusBarMeta').setAttribute('content', 'black');
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#17142f');
+    }
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <a class="wz-inline-home" href="./index.html#himmel" aria-label="Zur WahrZentrale" title="Zur WahrZentrale" id="wzHomeBtn"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10.5V20h4.5v-5.5h3V20H18v-9.5"/></svg></a>
+    <button type="button" class="back-btn" id="backBtn" style="display:none;" aria-label="Zurück"><svg class="aw-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="brand" id="brandHeader">
+      <img class="brand-badge brand-icon" src="as-icon-192.png" alt="" width="34" height="34">
+      <h1>AstroWahr</h1>
+    </div>
+    <button type="button" class="topbar-search-btn" id="searchBtn" aria-label="Suche"><svg class="aw-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  </header>
+
+  <main id="view">
+
+    <!-- START (Weiche: Astronomie / Astrologie) -->
+    <section class="tab" id="tab-start" data-title="AstroWahr">
+      <div class="hero-card">
+        <div class="hero-date" id="heroDate">–</div>
+        <div class="hero-title">Heute am Himmel</div>
+        <div class="hero-row" id="heroSky"></div>
+      </div>
+      <h2 class="section-title">Wohin möchtest du?</h2>
+      <div class="bento" id="forkBento"></div>
+      <h2 class="section-title">Schnellzugriff</h2>
+      <div class="bento" id="quickBento"></div>
+    </section>
+
+    <!-- ASTROLOGIE (Hub) -->
+    <section class="tab" id="tab-astrologie" data-title="Astrologie">
+      <h2 class="section-title">Astrologie</h2>
+      <div class="bento" id="astrologieBento"></div>
+      <h2 class="section-title">Deine Profile</h2>
+      <div id="astrologieProfiles"></div>
+    </section>
+
+    <!-- ASTRONOMIE (Hub) -->
+    <section class="tab" id="tab-astronomie" data-title="Astronomie">
+      <h2 class="section-title">Astronomie</h2>
+      <p class="hint">Reine, unabhängig überprüfbare Himmelsmechanik und Fakten – ohne symbolische Deutung.</p>
+      <div class="bento" id="astronomieBento"></div>
+    </section>
+
+    <!-- ASTRONOMIE: HIMMEL JETZT -->
+    <section class="tab" id="tab-astro-live" data-title="Himmel jetzt">
+      <div id="astroLiveRoot"></div>
+    </section>
+
+    <!-- ASTRONOMIE: PLANETEN-STECKBRIEFE -->
+    <section class="tab" id="tab-astro-planets" data-title="Planeten">
+      <div id="astroPlanetsRoot"></div>
+    </section>
+
+    <!-- ASTRONOMIE: SONNENAUF-/-UNTERGANG -->
+    <section class="tab" id="tab-astro-sun" data-title="Sonnenzeiten">
+      <div id="astroSunRoot"></div>
+    </section>
+
+    <!-- ASTRONOMIE: STERNBILDER & PRÄZESSION -->
+    <section class="tab" id="tab-astro-precession" data-title="Präzession">
+      <div id="astroPrecessionRoot"></div>
+    </section>
+
+    <!-- ASTRONOMIE: JAHRESZEITEN -->
+    <section class="tab" id="tab-astro-seasons" data-title="Jahreszeiten">
+      <div id="astroSeasonsRoot"></div>
+    </section>
+
+    <!-- ASTRONOMIE: STERNENHIMMEL (live, SterneWahr-Technologie) -->
+    <section class="tab" id="tab-sternenhimmel" data-title="Sternenhimmel">
+      <div id="sternenhimmelRoot"></div>
+    </section>
+
+    <!-- WELTRAUMKUNDE (Hub) -->
+    <section class="tab" id="tab-weltraum" data-title="Weltraumkunde">
+      <div id="weltraumRoot"></div>
+    </section>
+
+    <!-- WELTRAUMKUNDE: LEXIKON -->
+    <section class="tab" id="tab-weltraum-lexikon" data-title="Weltraum-Lexikon">
+      <div id="weltraumLexikonRoot"></div>
+    </section>
+
+    <!-- WELTRAUMKUNDE: STERNENTWICKLUNG -->
+    <section class="tab" id="tab-weltraum-sterne" data-title="Sternentwicklung">
+      <div id="weltraumSterneRoot"></div>
+    </section>
+
+    <!-- WELTRAUMKUNDE: RAUMFAHRT-ZEITSTRAHL -->
+    <section class="tab" id="tab-weltraum-zeitstrahl" data-title="Raumfahrt">
+      <div id="weltraumZeitstrahlRoot"></div>
+    </section>
+
+    <!-- TAGESHOROSKOP -->
+    <section class="tab" id="tab-horoskop" data-title="Tageshoroskop">
+      <p class="hint">Wähle dein Sternzeichen für den heutigen Impuls – täglich neu, mit der echten aktuellen Mondstellung.</p>
+      <div class="sign-grid" id="horoskopSignGrid"></div>
+      <div id="horoskopResult"></div>
+    </section>
+
+    <!-- GEBURTSHOROSKOP -->
+    <section class="tab" id="tab-chart" data-title="Geburtshoroskop">
+      <div id="chartRoot"></div>
+    </section>
+
+    <!-- TRANSITE -->
+    <section class="tab" id="tab-transite" data-title="Transite">
+      <div id="transiteRoot"></div>
+    </section>
+
+    <!-- KOMPATIBILITÄT -->
+    <section class="tab" id="tab-kompat" data-title="Kompatibilität">
+      <div id="kompatRoot"></div>
+    </section>
+
+    <!-- MONDKALENDER -->
+    <section class="tab" id="tab-mond" data-title="Mondkalender">
+      <div id="mondRoot"></div>
+    </section>
+
+    <!-- TAROT -->
+    <section class="tab" id="tab-tarot" data-title="Tarot">
+      <div id="tarotRoot"></div>
+    </section>
+
+    <!-- ASTRO-LEXIKON -->
+    <section class="tab" id="tab-astrolex" data-title="Astro-Lexikon">
+      <div id="astrolexRoot"></div>
+    </section>
+
+    <!-- MEHR -->
+    <section class="tab" id="tab-mehr" data-title="Mehr">
+      <div class="bento" id="mehrBento"></div>
+    </section>
+
+    <!-- ANLEITUNG -->
+    <section class="tab" id="tab-anleitung" data-title="Anleitung">
+      <div id="anleitungRoot" class="legal-content"></div>
+    </section>
+
+    <!-- EINSTELLUNGEN -->
+    <section class="tab" id="tab-einstellungen" data-title="Einstellungen">
+      <div id="einstellungenRoot"></div>
+    </section>
+
+    <!-- RECHTLICHES -->
+    <section class="tab" id="tab-rechtliches" data-title="Rechtliches">
+      <div id="rechtlichesRoot"></div>
+    </section>
+
+    <!-- IMPRESSUM -->
+    <section class="tab" id="tab-impressum" data-title="Impressum">
+      <div class="legal-content" id="impressumInline"></div>
+    </section>
+
+    <!-- DATENSCHUTZ -->
+    <section class="tab" id="tab-datenschutz" data-title="Datenschutz">
+      <div class="legal-content" id="datenschutzInline"></div>
+    </section>
+
+    <!-- LIZENZEN -->
+    <section class="tab" id="tab-lizenzen" data-title="Quellen & Lizenzen">
+      <div class="legal-content" id="lizenzenInline"></div>
+    </section>
+
+    <div class="app-footer">AstroWahr<span class="fdot">·</span>Teil der „Wahr"-App-Familie</div>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Hauptbereiche">
+    <button type="button" data-tab="start" data-icon="home"><span class="nav-glyph"></span><span class="nav-label">Start</span></button>
+    <button type="button" data-tab="astronomie" data-icon="telescope"><span class="nav-glyph"></span><span class="nav-label">Astronomie</span></button>
+    <button type="button" data-tab="astrologie" data-icon="crystal"><span class="nav-glyph"></span><span class="nav-label">Astrologie</span></button>
+    <button type="button" data-tab="mehr" data-icon="menu"><span class="nav-glyph"></span><span class="nav-label">Mehr</span></button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="update-bar" id="updateBar" hidden>
+    <span>Neue Version von AstroWahr verfügbar</span>
+    <button type="button" class="update-later" id="updateLater">Später</button>
+    <button type="button" class="update-btn" id="updateBtn">Aktualisieren</button>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Schließen"><svg class="aw-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="modal-content" id="modalContent"></div>
+      <div class="modal-zoom-controls" id="modalZoomControls" style="display:none;">
+        <button type="button" id="zoomOutBtn" aria-label="Verkleinern">−</button>
+        <button type="button" id="zoomResetBtn">100 %</button>
+        <button type="button" id="zoomInBtn" aria-label="Vergrößern">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="as-no-zoom.js"></script>
+<script src="as-icons.js"></script>
+<script>
+  // Navigationssymbole aus dem eigenen Symbolset einsetzen
+  document.querySelectorAll('nav.bottom-nav button').forEach(function (b) {
+    b.querySelector('.nav-glyph').innerHTML = window.AWIcon(b.dataset.icon);
+  });
+</script>
+<script src="as-astro.js"></script>
+<script src="as-tarot-cards.js"></script>
+<script src="as-tarot-art.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script src="as-app.js"></script>
+</body>
+</html>

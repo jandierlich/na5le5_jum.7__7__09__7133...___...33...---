@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Einstellungen – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>Einstellungen</h1>
+    <p class="hw-sub">Darstellung, Reihenfolge und lokale Daten.</p>
+  </div>
+
+  <div class="hw-card">
+    <h2>Darstellung</h2>
+    <div class="hw-radio" role="radiogroup" aria-label="Darstellung beim Start">
+      <label><input type="radio" name="hw-theme" value="light"> Hell (Standard beim Start)</label>
+      <label><input type="radio" name="hw-theme" value="dark"> Dunkel</label>
+    </div>
+    <p style="font-size:12px;margin:10px 0 0;">Der Hintergrund folgt immer der echten Sonnenhöhe an deinem Standort.</p>
+  </div>
+
+  <div class="hw-card">
+    <h2>Heute lohnt sich …</h2>
+    <p style="font-size:12px;margin-top:-6px;">Welche Hinweise auf der Startseite erscheinen dürfen. Ein Hinweis zeigt sich nur, wenn er gerade zutrifft.</p>
+    <div class="hw-radio" id="hw-ins-settings"></div>
+  </div>
+
+  <div class="hw-card">
+    <h2>Reihenfolge der Startseiten-Abschnitte</h2>
+    <p style="font-size:12px;margin-top:-6px;">Mit den Pfeil-Buttons verschieben. Ein Abschnitt ohne aktuell verfügbaren Wert wird übersprungen, seine Position bleibt aber gemerkt.</p>
+    <div id="hw-section-order-list"></div>
+    <button class="hw-btn" style="margin-top:14px;" onclick="hwResetSectionOrder()">Reihenfolge zurücksetzen</button>
+  </div>
+
+  <div class="hw-card">
+    <h2>Reihenfolge der Detail-Kacheln</h2>
+    <p style="font-size:12px;margin-top:-6px;">Betrifft die Kacheln innerhalb von „Weitere Details“.</p>
+    <div id="hw-tile-order-list"></div>
+    <button class="hw-btn" style="margin-top:14px;" onclick="hwResetTileOrder()">Reihenfolge zurücksetzen</button>
+  </div>
+
+  <div class="hw-card">
+    <h2>Lokale Daten</h2>
+    <p style="font-size:13px;">HimmelsWahr speichert Einstellungen, Orte und Kalibrierung ausschließlich auf diesem Gerät. Hier kannst du alles zurücksetzen.</p>
+    <button class="hw-btn" id="hw-reset-cal">Kompass-Kalibrierung zurücksetzen</button>
+    <button class="hw-btn" id="hw-reset-all" style="margin-bottom:0;">Alle gespeicherten Daten löschen</button>
+    <p id="hw-reset-msg" style="font-size:13px;margin:10px 0 0;display:none;"></p>
+  </div>
+
+  <a class="hw-btn" href="hw-index.html">Zur Startseite</a>
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('');
+
+function hwMsg(t){ var m = document.getElementById('hw-reset-msg'); m.textContent = t; m.style.display = 'block'; }
+document.addEventListener('DOMContentLoaded', function(){
+  hwRenderSectionSettings();
+  (function(){
+    var items = [['sterne','Sternenhimmel heute Nacht'],['regenbogen','Regenbogen-Chance'],['frost','Frost, Bodenfrost, Tau und Nebel']];
+    var off = []; try{ off = JSON.parse(localStorage.getItem('hw-insights-off') || '[]') || []; }catch(e){}
+    var box = document.getElementById('hw-ins-settings');
+    box.innerHTML = items.map(function(it){ return '<label><input type="checkbox" data-ins="' + it[0] + '"' + (off.indexOf(it[0]) === -1 ? ' checked' : '') + '> ' + it[1] + '</label>'; }).join('');
+    box.addEventListener('change', function(){
+      var o = []; box.querySelectorAll('input[data-ins]').forEach(function(c){ if(!c.checked) o.push(c.getAttribute('data-ins')); });
+      try{ localStorage.setItem('hw-insights-off', JSON.stringify(o)); }catch(e){}
+    });
+  })();
+  hwRenderTileSettings();
+  var cur = hwGetThemePref();
+  document.querySelectorAll('input[name=hw-theme]').forEach(function(r){
+    r.checked = (r.value === cur);
+    r.addEventListener('change', function(){ hwSetThemePref(r.value); hwApplyTheme(hwResolveTheme(r.value)); });
+  });
+  document.getElementById('hw-reset-cal').onclick = function(){
+    try{ localStorage.removeItem('hw-kompass-cal'); }catch(e){}
+    hwMsg('Kalibrierung zurückgesetzt.');
+  };
+  document.getElementById('hw-reset-all').onclick = function(){
+    if(!confirm('Alle von HimmelsWahr gespeicherten Daten (Orte, Favoriten, Einstellungen, Zwischenspeicher) auf diesem Gerät löschen?')) return;
+    try{
+      Object.keys(localStorage).filter(function(k){ return k.indexOf('hw-') === 0; }).forEach(function(k){ localStorage.removeItem(k); });
+    }catch(e){}
+    var done = function(){ hwMsg('Alle Daten wurden gelöscht. Die Einführung erscheint beim nächsten Start erneut.'); };
+    if(window.caches && caches.keys){ caches.keys().then(function(ks){ return Promise.all(ks.filter(function(k){ return k.indexOf('himmelswahr') === 0; }).map(function(k){ return caches.delete(k); })); }).then(done, done); }
+    else done();
+  };
+});
+
+</script>
+</body>
+</html>

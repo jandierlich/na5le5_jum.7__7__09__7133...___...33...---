@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="wz">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Datenschutz – WahrZentrale</title>
+<meta name="theme-color" content="#F1EEFA">
+<link rel="stylesheet" href="./wz-common.css">
+<style>
+  .ds-toc { background: var(--wz-card); border: 1px solid var(--wz-line); border-radius: 18px; padding: 14px 18px; margin: 0 0 22px; }
+  .ds-toc ol { margin: 6px 0 0; padding-left: 20px; }
+  .ds-toc li { margin: 3px 0; }
+  .ds-app { background: var(--wz-card); border: 1px solid var(--wz-line); border-radius: 16px; padding: 12px 16px 4px; margin: 0 0 12px; scroll-margin-top: 16px; }
+  .ds-app h3 { margin-top: 4px; }
+  h2, h3 { scroll-margin-top: 16px; }
+  table.ds { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 16px; }
+  table.ds th, table.ds td { text-align: left; vertical-align: top; padding: 7px 6px; border-bottom: 1px solid var(--wz-line); }
+  table.ds th { font-weight: 700; }
+  .ds-note { font-size: 14px; color: var(--wz-sub); }
+  @media (max-width: 600px) {
+    table.ds, table.ds tbody, table.ds tr, table.ds td { display: block; width: 100%; }
+    table.ds tr:first-child { display: none; }
+    table.ds tr { border-bottom: 1px solid var(--wz-line); padding: 8px 0; }
+    table.ds td { border: 0; padding: 2px 0; }
+    table.ds td:first-child { font-weight: 700; }
+    table.ds td:last-child { color: var(--wz-sub); font-size: 13px; }
+  }
+  table.ds td { overflow-wrap: anywhere; }
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body class="wz-doc">
+<main class="wz-doc-wrap">
+<nav class="wz-doc-nav" aria-label="Navigation">
+  <a href="./index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></g></svg> WahrZentrale</a>
+  <a href="./impressum.html">Impressum</a>
+  <a href="./lizenzen.html">Quellen &amp; Lizenzen</a>
+</nav>
+
+<h1>Datenschutzerklärung</h1>
+<p>Diese Datenschutzerklärung gilt für die gesamte WahrZentrale – die Startseite und alle darin enthaltenen Apps. Stand: 13. Oktober 2026.</p>
+
+<div class="ds-toc">
+  <strong>Inhalt</strong>
+  <ol>
+    <li><a href="#verantwortlicher">Verantwortlicher</a></li>
+    <li><a href="#grundsatz">Grundsatz: Alles bleibt auf deinem Gerät</a></li>
+    <li><a href="#hosting">Bereitstellung über GitHub Pages</a></li>
+    <li><a href="#speicher">Speicherung auf deinem Gerät</a></li>
+    <li><a href="#berechtigungen">Standort, Kamera, Mikrofon, Sensoren, Mitteilungen</a></li>
+    <li><a href="#dienste">Externe Dienste</a></li>
+    <li><a href="#karten">Karten (OpenStreetMap)</a></li>
+    <li><a href="#sicherung">Sicherung, Export und Teilen</a></li>
+    <li><a href="#apps">Die Apps im Einzelnen</a></li>
+    <li><a href="#rechte">Deine Rechte</a></li>
+  </ol>
+</div>
+
+<h2 id="verantwortlicher">1. Verantwortlicher</h2>
+<p>Jan Dierlich, Steenacker 33, 25499 Tangstedt, Deutschland<br>E-Mail: <a href="mailto:jandierlich@googlemail.com">jandierlich@googlemail.com</a></p>
+
+<h2 id="grundsatz">2. Grundsatz: Alles bleibt auf deinem Gerät</h2>
+<p>Die WahrZentrale ist eine Web-App (Progressive Web App), die vollständig in deinem Browser läuft. Es gibt keinen eigenen Server, keine Registrierung und kein Nutzerkonto. Alles, was du in den Apps eingibst, fotografierst oder aufzeichnest, wird ausschließlich auf deinem Gerät gespeichert und nicht an mich übertragen – ich habe darauf keinen Zugriff.</p>
+<p>Es werden keine Cookies gesetzt und keine Analyse-, Tracking- oder Werbedienste eingesetzt. Es werden keine Web-Schriftarten von Dritten geladen; alle Texte nutzen die Systemschrift deines Geräts. Es findet keine automatisierte Entscheidungsfindung und keine Profilbildung statt.</p>
+<p>Daten verlassen dein Gerät nur in den unten genau beschriebenen Fällen: beim Laden der App vom Hosting-Anbieter (Abschnitt 3) und wenn du eine Funktion nutzt, die Live-Daten eines externen Dienstes braucht (Abschnitt 6 und 7).</p>
+
+<h2 id="hosting">3. Bereitstellung über GitHub Pages</h2>
+<p>Die App-Dateien werden als statische Website über GitHub Pages ausgeliefert. Anbieter ist die GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA, ein Unternehmen der Microsoft Corporation. Wenn du die App aufrufst, installierst oder aktualisierst, verarbeitet GitHub automatisch technisch notwendige Verbindungsdaten: IP-Adresse, Datum und Uhrzeit, abgerufene Datei, übertragene Datenmenge, Referrer sowie Browser- und Betriebssystemkennung. Deine Inhalte (Einträge, Fotos, Touren usw.) werden dabei nicht übertragen.</p>
+<p>Zweck ist die Auslieferung der App sowie die Sicherheit und Stabilität des Dienstes. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren, zuverlässigen Bereitstellung). Ich habe keinen Zugriff auf diese Verbindungsdaten; GitHub speichert Server-Logs nach eigenen Angaben nur so lange wie nötig.</p>
+<p>GitHub ist das einzige Unternehmen mit Sitz in den USA, zu dem die WahrZentrale selbst eine Verbindung aufbaut – und nur für das Ausliefern der Programmdateien; keine deiner Eingaben gelangt dorthin. (Zur Spracheingabe in LosDenkWahr, die dein Betriebssystem übernimmt, siehe Abschnitt 5.) Die USA gelten datenschutzrechtlich als Drittland. Die Übermittlung stützt sich auf den Angemessenheitsbeschluss der EU-Kommission zum EU-US Data Privacy Framework (Art. 45 DSGVO), solange dieser gilt und GitHub darunter zertifiziert ist, und – nach Angaben von GitHub zusätzlich und unabhängig davon – auf die Standardvertragsklauseln der EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO). Sollte der Angemessenheitsbeschluss aufgehoben, geändert oder ausgesetzt werden, bleiben die Standardvertragsklauseln als Grundlage bestehen. Trotz dieser Garantien können US-Behörden unter bestimmten Voraussetzungen auf Daten bei US-Unternehmen zugreifen, ohne dass dir dieselben Rechtsbehelfe wie in der EU zustehen. Weitere Informationen: GitHub General Privacy Statement.</p>
+<p>Nach dem ersten Laden funktionieren die Apps offline. GitHub wird dann nur kontaktiert, wenn die App mit Internetverbindung geöffnet wird und dabei nach der aktuellen Version sieht.</p>
+
+<h2 id="speicher">4. Speicherung auf deinem Gerät</h2>
+<p>Damit die Apps funktionieren, speichern sie deine Inhalte und Einstellungen im Speicher des Browsers auf deinem Gerät (localStorage und IndexedDB) und legen die Programmdateien im Offline-Speicher ab (Service Worker, Cache). Dieses Speichern ist für die von dir ausdrücklich gewünschten Funktionen unbedingt erforderlich und daher nach § 25 Abs. 2 Nr. 2 TDDDG ohne gesonderte Einwilligung zulässig. Die damit verbundene, rein lokale Verarbeitung stützt sich auf Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse, dir die gewünschten Funktionen bereitzustellen).</p>
+<p>Alle Apps der WahrZentrale liegen unter derselben Adresse und teilen sich deshalb einen Speicherbereich auf deinem Gerät. Die Apps nutzen dabei jeweils eigene, getrennte Einträge. Gemeinsam genutzt werden nur diese Einträge der Zentrale:</p>
+<table class="ds">
+  <tr><th>Eintrag</th><th>Inhalt</th></tr>
+  <tr><td><code>wz_theme</code></td><td>Hell- oder Dunkelmodus – gilt für alle Apps. Beim ersten Start immer hell. Apps mit eigenem Schalter übernehmen den Wert automatisch.</td></tr>
+  <tr><td><code>wz_location</code></td><td>ob der Standort automatisch ermittelt wird oder welcher Ort (Name, Koordinaten) von Hand gewählt ist – gilt für HimmelsWahr, Sternenhimmel, AstroWahr und KompassWahr gemeinsam</td></tr>
+  <tr><td><code>wz_last_gps</code></td><td>der zuletzt in einer App per GPS ermittelte Standort (Koordinaten, Zeitpunkt), damit die Startseite „Heute“ nicht erneut fragen muss</td></tr>
+  <tr><td><code>wz_map_consent</code>, <code>wz_map_consent_rev</code></td><td>deine Entscheidung zur Kartenanzeige (Abschnitt 7) – gilt für alle Karten – und für welchen Kartenanbieter sie gilt</td></tr>
+  <tr><td><code>wz_place_name</code>, <code>wz_place_name_cache</code></td><td>ob der Ortsname im Kopfbereich nachgeschlagen werden darf, und die bereits ermittelten Ortsnamen zu gerundeten Koordinaten (höchstens 20)</td></tr>
+  <tr><td><code>wz_today_weather</code></td><td>ob die Startseite „Heute“ das Wetter anzeigen darf (Abschnitt 6)</td></tr>
+  <tr><td><code>wz_last_backup</code></td><td>Zeitpunkt deiner letzten Gesamtsicherung (für die Erinnerung)</td></tr>
+  <tr><td><code>wz_home_sort</code>, <code>wz_home_order</code>, <code>wz_recent</code></td><td>deine Sortierung der Startseite und wann du welche App zuletzt geöffnet hast (für „Zuletzt“) – nur auf deinem Gerät</td></tr>
+  <tr><td><code>wz_home_blocks</code>, <code>wz_home_layout</code>, <code>wz_home_style</code>, <code>wz_home_favs</code>, <code>wz_home_closed</code></td><td>dein Aufbau der Startseite: Reihenfolge und Sichtbarkeit der Bereiche, eigene Gruppen (mit Symbol, Beschriftung und Darstellung), Farben, Schriftgröße, Favoriten und welche Bereiche eingeklappt sind</td></tr>
+  <tr><td><code>wz_palette</code>, <code>wz_palette_custom</code></td><td>ob die eigene Farbwelt eingeschaltet ist und ihre beiden Reglerwerte (Farbton, Farbstärke) – gilt für alle Apps</td></tr>
+  <tr><td><code>wz_today_cfg</code></td><td>welche Karten „Heute“ zeigt und in welcher Reihenfolge</td></tr>
+  <tr><td><code>wz_nav_last</code>, <code>wz_nav_stack</code>, <code>wz_nav_skip</code></td><td>von welcher App du gekommen bist, damit „Zurück zu …“ funktioniert – nur für die laufende Sitzung (sessionStorage), wird beim Schließen gelöscht</td></tr>
+  <tr><td><code>wz_scan_handoff</code></td><td>was Scanner, Schnelleingabe oder „Hier merken“ an eine App übergeben (Text, bei Belegen das Foto, bei „Hier merken“ die Koordinaten) – nur für diesen einen Wechsel im Sitzungsspeicher (sessionStorage); wird beim Öffnen der App gelöscht</td></tr>
+  <tr><td><code>wz_today_wx</code></td><td>das zuletzt geladene Wetter für „Heute“ samt gerundetem Ort, höchstens 30 Minuten zwischengespeichert</td></tr>
+  <tr><td><code>wz_onboarded</code></td><td>dass die kurze Einführung der Startseite schon gezeigt wurde (die Apps merken sich das jeweils mit einem eigenen Eintrag, z. B. <code>hw-onboarded</code>, <code>bp_onboarded</code>)</td></tr>
+</table>
+<p>Die Startseite der WahrZentrale liest einzelne Werte der Apps, um sie dir in „Heute“, in den Kacheln und in der Suche anzuzeigen (z. B. Anzahl offener Gedanken, letzte Fahrt, Reise-Countdown, Rekorde). Das geschieht nur auf deinem Gerät; es wird dabei nichts verändert oder übertragen.</p>
+<p>Löschen kannst du deine Daten jederzeit in den jeweiligen Apps, gesammelt unter <a href="./wz-einstellungen.html">Einstellungen → Alle Daten löschen</a> oder über die Website-Daten in den Einstellungen deines Geräts. Wird die App vom Home-Bildschirm entfernt, werden die Daten ebenfalls gelöscht.</p>
+
+<h2 id="berechtigungen">5. Standort, Kamera, Mikrofon, Sensoren und Mitteilungen</h2>
+<p>Einige Apps können auf Funktionen deines Geräts zugreifen. Das geschieht nur, wenn du die jeweilige Funktion aktiv nutzt und im System-Dialog zustimmst. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG), die du jederzeit in den Einstellungen deines Geräts bzw. den Website-Einstellungen deines Browsers widerrufen kannst.</p>
+<ul>
+  <li><strong>Standort:</strong> für Wetter, Himmel, Sonnenzeiten, Kompass, Fahrten-Aufzeichnung, Parkorte, „In der Nähe“, Reiseorte, markante Punkte am Horizont (HorizontWahr), DurchblickWahr, LichtechoWahr und PlanetenWahr (StaunWahr), Vergleichswerte und Tempo-Messung in LabWahr und „Hier merken“ auf der Startseite. Der Standort wird auf dem Gerät verarbeitet und nur dann an einen Dienst gesendet, wenn dieser ihn für die gewünschte Funktion braucht (siehe Abschnitt 6). Eine Hintergrund-Ortung findet nicht statt.</li>
+  <li><strong>Kamera:</strong> als Live-Bild für Kompass-, Himmels- und Horizontansichten und die Höhenmessung (MessWahr) sowie zum Fotografieren/Scannen von Belegen, Etiketten, QR- und Barcodes. Das Live-Bild wird nicht aufgezeichnet. Fotos werden nur gespeichert, wenn die App das ausdrücklich vorsieht (z. B. Beleg-Foto in BelegParkWahr, Foto zu einer Tour oder Reise).</li>
+  <li><strong>Mikrofon:</strong> für Lautstärke-Messung (LautstärkeWahr), Sprachnotizen (BelegParkWahr), Spracheingabe (LosDenkWahr), Klang-Reaktion (PartikelWahr) sowie Klangbild, Spektrum und Stimmgerät (KlangWahr), akustische Versuche (LabWahr) und die Donnererkennung des Gewitter-Peilers (MessWahr). Der Ton wird nur live ausgewertet; gespeichert werden ausschließlich Sprachnotizen, die du selbst aufnimmst, bzw. der erkannte Text, den du bestätigst. Bei der Spracheingabe übernimmt die Spracherkennung dein Betriebssystem; je nach Gerät kann dafür eine Verarbeitung durch den Hersteller des Betriebssystems erfolgen.</li>
+  <li><strong>Bewegungs- und Lagesensoren:</strong> für Kompass, Himmels- und Horizontansichten, Neigungssteuerung sowie Höhenmessung, Wasserwaage, Neigungsmesser und Richtungspeilung des Gewitter-Peilers (MessWahr) sowie physikalische Versuche (LabWahr) und das Zielen durch die Erde (StaunWahr). Die Werte werden nur live verwendet.</li>
+  <li><strong>Mitteilungen:</strong> für den Regen-Alarm (HimmelsWahr) und Zahlungs-Erinnerungen (AlltagWahr). Sie werden lokal auf dem Gerät erzeugt, es gibt keinen Push-Server.</li>
+</ul>
+
+<h2 id="dienste">6. Externe Dienste</h2>
+<p>Die folgenden Dienste werden nur angefragt, wenn du eine Funktion nutzt, die sie benötigt. Dabei wird technisch bedingt immer deine IP-Adresse (und übliche Browser-Angaben) an den Anbieter übertragen, zusätzlich die jeweils genannten Inhalte. Für die weitere Verarbeitung bei sich ist der jeweilige Anbieter selbst verantwortlich. Rechtsgrundlage ist, soweit nicht anders angegeben, Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse, dir die von dir aufgerufene Funktion bereitzustellen). Die Antworten werden nicht dauerhaft im Offline-Speicher abgelegt.</p>
+<table class="ds">
+  <tr><th>Dienst</th><th>Wofür, was wird gesendet</th><th>Genutzt in</th></tr>
+  <tr><td><strong>Open-Meteo</strong> (api.open-meteo.com, air-quality-api.open-meteo.com, geocoding-api.open-meteo.com; OpenMeteo GmbH, Bürglen, Schweiz – Angemessenheitsbeschluss; Server nach Angaben des Anbieters in Europa und Nordamerika; Server-Protokolle werden nach Angaben des Anbieters nach 90 Tagen gelöscht)</td><td>Wetter, Niederschlag, Wolken, Luftqualität, Pollen, Höhe, Ortssuche. Gesendet: Koordinaten bzw. Suchtext. Für Abend-/Morgenrot zusätzlich zwei aus deinem Standort berechnete, gerundete Punkte in Richtung Sonnenuntergang/-aufgang. Keysglade fragt beim Öffnen eine kurze Wettervorschau für die gewählte Florida-Stadt ab (Koordinaten der Stadt, nicht deines Standorts), die ausführliche Vorhersage erst im Wetter-Tab. HorizontWahr fragt beim Laden der Umgebung – nach einmaligem Hinweis – die Geländehöhen deines Standorts und der gefundenen Objekte ab (Koordinaten auf 4 Nachkommastellen ≈ 10 m gerundet). KompassWahr sendet die Koordinaten für Wetter und Luftqualität auf 2 Nachkommastellen (≈ 1 km) und für die Geländehöhe auf 4 Nachkommastellen (≈ 10 m) gerundet, NaviWahr für das Wetter am Start auf 2 Nachkommastellen (≈ 1 km).</td><td>Zentrale („Heute“ und Ortssuche in den Einstellungen), HimmelsWahr, KompassWahr, HorizontWahr, NaviWahr, Keysglade</td></tr>
+  <tr><td><strong>Photon</strong> (photon.komoot.io; komoot GmbH mit Sitz in Deutschland)</td><td>Adresssuche und Ortsname zu Koordinaten auf Grundlage der OpenStreetMap-Daten. Gesendet: Suchtext bzw. Koordinaten. In KompassWahr vor der ersten Nutzung jeweils mit eigenem Hinweis. Die Startseite fragt den Ortsnamen für den Kopfbereich nur ab, wenn zum bekannten GPS-Standort noch kein Name vorliegt – mit auf 2 Nachkommastellen (≈ 1 km) gerundeten Koordinaten, einmal je Ort; abschaltbar in den Einstellungen.</td><td>Zentrale (Ortsname im Kopfbereich), KompassWahr, NaviWahr</td></tr>
+  <tr><td><strong>Overpass API</strong> (overpass-api.de, Betreiber in Deutschland; ersatzweise overpass.kumi.systems bzw. overpass.private.coffee, Betreiber in Österreich)</td><td>Orte in der Nähe (KompassWahr) bzw. markante Punkte im gewählten Umkreis von 5 bis 30 km (HorizontWahr). Gesendet: Standort und Umkreis. Nur auf Tipp, beim ersten Mal mit Hinweis.</td><td>KompassWahr, HorizontWahr</td></tr>
+  <tr><td><strong>OSRM-Routing der FOSSGIS e.V.</strong> (routing.openstreetmap.de, Deutschland)</td><td>Auto- oder Fußgängerroute bei aktiver Navigation. Gesendet: aktueller Standort und Ziel, bei einer Neuberechnung unterwegs zusätzlich die Fahrtrichtung (in Grad). Der Betreiber speichert Anfragen nach eigenen Angaben in Server-Logs.</td><td>NaviWahr</td></tr>
+  <tr><td><strong>Open Food Facts, Open Beauty Facts, Open Products Facts</strong> (Open Food Facts, Verein nach französischem Recht mit Sitz in Frankreich)</td><td>Produktdaten zu einem Barcode. Gesendet: der erkannte Barcode – beim Live-Scanner automatisch, sobald ein Code erkannt wird.</td><td>ProduktWahr</td></tr>
+</table>
+<p><strong>Wetter auf der Startseite:</strong> Die Karte „Heute“ zeigt das Wetter erst, nachdem du dort einmal auf „Wetter anzeigen“ getippt hast. Danach wird beim Öffnen der Startseite der bekannte Standort (von Hand gewählter Ort oder zuletzt ermittelter GPS-Standort, auf 2 Nachkommastellen ≈ 1 km gerundet) an Open-Meteo gesendet; das Ergebnis wird 30 Minuten lokal zwischengespeichert. Für den „Himmels-Tipp“ enthält diese eine Abfrage zusätzlich die stündliche Vorhersage der nächsten zwei Tage; gesendet wird dabei nichts anderes. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); abschalten kannst du das jederzeit in den <a href="./wz-einstellungen.html">Einstellungen</a>.</p>
+<p><strong>Kein Anbieter mit Sitz in den USA:</strong> Alle oben genannten Anbieter haben ihren Sitz in der EU oder in der Schweiz (für die Schweiz besteht ein Angemessenheitsbeschluss der EU-Kommission). Wo ein Anbieter seine Server betreibt und welche Dienstleister er dafür einsetzt, bestimmt er selbst; maßgeblich sind seine eigenen Datenschutzhinweise. Open-Meteo betreibt nach eigenen Angaben Server in Europa und Nordamerika; welcher Server eine Anfrage beantwortet, legt der Anbieter fest. Dass eine Wetter-Anfrage auf einem Server außerhalb Europas verarbeitet wird, kann ich deshalb nicht ausschließen. Die Texterkennung und die Barcode-Erkennung sind Teil der WahrZentrale und laufen vollständig auf deinem Gerät; es werden dafür keine Bibliotheken von fremden Servern geladen. Den Wechselkurs in Keysglade trägst du selbst ein – er wird nicht online abgefragt. Die einzige Verbindung zu einem US-Unternehmen, die die Apps selbst aufbauen, ist das Laden der App über GitHub (Abschnitt 3); zur Spracherkennung des Betriebssystems siehe Abschnitt 5.</p>
+<p><strong>Reine Links</strong> (keine automatische Übertragung): Einige Apps verlinken auf externe Seiten, z. B. openstreetmap.org, den Kartendienst deines Geräteherstellers (Routen-Link in KompassWahr, öffnet die Karten-App deines Geräts), die Produktseiten von Open Food Facts, den Wechselkurs der Europäischen Zentralbank, den NOAA-Gezeitenkalender oder den Missweisungs-Rechner von NOAA/BGS. Erst wenn du einen solchen Link antippst, verbindet sich dein Browser direkt mit dieser Seite; dort gilt deren Datenschutzerklärung.</p>
+
+<h2 id="karten">7. Karten (OpenStreetMap)</h2>
+<p>NaviWahr, Keysglade, BelegParkWahr und StaunWahr (PlanetenWahr) können eine Karte anzeigen. Die Kartenbibliothek Leaflet ist Teil der WahrZentrale und wird nicht von fremden Servern geladen. Die Kartenbilder (Kacheln) kommen vom OpenStreetMap-Kartenserver des FOSSGIS e.V. (tile.openstreetmap.de; gemeinnütziger Verein mit Sitz in Deutschland). Dabei werden deine IP-Adresse, der angezeigte Kartenausschnitt (und damit indirekt die ungefähre Lage deiner Route, deines Standorts oder deiner Parkorte) sowie übliche Browser-Angaben übertragen. Empfänger ist damit ein Betreiber mit Sitz in der EU.</p>
+<p>Das geschieht nur mit deiner ausdrücklichen Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die beim ersten Öffnen einer Karte abgefragt wird und für alle Karten der WahrZentrale gilt. Wer früher den Karten des vorherigen Anbieters zugestimmt hat, wird wegen des neuen Anbieters einmal erneut gefragt. Ohne Einwilligung wird keine Verbindung aufgebaut; die Apps funktionieren dann ohne Kartenbild.</p>
+<p>Widerruf: jederzeit mit Wirkung für die Zukunft unter <a href="./wz-einstellungen.html#karten">Einstellungen → Karten</a> oder in NaviWahr bzw. Keysglade selbst. Die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung bleibt unberührt.</p>
+
+<h2 id="sicherung">8. Sicherung, Export und Teilen</h2>
+<p>Unter <a href="./wz-sichern.html">Sichern &amp; Wiederherstellen</a> kannst du alle Daten aller Apps in eine Datei schreiben und später wieder einlesen; viele Apps bieten außerdem eigene Exporte (z. B. PDF, XLSX, GPX, JSON). Diese Dateien entstehen ausschließlich auf deinem Gerät. Wohin du sie speicherst oder schickst (z. B. Dateiablage, Cloud-Speicher, Nachrichten), entscheidest du über das Teilen-Menü deines Geräts; die App selbst überträgt dabei nichts. Eine Sicherungsdatei kann persönliche Inhalte, Fotos und Standorte enthalten – bewahre sie entsprechend sorgfältig auf. Beim Wiederherstellen wird die Datei nur lokal gelesen.</p>
+
+<h2 id="apps">9. Die Apps im Einzelnen</h2>
+<p class="ds-note">Hier steht kurz, was jede App speichert und nutzt. Die allgemeinen Regeln oben gelten überall.</p>
+
+<div class="ds-app" id="zentrale"><h3>WahrZentrale (Startseite, Suche, Schnelleingabe, Scanner, „Hier merken“, Einstellungen, Sicherung)</h3>
+<p>Liest Werte der Apps zur Anzeige (Abschnitt 4). Wetter in „Heute“ nur nach Freigabe (Abschnitt 6). Den Ortsnamen im Kopfbereich ermittelt sie bei Bedarf über Photon (Abschnitt 6, abschaltbar). Sonnenbogen, Sonnenauf- und -untergang und Mondphase im Kopfbereich werden aus dem bekannten Standort auf dem Gerät berechnet; dafür wird nichts gesendet. Die Suche durchsucht deine lokal gespeicherten Einträge auf dem Gerät; Suchbegriffe werden weder gespeichert noch gesendet.</p>
+<p>Der Scanner der Startseite nutzt die Kamera oder ein von dir gewähltes Foto. Barcodes, QR-Codes und Text werden vollständig auf dem Gerät erkannt; dabei wird nichts gesendet und nichts dauerhaft gespeichert. Wählst du eine App für das Ergebnis, wird das Erkannte – bei Belegen zusätzlich das Foto – nur für diesen Wechsel im Sitzungsspeicher des Browsers abgelegt und beim Öffnen der App sofort wieder gelöscht. Ein Barcode wird erst dann an die Produktdatenbanken gesendet (Abschnitt 6), wenn du „In ProduktWahr nachschlagen“ antippst. Dabei öffnet sich der Barcode-Scanner von ProduktWahr; weitere Barcodes, die er anschließend erkennt, fragt er wie dort beschrieben selbst ab.</p>
+<p>Die Schnelleingabe im Suchfeld wertet deinen Text nur auf dem Gerät aus und schlägt eine passende App vor. Gespeichert wird erst in dieser App, nach deinem Tipp; die Übergabe läuft wie beim Scanner über den Sitzungsspeicher und wird beim Öffnen der App gelöscht.</p>
+<p>Fragen im Suchfeld (z. B. „Regnet es heute?“ oder „Wo habe ich geparkt?“) werden ebenfalls nur auf dem Gerät erkannt und beantwortet – mit festen Stichwörtern, ohne KI-Dienst. Die Antworten stammen aus deinen lokal gespeicherten Einträgen, aus auf dem Gerät berechneten Sonnen-, Mond- und Planetendaten und aus dem Wetter von „Heute“, das nur nach deiner Freigabe abgerufen wird (Abschnitt 6). Die Frage selbst wird weder gespeichert noch gesendet.</p>
+<p>„Hier merken“ fragt den Standort deines Geräts erst ab, wenn du den Knopf antippst. Beim Merken selbst wird nichts gesendet. Gespeichert werden die Koordinaten dort, wo du es wählst: als Wegpunkt in KompassWahr (<code>kw-waypoints</code>) oder – nach Bestätigung im Formular – als Ort in WowarWahr; die Übergabe an WowarWahr läuft wie beim Scanner über den Sitzungsspeicher. Zusätzlich wird der Standort wie bei den anderen Apps als letzter bekannter Standort der WahrZentrale vermerkt (<code>wz_last_gps</code>, Abschnitt 4). Er wird danach wie jeder andere bekannte Standort behandelt: Die Startseite schlägt dazu – sofern in den Einstellungen nicht abgeschaltet – den Ortsnamen bei Photon nach und ruft, falls du es eingeschaltet hast, das Wetter bei Open-Meteo ab, jeweils mit auf ca. 1 km gerundeten Koordinaten (Abschnitt 6). Hast du in den Einstellungen einen festen Ort gewählt, wird stattdessen dieser verwendet.</p></div>
+
+<div class="ds-app" id="hw"><h3>HimmelsWahr</h3>
+<p>Speichert lokal: letzten Standort, gewählten Ort und Favoriten (max. 8), die zuletzt geladenen Wetterdaten (höchstens 60 Minuten, damit sie beim Öffnen sofort erscheinen), Vergleichswerte von gestern (Temperatur, Luftqualität mit gerundetem Ortsschlüssel), Reihenfolge der Abschnitte, Lichtverschmutzungs-Stufe, Kalibrierung der Kamera-Ansicht, Regen-Alarm-Status. Nutzt Standort, Kamera (Himmels-Kompass, nur Live-Bild), Lagesensor, Mitteilungen (Regen-Alarm) und Open-Meteo. Solange eine Seite offen ist, werden die Werte alle 10 Minuten aktualisiert. Sonne, Mond, Planeten und Sterne werden lokal berechnet. „Heute lohnt sich …“ wertet die ohnehin geladene Vorhersage zusammen mit diesen Berechnungen auf dem Gerät aus; welche Hinweise du ausgeblendet hast, wird lokal gespeichert.</p></div>
+
+<div class="ds-app" id="as"><h3>AstroWahr</h3>
+<p>Speichert lokal: Geburtshoroskope (Bezeichnung, Geburtsdatum/-zeit, Zeitzone, Ort mit Koordinaten), Tarot-Favoriten und anonyme Zähler, zuletzt genutzten Ort. Nutzt den Standort nur für Sonnenzeiten und Sternenhimmel; die Ortsbestimmung erfolgt ohne Online-Abfrage mit einer mitgelieferten Städteliste. Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="zh"><h3>Sternenhimmel (ZeitHimmel)</h3>
+<p>Speichert lokal (Präfix <code>zh:</code>): Ort, Zeit- und Anzeigeeinstellungen, Kompass-Kalibrierung, deine „Erinnerungen“ (Name, Zeitpunkt, Ort, Blickrichtung) und ggf. das für „Meine Geburtsnacht“ eingegebene Datum. Nutzt Standort, Lagesensor und Kamera (nur Live-Bild) auf Wunsch. Himmelsbilder werden nur auf deinen Tipp erzeugt und über das Teilen-Menü weitergegeben. Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="kw"><h3>KompassWahr</h3>
+<p>Speichert lokal: Standort-Modus und gewählten Ort, Wegpunkte (Name, Koordinaten, Zeitpunkt), Umkreis und Filter der Ortssuche, Missweisung, Bestätigungen der Hinweise zu Photon/Overpass. Nutzt Standort, Kamera (nur Live-Bild), Kompass-/Lagesensor, Open-Meteo, Photon und Overpass.</p></div>
+
+<div class="ds-app" id="hz"><h3>HorizontWahr</h3>
+<p>Speichert lokal (Präfix <code>horizontwahr_</code>): die zuletzt geladene Umgebung (Standort, auf 5 Nachkommastellen gerundet, Umkreis, Zeitpunkt sowie Name, Art, Lage und Höhe der gefundenen Objekte), Umkreis- und Artenauswahl, Augenhöhe, Kalibrierung der Kamera-Ansicht und die Bestätigung des Hinweises zu Overpass/Open-Meteo. Der Standort wird nur beim Tipp auf „Umgebung laden“ ermittelt und dann an Overpass (Standort und Umkreis) sowie an Open-Meteo (Geländehöhen für Standort und Objekte) gesendet (Abschnitt 6). Die Kamera-Ansicht nutzt Kamera (nur Live-Bild) und Kompass-/Lagesensor; Richtung, Entfernung, Höhenwinkel und Sicht werden auf dem Gerät berechnet. Die gespeicherte Umgebung kannst du in der App unter „Info“ löschen.</p></div>
+
+<div class="ds-app" id="sn"><h3>StaunWahr</h3>
+<p>Speichert lokal (Präfix <code>staunwahr_</code>): deine Lichtecho-Momente (Name und Datum), den gewählten Moment, Maßstab, Anordnung, Richtung und Sonnen-Standort in PlanetenWahr, ein freiwillig eingetragenes Körpergewicht (nur für den Vergleich „Dein Gewicht dort“), den zuletzt geöffneten Bereich und die Einführung. Alle Berechnungen – Gegenpunkt, Erdschichten, Sternentfernungen, Planetenstellungen, Geschwindigkeiten – laufen auf dem Gerät mit mitgelieferten Daten. Standort (gemeinsamer Standort der WahrZentrale bzw. auf Tipp per GPS) und Lagesensoren („Mit dem Handy zielen“, „Röntgenblick“) werden nur live verwendet und nicht gesendet. Beim „Planetenweg starten“ wird der Standort fortlaufend auf dem Gerät ausgewertet, solange der Weg läuft; er wird nicht aufgezeichnet. Nur die Karte in PlanetenWahr lädt nach deiner Einwilligung Kartenbilder von OpenStreetMap (siehe Abschnitt 7). „Im Sternenhimmel zeigen“ öffnet die App Sternenhimmel der WahrZentrale. Die Ortswahl („ändern“) sucht ausschließlich in mitgelieferten Ortsdaten auf dem Gerät; ein gewählter Ort wird als gemeinsamer Standort der WahrZentrale gespeichert.</p></div>
+
+<div class="ds-app" id="wk"><h3>NaviWahr</h3>
+<p>Speichert lokal: Touren (Titel, Zeiten, Strecke, Route, Wetter-Schnappschuss, Notizen mit Fotos und Standort, Kilometer-Abschnitte), gemerkte Navigationsziele, Einstellungen, Erfolge. Die Fotos der Notizen liegen in einer eigenen Datenbank auf dem Gerät (<code>naviwahr</code>). Dort wird während einer Aufzeichnung auch ihr Zwischenstand regelmäßig abgelegt, damit eine Fahrt nicht verloren geht, wenn das System die App schließt; er wird gelöscht, sobald du die Tour speicherst oder verwirfst. Der Standort wird nur zwischen deinem Tipp auf „Start“ und „Tour beenden“ bzw. während einer Navigation erfasst, nie im Hintergrund. Nutzt Open-Meteo (Wetter am Start), Photon (Adresssuche), OSRM (Route) und – mit Einwilligung – Karten.</p></div>
+
+<div class="ds-app" id="kg"><h3>Keysglade</h3>
+<p>Speichert lokal: Merkliste, Packliste, Notizen, Tagesplan, besuchte Ziele, Reisedatum, Ausgaben, gewählte Wetter-Stadt und Gezeiten-Station, Spielstände der Extra-Spiele; Reisetagebuch mit Fotos in IndexedDB. „In WowarWahr eintragen“ kopiert Name und Koordinaten eines Ziels lokal nach WowarWahr. „In der Nähe“ und „Meinen Standort zeigen“ fragen den Standort einmalig ab, er wird nicht gespeichert oder gesendet. Den Wechselkurs trägst du selbst ein (lokal gespeichert, keine Online-Abfrage). Nutzt Open-Meteo und – mit Einwilligung – Karten.</p></div>
+
+<div class="ds-app" id="wow"><h3>WowarWahr</h3>
+<p>Speichert lokal (IndexedDB): Reisen, Orte, Wunschziele, Einstellungen und verkleinerte Kopien deiner Fotos. Aufnahmedatum und GPS-Position werden direkt auf dem Gerät aus den Fotos gelesen. Standort, Kamera und Lagesensor nur für „Aktueller Standort“ und den Sehnsuchts-Kompass. Der Reisefilm wird auf dem Gerät erzeugt. Ortssuche und Kartendarstellung laufen offline mit mitgelieferten Daten. Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="bp"><h3>BelegParkWahr</h3>
+<p>Speichert lokal (IndexedDB): Parkscheine, Nebenkosten, Fahrten, Kilometerstände und Notizen mit Fotos, Sprachnotizen und – falls erlaubt – dem Standort beim Erfassen. Die Texterkennung läuft vollständig auf dem Gerät (Tesseract, Teil der WahrZentrale). PDF- und Tabellen-Export (XLSX) werden vollständig auf dem Gerät erzeugt. Nutzt Kamera, Mikrofon (Sprachnotizen), Standort und – mit Einwilligung – Karten.</p></div>
+
+<div class="ds-app" id="aw"><h3>AlltagWahr</h3>
+<p>Speichert lokal: wiederkehrende Ausgaben (Name, Betrag, Rhythmus, Kategorie, Fälligkeit, Kündigungsfrist), Kategorien, Monatsübersichten, Einstellung zu Erinnerungen. Mitteilungen nur nach Freigabe, lokal beim Öffnen der App. Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="pw"><h3>ProduktWahr</h3>
+<p>Speichert lokal: Profil (z. B. Allergien/Unverträglichkeiten), Favoriten, zwischengespeicherte Barcode-Ergebnisse. Fotos von Zutatenlisten werden nur auf dem Gerät ausgewertet und nicht gespeichert. Text- und Barcode-Erkennung laufen vollständig auf dem Gerät. Nutzt Kamera und Open Food/Beauty/Products Facts. Kein Medizinprodukt, keine Fachberatung.</p></div>
+
+<div class="ds-app" id="vw"><h3>VorratsWahr</h3>
+<p>Speichert lokal: Vorratseinträge (Name, Anzahl, Kategorie, Datum, Notiz) und eigene Kategorien. Scan-Fotos werden nur zur Texterkennung verwendet und sofort verworfen. PDF-Export und Texterkennung auf dem Gerät. Nutzt die Kamera; keine externen Dienste.</p></div>
+
+<div class="ds-app" id="qr"><h3>QRWahr</h3>
+<p>Speichert keine Scans. Das Kamerabild wird nur auf dem Gerät ausgewertet. Links aus einem QR-Code werden erst auf deinen Tipp geöffnet. Nutzt die Kamera; keine externen Dienste.</p></div>
+
+<div class="ds-app" id="lw"><h3>LautstärkeWahr</h3>
+<p>Wertet das Mikrofon nur live aus, ohne Aufnahme. Der Mess-Verlauf wird nur gespeichert, wenn du „Dauerhaft merken“ einschaltest; die Alarm-Einstellung wird immer lokal gespeichert. Keine externen Dienste. Die Werte sind unkalibrierte Schätzungen.</p></div>
+
+<div class="ds-app" id="mw"><h3>MessWahr</h3>
+<p>Speichert lokal (Präfix <code>messwahr_</code>): deine gesicherten Messungen (Art, Wert, Entfernung und Winkel, selbst vergebener Name, Zeitpunkt), die laufende Gewitter-Beobachtung (Zeitpunkt, Laufzeit bis zum Donner, Entfernung und Richtung je Blitz; wird nach drei Stunden ohne neuen Blitz verworfen) sowie Einstellungen (Kamerahöhe, Entfernung, Messart, Kalibrierung, Lufttemperatur, Reaktionszeit, Empfindlichkeit). Nutzt Kamera (nur Live-Bild, für die Höhenmessung), Lagesensor und – nur während der Gewitter-Peiler läuft – das Mikrofon. Der Ton wird ausschließlich live auf dem Gerät auf den Einsatz des Donners hin ausgewertet; es wird nichts aufgenommen, gespeichert oder übertragen. Der Peiler hält den Bildschirm wach und beendet sich beim Verlassen und nach 15 Minuten ohne Blitz selbst. Alle Werte werden auf dem Gerät berechnet. Keine externen Dienste. Keine Vermessung, kein geeichtes Messgerät und keine Unwetterwarnung.</p></div>
+
+<div class="ds-app" id="ld"><h3>LosDenkWahr</h3>
+<p>Speichert lokal: deine Gedanken (Text, Zeitpunkt, Status) und Einstellungen (Uhrzeit des Abend-Hinweises, Diskret-Modus, letzte Sicherung). Bei der Spracheingabe erfolgt die Erkennung durch dein Betriebssystem (siehe Abschnitt 5); gespeichert wird nur der bestätigte Text. Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="zw"><h3>ZahlenturmWahr · Korvanthiel · HerzKaroDrei</h3>
+<p id="kv">Speichern lokal: Spielstände, Bestwerte, Statistiken, Einstellungen sowie einen Zeitstempel für „Zuletzt gespielt“ und die Tagesaufgabe auf der Startseite. <span id="hk">Grafik und Töne werden im Programm erzeugt.</span> Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="af"><h3>AufwindWahr</h3>
+<p>Speichert lokal (Präfix <code>aufwindwahr_</code>): den laufenden Spielstand, die zuletzt gewählten Mitspieler (Namen, Symbol und ob Mensch oder Computer), die letzte Brett-Nummer, die Zahl der Partien und Siege je Name, die Ton-Einstellung und ob die Spielregeln schon gezeigt wurden; dazu den Zeitstempel für „Zuletzt gespielt“. Die Bretter werden aus ihrer Nummer auf dem Gerät berechnet, Grafik und Töne im Programm erzeugt, der Computer-Gegner rechnet ebenfalls auf dem Gerät. Keine externen Dienste, keine Verbindung ins Internet.</p></div>
+
+<div class="ds-app" id="pk"><h3>PartikelWahr · StrömungsWahr · BeatWahr</h3>
+<p id="st">Speichern lokal: Anzeige-Einstellungen, Neigungs-Kalibrierung, Beat-Projekte. Mikrofon (PartikelWahr) und Lagesensoren nur nach Erlaubnis und nur live. <span id="bw">Eigene Musikdateien werden nur auf dem Gerät abgespielt und analysiert. BeatWahr erzeugt Aufnahmen und Exporte ausschließlich auf dem Gerät.</span> Keine externen Dienste.</p></div>
+
+<div class="ds-app" id="kl"><h3>KlangWahr</h3>
+<p>Wertet das Mikrofon nur live aus (Web Audio API), ohne Aufnahme. Gespeichert werden lokal (Präfix <code>klangwahr_</code>) nur „Momente“, die du selbst merkst – stärkste Frequenzen, Pegel, Klangschwerpunkt, Zeitpunkt, ein kleines Spektrum-Bild und ein selbst vergebener Name, aber kein Ton – sowie Einstellungen (Bereich, Instrument, Kammerton, Tongenerator). Der Tongenerator erzeugt Töne auf dem Gerät. Keine externen Dienste. Pegel sind unkalibrierte Schätzungen.</p></div>
+
+<div class="ds-app" id="lb"><h3>LabWahr</h3>
+<p>Wertet Bewegungssensoren (Beschleunigung, Drehrate), Mikrofon und – nur auf deinen Tipp – den Standort ausschließlich live auf dem Gerät aus. Es werden keine Ton- oder Bildaufnahmen gespeichert; vom Mikrofon bleiben nur abgeleitete Kennwerte (z. B. Laufzeiten, Frequenzen, verkleinerte Lautstärke-Hüllkurven für das Diagramm). Gespeichert wird lokal (Präfix <code>labwahr_</code>): der Stand je Versuch (Schritt, gewählte Hypothese, eingegebene Parameter, kompakte Messdaten), deine Protokolle mit Messwerten und Notizen, Ergebnisse der Wissenstests sowie Einstellungen von „Freies Messen“ und Tongenerator. Nutzt du den Standort zum Vergleich (Schattenversuche), wird er nur im jeweiligen Versuch gespeichert; „Tempo (GPS)“ beim freien Messen hält Werte nur im Arbeitsspeicher, bis du sie selbst exportierst. PDF- und CSV-Dateien entstehen auf dem Gerät und werden nur geteilt, wenn du das tust. Keine externen Dienste, keine Verbindung ins Internet.</p></div>
+
+<h2 id="rechte">10. Deine Rechte</h2>
+<p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO aus Gründen, die sich aus deiner besonderen Situation ergeben (Art. 21). Eine Einwilligung kannst du jederzeit mit Wirkung für die Zukunft widerrufen. Da ich selbst keine Daten von dir erhalte, betreffen diese Rechte gegenüber mir praktisch nur die Kommunikation per E-Mail; über deine Inhalte hast du auf deinem Gerät die volle Kontrolle. Zu den Verbindungsdaten bei GitHub und den externen Diensten wende dich bitte an den jeweiligen Anbieter.</p>
+<p>Du hast außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO), z. B. beim Unabhängigen Landeszentrum für Datenschutz Schleswig-Holstein (ULD), Holstenstraße 98, 24103 Kiel.</p>
+<p class="ds-note">Diese Erklärung wird angepasst, wenn sich Funktionen ändern. Stand: 13. Oktober 2026.</p>
+</main>
+</body>
+</html>

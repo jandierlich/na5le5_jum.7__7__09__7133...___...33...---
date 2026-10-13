@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="bp">
+<head>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" href="./bp-icon-192.png" type="image/png">
+<title>BelegParkWahr</title>
+<meta name="description" content="Parkscheine und Nebenkosten erfassen, verwalten und als PDF exportieren.">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="bp-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Bibliotheken werden erst bei Bedarf geladen: Karte (lokal), PDF (lokal), Tabellen-Export (lokal),
+     Texterkennung (wz-ocr.js, lokal, nur beim Fotografieren eines Belegs) -->
+<script src="./wz-shared.js"></script>
+<script src="bp-db.js"></script>
+<script src="bp-crop.js"></script>
+<script src="bp-voice.js"></script>
+<script src="bp-app.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script>
+/* Kurze Einführung beim ersten Start (einheitlich wie in allen Apps); ausführlich unter „Anleitung“ */
+(function(){
+  if(typeof wzOnboarding !== 'function') return;
+  function ic(f){ try{ return typeof f === 'function' ? f() : ''; }catch(e){ return ''; } }
+  wzOnboarding({
+    key: 'bp_onboarded',
+    slides: [
+      { title: 'Willkommen bei BelegParkWahr', text: 'Parkscheine, Belege, Fahrten und Kilometerstände an einem Ort – fotografiert, gesprochen oder getippt.' },
+      { iconHtml: ic(typeof mapPinSvg !== 'undefined' ? mapPinSvg : null), title: 'Erfassen in Sekunden', text: 'Unter „Parken“ und „Kosten“ fotografierst du einen Schein oder Beleg. Datum und Betrag werden auf deinem Gerät erkannt – du bestätigst nur noch. Gedanken zu einer Fahrt sprichst du unter „Notizen“ ein.' },
+      { iconHtml: ic(typeof fileTextSvg !== 'undefined' ? fileTextSvg : null), title: 'Überblick und Export', text: '„Monat & Jahr“ zeigt alle Summen und erstellt eine Übersicht als PDF – praktisch für die Steuer oder die Abrechnung. Die Karte zeigt, wo du überall geparkt hast.' },
+      { iconHtml: ic(typeof bookSvg !== 'undefined' ? bookSvg : null), title: 'Alles bleibt bei dir', text: 'Fotos und Einträge werden nur auf diesem Gerät gespeichert. Jeden Bereich erklärt dir die „Anleitung“ ausführlich.' }
+    ]
+  });
+})();
+</script>
+</body>
+</html>

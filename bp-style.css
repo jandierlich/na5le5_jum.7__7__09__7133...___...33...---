@@ -1,0 +1,405 @@
+:root {
+  /* Ruhige, kühle Neumorphismus-Basis statt der alten kräftigen Violett-Flächen */
+  --bg: #E7ECF6;
+  --card: #EEF1FA;
+  --ink: #2E3448;
+  --sub: #525E80;
+  --violet: #5A2FBE;
+  --violet-deep: #241748;
+  --coral: #FF4433;
+  --teal: #7C5CFF;
+  --amber: #FF8C00;
+  --pink: #E8267A;
+  --line: #D7DEEF;
+  --amount: #23305E;
+  --shadow-dark: rgba(163, 177, 204, 0.55);
+  --shadow-light: rgba(255, 255, 255, 0.9);
+  --shadow-dark-soft: rgba(163, 177, 204, 0.35);
+  --shadow-light-soft: rgba(255, 255, 255, 0.7);
+  color-scheme: light;
+}
+
+body.dark {
+  --bg: #1E1B2E;
+  --card: #2A2440;
+  --ink: var(--wzp-eeeaf8, #EEEAF8);
+  --sub: var(--wzp-a59dbe, #A59DBE);
+  --line: #4A3D6B;
+  --amount: #B9A6F5;
+  --violet: #B9A6F5;
+  --violet-deep: #5A2FBE;
+  --pink: #FF5CA8;
+  --coral: #FF5A47;
+  --teal: #8E75F0;
+  --amber: #FFA020;
+  --shadow-dark: rgba(0, 0, 0, 0.55);
+  --shadow-light: rgba(255, 255, 255, 0.05);
+  --shadow-dark-soft: rgba(0, 0, 0, 0.4);
+  --shadow-light-soft: rgba(255, 255, 255, 0.035);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+button { touch-action: manipulation; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, sans-serif;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+  height: 100%;
+  overflow: hidden;
+}
+
+.form-screen {
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  height: var(--wz-vh, 100dvh);
+  height: var(--wz-vh, 100dvh);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+  overscroll-behavior-y: contain;
+}
+
+/* ---------- Header: weich geprägt statt kräftiger Farbverlauf ---------- */
+.header {
+  background: linear-gradient(150deg, var(--violet) 0%, var(--violet-deep) 100%);
+  color: #fff;
+  padding: max(22px, env(safe-area-inset-top)) 20px 32px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 14px 28px var(--shadow-dark-soft);
+}
+.header-dashboard {
+  background: linear-gradient(150deg, var(--violet-deep) 0%, var(--wzp-3a2380, #3A2380) 100%);
+}
+.header .blob1 { position: absolute; width: 170px; height: 170px; border-radius: 50%; background: rgba(255,255,255,0.10); top: -75px; right: -55px; }
+.header .blob2 { position: absolute; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.07); bottom: -45px; left: 30px; }
+.header-row { position: relative; display: flex; align-items: center; gap: 10px; }
+.header-sub { font-size: 11px; font-weight: 700; letter-spacing: 2px; opacity: 0.85; text-transform: uppercase; font-family:inherit;font-variant-numeric:tabular-nums; }
+.header-title { font-size: 25px; font-weight: 700; font-family: ui-rounded, -apple-system, sans-serif; }
+.header-btn { background: rgba(255,255,255,0.16); border: none; color: #fff; border-radius: 16px; padding: 8px; cursor: pointer; display: flex; }
+
+.content { flex: 1; overflow-y: auto; padding: 18px 18px calc(100px + env(safe-area-inset-bottom)); overscroll-behavior-y: contain; }
+
+/* ---------- Neumorphe Flächen: gleicher Ton wie der Hintergrund, Tiefe nur über Schatten ---------- */
+.card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 7px 7px 16px var(--shadow-dark-soft), -7px -7px 16px var(--shadow-light-soft);
+}
+
+.summary-card {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 20px 20px;
+  border-radius: 28px;
+  box-shadow: 9px 9px 20px var(--shadow-dark), -9px -9px 20px var(--shadow-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.summary-card .amount { font-family:inherit;font-variant-numeric:tabular-nums; font-size: 19px; font-weight: 700; color: var(--amount); }
+.summary-sub { font-size: 12px; color: var(--sub); font-weight: 600; }
+.summary-photos { font-family:inherit;font-variant-numeric:tabular-nums; font-size: 11px; color: var(--violet); font-weight: 600; margin-top: 2px; }
+
+.entry-row { display: flex; align-items: center; gap: 12px; }
+.entry-badge {
+  width: 42px; height: 42px; border-radius: 18px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family:inherit;font-variant-numeric:tabular-nums; font-size: 11px; font-weight: 700;
+  background: linear-gradient(135deg, var(--violet), var(--violet-deep)); color: #fff;
+  overflow: hidden;
+}
+.entry-badge img { width: 100%; height: 100%; object-fit: cover; }
+.entry-main { flex: 1; min-width: 0; }
+.entry-title { font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.entry-date { font-family:inherit;font-variant-numeric:tabular-nums; font-size: 11px; font-weight: 600; color: var(--sub); }
+.entry-amount { font-family:inherit;font-variant-numeric:tabular-nums; font-size: 17px; font-weight: 700; color: var(--amount); }
+.entry-cat { font-size: 10px; font-family:inherit;font-variant-numeric:tabular-nums; font-weight: 600; letter-spacing: 0.5px; }
+
+/* ---------- Kachel-Dashboard (Bento-Raster) ---------- */
+.tile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.tile {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  background: var(--card);
+  border-radius: 26px;
+  padding: 16px;
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  box-shadow: 7px 7px 16px var(--shadow-dark-soft), -7px -7px 16px var(--shadow-light-soft);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.tile:active { transform: scale(0.97); box-shadow: 4px 4px 10px var(--shadow-dark-soft), -4px -4px 10px var(--shadow-light-soft); }
+.tile-icon-wrap {
+  width: 42px; height: 42px; border-radius: 15px; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--violet) 14%, transparent); color: var(--violet);
+}
+.tile-label { font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 15px; margin-top: 10px; }
+.tile-sub { font-family: -apple-system, sans-serif; font-size: 11.5px; font-weight: 500; color: var(--sub); margin-top: 2px; line-height: 1.3; }
+.tile-ghost {
+  min-height: 68px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: var(--sub);
+  box-shadow: 5px 5px 12px var(--shadow-dark-soft), -5px -5px 12px var(--shadow-light-soft);
+}
+.tile-ghost .tile-icon-wrap { width: 34px; height: 34px; border-radius: 12px; }
+.tile-ghost .tile-label { margin-top: 0; font-size: 13px; }
+
+.section-label { font-family:inherit;font-variant-numeric:tabular-nums; font-size: 10px; font-weight: 700; color: var(--sub); letter-spacing: 1.5px; margin: 16px 0 8px; }
+
+.stat-strip { display: flex; gap: 10px; margin-bottom: 8px; }
+.stat-tile {
+  flex: 1; text-align: center; margin: 0; border-radius: 20px; padding: 12px 8px;
+  box-shadow: 5px 5px 12px var(--shadow-dark-soft), -5px -5px 12px var(--shadow-light-soft);
+}
+
+/* ---------- Kachel-Navigation (ersetzt die frühere schwebende Tableiste) ---------- */
+.nav-tile-strip {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.nav-tile {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 2px 9px;
+  border: none;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 5px 5px 12px var(--shadow-dark-soft), -5px -5px 12px var(--shadow-light-soft);
+  color: var(--sub);
+  font-family:inherit;font-variant-numeric:tabular-nums;
+  font-size: 9px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, color 0.15s ease;
+}
+.nav-tile .tile-icon-wrap {
+  width: 30px; height: 30px; border-radius: 11px;
+  background: color-mix(in srgb, var(--violet) 16%, transparent);
+  color: var(--violet);
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-tile.active {
+  color: var(--violet);
+  font-weight: 700;
+  box-shadow: inset 3px 3px 7px var(--shadow-dark-soft), inset -3px -3px 7px var(--shadow-light-soft);
+}
+
+/* ---------- Segment-Umschalter (Nebenkosten/Fahrten/km-Stand, Monat/Jahr) ---------- */
+.segment-toggle {
+  display: flex;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 4px;
+  margin-bottom: 16px;
+  box-shadow: inset 3px 3px 7px var(--shadow-dark-soft), inset -3px -3px 7px var(--shadow-light-soft);
+}
+.segment-btn {
+  flex: 1;
+  padding: 10px 3px;
+  border: none;
+  border-radius: 16px;
+  font-family: ui-rounded, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--sub);
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.segment-btn.active {
+  background: linear-gradient(135deg, var(--violet), var(--violet-deep));
+  color: #fff;
+  box-shadow: 3px 3px 8px var(--shadow-dark-soft);
+}
+
+.nav-round-btn { background: var(--card); border-radius: 16px; padding: 8px; box-shadow: 4px 4px 10px var(--shadow-dark-soft), -4px -4px 10px var(--shadow-light-soft); }
+
+/* Kein schwebender Tableisten-Balken mehr — Navigation läuft komplett über
+   die Kacheln (Übersicht-Raster + .nav-tile-strip auf den Hauptbildschirmen).
+   Der FAB sitzt jetzt direkt über dem unteren Rand/Safe-Area statt über der
+   früheren Tableiste. */
+.fab {
+  position: fixed; right: calc(50% - 240px + 22px); bottom: calc(24px + env(safe-area-inset-bottom)); width: 60px; height: 60px; border-radius: 50%;
+  border: none; background: linear-gradient(135deg, var(--violet), var(--violet-deep)); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; box-shadow: 8px 8px 18px var(--shadow-dark), -4px -4px 12px var(--shadow-light-soft);
+  z-index: 20;
+}
+@media (max-width: 520px) { .fab { right: 22px; } }
+
+.btn-primary {
+  width: 100%; padding: 15px; border-radius: 22px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--violet), var(--violet-deep)); color: #fff;
+  font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 14px;
+  box-shadow: 6px 6px 16px var(--shadow-dark), -4px -4px 12px var(--shadow-light-soft);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-secondary {
+  width: 100%; padding: 15px; border-radius: 22px; border: none; background: var(--card);
+  color: var(--violet); font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 5px 5px 12px var(--shadow-dark-soft), -5px -5px 12px var(--shadow-light-soft);
+}
+.btn-row { display: flex; gap: 10px; }
+.btn-row > * { flex: 1; }
+
+label.field-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: var(--ink); opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; display: block; font-family:inherit;font-variant-numeric:tabular-nums; }
+input, select, textarea {
+  width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 18px; border: none;
+  font-family: -apple-system, sans-serif; font-size: 15px; margin-bottom: 16px; background: var(--bg); color: var(--ink);
+  box-shadow: inset 3px 3px 7px var(--shadow-dark-soft), inset -3px -3px 7px var(--shadow-light-soft);
+}
+textarea { resize: vertical; min-height: 60px; }
+
+input[type="date"] {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.photo-capture-wrap { position: relative; margin-bottom: 16px; }
+.photo-capture {
+  height: 220px; border-radius: 26px; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; gap: 8px; cursor: pointer; border: none; width: 100%;
+  background: linear-gradient(135deg, var(--violet-deep), var(--violet)); overflow: hidden; position: relative;
+  box-shadow: 7px 7px 16px var(--shadow-dark-soft), -7px -7px 16px var(--shadow-light-soft);
+}
+.photo-capture img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: rgba(0,0,0,0.15); }
+.photo-capture .overlay-text { position: relative; background: rgba(0,0,0,0.35); padding: 6px 12px; border-radius: 16px; }
+.photo-retake-btn {
+  position: absolute; right: 10px; bottom: 10px; width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: rgba(var(--wzq-141023, 20, 16, 35),0.6); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.photo-lightbox-overlay {
+  position: fixed; inset: 0; background: rgba(var(--wzq-0a0814, 10, 8, 20),0.92); z-index: 2100;
+  display: flex; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px 16px;
+  box-sizing: border-box;
+}
+.photo-lightbox-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 16px; }
+.photo-lightbox-close {
+  position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; width: 40px; height: 40px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+.ocr-field {
+  display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: 20px;
+  padding: 12px 15px; margin-bottom: 4px; box-shadow: inset 2px 2px 6px var(--shadow-dark-soft), inset -2px -2px 6px var(--shadow-light-soft);
+  border: 2px solid var(--amber);
+}
+.ocr-field.confirmed { border-color: var(--teal); }
+/* Eingabe im Vorschlagsfeld ohne eigenen inneren Rahmen; der Fokus zeigt sich am äußeren Feld */
+.ocr-field input { box-shadow: none; border-radius: 0; outline: none; }
+.ocr-field input:not([type="date"]) { -webkit-appearance: none; appearance: none; }
+.ocr-field input:focus, .ocr-field input:focus-visible { outline: none; box-shadow: none; }
+.ocr-field:focus-within { box-shadow: inset 2px 2px 6px var(--shadow-dark-soft), inset -2px -2px 6px var(--shadow-light-soft), 0 0 0 3px rgba(139,108,240,.22); }
+/* Gleiches gilt für Felder, die in einem eigenen Kasten sitzen (Datum, Suche) */
+input[style*="border:none"], .search-bar input { box-shadow: none; border-radius: 0; }
+input[style*="border:none"]:focus, input[style*="border:none"]:focus-visible, .search-bar input:focus, .search-bar input:focus-visible { outline: none; }
+.search-bar:focus-within { box-shadow: inset 2px 2px 6px var(--shadow-dark-soft), inset -2px -2px 6px var(--shadow-light-soft), 0 0 0 3px rgba(139,108,240,.22); }
+.ocr-field .value { font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 14px; }
+.ocr-hint { font-size: 10px; color: var(--amber); margin: 2px 0 14px; font-family: -apple-system, sans-serif; }
+
+.icon-btn { border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--sub); }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--sub); font-size: 13px; font-weight: 500; }
+
+.backup-banner {
+  background: linear-gradient(135deg, var(--amber), #E8862A); color: #fff; border-radius: 20px; padding: 12px 14px;
+  margin-bottom: 14px; font-size: 13px; display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+
+.search-bar { display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 20px; padding: 4px 14px; margin-bottom: 12px; box-shadow: inset 2px 2px 6px var(--shadow-dark-soft), inset -2px -2px 6px var(--shadow-light-soft); }
+.search-bar input { border: none; margin: 0; padding: 8px 0; box-shadow: none; background: transparent; }
+
+.swipe-actions { display: flex; gap: 6px; }
+.swipe-actions button { border: none; border-radius: 16px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+#map { width: 100%; height: 100%; border-radius: 0; }
+.map-wrap { position: relative; flex: 1; }
+.map-info-card { position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 500; }
+
+.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-top: 10px; }
+.chart-bars > div { flex: 1; border-radius: 10px; background: linear-gradient(180deg, var(--violet), transparent); }
+
+.total-strip { display: flex; justify-content: space-between; padding: 17px 18px; margin-top: 8px; border-radius: 26px; color: #fff; background: linear-gradient(135deg, var(--violet), var(--violet-deep)); box-shadow: 6px 6px 16px var(--shadow-dark), -4px -4px 12px var(--shadow-light-soft); font-family: ui-rounded, -apple-system, sans-serif; }
+
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 900; overflow: hidden; }
+.confetti-particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 1;
+  animation: confetti-burst 900ms cubic-bezier(.15,.7,.3,1) forwards;
+}
+@keyframes confetti-burst {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: var(--end-transform); opacity: 0; }
+}
+
+/* Eigene modale Dialoge — ersetzen die nativen alert()/confirm()-Popups des Browsers,
+   damit Hinweise und Rückfragen wie der Rest der App aussehen (statt wie ein System-Dialog). */
+.app-modal-overlay {
+  position: fixed; inset: 0; background: rgba(var(--wzq-141023, 20, 16, 35),0.55); z-index: 2000;
+  display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+  animation: modalFadeIn 0.18s ease;
+}
+.app-modal-card {
+  background: var(--card); color: var(--ink); border-radius: 28px; padding: 22px 20px;
+  max-width: 340px; width: 100%; box-shadow: 12px 12px 28px var(--shadow-dark), -8px -8px 20px var(--shadow-light-soft);
+  animation: modalPopIn 0.18s ease;
+}
+.app-modal-text { font-size: 14px; font-weight: 500; line-height: 1.5; white-space: pre-line; margin-bottom: 18px; }
+.app-modal-actions { display: flex; gap: 10px; }
+.app-modal-btn {
+  flex: 1; padding: 12px; border-radius: 20px; border: none;
+  font-family: ui-rounded, -apple-system, sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.app-modal-btn-primary { background: var(--violet); color: #fff; }
+.app-modal-btn-secondary { background: var(--bg); color: var(--sub); box-shadow: inset 2px 2px 6px var(--shadow-dark-soft), inset -2px -2px 6px var(--shadow-light-soft); }
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalPopIn { from { opacity: 0; transform: scale(0.92) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* Sanfter Übergang beim Bildschirmwechsel, statt hartem Umschalten */
+#app > div:first-child { animation: screenFadeIn 0.22s ease; }
+@keyframes screenFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Größere Bildschirme (z. B. Tablet, Browserfenster) — Inhalt mittig in nutzbarer Breite statt
+   auf voller Breite zu verlaufen. Auf dem Smartphone (die Haupt-Zielplattform) ändert sich nichts. */
+@media (min-width: 521px) {
+  body { display: flex; justify-content: center; background: var(--line); }
+  #app { max-width: 480px; width: 100%; background: var(--bg); box-shadow: 0 0 40px rgba(0,0,0,0.15); }
+}

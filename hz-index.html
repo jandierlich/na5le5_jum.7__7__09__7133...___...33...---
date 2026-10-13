@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hz">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>HorizontWahr</title>
+<meta name="description" content="HorizontWahr – Was ist das da hinten? Kirchen, Burgen, Orte und Berge im Kamerabild, mit Entfernung und Richtung.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="./hz-icon-192.png">
+<!-- HorizontWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<style>@view-transition{navigation:auto}.wzi{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.22em;fill:currentColor;flex-shrink:0}
+  [hidden]{display:none!important}
+  :root{
+    --bg:var(--wzp-f1eefa, #F1EEFA); --card:var(--wzp-f8f6fc, #F8F6FC); --card2:var(--wzp-dac7f2, #DAC7F2); --btn-warm:var(--wzp-dac7f2, #DAC7F2); --text:var(--wzp-241e3f, #241E3F); --sub:var(--wzp-524370, #524370); --sub-onbg:var(--wzp-4a3d56, #4A3D56);
+    --border:var(--wzp-c7b3ec, #C7B3EC); --cta-bg:var(--wzp-5a2fbe, #5A2FBE); --cta-text:#FFFFFF; --accent:var(--wzp-5a2fbe, #5A2FBE); --soft:var(--wzp-e6ddf7, #E6DDF7);
+    --red:#FF3B30; --tint-red:#FBD6D6; --pill-red:#7A1F1F;
+    --shadow-dark-soft: rgba(var(--wzq-241e3f, 36, 30, 63),.16); --shadow-light-soft: rgba(255,255,255,.75);
+    --mono: ui-monospace, Menlo, -apple-system, sans-serif;
+  }
+  html.theme-dark{
+    --bg:var(--wzp-1e1b2e, #1E1B2E); --card:var(--wzp-2a2440, #2A2440); --card2:var(--wzp-3a2e52, #3A2E52); --btn-warm:var(--card2); --text:var(--wzp-eeeaf8, #EEEAF8); --sub:var(--wzp-c3b2f0, #C3B2F0); --sub-onbg:var(--wzp-c3b2f0, #C3B2F0);
+    --border:var(--wzp-5c4c82, #5C4C82); --cta-bg:var(--wzp-b9a6f5, #B9A6F5); --cta-text:var(--wzp-241e3f, #241E3F); --accent:var(--wzp-b9a6f5, #B9A6F5); --soft:var(--wzp-362c52, #362C52);
+    --tint-red:#331A1A; --pill-red:#F5A3A3;
+    --shadow-dark-soft: rgba(0,0,0,.45); --shadow-light-soft: rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);width:100%;overflow-x:hidden;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;touch-action:manipulation}
+  body{font-family:-apple-system,sans-serif;color:var(--text);line-height:1.5}
+  .app{max-width:480px;margin:0 auto;min-height:var(--wz-vh, 100dvh);padding:0 16px 28px;position:relative}
+  .safe-top{padding-top:calc(env(safe-area-inset-top) + 60px)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  header{background:linear-gradient(150deg,var(--cta-bg) 0%,var(--wzp-241748, #241748) 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top,0px) + 6px) 24px 26px;margin:calc(-1 * (env(safe-area-inset-top,0px) + 60px)) -16px 20px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10);top:-75px;right:-55px}
+  header::after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-45px;left:30px}
+  .logo-badge{position:relative;width:72px;height:72px;margin:0 auto 14px}
+  .logo-badge img{width:100%;height:100%;display:block;object-fit:contain;box-shadow:0 14px 30px rgba(var(--wzq-141023, 20, 16, 35),.35);border-radius:18px}
+  header h1{font-size:23px;margin:0;font-weight:700;letter-spacing:-.01em;color:#fff;position:relative;font-family:ui-rounded,-apple-system,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+  header p{font-size: 13.5px;color:rgba(255,255,255,.88);margin:8px 0 0;position:relative;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+  .theme-toggle,.home-link{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:9999;width:40px;height:40px;border-radius:20px;border:1px solid rgba(120,120,128,0.3);background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:16px;text-align:center;line-height:38px;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);text-decoration:none;color:var(--wzp-241e3f, #241E3F)}
+  .theme-toggle{right:16px}
+  .home-link{right:64px}
+  @media (min-width:640px){.theme-toggle{right:calc(50vw - 195px + 16px) !important}.home-link{right:calc(50vw - 195px + 64px) !important}}
+
+  .tabs{display:flex;gap:6px;background:var(--card2);border-radius:14px;padding:4px;margin:14px 0 18px}
+  .tab{flex:1;text-align:center;padding:9px 4px;border-radius:11px;font-size: 14.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;border:none;background:transparent;font-family:inherit}
+  .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:6px 6px 14px var(--shadow-dark-soft),-6px -6px 14px var(--shadow-light-soft)}
+  .card h2{font-size:15px;margin:0 0 10px;font-weight:600}
+  .card h3{font-size:14px;margin:14px 0 6px;font-weight:600}
+  .muted{color:var(--sub-onbg);font-size: 13.5px;line-height:1.5}
+  .muted p{margin:0 0 8px}
+  .small{font-size:12.5px}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--btn-warm);color:var(--text);border:none;border-radius:16px;padding:16px 14px;font-size:16px;font-weight:700;text-align:center;cursor:pointer;font-family:inherit}
+  .cta:active{transform:scale(.98)}
+  .cta:disabled{opacity:.5;cursor:default}
+  .cta.primary{background:var(--wz-primary-bg, var(--cta-bg)) !important;color:var(--wz-primary-fg, var(--cta-text)) !important;box-shadow:var(--wz-primary-shadow, none) !important;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .cta.danger{background:var(--tint-red);color:var(--pill-red)}
+  .cta.slim{padding:12px 12px;font-size:15px;border-radius:14px}
+  .btn-row{display:flex;gap:10px;margin-top:10px}
+  .btn-row .cta{flex:1}
+
+  .stat-row{display:flex;gap:10px;margin-top:12px}
+  .stat{flex:1;background:var(--card2);border-radius:14px;padding:10px 12px;text-align:center;min-width:0}
+  .stat b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat span{display:block;font-size: 12.5px;color:var(--sub-onbg);margin-top:2px}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0}
+  .toggle-row .label{font-size: 14.5px;font-weight:600}
+  .toggle-row .desc{font-size: 13px;color:var(--sub-onbg);margin-top:2px}
+  .switch{position:relative;width:46px;height:27px;border-radius:999px;background:var(--card2);border:1px solid var(--border);flex-shrink:0;cursor:pointer;padding:0}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+  .switch.on{background:var(--cta-bg);border-color:var(--cta-bg)}
+  .switch.on::after{transform:translateX(19px)}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{padding:6px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--border);font-size: 13.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .field:last-child{border-bottom:none}
+  .field label{font-size:14.5px;font-weight:600}
+  .field .hint{display:block;font-size:12.5px;font-weight:400;color:var(--sub-onbg)}
+  .num-input{width:108px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;text-align:right;font-variant-numeric:tabular-nums;-webkit-appearance:none;appearance:none}
+  .text-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none}
+  input[type=range]{accent-color:var(--accent);width:100%}
+
+  .history-item{background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .history-item .row1{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .history-item .when{font-size: 13px;color:var(--sub-onbg)}
+  .history-item .vals{font-size: 15px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+  .history-item .note{font-size: 13.5px;color:var(--sub-onbg);margin-top:3px}
+  .history-item .actions{display:flex;gap:14px;margin-top:8px}
+  .icon-btn{background:none;border:none;font-size:14px;cursor:pointer;color:var(--sub-onbg);padding:2px 0;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+  .empty-hint{text-align:center;color:var(--sub-onbg);font-size: 14px;padding:22px 10px}
+
+  .scale-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size: 14px}
+  .scale-row:last-child{border-bottom:none}
+  .scale-row .v{font-weight:600;color:var(--sub-onbg);font-size: 13.5px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .steps{margin:0;padding:0 0 0 20px;font-size:13.5px;color:var(--sub-onbg)}
+  .steps li{margin:0 0 6px}
+  .notice{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--soft);color:var(--text);font-size: 13.5px}
+  .notice.warn{background:var(--tint-red);color:var(--pill-red);font-weight:600}
+
+  /* Messanzeige (dunkle Instrumentenfläche, wie die Sonnenbahn in HimmelsWahr) */
+  .instr{background:linear-gradient(165deg,var(--wzp-241748, #241748) 0%,var(--wzp-15102a, #15102A) 100%);border-radius:16px;color:#fff;position:relative;overflow:hidden;border:1px solid rgba(226,220,255,.14)}
+  .instr-lbl{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .instr-val{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .instr-sub{display:block;font:500 11px var(--mono);color:rgba(226,220,255,.72);margin-top:2px}
+  .instr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;border-top:1px solid rgba(226,220,255,.14)}
+
+  /* Vollbild-Kamera (gleiche Optik wie die Sonnenbahn in HimmelsWahr) */
+  .ar{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:2000;display:none;color:#fff}
+  .ar.on{display:block}
+  .ar video,.ar canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ar video{object-fit:cover}
+  .ar-top{position:absolute;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;z-index:3}
+  .ar-btn{border-radius:10px;border:1px solid rgba(226,220,255,0.24);background:rgba(12,10,32,0.72);color:#fff;font:inherit;font-size:13px;font-weight:650;padding:10px 13px;min-height:44px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+  .ar-btn.main{background:linear-gradient(150deg,var(--wzp-6e4fe0, #6E4FE0) 0%,var(--wzp-5a2fbe, #5A2FBE) 100%);border-color:transparent;font-size:15px;padding:13px 16px}
+  .ar-btn:disabled{opacity:.45}
+  .ar-title{background:rgba(12,10,32,0.72);border:1px solid rgba(226,220,255,0.24);border-radius:10px;padding:6px 10px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);align-self:center;text-align:center;white-space:pre-line;line-height:1.35;color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px rgba(10,8,30,.85);font-variant-numeric:tabular-nums}
+  .ar-info{position:absolute;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;border-radius:12px;padding:12px 14px;background:rgba(12,10,32,0.84);border:1px solid rgba(226,220,255,0.24);line-height:1.3;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .ar-info small{display:block;opacity:.85;font-size:12px;margin-top:6px;line-height:1.4}
+  .ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ar-grid.three{grid-template-columns:repeat(3,1fr)}
+  .ar-grid span,.ar-ev span{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .ar-grid b,.ar-ev b{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ar-grid .gold b{color:#FFD27A}
+  .ar-grid i,.ar-ev i{display:block;font:500 11px var(--mono);font-style:normal;color:rgba(226,220,255,0.72);margin-top:2px}
+  .ar-row{display:flex;gap:8px;margin-top:10px}
+  .ar-row .ar-btn{flex:1}
+  .ar-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;color:#fff}
+  .ar-field label{min-width:76px;font-size:13px}
+  .ar-field input[type=range]{flex:1;min-width:0;accent-color:#B9A6F5}
+  .ar-field output{min-width:44px;text-align:right;font:600 13px var(--mono)}
+  .ar-sep{margin-top:10px;padding-top:10px;border-top:1px solid rgba(226,220,255,0.18)}
+  html:has(.ar.on) .wz-hbtn, html:has(.ar.on) .home-link, html:has(.ar.on) .theme-toggle{display:none !important}
+
+  footer{text-align:center;padding:22px 0 6px;font-size:14px;font-weight:600;color:var(--text)}
+  footer a,footer button{color:var(--text);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:14px;font-weight:600;font-family:inherit;-webkit-appearance:none;appearance:none;padding:0;margin:0}
+  .field > span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+  .muted a{color:var(--accent);font-weight:600}
+  /* HorizontWahr */
+  #hzRadar{display:block;width:100%;max-width:320px;margin:0 auto;height:auto}
+  .hz-osm{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom) + 4px);z-index:2;font:500 9.5px -apple-system,sans-serif;color:rgba(255,255,255,.7);text-shadow:0 1px 2px rgba(0,0,0,.6);pointer-events:none}
+  .hz-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .hz-item:last-child{border-bottom:none}
+  .hz-ic{flex:0 0 36px;height:36px;border-radius:11px;background:var(--soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+  .hz-ic .wzi{width:20px;height:20px}
+  .hz-main{flex:1;min-width:0}
+  .hz-main b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hz-main span{display:block;font-size:12.5px;color:var(--sub-onbg)}
+  .hz-r{text-align:right;font:600 13px var(--mono);color:var(--text);white-space:nowrap}
+  .hz-r small{display:block;font:500 11px var(--mono);color:var(--sub-onbg)}
+  .hz-go{margin-left:4px;padding:6px 10px;font-size:12.5px}
+  .hz-more{display:block;margin:10px auto 0}
+  .hz-reset-row{display:flex;justify-content:flex-end;margin:-4px 0 12px}
+  .hz-reset-row .icon-btn{font-size:13.5px;font-weight:600;color:var(--sub-onbg)}
+  .hz-reset{margin:2px 0 12px}
+  .hz-legend{padding:6px 14px 14px}
+  .hz-leg{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(226,220,255,.12)}
+  .hz-leg svg{flex:0 0 44px;width:44px;height:44px;fill:none}
+  .hz-leg b{display:block;font-size:13.5px;font-weight:600;color:#fff}
+  .hz-leg span{display:block;font-size:12.5px;color:rgba(226,220,255,.78);line-height:1.4}
+  .hz-leg-sep{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin:12px 0 8px}
+  .hz-leg-cols{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:rgba(226,220,255,.85)}
+  .hz-leg-cols span{display:inline-flex;align-items:center;gap:6px}
+  .hz-leg-cols i{width:11px;height:11px;border-radius:50%;display:inline-block;box-sizing:border-box}</style>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+<symbol id="wzi-home" viewBox="0 0 24 24"><path d="M4 11.5L12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h5v-5.5h2V20h5v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-close" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></g></symbol>
+<symbol id="wzi-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 8.2h3.2L8.6 6h6.8l1.4 2.2H20v10.6H4z"/><circle cx="12" cy="13" r="3.3"/></g></symbol>
+<symbol id="wzi-horizon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 16.5h19"/><path d="M5 20c4.5-1 9.5-1 14 0" opacity=".6"/><path d="M6.5 16.5v-4l2-1.6 2 1.6v4M7.7 10.6l.8-4.1.8 4.1"/><path d="M16.5 16.5V9.6M15.6 9.6h1.8l-.9-4.1z"/><path d="M16.5 5.5V3"/><circle cx="16.5" cy="7.6" r="3" opacity=".5"/></g></symbol>
+<symbol id="wzi-radar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5" opacity=".6"/><path d="M12 12l6-6"/><circle cx="15.5" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="9" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-crosshair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-tower" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21l1.6-11h2.8L15 21"/><path d="M10.2 13h3.6"/><rect x="9.6" y="6.5" width="4.8" height="3.5" rx=".8"/><path d="M12 6.5V2.5"/><path d="M7.5 21h9"/></g></symbol>
+<symbol id="wzi-church" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21v-7l6-4.5 6 4.5v7z"/><path d="M12 9.5V2.5M10 4.5h4"/><path d="M10.2 21v-3.6a1.8 1.8 0 0 1 3.6 0V21"/></g></symbol>
+<symbol id="wzi-peak" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 20l6.5-11 3.5 5.5 2.5-3.5 6.5 9z"/><path d="M7.1 11.3l1.9 1.6 1.7-1.3" opacity=".7"/></g></symbol>
+<symbol id="wzi-lighthouse" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21l1.4-11h3.2L15 21"/><path d="M9.8 10h4.4M10 6.5h4v3.5h-4z"/><path d="M12 6.5V4.5M6 21h12"/><path d="M5 7.5l3-1M19 7.5l-3-1" opacity=".7"/></g></symbol>
+<symbol id="wzi-castle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9h3v2h2.5V9h5v2H17V9h3v12z"/><path d="M10 21v-4a2 2 0 0 1 4 0v4"/><path d="M12 9V4l3 1.2-3 1.2" /></g></symbol>
+<symbol id="wzi-town" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21v-7l4-3 4 3v7M11 21V8.5l5-3.5 5 3.5V21"/><path d="M3 21h18"/><path d="M14.5 11h3M14.5 14.5h3" opacity=".7"/></g></symbol>
+<symbol id="wzi-mill" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21l1.2-8.5h3.6L15 21"/><path d="M8.5 21h7"/><circle cx="12" cy="10" r="1"/><path d="M12 10L7 5M12 10l5-5M12 10l-5 5M12 10l5 5" /><path d="M7 5l-1.4 1.4M17 5l1.4 1.4" opacity=".7"/></g></symbol>
+<symbol id="wzi-viewpoint" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M5 20.5l5-8 3 4 2-2.5 4 6.5"/><circle cx="16.5" cy="6.5" r="2.5"/><path d="M16.5 2.5v1M20.5 6.5h-1M13.5 4l.7.7" opacity=".7"/></g></symbol>
+<symbol id="wzi-landmark" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3-3.8-2-3.8 2 .7-4.3-3.1-3 4.3-.6z"/><path d="M6 21h12M8 21v-3h8v3"/></g></symbol>
+<symbol id="wzi-highrise" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V8l5-3v16M10 21V3.5l6 3V21M16 21v-9h3v9"/><path d="M3 21h18"/><path d="M7 11h1M7 14h1M12.5 8h1M12.5 11h1M12.5 14h1" opacity=".7"/></g></symbol>
+<symbol id="wzi-refresh" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4v4.5H15"/></g></symbol>
+<symbol id="wzi-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5L21.5 20h-19z"/><line x1="12" y1="9.2" x2="12" y2="14.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2.2 5.2-5.2 2.2 2.2-5.2z" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="var(--wzi-bg,#fff)"/></symbol>
+<symbol id="wzi-pin" viewBox="0 0 24 24"><path d="M12 2c-4.1 0-7.4 3.3-7.4 7.4 0 5.6 7.4 12.6 7.4 12.6s7.4-7 7.4-12.6C19.4 5.3 16.1 2 12 2z" fill="currentColor"/><circle cx="12" cy="9.4" r="2.6" fill="var(--wzi-bg,#fff)"/></symbol>
+</defs>
+</svg>
+<a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<div class="app safe-top safe-bottom">
+  <header class="wz-hero">
+    <div class="logo-badge"><img class="wz-logo-light" src="./hz-icon-192.png" alt="HorizontWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>HorizontWahr</h1>
+    <p>Was ist das da hinten? Kirchen, Burgen, Orte und Berge – mit Entfernung und Richtung.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="rundblick" role="tab">Rundblick</button>
+    <button class="tab" data-tab="liste" role="tab">Liste</button>
+    <button class="tab" data-tab="info" role="tab">Info</button>
+  </div>
+
+  <!-- ===== RUNDBLICK ===== -->
+  <section class="screen active" id="screen-rundblick">
+    <div class="card">
+      <h2>Umgebung laden</h2>
+      <p class="muted">HorizontWahr sucht markante Punkte rund um deinen Standort aus OpenStreetMap und merkt sie sich auf dem Gerät. Danach funktioniert die Kamera-Ansicht auch ohne Netz.</p>
+      <h3>Umkreis</h3>
+      <div class="chip-row" id="hzRadius" role="radiogroup" aria-label="Umkreis">
+        <button type="button" class="chip" data-r="5" role="radio">5 km</button>
+        <button type="button" class="chip" data-r="10" role="radio">10 km</button>
+        <button type="button" class="chip" data-r="15" role="radio">15 km</button>
+        <button type="button" class="chip" data-r="20" role="radio">20 km</button>
+      </div>
+      <h3>Was soll erscheinen?</h3>
+      <div class="chip-row" id="hzCats" aria-label="Arten"></div>
+      <button type="button" class="cta slim hz-reset" id="hzReset"><svg class="wzi" aria-hidden="true"><use href="#wzi-close"></use></svg> Auswahl zurücksetzen</button>
+      <button class="cta primary" id="hzLoad"><svg class="wzi" aria-hidden="true"><use href="#wzi-refresh"></use></svg> Umgebung laden</button>
+      <p class="muted small" id="hzStatus" role="status" style="margin:10px 0 0;white-space:pre-line"></p>
+    </div>
+
+    <div class="card">
+      <h2>Kamera-Ansicht</h2>
+      <p class="muted">Halte dein Smartphone hoch und schwenke langsam über den Horizont. Über jedem Objekt steht Name und Entfernung; im Fadenkreuz erscheinen Details. Das Kamerabild wird nicht gespeichert und nicht übertragen.</p>
+      <button class="cta primary" id="hzStart"><svg class="wzi" aria-hidden="true"><use href="#wzi-camera"></use></svg> Rundblick starten</button>
+      <p class="muted small" id="hzErr" role="alert" hidden></p>
+    </div>
+
+    <div class="card">
+      <h2>Rundblick von oben</h2>
+      <div class="instr"><svg id="hzRadar" viewBox="-160 -160 320 320" role="img" aria-label="Lage der Objekte rund um deinen Standort"></svg>
+        <div class="instr-grid" id="hzRadarStats"></div>
+      </div>
+      <p class="muted small" style="margin-top:8px">Norden oben. Abstand vom Mittelpunkt wächst mit der Wurzel der Entfernung, damit nahe Punkte nicht verschwinden.</p>
+    </div>
+  </section>
+
+  <!-- ===== LISTE ===== -->
+  <section class="screen" id="screen-liste">
+    <div class="card">
+      <h2>Objekte in der Umgebung</h2>
+      <div class="chip-row" id="hzSort" role="radiogroup" aria-label="Sortierung">
+        <button type="button" class="chip active" data-s="dist" role="radio" aria-checked="true">Nach Entfernung</button>
+        <button type="button" class="chip" data-s="dir" role="radio" aria-checked="false">Nach Richtung</button>
+      </div>
+      <input class="text-input" id="hzFilter" type="search" placeholder="Suchen, z. B. Kirche oder Ortsname" aria-label="Liste durchsuchen" style="margin-bottom:12px">
+      <div id="hzList"></div>
+      <p class="muted small" style="margin-top:8px">Tippe auf „Suchen“, um das Objekt in der Kamera-Ansicht anzupeilen. Daten © OpenStreetMap-Mitwirkende (ODbL).</p>
+    </div>
+  </section>
+
+  <!-- ===== INFO ===== -->
+  <section class="screen" id="screen-info">
+    <div class="card">
+      <h2>Wie weit kann ich sehen?</h2>
+      <div class="field">
+        <label for="hzEye">Deine Augenhöhe über Grund<span class="hint">z. B. 1,6 m am Boden, 30 m auf einem Turm</span></label>
+        <span><input class="num-input" id="hzEye" type="text" inputmode="decimal" value="1,6"> <span class="muted">m</span></span>
+      </div>
+      <div class="scale-row"><span>Sichtweite bis zum Horizont</span><span class="v" id="hzHorizon">–</span></div>
+      <p class="muted small" style="margin-top:8px">Mit üblicher Lichtbrechung der Luft (Faktor 0,13) auf einer glatten Erdkugel. Bei Dunst oder Nebel ist die tatsächliche Sicht oft viel geringer. Ein Objekt jenseits des Horizonts ist im unteren Teil verdeckt – HorizontWahr zeigt im Fadenkreuz an, wie viele Meter etwa.</p>
+    </div>
+    <div class="card">
+      <h2>Zeichen in der Kamera-Ansicht</h2>
+      <div class="instr hz-legend"><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 34V12" stroke="rgba(10,8,30,.42)" stroke-width="3"/><path d="M22 34V12" stroke="#B9A6F5" stroke-width="1.5"/><g opacity="1"><path d="M22 6.5l4.4 5.5-4.4 5.5-4.4-5.5z" fill="#B9A6F5" stroke="rgba(10,8,30,.42)" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke"/></g><path d="M6 34h32" stroke="#E2DCFF" stroke-width="1"/></svg><div><b>Raute mit Strich</b><span>Raute = Spitze des Objekts, Strich = seine Höhe bis zum Fuß.</span></div></div><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 34V12" stroke="rgba(10,8,30,.42)" stroke-width="3" stroke-dasharray="3 3"/><path d="M22 34V12" stroke="#B9A6F5" stroke-width="1.5" stroke-dasharray="3 3"/><g opacity="1"><path d="M22 6.5l4.4 5.5-4.4 5.5-4.4-5.5z" fill="#B9A6F5" stroke="rgba(10,8,30,.42)" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke"/></g><path d="M6 34h32" stroke="#E2DCFF" stroke-width="1"/></svg><div><b>Gestrichelter Strich</b><span>Der untere Teil ist durch die Erdkrümmung verdeckt.</span></div></div><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="24" r="4.6" fill="rgba(10,8,30,.42)"/><circle cx="22" cy="24" r="3.6" fill="none" stroke="#8E75F0" stroke-width="1.6"/><path d="M6 24h32" stroke="#E2DCFF" stroke-width="1" opacity=".6"/></svg><div><b>Ring</b><span>Ein Ort (Dorf oder Stadt), am Boden bzw. am Horizont.</span></div></div><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 34V16" stroke="#B9A6F5" stroke-width="1.5" stroke-dasharray="3 3" opacity=".5"/><g opacity="0.5"><path d="M22 10.5l4.4 5.5-4.4 5.5-4.4-5.5z" fill="#B9A6F5" stroke="rgba(10,8,30,.42)" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke"/></g><path d="M6 30h32" stroke="#E2DCFF" stroke-width="1"/></svg><div><b>Blass</b><span>Liegt ganz hinter dem Horizont – von hier nicht zu sehen.</span></div></div><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><g opacity="1"><path d="M22 16.5l4.4 5.5-4.4 5.5-4.4-5.5z" fill="#B9A6F5" stroke="rgba(10,8,30,.42)" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke"/></g><circle cx="22" cy="22" r="9" fill="none" stroke="#FFD27A" stroke-width="1.5"/></svg><div><b>Goldener Kreis</b><span>Das Objekt im Fadenkreuz; seine Daten stehen unten.</span></div></div><div class="hz-leg"><svg viewBox="0 0 44 44" aria-hidden="true"><text x="22" y="20" text-anchor="middle" font-size="8.5" font-weight="700" fill="#FFD27A" font-family="ui-monospace,Menlo,sans-serif">ZIEL</text><text x="22" y="30" text-anchor="middle" font-size="7.5" fill="#FFD27A" font-family="ui-monospace,Menlo,sans-serif">4,2 km</text></svg><div><b>Goldenes Schild</b><span>Das Ziel, das du in der Liste mit „Suchen“ gewählt hast.</span></div></div>
+        <div class="hz-leg-sep">Farben</div><div class="hz-leg-cols"><span><i style="background:#FFD27A"></i>Kirchen, Sehenswürdigkeiten</span><span><i style="background:#FFE7A8"></i>Aussichtspunkte</span><span><i style="background:#C3B2F0"></i>Berge &amp; Hügel</span><span><i style="background:#D8CCFA"></i>Burgen &amp; Schlösser</span><span><i style="background:none;border:1.6px solid #8E75F0"></i>Orte</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>So genau ist die Ansicht</h2>
+      <p class="muted">Der Kompass des Smartphones kann einige Grad abweichen, besonders in der Nähe von Metall, Autos oder Lautsprechern. Mit „Ausrichten“ in der Kamera-Ansicht peilst du ein bekanntes Objekt an und gleichst die Richtung aus. Höhen stammen aus OpenStreetMap; fehlen sie, nimmt HorizontWahr typische Werte an (im Fadenkreuz als „angenommen“ markiert). Geländehöhen kommen – wenn verfügbar – von Open-Meteo.</p>
+    </div>
+    <div class="card">
+      <h2>Datenquellen</h2>
+      <p class="muted">Objekte: © OpenStreetMap-Mitwirkende, Open Database License (ODbL), abgefragt über die Overpass API. Geländehöhen: Open-Meteo.com, CC BY 4.0. Gespeichert wird nur auf deinem Gerät; Einzelheiten unter <a href="./datenschutz.html#hz">Datenschutz</a> und <a href="./lizenzen.html">Lizenzen</a>.</p>
+      <div class="btn-row"><button class="cta slim danger" id="hzClear"><svg class="wzi" aria-hidden="true"><use href="#wzi-close"></use></svg> Gespeicherte Umgebung löschen</button></div>
+    </div>
+    <div class="card">
+      <h2>Über diese App</h2>
+      <p class="muted">Teil der WahrZentrale</p>
+      <div style="height:10px"></div>
+      <button class="cta" id="showOnboardingBtn">Einführung erneut anzeigen</button>
+    </div>
+  </section>
+
+  <footer class="wz-footer">
+    <button type="button" onclick="HZ.showOnboarding()">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#hz">Datenschutz</a>
+  </footer>
+</div>
+
+<!-- Vollbild: Rundblick -->
+<div class="ar" id="hzAr" role="dialog" aria-label="Rundblick mit der Kamera">
+  <video id="hzVideo" autoplay playsinline muted></video>
+  <canvas id="hzCanvas"></canvas>
+  <div class="ar-top">
+    <button type="button" class="ar-btn" id="hzArClose">Schließen</button>
+    <span class="ar-title" id="hzArTitle">Rundblick</span>
+    <button type="button" class="ar-btn" id="hzArCal">Ausrichten</button>
+  </div>
+  <div class="ar-info" id="hzArInfo"></div>
+  <div class="hz-osm" aria-hidden="true">© OpenStreetMap-Mitwirkende</div>
+</div>
+
+<script src="./wz-ui.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script>function wzIcon(id,cls){return '<svg class="wzi'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#wzi-'+id+'"></use></svg>';}</script>
+<script>
+/* ---------- Lage des Geräts (gleiche Rechnung wie Himmels-Kompass und Sternenhimmel) ----------
+   Kamera-Orientierung als Quaternion aus den Sensorwinkeln – ohne Polstelle beim Blick nach oben/unten.
+   Auf dem Smartphone trägt das Gyroskop die Bewegung, der Kompass liefert nur den geglätteten Versatz. */
+var ORI = (function(){
+  var D2R = Math.PI / 180;
+  function wrap360(d){ d %= 360; return d < 0 ? d + 360 : d; }
+  function wrap180(d){ d = wrap360(d); return d > 180 ? d - 360 : d; }
+  function qFromAngles(a, b, g){
+    var _z = (a || 0) * D2R, _x = (b || 0) * D2R, _y = (g || 0) * D2R;
+    var cX = Math.cos(_x / 2), cY = Math.cos(_y / 2), cZ = Math.cos(_z / 2), sX = Math.sin(_x / 2), sY = Math.sin(_y / 2), sZ = Math.sin(_z / 2);
+    return [sX * cY * cZ - cX * sY * sZ, cX * sY * cZ + sX * cY * sZ, cX * cY * sZ + sX * sY * cZ, cX * cY * cZ - sX * sY * sZ];
+  }
+  function qMul(a, b){
+    return [a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1], a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+            a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3], a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]];
+  }
+  function qAxis(ax, rad){ var s = Math.sin(rad / 2); return [ax[0] * s, ax[1] * s, ax[2] * s, Math.cos(rad / 2)]; }
+  function qNorm(q){ var n = Math.hypot(q[0], q[1], q[2], q[3]) || 1; return [q[0] / n, q[1] / n, q[2] / n, q[3] / n]; }
+  function qSlerp(a, b, t){
+    var bx = b[0], by = b[1], bz = b[2], bw = b[3], dot = a[0] * bx + a[1] * by + a[2] * bz + a[3] * bw;
+    if(dot < 0){ bx = -bx; by = -by; bz = -bz; bw = -bw; dot = -dot; }
+    if(dot > 0.9995) return qNorm([a[0] + (bx - a[0]) * t, a[1] + (by - a[1]) * t, a[2] + (bz - a[2]) * t, a[3] + (bw - a[3]) * t]);
+    var th0 = Math.acos(Math.min(1, dot)), th = th0 * t, s0 = Math.cos(th) - dot * Math.sin(th) / Math.sin(th0), s1 = Math.sin(th) / Math.sin(th0);
+    return [a[0] * s0 + bx * s1, a[1] * s0 + by * s1, a[2] * s0 + bz * s1, a[3] * s0 + bw * s1];
+  }
+  function qRot(q, v){
+    var qx = q[0], qy = q[1], qz = q[2], qw = q[3], tx = 2 * (qy * v[2] - qz * v[1]), ty = 2 * (qz * v[0] - qx * v[2]), tz = 2 * (qx * v[1] - qy * v[0]);
+    return [v[0] + qw * tx + (qy * tz - qz * ty), v[1] + qw * ty + (qz * tx - qx * tz), v[2] + qw * tz + (qx * ty - qy * tx)];
+  }
+  function makeYawOffset(){
+    var cur = null, fast = 0, last = 0, w = function(d){ return ((d + 540) % 360) - 180; };
+    return function(target, now){
+      if(cur === null || !(now - last < 1000)){ cur = fast = target; last = now; return cur; }
+      var dt = Math.max(0, now - last); last = now;
+      fast = (fast + w(target - fast) * (1 - Math.exp(-dt / 250)) + 360) % 360;
+      var bias = w(fast - cur), a = Math.abs(bias), tau = a > 20 ? 100 : a > 6 ? 300 : a > 2.5 ? 700 : 2000;
+      cur = (cur + bias * (1 - Math.exp(-dt / tau)) + 360) % 360;
+      return cur;
+    };
+  }
+  var st = { raw: null, absSeen: false, smQ: null, smT: 0, yaw: makeYawOffset(), on: false };
+  function store(e, ok){ st.raw = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, webkit: (e.webkitCompassHeading != null ? e.webkitCompassHeading : null), ok: ok, t: performance.now() }; }
+  function onAbs(e){ if(e.alpha == null) return; st.absSeen = true; store(e, true); }
+  function onOri(e){
+    if(e.beta == null) return;
+    if(e.webkitCompassHeading != null){ store(e, true); return; }
+    if(st.absSeen) return;
+    store(e, e.absolute === true);
+  }
+  /* Erlaubnis (Smartphone) muss aus einem Tipp heraus angefragt werden */
+  function permit(){
+    var p = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')
+      ? DeviceOrientationEvent.requestPermission() : Promise.resolve(typeof DeviceOrientationEvent !== 'undefined' ? 'granted' : 'unsupported');
+    return p.then(function(r){
+      if(r === 'unsupported') throw new Error('Dieses Gerät liefert keine Lagedaten.');
+      if(r !== 'granted') throw new Error('Der Zugriff auf die Bewegungs- und Lagesensoren wurde nicht erlaubt. Du kannst ihn in den Einstellungen deines Browsers wieder erlauben.');
+    });
+  }
+  function start(){
+    if(st.on) return;
+    st.on = true;
+    window.addEventListener('deviceorientationabsolute', onAbs, true);
+    window.addEventListener('deviceorientation', onOri, true);
+  }
+  function stop(){
+    st.on = false;
+    window.removeEventListener('deviceorientationabsolute', onAbs, true);
+    window.removeEventListener('deviceorientation', onOri, true);
+    st.raw = null; st.absSeen = false; st.smQ = null;
+  }
+  /* compass=false: nur Gyroskop (stabil, ohne Nordbezug) – genügt für Neigungen und eigene Marken */
+  function attitude(compass){
+    var r = st.raw;
+    if(!r || r.beta == null) return null;
+    var alphaEff;
+    if(compass && r.webkit != null){
+      var gyroYaw = typeof r.alpha === 'number' && !isNaN(r.alpha), a0 = gyroYaw ? r.alpha : 0;
+      var q0 = qFromAngles(a0, r.beta, r.gamma || 0), f0 = qRot(q0, [0, 0, -1]);
+      var ref = Math.abs(f0[2]) < 0.7 ? f0 : qRot(q0, [0, 1, 0]);
+      var h0 = wrap360(Math.atan2(ref[0], ref[1]) / D2R), d = wrap360(r.webkit - h0);
+      if(gyroYaw) d = st.yaw(d, performance.now());
+      alphaEff = wrap360(a0 - d);
+    } else alphaEff = (r.alpha || 0);
+    var q = qFromAngles(alphaEff, r.beta, r.gamma || 0);
+    var ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0);
+    ang = ((ang % 360) + 360) % 360;
+    return { q: qNorm(qMul(q, qAxis([0, 0, 1], -ang * D2R))), ok: compass ? (r.webkit != null || r.ok) : true, beta: r.beta, gamma: r.gamma || 0 };
+  }
+  /* zeitbasierte Glättung (ca. tau ms), gleich stark bei 60 und 120 Hz */
+  function smooth(att, tau){
+    var now = performance.now();
+    if(!st.smQ){ st.smQ = att.q; st.smT = now; return st.smQ; }
+    var dt = Math.min(200, Math.max(0, now - st.smT)); st.smT = now;
+    st.smQ = qSlerp(st.smQ, att.q, 1 - Math.exp(-dt / (tau || 60)));
+    return st.smQ;
+  }
+  function vec(az, alt){ var A = az * D2R, L = alt * D2R; return [Math.sin(A) * Math.cos(L), Math.cos(A) * Math.cos(L), Math.sin(L)]; }
+  function dot(a, b){ return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  /* Blickrichtung und Bildachsen für eine Orientierung; yawCal dreht um die Hochachse (Kalibrierung) */
+  function view(q, yawCal){
+    var qv = yawCal ? qNorm(qMul(qAxis([0, 0, 1], -yawCal * D2R), q)) : q;
+    var fw = qRot(qv, [0, 0, -1]);
+    return { fw: fw, rt: qRot(qv, [1, 0, 0]), up: qRot(qv, [0, 1, 0]),
+      az: wrap360(Math.atan2(fw[0], fw[1]) / D2R), alt: Math.asin(Math.max(-1, Math.min(1, fw[2]))) / D2R };
+  }
+  /* Brennweite in Bildpunkten für das Kamerabild (object-fit: cover) */
+  function focal(video, W, H, fov){
+    var vw = video && video.videoWidth || 0, vh = video && video.videoHeight || 0;
+    if(vw && ((vw > vh) !== (W > H))){ var t = vw; vw = vh; vh = t; }
+    return vw ? (Math.max(vw, vh) / 2) / Math.tan(fov * D2R / 2) * Math.max(W / vw, H / vh) : (Math.max(W, H) / 2) / Math.tan(fov * D2R / 2);
+  }
+  function projector(v, W, H, f){
+    return function(az, alt, minZ){
+      var e = vec(az, alt), zc = dot(e, v.fw);
+      if(zc < (minZ || 0.05)) return null;
+      return { x: W / 2 + f * dot(e, v.rt) / zc, y: H / 2 - f * dot(e, v.up) / zc };
+    };
+  }
+  /* Richtung „nach oben" im Gerät (für Wasserwaage und Neigung), aus beta/gamma */
+  function upVector(){
+    var r = st.raw; if(!r || r.beta == null) return null;
+    var b = r.beta * D2R, g = (r.gamma || 0) * D2R;
+    return [-Math.sin(g) * Math.cos(b), Math.sin(b), Math.cos(g) * Math.cos(b)];
+  }
+  return { permit: permit, start: start, stop: stop, attitude: attitude, smooth: smooth, view: view, focal: focal, projector: projector,
+    vec: vec, dot: dot, wrap360: wrap360, wrap180: wrap180, upVector: upVector, state: st, D2R: D2R };
+})();
+
+/* Kamera (Rückseite) – nur Live-Bild, nichts wird gespeichert */
+function camStart(video){
+  if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return Promise.reject(new Error('Kamera nicht verfügbar'));
+  return navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }).then(function(s){
+    video.srcObject = s; var p = video.play(); if(p && p.catch) p.catch(function(){});
+    return s;
+  });
+}
+function camStop(stream, video){
+  if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
+  if(video) video.srcObject = null;
+}
+
+/* ============================================================
+   HorizontWahr – markante Punkte am Horizont im Kamerabild
+   Objekte: © OpenStreetMap-Mitwirkende (ODbL), über die Overpass API.
+   Geländehöhen: Open-Meteo.com (CC BY 4.0).
+   Richtung, Höhenwinkel, Erdkrümmung und Sicht werden auf dem Gerät berechnet.
+   © 2026 Jan Dierlich – Alle Rechte vorbehalten.
+   ============================================================ */
+(function(){
+  "use strict";
+  var LS_CFG = "horizontwahr_cfg", LS_DATA = "horizontwahr_daten", LS_OK = "horizontwahr_ok_dienste", LS_ONB = "horizontwahr_onboarded";
+  var $ = function(id){ return document.getElementById(id); };
+  var D2R = Math.PI / 180, RE = 6371000, KREF = 0.13, REFF = RE / (1 - KREF);
+  function load(k, d){ try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } }
+  function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function f(n, d){ return n == null || !isFinite(n) ? "–" : n.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function km(m){ return m < 1000 ? f(Math.round(m / 10) * 10, 0) + " m" : f(m / 1000, m < 10000 ? 1 : 0) + " km"; }
+  function num(s){ var n = parseFloat(String(s == null ? "" : s).replace(",", ".")); return isFinite(n) ? n : null; }
+  var WORDS = ["N", "NO", "O", "SO", "S", "SW", "W", "NW"];
+  function word(az){ return WORDS[Math.round(ORI.wrap360(az) / 45) % 8]; }
+  function toast(t){ if(window.wzToast) wzToast(t); }
+
+  var CATS = [
+    { id: "kirche", name: "Kirchen", ic: "church", col: "#FFD27A" },
+    { id: "ort", name: "Orte", ic: "town", col: "#8E75F0" },
+    { id: "berg", name: "Berge & Hügel", ic: "peak", col: "#C3B2F0" },
+    { id: "burg", name: "Burgen & Schlösser", ic: "castle", col: "#D8CCFA" },
+    { id: "aussicht", name: "Aussichtspunkte", ic: "viewpoint", col: "#FFE7A8" },
+    { id: "sehens", name: "Sehenswürdigkeiten", ic: "landmark", col: "#FFD27A" }
+  ];
+  var CAT = {}; CATS.forEach(function(c){ CAT[c.id] = c; });
+
+  var cfg = load(LS_CFG, {}) || {};
+  if(cfg.r === 30) cfg.r = 20;
+  if([5, 10, 15, 20].indexOf(cfg.r) === -1) cfg.r = 10;
+  if(!Array.isArray(cfg.cats)) cfg.cats = [];
+  cfg.cats = cfg.cats.filter(function(id, i, a){ return CAT[id] && a.indexOf(id) === i; });
+  if(!cfg.cal) cfg.cal = { yaw: 0, fov: 68 };
+  if(!(cfg.eye > 0)) cfg.eye = 1.6;
+  function saveCfg(){ save(LS_CFG, cfg); }
+  var data = load(LS_DATA, null);
+  /* nicht mehr angebotene Arten aus früheren Ladevorgängen ausblenden */
+  if(data && Array.isArray(data.items)) data.items = data.items.filter(function(it){ return CAT[it.c]; });
+
+  /* ---------- Tabs ---------- */
+  var current = "rundblick";
+  function showTab(id){
+    current = id;
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ var on = t.getAttribute("data-tab") === id; t.classList.toggle("active", on); t.setAttribute("aria-selected", on ? "true" : "false"); });
+    Array.prototype.forEach.call(document.querySelectorAll(".screen"), function(s){ s.classList.toggle("active", s.id === "screen-" + id); });
+    if(id === "liste") renderList();
+    try { history.replaceState(null, "", "#" + id); } catch(e){}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ t.addEventListener("click", function(){ showTab(t.getAttribute("data-tab")); }); });
+
+  /* ---------- Auswahl ---------- */
+  function paintRadius(){ Array.prototype.forEach.call($("hzRadius").children, function(c){ var on = +c.getAttribute("data-r") === cfg.r; c.classList.toggle("active", on); c.setAttribute("aria-checked", on ? "true" : "false"); }); }
+  Array.prototype.forEach.call($("hzRadius").children, function(c){ c.addEventListener("click", function(){ cfg.r = +c.getAttribute("data-r"); saveCfg(); paintRadius(); }); });
+  paintRadius();
+  $("hzCats").innerHTML = CATS.map(function(c){ return '<button type="button" class="chip" data-c="' + c.id + '" aria-pressed="false">' + wzIcon(c.ic) + esc(c.name) + '</button>'; }).join("");
+  function paintCats(){ Array.prototype.forEach.call($("hzCats").children, function(b){ var on = cfg.cats.indexOf(b.getAttribute("data-c")) !== -1; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false"); }); }
+  $("hzCats").addEventListener("click", function(e){
+    var b = e.target.closest("[data-c]"); if(!b) return;
+    var id = b.getAttribute("data-c"), i = cfg.cats.indexOf(id);
+    if(i === -1) cfg.cats.push(id); else cfg.cats.splice(i, 1);
+    saveCfg(); paintCats(); renderRadar(); if(current === "liste") renderList();
+    if(!loading && typeof paintStatus === "function") paintStatus();
+  });
+  paintCats();
+  /* Auswahl auf den Anfangszustand zurücksetzen (Umkreis 10 km, keine Art gewählt) */
+  $("hzReset").addEventListener("click", function(){
+    cfg.r = 10; cfg.cats = []; saveCfg();
+    paintRadius(); paintCats(); renderRadar(); if(current === "liste") renderList();
+    toast("Auswahl zurückgesetzt");
+  });
+
+  /* Höhe über dem Meeresspiegel: bei Bergen der OSM-Wert, sonst die geladene Geländehöhe (Open-Meteo) */
+  function seaLevel(it){ return it.c === "berg" && it.x != null ? it.x : (it.e != null ? it.e : null); }
+  /* ---------- Geometrie ---------- */
+  function hav(la1, lo1, la2, lo2){ var a = Math.sin((la2 - la1) * D2R / 2), b = Math.sin((lo2 - lo1) * D2R / 2); var h = a * a + Math.cos(la1 * D2R) * Math.cos(la2 * D2R) * b * b; return 2 * RE * Math.asin(Math.min(1, Math.sqrt(h))); }
+  function bear(la1, lo1, la2, lo2){ var y = Math.sin((lo2 - lo1) * D2R) * Math.cos(la2 * D2R), x = Math.cos(la1 * D2R) * Math.sin(la2 * D2R) - Math.sin(la1 * D2R) * Math.cos(la2 * D2R) * Math.cos((lo2 - lo1) * D2R); return ORI.wrap360(Math.atan2(y, x) / D2R); }
+  function eye(){ var e = num(cfg.eye); return e && e > 0.2 ? e : 1.6; }
+  /* Sichtweite bis zum Horizont und verdeckte Höhe hinter dem Horizont (glatte Kugel mit Lichtbrechung) */
+  function horizonDist(h){ return Math.sqrt(2 * REFF * Math.max(0.1, h)); }
+  function hiddenAt(d){ var dh = horizonDist(eye()); return d > dh ? Math.pow(d - dh, 2) / (2 * REFF) : 0; }
+  function enrich(){
+    if(!data) return [];
+    var g0 = data.own != null ? data.own : 0, eyeAbs = g0 + eye();
+    return data.items.filter(function(it){ return CAT[it.c] && it.t !== "Sendemast" && cfg.cats.indexOf(it.c) !== -1; }).map(function(it){
+      var d = Math.max(1, hav(data.lat, data.lon, it.la, it.lo)), az = bear(data.lat, data.lon, it.la, it.lo);
+      var g = it.c === "berg" && it.x != null ? it.x : (it.e != null ? it.e : g0), h = it.h || 0, drop = d * d / (2 * REFF);
+      return { it: it, d: d, az: az, altTop: Math.atan2(g + h - eyeAbs - drop, d) / D2R, altBase: Math.atan2(g - eyeAbs - drop, d) / D2R, hid: hiddenAt(d), g: g };
+    });
+  }
+
+  /* ---------- Laden: Overpass + Geländehöhen ---------- */
+  /* Je Art eine eigene, schlanke Abfrage: Fällt eine aus, bleiben die anderen erhalten.
+     Kein Ausgabe-Limit beim Server (das lieferte eine zufällige Auswahl) – gekappt wird erst
+     auf dem Gerät, und zwar nach Entfernung (die nächsten Objekte bleiben immer drin). */
+  var KEEP = { turm: 200, kirche: 200, ort: 300, berg: 150, leucht: 60, burg: 100, muehle: 120, aussicht: 120, sehens: 150, hoch: 150 };
+  function qCat(id, r, la, lo){
+    var a = "(around:" + r + "," + la.toFixed(5) + "," + lo.toFixed(5) + ")";
+    var C = {
+      turm: 'nwr["man_made"="tower"]["tower:type"!~"^(lighting|cooling|minaret|observation)$"]' + a + ';nwr["man_made"="water_tower"]' + a + ';nwr["man_made"="chimney"]' + a + ';',
+      kirche: 'nwr["building"="church"]' + a + ';nwr["building"="cathedral"]' + a + ';nwr["building"="chapel"]' + a + ';nwr["amenity"="place_of_worship"]["religion"="christian"]' + a + ';',
+      ort: 'node["place"="city"]' + a + ';node["place"="town"]' + a + ';node["place"="village"]' + a + ';node["place"="suburb"]' + a + ';',
+      berg: 'node["natural"="peak"]' + a + ';node["natural"="hill"]' + a + ';',
+      leucht: 'nwr["man_made"="lighthouse"]' + a + ';',
+      burg: 'nwr["historic"="castle"]' + a + ';nwr["building"="castle"]' + a + ';nwr["historic"="manor"]' + a + ';',
+      muehle: 'nwr["man_made"="windmill"]' + a + ';nwr["man_made"="watermill"]' + a + ';',
+      aussicht: 'nwr["man_made"="tower"]["tower:type"="observation"]' + a + ';nwr["tourism"="viewpoint"]' + a + ';',
+      sehens: 'nwr["tourism"="attraction"]' + a + ';nwr["historic"="monument"]' + a + ';',
+      hoch: 'wr["building"]["height"~"^([4-9][0-9]|[1-9][0-9][0-9])([.,][0-9]+)?( ?m)?$"]' + a + ';wr["building"]["building:levels"~"^(1[4-9]|[2-9][0-9])$"]' + a + ';nwr["building"="skyscraper"]' + a + ';nwr["aeroway"="aerodrome"]' + a + ';'
+    };
+    return "[out:json][timeout:" + qTimeout(id) + "];(" + C[id] + ");out center 2000;";
+  }
+  /* Hochhaus-Suche ist für den Server am aufwendigsten – sie bekommt mehr Zeit */
+  function qTimeout(id){ return id === "hoch" ? 55 : 30; }
+  function hnum(v){ if(v == null) return null; var m = String(v).replace(",", ".").match(/[0-9]+(\.[0-9]+)?/); if(!m) return null; var n = parseFloat(m[0]); if(/ft|'/.test(String(v))) n *= 0.3048; return n > 0 && n < 900 ? n : null; }
+  function classify(el){
+    var t = el.tags || {}, mm = t.man_made, tt = t["tower:type"];
+    if(t.aeroway === "aerodrome") return { c: "hoch", t: /international|public/i.test(t["aerodrome:type"] || "") || t.iata ? "Flughafen" : "Flugplatz", dh: 0 };
+    if(mm === "windmill") return { c: "muehle", t: "Windmühle", dh: 20 };
+    if(mm === "watermill") return { c: "muehle", t: "Wassermühle", dh: 10 };
+    if(t.tourism === "viewpoint" && !mm) return { c: "aussicht", t: "Aussichtspunkt", dh: 0 };
+    if(t.place) return { c: "ort", t: t.place === "city" ? "Stadt" : t.place === "town" ? "Kleinstadt" : t.place === "suburb" ? "Stadtteil" : "Dorf", dh: 0 };
+    if(t.natural === "peak" || t.natural === "hill") return { c: "berg", t: t.natural === "peak" ? "Gipfel" : "Hügel", dh: 0 };
+    if(mm === "lighthouse") return { c: "leucht", t: "Leuchtturm", dh: 30 };
+    if(t.historic === "castle" || t.building === "castle") return { c: "burg", t: /manor|palace|stately|schloss/i.test(t.castle_type || "") ? "Schloss" : "Burg", dh: 25 };
+    if(t.historic === "manor") return { c: "burg", t: "Herrenhaus", dh: 15 };
+    if(t.building === "church" || t.building === "cathedral") return { c: "kirche", t: t.building === "cathedral" ? "Dom / Kathedrale" : "Kirche", dh: t.building === "cathedral" ? 70 : 40 };
+    if(t.building === "chapel") return { c: "kirche", t: "Kapelle", dh: 15 };
+    if(t.amenity === "place_of_worship" && t.religion === "christian") return { c: "kirche", t: "Kirche", dh: 30 };
+    if(mm === "water_tower") return { c: "turm", t: "Wasserturm", dh: 35 };
+    if(mm === "chimney") return { c: "turm", t: "Schornstein", dh: 60 };
+    if(mm === "tower"){
+      if(tt === "communication") return { c: "turm", t: "Funkturm", dh: 120 };
+      if(tt === "observation") return { c: "aussicht", t: "Aussichtsturm", dh: 30 };
+      if(tt === "bell_tower") return { c: "turm", t: "Glockenturm", dh: 35 };
+      if(tt === "defensive" || tt === "watchtower") return { c: "turm", t: "Wehrturm", dh: 20 };
+      return { c: "turm", t: "Turm", dh: 30 };
+    }
+    if(t.historic === "monument") return { c: "sehens", t: "Denkmal", dh: 15 };
+    if(t.tourism === "attraction") return { c: "sehens", t: "Sehenswürdigkeit", dh: 15 };
+    var lv = num(t["building:levels"]);
+    if(t.building && (hnum(t.height) >= 40 || lv >= 14 || t.building === "skyscraper")) return { c: "hoch", t: "Hochhaus", dh: lv >= 14 ? Math.round(lv * 3.2) : 40 };
+    return null;
+  }
+  function parse(json, la, lo, only){
+    var out = [], seen = {};
+    (json.elements || []).forEach(function(el){
+      var p = el.lat != null ? el : el.center; if(!p || p.lat == null) return;
+      var k = classify(el); if(!k) return;
+      /* Objekte, die eigentlich zu einer anderen Art gehören, kommen dort über deren eigene Abfrage */
+      if(only && k.c !== only) return;
+      var t = el.tags || {}, h = hnum(t.height), known = h != null;
+      if(k.c === "wind" && h == null){ var hub = hnum(t["height:hub"]), rot = hnum(t["rotor:diameter"]); if(hub){ h = hub + (rot ? rot / 2 : 0); known = true; } }
+      if(k.c === "ort" || k.c === "berg"){ h = 0; known = true; }
+      var name = t.name || "";
+      var it = { c: k.c, t: k.t, n: name, la: +p.lat.toFixed(6), lo: +p.lon.toFixed(6), h: Math.round(h != null ? h : k.dh), k: known ? 1 : 0 };
+      if(k.c === "berg"){ var ele = hnum(t.ele); if(ele != null) it.x = ele; }
+      /* doppelte Einträge (z. B. Punkt und Gebäude derselben Kirche) zusammenfassen */
+      var key = k.c + "|" + (name || k.t) + "|" + Math.round(p.lat * 500) + "|" + Math.round(p.lon * 300);
+      if(name && seen[key]) return; seen[key] = 1;
+      out.push(it);
+    });
+    out.forEach(function(it){ it.d = hav(la, lo, it.la, it.lo); });
+    out.sort(function(a, b){ return a.d - b.d; });
+    if(only && KEEP[only]) out = out.slice(0, KEEP[only]);
+    out.forEach(function(it){ delete it.d; });
+    return out;
+  }
+  var MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
+  function overpass(query, status, tmo){
+    var per = ((tmo || 30) + 10) * 1000, deadline = Date.now() + per * 2, m = 0, attempt = 0;
+    function tryNext(lastErr){
+      if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; return Promise.reject(c); }
+      if(m >= MIRRORS.length || Date.now() > deadline - 3000) return Promise.reject(lastErr || new Error("Kein Overpass-Server erreichbar"));
+      if(m > 0 || attempt > 0) status("Server antwortet langsam – versuche es weiter …");
+      var ctrl = new AbortController(), timer = setTimeout(function(){ ctrl.abort(); }, Math.min(per, deadline - Date.now()));
+      (loadCtl.all = loadCtl.all || []).push(ctrl);
+      return fetch(MIRRORS[m], { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" }, body: "data=" + encodeURIComponent(query), signal: ctrl.signal })
+        .then(function(r){ if(!r.ok){ var e = new Error("HTTP " + r.status); e.skip = r.status === 429 || r.status >= 500; throw e; } return r.json(); })
+        .then(function(j){
+          clearTimeout(timer);
+          if(!j || !Array.isArray(j.elements)) throw new Error("Unerwartete Antwort");
+          if(j.remark && /error|timed out|out of memory/i.test(j.remark)){ var e = new Error("Overpass: " + j.remark); e.skip = true; e.heavy = /timed out|out of memory/i.test(j.remark); throw e; }
+          return j;
+        }).catch(function(e){
+          clearTimeout(timer);
+          if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; throw c; }
+          if(e.skip || attempt >= 1){ m++; attempt = 0; } else attempt++;
+          return new Promise(function(res){ setTimeout(res, 700); }).then(function(){ return tryNext(e); });
+        });
+    }
+    return tryNext(null);
+  }
+  /* Geländehöhen in Paketen zu 100 Punkten (Koordinaten auf ca. 10 m gerundet) */
+  function elevations(points){
+    var out = new Array(points.length), chunks = [];
+    for(var i = 0; i < points.length; i += 100) chunks.push(i);
+    /* (bis zu 1000 Punkte = 10 kleine Anfragen) */
+    return chunks.reduce(function(p, start){
+      return p.then(function(){
+        if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; throw c; }
+        var part = points.slice(start, start + 100);
+        var url = "https://api.open-meteo.com/v1/elevation?latitude=" + part.map(function(x){ return x[0].toFixed(4); }).join(",") + "&longitude=" + part.map(function(x){ return x[1].toFixed(4); }).join(",");
+        return fetch(url).then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); }).then(function(j){
+          (j.elevation || []).forEach(function(v, k){ if(isFinite(v)) out[start + k] = Math.round(v); });
+        });
+      });
+    }, Promise.resolve()).then(function(){ return out; });
+  }
+  function getPosition(){
+    var c = window.wzCore && wzCore.location ? wzCore.location() : null;
+    if(c && c.mode === "manual" && isFinite(c.lat)) return Promise.resolve({ lat: +c.lat, lon: +c.lon, name: c.name || "", manual: true });
+    return new Promise(function(res, rej){
+      if(!navigator.geolocation) return rej(new Error("Standort ist auf diesem Gerät nicht verfügbar."));
+      navigator.geolocation.getCurrentPosition(function(p){
+        try { if(window.wzCore && wzCore.rememberGps) wzCore.rememberGps(p.coords.latitude, p.coords.longitude); } catch(e){}
+        res({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy });
+      }, function(){ rej(new Error("Standort nicht verfügbar. Erlaube den Standortzugriff für diese Website oder wähle in den Einstellungen der WahrZentrale einen festen Ort.")); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 30000 });
+    });
+  }
+  function askOnce(){
+    try { if(localStorage.getItem(LS_OK) === "1") return Promise.resolve(true); } catch(e){}
+    return wzConfirm("Umgebung laden? Dafür werden dein Standort und der Umkreis an einen Overpass-Server gesendet (overpass-api.de, ersatzweise Spiegelserver in Österreich, OSM-Gemeinschaft). Für genauere Höhenwinkel gehen außerdem die Koordinaten deines Standorts und der gefundenen Objekte an Open-Meteo (Geländehöhen). Daten © OpenStreetMap-Mitwirkende (ODbL).\n\nDieser Hinweis erscheint nur einmal – die Angaben stehen dauerhaft in der Datenschutzerklärung.", { okLabel: "Zustimmen", cancelLabel: "Ablehnen" })
+      .then(function(ok){ if(ok){ try { localStorage.setItem(LS_OK, "1"); } catch(e){} } return ok; });
+  }
+  var loading = false, loadCtl = { stop: false, ctrl: null };
+  var LOAD_HTML = $("hzLoad").innerHTML;
+  function status(t){ $("hzStatus").textContent = t || ""; }
+  function loadUi(on){
+    loading = on;
+    $("hzLoad").innerHTML = on ? wzIcon("close") + " Laden abbrechen" : LOAD_HTML;
+    $("hzLoad").classList.toggle("primary", !on);
+  }
+  /* Lädt die gewählten Arten einzeln (höchstens zwei Anfragen gleichzeitig, das erlaubt der Server pro Gerät).
+     Ergebnis je Art in cs: Anzahl (0 = gibt es im Umkreis laut OpenStreetMap nicht), -1 = Server überlastet,
+     -2 = Abfrage für den Server zu umfangreich. Schlägt eine Art fehl, werden – falls vorhanden – ihre Objekte
+     aus der letzten Ladung am selben Ort übernommen (-3 = ältere Daten übernommen). */
+  function loadCats(ids, rKm, p){
+    var cs = {}, got = {}, done = 0, idx = 0, firstErr = null;
+    function name(id){ return CAT[id] ? CAT[id].name : id; }
+    function one(){
+      if(idx >= ids.length) return Promise.resolve();
+      var id = ids[idx++];
+      status("Suche " + name(id) + " im Umkreis von " + rKm + " km … (" + (done + 1) + " von " + ids.length + ")");
+      return overpass(qCat(id, rKm * 1000, p.lat, p.lon), function(){ status("Server antwortet langsam (" + name(id) + ") – versuche es weiter …"); }, qTimeout(id))
+        .then(function(j){ got[id] = parse(j, p.lat, p.lon, id); cs[id] = got[id].length; },
+              function(e){ if(e && e.cancel) throw e; if(!firstErr) firstErr = e; cs[id] = e && e.heavy ? -2 : -1; })
+        .then(function(){ done++; return one(); });
+    }
+    return Promise.all([one(), one()]).then(function(){
+      if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; throw c; }
+      var old = data, near = old && old.items && hav(old.lat, old.lon, p.lat, p.lon) < 1000;
+      ids.forEach(function(id){
+        if(cs[id] >= 0 || !near) return;
+        var prev = old.items.filter(function(it){ return it.c === id && hav(p.lat, p.lon, it.la, it.lo) <= rKm * 1000; });
+        var okBefore = old.cs ? old.cs[id] >= 0 || old.cs[id] === -3 : prev.length > 0;
+        if(okBefore && prev.length){ got[id] = prev; cs[id] = -3; }
+      });
+      var items = [];
+      ids.forEach(function(id){ if(got[id]) items = items.concat(got[id]); });
+      if(!ids.some(function(id){ return got[id]; })) throw firstErr || new Error("Kein Overpass-Server erreichbar");
+      items.forEach(function(it){ it.d = hav(p.lat, p.lon, it.la, it.lo); });
+      items.sort(function(a, b){ return a.d - b.d; });
+      items.forEach(function(it){ delete it.d; });
+      return { items: items, cs: cs };
+    });
+  }
+  $("hzLoad").addEventListener("click", function(){
+    if(loading){ loadCtl.stop = true; (loadCtl.all || []).forEach(function(c){ try { c.abort(); } catch(e){} }); status("Wird abgebrochen …"); return; }
+    if(cfg.cats.length === 0){ status("Bitte zuerst oben auswählen, was erscheinen soll."); return; }
+    askOnce().then(function(ok){
+      if(!ok) return;
+      loadCtl = { stop: false, all: [] }; loadUi(true);
+      status("Standort wird bestimmt …");
+      var pos;
+      getPosition().then(function(p){
+        pos = p;
+        return loadCats(cfg.cats.slice(), cfg.r, p);
+      }).then(function(res){
+        var items = res.items;
+        status(items.length + " Objekte gefunden – Geländehöhen werden ergänzt …");
+        var n = Math.min(items.length, 999);
+        var pts = [[pos.lat, pos.lon]].concat(items.slice(0, n).map(function(it){ return [it.la, it.lo]; }));
+        return elevations(pts).then(function(el){
+          return { own: el[0] != null ? el[0] : null, items: items.map(function(it, k){ if(k < n && el[k + 1] != null) it.e = el[k + 1]; return it; }), dem: el[0] != null, cs: res.cs };
+        }).catch(function(){ return { own: null, items: items, dem: false, cs: res.cs }; });
+      }).then(function(r){
+        if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; throw c; }
+        data = { v: 1, lat: +pos.lat.toFixed(5), lon: +pos.lon.toFixed(5), name: pos.name || "", manual: !!pos.manual, r: cfg.r, ts: Date.now(), own: r.own, dem: r.dem, items: r.items, cs: r.cs };
+        if(!save(LS_DATA, data)){ data.items = data.items.slice(0, 400); save(LS_DATA, data); }
+        paintStatus(); renderRadar(); if(current === "liste") renderList();
+        var bad = Object.keys(r.cs).filter(function(id){ return r.cs[id] < 0; });
+        toast(r.items.length + " Objekte geladen" + (bad.length ? " – " + bad.length + (bad.length === 1 ? " Art" : " Arten") + " nicht erreichbar" : ""));
+      }).catch(function(e){
+        if(e && e.cancel){ if(data) paintStatus(); status("Abgebrochen." + (data ? " Die zuletzt geladene Umgebung bleibt erhalten." : "")); return; }
+        var busy = e && (e.name === "AbortError" || e.name === "TypeError" || /load failed|failed to fetch|networkerror|HTTP (429|5\d\d)|Overpass|nicht erreichbar/i.test(e.message || ""));
+        status(e && e.message && /Standort/.test(e.message) ? e.message : e && e.heavy
+          ? "Die Abfrage war für den Kartenserver zu umfangreich. Bitte einen kleineren Umkreis oder weniger Arten wählen."
+          : busy
+          ? "Der Kartenserver ist gerade überlastet oder nicht erreichbar. Bitte in ein paar Minuten noch einmal versuchen – mit kleinerem Umkreis klappt es meist schneller."
+          : "Laden nicht möglich (" + ((e && e.message) || "Fehler") + "). Bitte später noch einmal versuchen.");
+      }).then(function(){ loadUi(false); });
+    });
+  });
+  function paintStatus(){
+    if(!data){ status("Noch keine Umgebung geladen."); return; }
+    var dt = new Date(data.ts);
+    var t = data.items.length + " Objekte im Umkreis von " + data.r + " km · geladen " + dt.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }) + ", " + dt.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + (data.manual ? " · fester Ort" + (data.name ? " „" + data.name + "“" : "") : "") + (data.dem ? " · mit Geländehöhen" : "");
+    var cs = data.cs;
+    if(cs){
+      var nm = function(id){ return CAT[id] ? CAT[id].name : id; }, sel = cfg.cats;
+      var none = sel.filter(function(id){ return cs[id] === 0; }).map(nm);
+      var busy = sel.filter(function(id){ return cs[id] === -1; }).map(nm);
+      var heavy = sel.filter(function(id){ return cs[id] === -2; }).map(nm);
+      var older = sel.filter(function(id){ return cs[id] === -3; }).map(nm);
+      var notYet = sel.filter(function(id){ return !(id in cs); }).map(nm);
+      if(none.length) t += "\nKeine Treffer im Umkreis (in OpenStreetMap nicht eingetragen): " + none.join(", ");
+      if(busy.length) t += "\nNicht geladen, Server überlastet: " + busy.join(", ") + " – bitte später erneut laden";
+      if(heavy.length) t += "\nFür den Server zu umfangreich: " + heavy.join(", ") + " – mit kleinerem Umkreis erneut laden";
+      if(older.length) t += "\nServer überlastet, ältere Daten behalten: " + older.join(", ");
+      if(notYet.length) t += "\nNoch nicht geladen: " + notYet.join(", ") + " – tippe auf „Umgebung laden“";
+    }
+    status(t);
+  }
+  paintStatus();
+  $("hzClear").addEventListener("click", function(){
+    wzConfirm("Gespeicherte Umgebung löschen?", { okLabel: "Löschen", cancelLabel: "Abbrechen" }).then(function(ok){
+      if(!ok) return; data = null; try { localStorage.removeItem(LS_DATA); } catch(e){} paintStatus(); renderRadar(); toast("Gelöscht");
+    });
+  });
+
+  /* ---------- Rundblick von oben ---------- */
+  function renderRadar(){
+    var svg = $("hzRadar"), GR = "rgba(226,220,255,", s = "", R = 140, list = enrich();
+    [0.25, 0.5, 0.75, 1].forEach(function(k){ s += '<circle r="' + (R * Math.sqrt(k)).toFixed(1) + '" fill="none" stroke="' + GR + (k === 1 ? ".35)" : ".16)") + '" stroke-width="1"' + (k === 1 ? "" : ' stroke-dasharray="2 5"') + '/>'; });
+    for(var a = 0; a < 360; a += 30){ var x = Math.sin(a * D2R), y = -Math.cos(a * D2R); s += '<path d="M' + (x * 8).toFixed(1) + ' ' + (y * 8).toFixed(1) + 'L' + (x * R).toFixed(1) + ' ' + (y * R).toFixed(1) + '" stroke="' + GR + '.1)"/>'; }
+    [["N", 0], ["O", 90], ["S", 180], ["W", 270]].forEach(function(d){ var x = Math.sin(d[1] * D2R) * (R + 12), y = -Math.cos(d[1] * D2R) * (R + 12) + 4; s += '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="ui-monospace,Menlo,sans-serif">' + d[0] + '</text>'; });
+    var maxD = data ? data.r * 1000 : 10000;
+    s += '<text x="4" y="' + (-R + 12) + '" fill="' + GR + '.6)" font-size="9.5" font-family="ui-monospace,Menlo,sans-serif">' + (data ? data.r + " km" : "") + '</text>';
+    list.forEach(function(o){
+      var rr = R * Math.sqrt(Math.min(1, o.d / maxD)), x = Math.sin(o.az * D2R) * rr, y = -Math.cos(o.az * D2R) * rr, c = CAT[o.it.c];
+      s += o.it.c === "ort" ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.6" fill="none" stroke="' + c.col + '" stroke-width="1.2"/>' : '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (o.it.c === "wind" ? 1.6 : 2.4) + '" fill="' + c.col + '"/>';
+    });
+    s += '<circle r="4" fill="#fff"/><circle r="8" fill="none" stroke="#fff" stroke-opacity=".5"/>';
+    svg.innerHTML = s;
+    var near = list.filter(function(o){ return o.it.c !== "ort"; }).sort(function(a, b){ return a.d - b.d; })[0];
+    var tall = list.filter(function(o){ return o.it.c !== "ort" && o.it.c !== "berg"; }).sort(function(a, b){ return b.it.h - a.it.h; })[0];
+    $("hzRadarStats").innerHTML = '<div><span class="instr-lbl">Objekte</span><b class="instr-val">' + list.length + '</b><i class="instr-sub">' + (data ? "ausgewählt" : "nichts geladen") + '</i></div>' +
+      '<div><span class="instr-lbl">Am nächsten</span><b class="instr-val">' + (near ? km(near.d) : "–") + '</b><i class="instr-sub">' + (near ? esc(near.it.n || near.it.t) : "&nbsp;") + '</i></div>' +
+      '<div><span class="instr-lbl">Am höchsten</span><b class="instr-val">' + (tall ? f(tall.it.h, 0) + " m" : "–") + '</b><i class="instr-sub">' + (tall ? esc(tall.it.n || tall.it.t) : "&nbsp;") + '</i></div>';
+  }
+  renderRadar();
+
+  /* ---------- Liste ---------- */
+  var sortBy = "dist", shown = 60;
+  Array.prototype.forEach.call($("hzSort").children, function(c){ c.addEventListener("click", function(){ sortBy = c.getAttribute("data-s"); Array.prototype.forEach.call($("hzSort").children, function(x){ x.classList.toggle("active", x === c); x.setAttribute("aria-checked", x === c ? "true" : "false"); }); renderList(); }); });
+  $("hzFilter").addEventListener("input", function(){ shown = 60; renderList(); });
+  function renderList(){
+    var box = $("hzList");
+    if(!data){ box.innerHTML = '<div class="empty-hint">Noch keine Umgebung geladen. Tippe unter „Rundblick“ auf „Umgebung laden“.</div>'; return; }
+    var qy = $("hzFilter").value.trim().toLowerCase(), list = enrich();
+    if(qy) list = list.filter(function(o){ return (o.it.n + " " + o.it.t + " " + CAT[o.it.c].name).toLowerCase().indexOf(qy) !== -1; });
+    /* Windräder dicht beieinander als Windpark zusammenfassen */
+    var parks = clusters(list), rest = list.filter(function(o){ return o.it.c !== "wind"; });
+    parks.forEach(function(g){ var o = g[0]; o.n = g.length; rest.push(o); });
+    list = rest;
+    list.sort(sortBy === "dir" ? function(a, b){ return a.az - b.az; } : function(a, b){ return a.d - b.d; });
+    if(!list.length){ box.innerHTML = '<div class="empty-hint">Keine passenden Objekte.</div>'; return; }
+    var more = list.length > shown;
+    box.innerHTML = list.slice(0, shown).map(function(o, i){
+      var it = o.it;
+      return '<div class="hz-item"><span class="hz-ic">' + wzIcon(CAT[it.c].ic) + '</span><span class="hz-main"><b>' + esc(o.n > 1 ? "Windpark · " + o.n + " Windräder" : (it.n || it.t)) + '</b><span>' + [o.n > 1 ? "nächstes Windrad" : (it.n ? it.t : ""), it.c !== "ort" && it.c !== "berg" ? f(it.h, 0) + " m hoch" + (it.k ? "" : " (angenommen)") : seaLevel(it) != null ? f(seaLevel(it), 0) + " m ü. NN" : (it.n ? "" : CAT[it.c].name)].filter(Boolean).map(esc).join(" · ") + '</span></span>' +
+        '<span class="hz-r">' + km(o.d) + '<small>' + word(o.az) + " " + Math.round(o.az) + '°</small></span><button type="button" class="chip hz-go" data-go="' + data.items.indexOf(it) + '">Suchen</button></div>';
+    }).join("") + (more ? '<button type="button" class="chip hz-more" id="hzMore">Weitere ' + Math.min(60, list.length - shown) + ' anzeigen</button>' : "");
+    if(more) $("hzMore").addEventListener("click", function(){ shown += 60; renderList(); });
+  }
+  $("hzList").addEventListener("click", function(e){ var b = e.target.closest("[data-go]"); if(!b) return; startAr(+b.getAttribute("data-go")); });
+
+  /* ---------- Sichtweite ---------- */
+  $("hzEye").value = f(eye(), 1);
+  function horizonUi(){ $("hzHorizon").textContent = "ca. " + km(horizonDist(eye())); }
+  $("hzEye").addEventListener("input", function(){ var v = num(this.value); if(v && v > 0.2 && v < 9000){ cfg.eye = v; saveCfg(); horizonUi(); } });
+  horizonUi();
+
+  /* ---------- Kamera-Ansicht ---------- */
+  var AR = { on: false, stream: null, raf: 0, list: [], target: null, calOpen: false, lastInfo: "", sel: null, lastPick: 0 };
+  function err(t){ var e = $("hzErr"); e.textContent = t || ""; e.hidden = !t; }
+  function startAr(targetIdx){
+    err("");
+    if(!data){ err("Bitte zuerst „Umgebung laden“."); showTab("rundblick"); return; }
+    ORI.permit().then(function(){
+      ORI.start();
+      AR.on = true; AR.list = enrich(); AR.slots = {}; AR.list.forEach(function(o){ o.key = 'i' + data.items.indexOf(o.it); }); AR.target = targetIdx != null ? data.items[targetIdx] : null; AR.calOpen = false; AR.lastInfo = "";
+      $("hzAr").classList.add("on");
+      $("hzArTitle").textContent = "Rundblick\n" + data.items.length + " Objekte · " + data.r + " km";
+      camStart($("hzVideo")).then(function(s){ AR.stream = s; }).catch(function(){ $("hzArInfo").textContent = "Kamera nicht verfügbar – die Beschriftung erscheint auf dunklem Hintergrund."; });
+      cancelAnimationFrame(AR.raf); AR.raf = requestAnimationFrame(draw);
+    }).catch(function(e){ err(e.message); if(current !== "rundblick") wzAlert(e.message); });
+  }
+  function stopAr(){
+    AR.on = false; cancelAnimationFrame(AR.raf);
+    camStop(AR.stream, $("hzVideo")); AR.stream = null; ORI.stop();
+    $("hzAr").classList.remove("on");
+  }
+  $("hzStart").addEventListener("click", function(){ startAr(null); });
+  $("hzArClose").addEventListener("click", stopAr);
+  $("hzArCal").addEventListener("click", function(){ AR.calOpen = !AR.calOpen; AR.lastInfo = ""; this.textContent = AR.calOpen ? "Fertig" : "Ausrichten"; });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden && AR.on) stopAr(); });
+
+  /* Windräder in der Nähe zueinander zu Windparks bündeln (nur für die Beschriftung) */
+  function clusters(vis){
+    var w = vis.filter(function(o){ return o.it.c === "wind"; }).sort(function(a, b){ return a.d - b.d; }), used = [], out = [];
+    w.forEach(function(o){
+      if(used.indexOf(o) !== -1) return;
+      var g = [o]; used.push(o);
+      w.forEach(function(p){ if(used.indexOf(p) === -1 && hav(o.it.la, o.it.lo, p.it.la, p.it.lo) < 1600){ g.push(p); used.push(p); } });
+      out.push(g);
+    });
+    return out;
+  }
+  function draw(){
+    if(!AR.on) return;
+    AR.raf = requestAnimationFrame(draw);
+    var cv = $("hzCanvas"), ctx = cv.getContext("2d"), dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    if(cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)){ cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    var att = ORI.attitude(true);
+    if(!att){ ctx.fillStyle = "#fff"; ctx.font = "600 15px -apple-system,sans-serif"; ctx.textAlign = "center"; ctx.fillText("Warte auf Kompass und Lagesensor …", W / 2, H / 2); return; }
+    var qq = ORI.smooth(att, 60), raw = ORI.view(qq, 0), v = ORI.view(qq, cfg.cal.yaw), fpx = ORI.focal($("hzVideo"), W, H, cfg.cal.fov), P = ORI.projector(v, W, H, fpx);
+    AR.rawAz = raw.az; AR.view = v;
+    var DARK = "rgba(10,8,30,", GRID = "rgba(226,220,255,", GOLD = "#FFD27A", MONO = "ui-monospace, Menlo, -apple-system, sans-serif";
+    function mono(t, x, y, size, col, align, weight){ ctx.font = (weight || 600) + " " + size + "px " + MONO; ctx.textAlign = align || "center"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.strokeStyle = DARK + "0.8)"; ctx.strokeText(t, x, y); ctx.fillStyle = col; ctx.fillText(t, x, y); }
+    function inView(p, pad){ return p && p.x > -pad && p.x < W + pad && p.y > -pad && p.y < H + pad; }
+    /* Horizont (scheinbar, mit Erdkrümmung) und Richtungsskala */
+    var dip = -Math.atan(horizonDist(eye()) / REFF) / D2R;
+    ctx.beginPath(); var first = true, a, p;
+    for(a = 0; a <= 360; a += 2){ p = P(a, dip); if(!p){ first = true; continue; } if(first){ ctx.moveTo(p.x, p.y); first = false; } else ctx.lineTo(p.x, p.y); }
+    /* dunkle Kontur unter der Horizontlinie: auch vor hellem Himmel und weißen Wänden sichtbar */
+    ctx.strokeStyle = "rgba(10,8,30,0.4)"; ctx.lineWidth = 3; ctx.stroke();
+    ctx.strokeStyle = GRID + "0.9)"; ctx.lineWidth = 1.2; ctx.stroke();
+    var CARD = { 0: "N", 45: "NO", 90: "O", 135: "SO", 180: "S", 225: "SW", 270: "W", 315: "NW" };
+    ctx.lineWidth = 1;
+    for(a = 0; a < 360; a += 5){
+      var h0 = P(a, dip), h1 = P(a, dip - (a % 15 === 0 ? 1.4 : 0.7)); if(!inView(h0, 10) || !h1) continue;
+      ctx.beginPath(); ctx.moveTo(h0.x, h0.y); ctx.lineTo(h1.x, h1.y);
+      ctx.strokeStyle = "rgba(10,8,30,0.4)"; ctx.lineWidth = 2.6; ctx.stroke(); ctx.strokeStyle = GRID + "0.9)"; ctx.lineWidth = 1; ctx.stroke();
+      if(a % 15 === 0){ var hl = P(a, dip - 3.2); if(hl) mono((CARD[a] ? CARD[a] + " " : "") + a + "°", hl.x, hl.y + 4, CARD[a] ? 12 : 10.5, CARD[a] ? "#fff" : "#E6DDF7"); }
+    }
+    /* Objekte projizieren */
+    var vis = [];
+    AR.list.forEach(function(o){
+      var pt = P(o.az, o.altTop, 0.08); if(!pt || pt.x < -60 || pt.x > W + 60) return;
+      var pb = P(o.az, o.altBase, 0.08);
+      o.pt = pt; o.pb = pb; vis.push(o);
+    });
+    /* Marken: kräftig mit dunklem Rand, damit sie auf hellem und dunklem Kamerabild gleich gut zu sehen sind.
+       Senkrechter Strich vom Fuß zur Spitze (gestrichelt, wenn unten etwas durch die Erdkrümmung verdeckt ist).
+       Volle Deckkraft für sichtbare Objekte; nur Objekte ganz hinter dem Horizont bleiben gedämpft. */
+    var HALO = "rgba(10,8,30,0.42)";
+    vis.forEach(function(o){
+      var c = CAT[o.it.c].col, far = o.hid >= o.it.h && o.it.c !== "ort" && o.it.c !== "berg", x = o.pt.x, y = o.pt.y;
+      ctx.globalAlpha = far ? 0.5 : 1;
+      if(o.it.c === "ort"){
+        ctx.beginPath(); ctx.arc(x, y, 4.6, 0, 6.283); ctx.fillStyle = HALO; ctx.fill();
+        ctx.lineWidth = 1.6; ctx.strokeStyle = c; ctx.beginPath(); ctx.arc(x, y, 3.6, 0, 6.283); ctx.stroke();
+      } else {
+        if(o.pb && Math.abs(o.pb.y - y) > 2){
+          var dash = o.hid >= 0.5 ? [3, 3] : [];
+          ctx.setLineDash(dash); ctx.lineCap = "round";
+          ctx.strokeStyle = HALO; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(o.pb.x, o.pb.y); ctx.lineTo(x, y); ctx.stroke();
+          ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(o.pb.x, o.pb.y); ctx.lineTo(x, y); ctx.stroke();
+          ctx.setLineDash([]); ctx.lineCap = "butt";
+        }
+        ctx.beginPath(); ctx.moveTo(x, y - 5.5); ctx.lineTo(x + 4.4, y); ctx.lineTo(x, y + 5.5); ctx.lineTo(x - 4.4, y); ctx.closePath();
+        ctx.lineJoin = "round"; ctx.strokeStyle = HALO; ctx.lineWidth = 2.2; ctx.stroke(); ctx.fillStyle = c; ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    });
+    /* Ruhige Beschriftung: Jedes Schild steht senkrecht über seinem Objekt (Linie immer senkrecht).
+       Überlappen sich Schilder, werden sie nur übereinander gestapelt – nie seitlich verschoben.
+       Ein Schild behält seine Stapelhöhe, solange sie frei bleibt, und gleitet sanft an neue Plätze.
+       Findet ein Objekt keinen freien Platz, bleibt nur seine Raute; die Daten zeigt das Fadenkreuz. */
+    var labels = [], placed = [], ROW = 28, now = performance.now();
+    if(!AR.slots) AR.slots = {};
+    clusters(vis).forEach(function(g){
+      var o = g[0], n = g.length;
+      labels.push({ o: o, key: "w" + o.key, t1: n > 1 ? "WINDPARK · " + n : (o.it.n ? o.it.n.toUpperCase() : "WINDRAD"), t2: km(o.d) + (n > 1 ? " · " + n + " Windräder" : "") });
+    });
+    vis.forEach(function(o){ if(o.it.c !== "wind") labels.push({ o: o, key: o.key, t1: (o.it.n || o.it.t).toUpperCase(), t2: (o.it.n ? o.it.t + " · " : "") + km(o.d) }); });
+    labels.sort(function(a, b){ var ta = AR.target && a.o.it === AR.target ? -1 : 0, tb = AR.target && b.o.it === AR.target ? -1 : 0; return ta - tb || a.o.d - b.o.d; });
+    var maxLabels = 26, count = 0, seen = {};
+    ctx.font = "600 11px " + MONO;
+    labels.forEach(function(l){
+      if(count >= maxLabels) return;
+      var o = l.o, t1 = l.t1.length > 26 ? l.t1.slice(0, 25) + "…" : l.t1, w = Math.max(ctx.measureText(t1).width, ctx.measureText(l.t2).width * 0.95) + 8;
+      var sx = o.pt.x, align = "center", x0;
+      /* am Bildrand: Schild neben die Linie statt darüber, die Linie bleibt senkrecht */
+      if(sx - w / 2 < 4){ align = "left"; x0 = sx - 6; }
+      else if(sx + w / 2 > W - 4){ align = "right"; x0 = sx - w + 6; }
+      else x0 = sx - w / 2;
+      if(x0 < 2 || x0 + w > W - 2) return;
+      var base = o.pt.y - 22;
+      function free(row){
+        var y = base - row * ROW;
+        return y > 96 && placed.every(function(r){ return x0 + w < r.x0 || x0 > r.x1 || y + 4 < r.y0 || y - 26 > r.y1; });
+      }
+      var st = AR.slots[l.key], row = -1;
+      /* bisherige Höhe behalten, solange frei; tiefer rutschen erst nach kurzer Ruhe */
+      if(st && free(st.row)){
+        row = st.row;
+        if(row > 0 && now - st.t > 600){ for(var k0 = 0; k0 < row; k0++) if(free(k0)){ row = k0; break; } }
+      } else { for(var k = 0; k < 7; k++) if(free(k)){ row = k; break; } }
+      if(row < 0){ delete AR.slots[l.key]; return; }
+      if(!st || st.row !== row) AR.slots[l.key] = { row: row, t: now, y: st ? st.y : base - row * ROW };
+      st = AR.slots[l.key]; seen[l.key] = 1;
+      var ty = base - row * ROW;
+      /* sanft gleiten (zeitbasiert, gleich bei 60 und 120 Hz) */
+      var dt = Math.min(100, now - (st.last || now)); st.last = now;
+      st.y = Math.abs(st.y - ty) > ROW * 4 ? ty : st.y + (ty - st.y) * (1 - Math.exp(-dt / 90));
+      var y = st.y;
+      placed.push({ x0: x0, x1: x0 + w, y0: ty - 26, y1: ty + 4 }); count++;
+      var tgt = AR.target && o.it === AR.target, col = tgt ? GOLD : "#fff";
+      ctx.strokeStyle = HALO; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(sx, o.pt.y - 7); ctx.lineTo(sx, y + 4); ctx.stroke();
+      ctx.strokeStyle = tgt ? GOLD : GRID + "0.8)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(sx, o.pt.y - 7); ctx.lineTo(sx, y + 4); ctx.stroke();
+      var tx = align === "center" ? sx : align === "left" ? x0 + 4 : x0 + w - 4;
+      mono(t1, tx, y - 12, 11, col, align, 700);
+      mono(l.t2, tx, y + 1, 10, tgt ? GOLD : "#E6DDF7", align, 500);
+    });
+    Object.keys(AR.slots).forEach(function(k){ if(!seen[k] && now - AR.slots[k].t > 1500) delete AR.slots[k]; });
+    /* Ziel außerhalb des Bildes: Pfeil am Rand */
+    if(AR.target){
+      var to = AR.list.filter(function(o){ return o.it === AR.target; })[0];
+      if(to){
+        var dz = ORI.wrap180(to.az - v.az), tp = P(to.az, to.altTop, 0.08);
+        if(!inView(tp, -20)){
+          var ax = dz > 0 ? W - 26 : 26, ay = H * 0.42;
+          ctx.fillStyle = GOLD; ctx.beginPath();
+          if(dz > 0){ ctx.moveTo(ax + 12, ay); ctx.lineTo(ax - 4, ay - 12); ctx.lineTo(ax - 4, ay + 12); } else { ctx.moveTo(ax - 12, ay); ctx.lineTo(ax + 4, ay - 12); ctx.lineTo(ax + 4, ay + 12); }
+          ctx.closePath(); ctx.fill();
+          mono(Math.abs(Math.round(dz)) + "°", ax, ay + 30, 11, GOLD);
+        }
+      }
+    }
+    /* Fadenkreuz und Auswahl */
+    var cx = W / 2, cy = H / 2, best = null, bd = 1e9;
+    vis.forEach(function(o){ var dd = Math.hypot(o.pt.x - cx, (o.pt.y + (o.pb ? o.pb.y : o.pt.y)) / 2 - cy) - (o.pb ? Math.min(40, Math.abs(o.pb.y - o.pt.y) / 2) : 0); var dx = Math.abs(o.pt.x - cx); if(dx < 34 && dd < bd){ bd = dd; best = o; } });
+    if(best && bd > 90) best = null;
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.25; ctx.save(); ctx.strokeStyle = "rgba(10,8,30,0.55)"; ctx.lineWidth = 3.6; ctx.beginPath(); ctx.arc(cx, cy, 14, 0, 6.283); ctx.moveTo(cx - 22, cy); ctx.lineTo(cx - 8, cy); ctx.moveTo(cx + 8, cy); ctx.lineTo(cx + 22, cy); ctx.moveTo(cx, cy - 22); ctx.lineTo(cx, cy - 8); ctx.moveTo(cx, cy + 8); ctx.lineTo(cx, cy + 22); ctx.stroke(); ctx.restore(); ctx.beginPath(); ctx.arc(cx, cy, 14, 0, 6.283); ctx.moveTo(cx - 22, cy); ctx.lineTo(cx - 8, cy); ctx.moveTo(cx + 8, cy); ctx.lineTo(cx + 22, cy); ctx.moveTo(cx, cy - 22); ctx.lineTo(cx, cy - 8); ctx.moveTo(cx, cy + 8); ctx.lineTo(cx, cy + 22); ctx.stroke();
+    if(best){ ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(best.pt.x, best.pt.y, 9, 0, 6.283); ctx.stroke(); }
+    AR.sel = best;
+    info(v, att, vis);
+  }
+  function cell(k, val, sub, cls){ return '<div' + (cls ? ' class="' + cls + '"' : '') + '><span>' + k + '</span><b>' + val + '</b><i>' + (sub || "&nbsp;") + '</i></div>'; }
+  function info(v, att, vis){
+    var now = performance.now(); if(now - AR.lastPick < 150 && !AR.calOpen) return; AR.lastPick = now;
+    var el = $("hzArInfo"), html;
+    if(AR.calOpen){
+      if(AR.calHtml && el.querySelector("#hzCalList")){
+        /* nur die Auswahl aktualisieren, Regler nicht neu aufbauen */
+        var near = vis.slice().sort(function(a, b){ return Math.abs(ORI.wrap180(a.az - v.az)) - Math.abs(ORI.wrap180(b.az - v.az)); }).filter(function(o){ return o.it.c !== "ort"; }).slice(0, 4);
+        var lh = near.map(function(o){ return '<button type="button" class="ar-btn" data-al="' + data.items.indexOf(o.it) + '">' + esc((o.it.n || o.it.t).slice(0, 22)) + ' · ' + km(o.d) + '</button>'; }).join("");
+        if(lh !== AR.calList){ $("hzCalList").innerHTML = lh || '<small>Kein Objekt in der Nähe der Blickrichtung.</small>'; AR.calList = lh; }
+        return;
+      }
+      AR.calHtml = true; AR.calList = "";
+      el.innerHTML = '<div style="font-size:13.5px;line-height:1.4"><b>Ausrichten:</b> Richte das Fadenkreuz genau auf ein Objekt, das du sicher erkennst, und tippe es hier an.</div>' +
+        '<div id="hzCalList" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>' +
+        '<div class="ar-sep"><div class="ar-field"><label for="hzFov">Sichtfeld</label><input type="range" id="hzFov" min="45" max="95" step="1"><output id="hzFovO"></output></div>' +
+        '<div class="ar-field"><label for="hzYaw">Richtung</label><input type="range" id="hzYaw" min="-45" max="45" step="0.5"><output id="hzYawO"></output></div>' +
+        '<div class="ar-row"><button type="button" class="ar-btn" id="hzCalReset">Zurücksetzen</button></div></div>';
+      var fov = $("hzFov"), yaw = $("hzYaw");
+      var sync = function(){ fov.value = cfg.cal.fov; yaw.value = cfg.cal.yaw; $("hzFovO").textContent = Math.round(cfg.cal.fov) + "°"; $("hzYawO").textContent = (cfg.cal.yaw > 0 ? "+" : "") + f(cfg.cal.yaw, 1) + "°"; };
+      sync();
+      fov.oninput = function(){ cfg.cal.fov = +fov.value; saveCfg(); sync(); };
+      yaw.oninput = function(){ cfg.cal.yaw = +yaw.value; saveCfg(); sync(); };
+      $("hzCalReset").onclick = function(){ cfg.cal = { yaw: 0, fov: 68 }; saveCfg(); sync(); };
+      $("hzCalList").onclick = function(e){
+        var b = e.target.closest("[data-al]"); if(!b) return;
+        var it = data.items[+b.getAttribute("data-al")], o = AR.list.filter(function(x){ return x.it === it; })[0]; if(!o) return;
+        cfg.cal.yaw = Math.max(-45, Math.min(45, ORI.wrap180(o.az - AR.rawAz))); saveCfg(); sync(); toast("Ausgerichtet auf „" + (it.n || it.t) + "“");
+      };
+      return;
+    }
+    AR.calHtml = false;
+    var o = AR.sel;
+    if(o){
+      var it = o.it, hidTxt;
+      if(it.c === "ort") hidTxt = o.hid >= 0.5 ? "Boden ca. " + f(o.hid, 0) + " m unter dem Horizont" : "vor dem Horizont";
+      else if(it.c === "berg") hidTxt = seaLevel(it) != null ? f(seaLevel(it), 0) + " m ü. NN" : "Höhe unbekannt";
+      else hidTxt = o.hid < 0.5 ? "ganz sichtbar" : o.hid >= it.h ? "hinter dem Horizont" : "unten ca. " + f(o.hid, 0) + " m verdeckt";
+      html = '<div style="font-size:15px;font-weight:700;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(it.n || it.t) + ' <span style="font-weight:500;color:#B9A6F5;font-size:12.5px">' + esc(it.n ? it.t : CAT[it.c].name) + '</span></div>' +
+        '<div class="ar-grid three">' + cell("Entfernung", km(o.d), word(o.az) + " · " + Math.round(o.az) + "°", "gold") +
+        cell("Höhe", it.c === "ort" || it.c === "berg" ? (seaLevel(it) != null ? f(seaLevel(it), 0) + " m" : "–") : f(it.h, 0) + " m", it.c === "ort" || it.c === "berg" ? (seaLevel(it) != null ? "ü. NN" : "") : it.k ? "laut OSM" : "angenommen") +
+        cell("Sicht", o.hid < 0.5 || it.c === "berg" ? "frei" : o.hid >= it.h && it.c !== "ort" ? "verdeckt" : f(o.hid, 0) + " m", hidTxt) + '</div>';
+    } else {
+      var n = vis.length;
+      html = '<div class="ar-grid three">' + cell("Blickrichtung", word(v.az) + " " + Math.round(v.az) + "°", "Neigung " + (v.alt >= 0 ? "+" : "−") + Math.abs(Math.round(v.alt)) + "°") +
+        cell("Im Bild", n + (n === 1 ? " Objekt" : " Objekte"), "Fadenkreuz auf ein Objekt") +
+        cell("Horizont", "≈ " + km(horizonDist(eye())), "bei " + f(eye(), 1) + " m Augenhöhe") + '</div>' +
+        (att.ok ? "" : "<small>Kompass ungenau (Gerät ohne Nordbezug) – mit „Ausrichten“ angleichen.</small>");
+    }
+    if(html !== AR.lastInfo){ el.innerHTML = html; AR.lastInfo = html; }
+  }
+
+  /* ---------- Einführung ---------- */
+  var onb = wzOnboarding({
+    key: LS_ONB,
+    slides: [
+      { icon: "horizon", title: "Willkommen bei HorizontWahr", text: "Was ist das da hinten? Halte die Kamera in die Landschaft – Kirchen, Burgen, Orte, Berge, Aussichtspunkte und Sehenswürdigkeiten werden mit Namen und Entfernung beschriftet." },
+      { icon: "radar", title: "Einmal laden, überall schauen", text: "Die Umgebung wird einmal aus OpenStreetMap geladen und auf dem Gerät gemerkt. Danach geht der Rundblick auch offline." },
+      { icon: "crosshair", title: "Forschen mit dem Fadenkreuz", text: "Im Fadenkreuz siehst du Entfernung, Höhe und wie viel die Erdkrümmung verdeckt. „Ausrichten“ gleicht den Kompass an einem bekannten Objekt an." },
+      { icon: "lock", title: "Privat geht vor", text: "Dein Standort wird nur beim Laden gesendet – erst nach deiner Zustimmung. Das Kamerabild bleibt auf dem Gerät und wird nie gespeichert." }
+    ]
+  });
+  window.HZ = { showOnboarding: function(){ onb.show(); } };
+  $("showOnboardingBtn").addEventListener("click", function(){ onb.show(); });
+  var h0 = (location.hash || "").slice(1);
+  if(["rundblick", "liste", "info"].indexOf(h0) !== -1) showTab(h0);
+  window.addEventListener("pagehide", function(){ if(AR.on) stopAr(); });
+})();
+
+</script>
+</body>
+</html>

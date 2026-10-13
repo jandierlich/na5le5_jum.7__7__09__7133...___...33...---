@@ -1,0 +1,41 @@
+Alle Rechte vorbehalten / All Rights Reserved.
+
+Copyright (c) 2026 Jan Dierlich
+
+Dieses Repository (WahrZentrale) enthält die WahrZentrale mit allen darin
+zusammengeführten Apps (HimmelsWahr, Sternenhimmel (ZeitHimmel), AstroWahr,
+KompassWahr, NaviWahr, Keysglade, WowarWahr, BelegParkWahr, AlltagWahr,
+ProduktWahr, VorratsWahr, QRWahr, LautstärkeWahr, LosDenkWahr, MessWahr,
+LabWahr, AufwindWahr, ZahlenturmWahr, Korvanthiel, HerzKaroDrei,
+PartikelWahr, StrömungsWahr, BeatWahr, HorizontWahr, KlangWahr,
+StaunWahr).
+
+Der Quellcode sowie alle Texte, Grafiken, Symbole und Klänge sind
+urheberrechtlich geschützt. Eine Nutzung, Vervielfältigung,
+Weiterverbreitung, Veränderung oder Weitergabe – auch auszugsweise – ist
+ohne ausdrückliche schriftliche Zustimmung des Autors nicht gestattet.
+Die private Nutzung der App im Familien- und Freundeskreis ist erlaubt.
+
+Ausgenommen sind Inhalte, die auf gemeinfreien amtlichen Werken beruhen
+(z. B. Verordnung (EG) Nr. 1333/2008, Verordnung (EU) Nr. 1169/2011,
+Verordnung (EG) Nr. 1223/2009, Verordnung (EG) Nr. 1907/2006). Die
+redaktionelle Auswahl, Formulierung, Struktur und Programmierung bleiben
+geschützt.
+
+Enthaltene Drittkomponenten (unter ihren eigenen Lizenzen):
+- lib-leaflet.js, lib-leaflet.css – Leaflet 1.9.4, BSD-2-Clause,
+  Copyright (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
+- lib-jspdf.umd.min.js – jsPDF 2.5.1, MIT,
+  Copyright (c) 2010-2021 James Hall, (c) 2015-2021 yWorks GmbH
+- lib-ocr-core-5.1.1-*.wasm.js – tesseract.js-core 5.1.1 (Tesseract OCR
+  als WebAssembly), Apache License 2.0, mit Leptonica, libpng, libjpeg und
+  zlib (jeweils unter ihren eigenen freien Lizenzen)
+- lib-ocr-deu-/eng-4.0.0-best-int.traineddata.gz – Tesseract-Sprachdaten
+  (tessdata 4.0.0), Apache License 2.0
+- lib-zxing-0.21.3.min.js – @zxing/library 0.21.3, Apache License 2.0,
+  mit ts-custom-error 3.3.1 (MIT)
+- wow-*.json – Natural Earth (gemeinfrei) und GeoNames (CC BY 4.0)
+Die Texterkennungs- und Barcode-Dateien liegen in diesem Repository und
+werden erst beim ersten Scannen geladen – von derselben Adresse, nicht von
+fremden Servern.
+Die vollständigen Lizenztexte und alle Datenquellen stehen in lizenzen.html.

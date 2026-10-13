@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Kunst und Museen">
+  <path d="M24,6 C12,6 5,15 5,24 C5,31 10,33 15,31 C17,30 19,31 19,34 C19,38 22,42 27,42 C38,42 43,32 43,23 C43,13 35,6 24,6 Z" fill="#0B1440"/>
+  <circle cx="16" cy="18" r="3" fill="#FF8C00"/>
+  <circle cx="26" cy="13" r="3" fill="#3355C8"/>
+  <circle cx="35" cy="19" r="3" fill="#6C8BFF"/>
+  <circle cx="34" cy="29" r="3" fill="#FFB347"/>
+</svg>

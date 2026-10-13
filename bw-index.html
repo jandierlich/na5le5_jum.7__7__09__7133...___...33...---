@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark" data-wz-app="bw">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="description" content="Beats und Melodien bauen – Rhythmus, Bass und Melodie mischen.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" id="themeColorMeta" content="#0d0a1c">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="color-scheme" content="dark light">
+<script>try{if(localStorage.getItem('beatwahr_theme')==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<title>BeatWahr</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f4f5f8;
+  --bg-raised:#ffffff;
+  --bg-track:#d3d9ea;
+  --line:#aab2cf;
+  --text:#12162a;
+  --text-dim:#4d5573;
+  --accent:#182a63;
+  --accent-text:#182a63;
+  --accent-soft:#e3e6f4;
+  --amber:#dd8a2e;
+  --violet:var(--wzp-8b7ff2, #8b7ff2);
+  --teal:#279e90;
+  --gold:#d9a52e;
+  --coral:#dd6a5a;
+  --pink:#c85f96;
+  --danger:#c1392f;
+  --danger-fill:#c1392f;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(26,31,51,.07), 0 1px 8px rgba(26,31,51,.04);
+  --success:#279e58;
+}
+html[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:var(--wzp-0d0a1c, #0d0a1c);
+  --bg-raised:var(--wzp-1b1638, #1b1638);
+  --bg-track:var(--wzp-2c2555, #2c2555);
+  --line:var(--wzp-3a3170, #3a3170);
+  --text:var(--wzp-f1eefb, #f1eefb);
+  --text-dim:var(--wzp-a79fd0, #a79fd0);
+  --accent:var(--wzp-7b3fe4, #7b3fe4);
+  --accent-text:#00e5ff;
+  --accent-soft:var(--wzp-2a1f55, #2a1f55);
+  --amber:#e6a94f;
+  --violet:var(--wzp-a79bff, #a79bff);
+  --teal:#3fc2b0;
+  --gold:#e6bf55;
+  --coral:#e8836f;
+  --pink:#dd82ae;
+  --danger:#e2564a;
+  --danger-fill:#e2564a;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 1px 10px rgba(0,0,0,.25);
+  --success:#3fbf78;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;}
+input, textarea, select{ user-select:text; -webkit-user-select:text; -webkit-touch-callout:default; }
+html,body{
+  margin:0; padding:0; height:100%;
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+  overscroll-behavior:none;
+  touch-action:manipulation;
+}
+body{ display:flex; flex-direction:column; height:var(--wz-vh, 100dvh); height:var(--wz-vh, 100dvh); }
+.num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum";}
+button{font-family:inherit;}
+
+/* ============ HOME VIEW ============ */
+.home-view{
+  position:relative;
+  flex:1; display:flex; flex-direction:column;
+  padding:calc(22px + env(safe-area-inset-top)) 18px calc(22px + env(safe-area-inset-bottom));
+  overflow-y:auto;
+  background:var(--bg);
+}
+#hubBtn{
+  position:absolute; top:calc(18px + env(safe-area-inset-top)); left:16px; z-index:5;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--bg-raised); border:1.5px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text); box-shadow:var(--shadow); text-decoration:none;
+}
+#hubBtn svg{ width:17px; height:17px; }
+.home-header{ margin-top:44px; }
+.home-header h1{ font-size:30px; margin:6px 0 6px; color:var(--text); font-weight:800; letter-spacing:-.3px; }
+.home-header p{ font-size:14px; color:var(--text-dim); margin:0 0 24px; line-height:1.55; max-width:34ch; font-weight:500; }
+.home-tiles{ display:flex; flex-direction:column; gap:12px; }
+.home-tile{
+  display:flex; align-items:center; gap:12px;
+  background:var(--bg-raised); border:1.5px solid var(--line); border-radius:16px;
+  padding:18px 16px; box-shadow:var(--shadow); text-align:left;
+}
+.home-tile .emoji{ display:flex; color:var(--accent-text); }
+.home-tile span{font-size:14.5px; font-weight:700; color:var(--text);}
+.home-tile.primary{background:var(--accent); border-color:var(--accent);}
+.home-tile.primary span, .home-tile.primary .emoji{color:#fff;}
+
+/* ============ APP SHELL (Sequencer view) ============ */
+.app-shell{ flex:1; display:none; flex-direction:column; min-height:0; background:var(--bg); }
+
+/* HEADER: schlank, nur globale Transport-Kontrollen */
+header{
+  flex:0 0 auto;
+  padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-raised);
+  display:flex; align-items:center; gap:8px;
+}
+[data-icon]{ display:inline-flex; align-items:center; justify-content:center; }
+#homeBtn{
+  width:36px; height:36px; border-radius:var(--radius); border:none;
+  background:var(--accent-soft); color:var(--accent-text); font-size:15px; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+}
+.header-title{ flex:1; min-width:0; }
+.header-title .name{ font-size:14px; font-weight:800; color:var(--accent-text); }
+.header-title .sub{ font-size:10.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+#playBtn{
+  width:42px; height:42px; border-radius:50%; border:none;
+  background:var(--accent); color:#fff; font-size:16px;
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto; box-shadow:var(--shadow);
+}
+#playBtn.playing{background:var(--danger-fill);}
+.bpm-mini{ display:flex; align-items:center; gap:4px; background:var(--bg-track); border-radius:var(--radius); padding:4px 6px; flex:0 0 auto; }
+.bpm-mini button{ width:24px; height:24px; border-radius:7px; border:none; background:var(--bg-raised); color:var(--text); font-size:14px; box-shadow:var(--shadow); }
+.bpm-mini .bpm-val{ font-size:13px; font-weight:800; color:var(--accent-text); min-width:30px; text-align:center; }
+#undoBtn{ width:36px; height:36px; border-radius:var(--radius); border:none; background:var(--bg-track); color:var(--accent-text); font-size:14px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; }
+
+/* TAB CONTENT AREA */
+.tab-content{ flex:1; min-height:0; display:none; flex-direction:column; }
+.tab-content.active{ display:flex; }
+.tab-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+/* TAB BAR (unten, wie native App) */
+.tabbar{
+  flex:0 0 auto; display:flex; border-top:1px solid var(--line); background:var(--bg-raised);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tabbar button{
+  flex:1; border:none; background:none; padding:8px 0 6px; display:flex; flex-direction:column;
+  align-items:center; gap:2px; color:var(--text-dim); font-size:10.5px; font-weight:700;
+}
+.tabbar button .ticon{ display:flex; align-items:center; justify-content:center; }
+.tabbar button.active{ color:var(--accent-text); }
+
+/* PATTERN BAR (Sequencer-Tab) */
+.pattern-bar{ display:flex; align-items:center; gap:8px; padding:8px 10px 4px; flex:0 0 auto; }
+.pattern-tabs{display:flex; gap:5px; flex:1;}
+.pattern-tab{ flex:1; padding:7px 0; text-align:center; border-radius:9px; border:none; background:var(--bg-track); color:var(--text-dim); font-size:13px; font-weight:700; }
+.pattern-tab.active{background:var(--accent); color:#fff;}
+
+/* SEQUENCER: Track-Karten (nur Steps + Name + M/S, schlank) */
+.seq-tracks{padding:4px 0 10px;}
+.seq-track{
+  padding:8px 10px; margin:0 8px 8px;
+  background:var(--bg-raised); border-radius:var(--radius); box-shadow:var(--shadow);
+}
+.seq-track-head{ display:flex; align-items:center; gap:6px; margin-bottom:7px; }
+.track-color{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+.track-name{ font-size:12px; font-weight:700; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.vol-mini{ display:flex; align-items:center; justify-content:center; gap:4px; background:var(--bg-track); border-radius:var(--radius); padding:3px 5px; flex:0 0 auto; width:92px; height:24px; margin-right:9px; }
+.vol-mini button{ width:24px; height:24px; border-radius:6px; border:none; background:var(--bg-raised); color:var(--text); font-size:14px; box-shadow:var(--shadow); flex:0 0 auto; line-height:1; }
+.vol-mini .vol-val{ font-size:10.5px; font-weight:800; color:var(--accent-text); min-width:26px; text-align:center; }
+.mini-btn{ width:24px; height:24px; border-radius:7px; border:none; background:var(--bg-track); color:var(--text-dim); font-size:10.5px; font-weight:700; flex:0 0 auto; }
+.mini-btn.on{background:var(--accent); color:#fff;}
+.head-wave-select{ width:92px; height:24px; flex:0 0 auto; background:var(--bg-track); color:var(--text); border:none; border-radius:8px; padding:3px 4px; font-size:10px; margin-right:6px; }
+
+.steps{ display:grid; gap:3px; }
+.step{ aspect-ratio:1/1; border-radius:6px; background:var(--bg-track); border:1.5px solid var(--line); position:relative; touch-action:manipulation; transition:transform .08s ease, filter .08s ease; }
+.step.pressed{ transform:scale(.88); filter:brightness(.92); }
+.step.beat{border-color:color-mix(in srgb, var(--text-dim) 70%, transparent);}
+.step.active{background:var(--track-color, var(--accent)); border-color:transparent;}
+.step.playhead{outline:2px solid var(--accent-text); outline-offset:1px;}
+.step.playhead.active{animation:pulse .18s ease-out;}
+@keyframes pulse{ 0%{transform:scale(1.12);} 100%{transform:scale(1);} }
+.step.open::after{ content:''; position:absolute; inset:27%; border-radius:50%; background:var(--bg-raised); }
+.melody-track .step.active{background:var(--violet);}
+.melody-note-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:7.5px; font-weight:700; color:#12131a; pointer-events:none; letter-spacing:-.2px; }
+
+/* MELODIE-TASTATUR (unten im Sequencer-Tab) */
+.keyboard-wrap{ flex:0 0 auto; border-top:1px solid var(--line); background:var(--bg-raised); padding:6px 8px; }
+.kb-head{ display:flex; align-items:center; justify-content:space-between; padding:2px 4px 6px; gap:6px; }
+.kb-head .kb-title{font-size:12px; font-weight:700; color:var(--text-dim); transition:color .15s;}
+.kb-head .kb-title.armed{ color:#fff; background:var(--accent); padding:4px 9px; border-radius:7px; }
+.kb-select{ background:var(--bg-track); color:var(--text); border:none; border-radius:8px; padding:5px 8px; font-size:12px; }
+.mode-seg{display:flex; gap:4px; background:var(--bg-track); border-radius:9px; padding:3px;}
+.mode-seg button{border:none; background:none; padding:5px 9px; border-radius:7px; font-size:11.5px; color:var(--text-dim); font-weight:600;}
+.mode-seg button.active{background:var(--accent); color:#fff;}
+.keys{ display:flex; gap:3px; height:72px; }
+.key{ flex:1; border-radius:7px; background:var(--bg-track); border:1px solid var(--line); display:flex; align-items:flex-end; justify-content:center; padding-bottom:5px; font-size:9px; color:var(--text-dim); font-weight:600; touch-action:none; }
+.key.pressed{background:var(--violet); color:#fff; border-color:var(--violet);}
+.key.black{background:var(--accent); color:var(--wzp-cfd0f5, #cfd0f5); border-color:var(--accent);}
+.key.black.pressed{background:var(--violet); border-color:var(--violet);}
+
+/* SPUR-REIHENFOLGE (Einstellungen-Tab) */
+.track-order-row{ display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); }
+.track-order-row:last-child{ border-bottom:none; }
+.track-order-row .track-color{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+.track-order-row .track-name{ font-size:13px; font-weight:700; flex:1; }
+.reorder-btns{ display:flex; gap:3px; }
+.reorder-btns button{ width:24px; height:24px; border-radius:7px; border:none; background:var(--bg-track); color:var(--accent-text); font-size:11px; }
+
+/* GEMEINSAME FORM-STYLES (Einstellungen-Tab) */
+.section-card{ margin:10px 8px 0; padding:14px; background:var(--bg-raised); border-radius:var(--radius); box-shadow:var(--shadow); }
+.section-card:last-child{ margin-bottom:10px; }
+.section-card h3{ font-size:12.5px; margin:0 0 8px; color:var(--text-dim); font-weight:700; text-transform:none; }
+.section-card h3:not(:first-child){ margin-top:16px; }
+.hint-text{ font-size:11.5px; color:var(--text-dim); margin:8px 0 0; line-height:1.45; }
+.field-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:2px 0;}
+.field-row label{font-size:13px; color:var(--text);}
+.seg{display:flex; gap:5px; background:var(--bg-track); border-radius:9px; padding:3px;}
+.seg button{border:none; background:none; padding:6px 12px; border-radius:7px; font-size:12.5px; color:var(--text-dim); font-weight:600;}
+.seg button.active{background:var(--accent); color:#fff;}
+input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:2px; background:var(--line); outline:none;}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:11px; height:22px; border-radius:2px;
+  background:var(--accent-text);
+  background-image:linear-gradient(var(--bg) 0, var(--bg) 1px, transparent 1px, transparent 2px, var(--bg) 2px, var(--bg) 3px, transparent 3px);
+  background-position:center; background-repeat:no-repeat;
+  border:1px solid rgba(0,0,0,.35);
+  box-shadow:0 1px 2px rgba(0,0,0,.5);
+  cursor:pointer;
+}
+.chain-row{display:flex; flex-wrap:wrap; gap:6px; padding:6px 0 2px;}
+.chain-chip{ padding:6px 12px; border-radius:9px; background:var(--accent); color:#fff; font-size:12.5px; font-weight:700; border:none; }
+.chain-add-row{display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
+.chain-add-row button{ flex:1 1 21%; border:none; border-radius:9px; padding:8px 0; font-size:12.5px; font-weight:700; background:var(--bg-track); color:var(--text); }
+.two-col{display:flex; gap:8px; margin-top:6px;}
+.two-col button{flex:1;}
+.wide-btn{ width:100%; border:none; border-radius:10px; padding:12px; background:var(--bg-track); color:var(--text); font-size:13.5px; font-weight:600; margin-top:8px; }
+.wide-btn.icon-label{ display:flex; align-items:center; justify-content:center; gap:8px; }
+.wide-btn.icon-label [data-icon]{ display:flex; flex:0 0 auto; }
+.tap-btn{ border:none; border-radius:10px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:800; padding:8px 14px; }
+.toggle-switch{ width:42px; height:24px; border-radius:12px; background:var(--bg-track); border:none; position:relative; flex:0 0 auto; }
+.toggle-switch .knob{ position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:var(--shadow); transition:left .15s; }
+.toggle-switch.on{background:var(--accent);}
+.toggle-switch.on .knob{left:20px;}
+
+/* MODALS (Projekte / Anleitung / Info) */
+.modal-overlay{ position:fixed; inset:0; background:rgba(20,25,50,.35); display:none; align-items:flex-end; justify-content:center; z-index:50; }
+.modal-overlay.show{display:flex;}
+.modal{ width:100%; max-width:480px; background:var(--bg-raised); border-radius:18px 18px 0 0; padding:16px 16px calc(16px + env(safe-area-inset-bottom)); max-height:82vh; overflow-y:auto; position:relative; }
+.modal h2{font-size:16px; margin:0 0 12px; color:var(--accent-text);}
+.modal-close{ position:absolute; top:10px; right:14px; background:none; border:none; color:var(--text-dim); display:flex; }
+
+/* CONFIRM DIALOG (kleiner, zentrierter Dialog für riskante Aktionen) */
+.confirm-overlay{ position:fixed; inset:0; background:rgba(20,25,50,.4); display:none; align-items:center; justify-content:center; z-index:60; padding:24px; }
+.confirm-overlay.show{display:flex;}
+.confirm-box{ width:100%; max-width:320px; background:var(--bg-raised); border-radius:16px; padding:18px 18px 14px; box-shadow:var(--shadow); }
+.confirm-box p{ font-size:14px; line-height:1.5; color:var(--text); margin:0 0 16px; }
+.confirm-actions{ display:flex; gap:8px; }
+.confirm-actions button{ flex:1; border:none; border-radius:10px; padding:11px 0; font-size:13.5px; font-weight:700; }
+.confirm-actions .confirm-cancel{ background:var(--bg-track); color:var(--text); }
+.confirm-actions .confirm-ok{ background:var(--danger); color:#fff; }
+.confirm-actions .confirm-ok.neutral{ background:var(--accent); }
+
+/* Sound-Editor pro Spur */
+.field-col{ padding:8px 0; }
+.field-col label{ display:flex; justify-content:space-between; font-size:13px; color:var(--text); margin-bottom:6px; }
+.field-col .field-val{ color:var(--accent-text); font-weight:700; }
+.field-col input[type="range"]{ width:100%; }
+
+/* TOAST (kurzes, nicht-blockierendes Feedback statt native alert()) */
+.toast-wrap{ position:fixed; left:0; right:0; top:calc(env(safe-area-inset-top) + 62px); display:flex; justify-content:center; z-index:90; pointer-events:none; }
+.toast{
+  max-width:88%; padding:10px 16px; border-radius:11px; background:var(--text); color:var(--bg);
+  font-size:13px; font-weight:600; box-shadow:var(--shadow); opacity:0; transform:translateY(-8px);
+  transition:opacity .18s ease, transform .18s ease; display:flex; align-items:center; gap:8px;
+}
+.toast.show{ opacity:1; transform:translateY(0); }
+.toast.error{ background:var(--danger-fill); color:#fff; }
+.toast.success::before{ content:''; display:inline-block; width:15px; height:15px; background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5l5 5 10-11'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5l5 5 10-11'/%3E%3C/svg%3E") center/contain no-repeat; vertical-align:-2px; }
+.toast.error::before{ content:'!'; font-weight:800; }
+.proj-row{ display:flex; align-items:center; gap:6px; padding:10px 4px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.proj-row .proj-name{flex:1; font-size:14px; min-width:80px;}
+.proj-row button{ border:none; border-radius:8px; padding:6px 10px; font-size:12px; background:var(--bg-track); color:var(--text); }
+.proj-row button.load{background:var(--accent); color:#fff;}
+.proj-row button.del{background:transparent; color:var(--danger);}
+.new-proj-row{ display:flex; gap:8px; margin-top:10px; }
+.new-proj-row input{ flex:1; background:var(--bg-track); border:1px solid var(--line); border-radius:8px; padding:9px 10px; color:var(--text); font-size:14px; }
+.new-proj-row button{ border:none; border-radius:8px; padding:0 14px; background:var(--accent); color:#fff; font-weight:700; font-size:13px; }
+.legal-text{font-size:13px; line-height:1.65; color:var(--text);}
+.legal-text h3{color:var(--accent-text); font-size:14.5px; margin:18px 0 6px;}
+.legal-text h3:first-child{margin-top:0;}
+.legal-text p{margin:4px 0; color:var(--text);}
+.legal-text ul{margin:4px 0; padding-left:18px;}
+.legal-text li{margin:3px 0; color:var(--text);}
+.legal-text strong{color:var(--accent-text);}
+</style>
+<style id="fw-familie">
+.fw-i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto;}
+
+/* FunWahr-Familienstil – bewusst in jede App kopiert (keine gemeinsame Datei),
+   damit jede App technisch eigenständig bleibt. */
+.fw-home{width:38px!important;height:38px!important;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;
+  background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;text-decoration:none!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);flex:0 0 auto;padding:0!important;font-size:0!important;backdrop-filter:none!important;}
+.fw-home svg{width:18px!important;height:18px!important;display:block;}
+.fw-home:active{transform:scale(.92);}
+.fw-title{background:linear-gradient(90deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-a742ff, #a742ff) 50%,#ff3caa)!important;-webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent;white-space:nowrap;text-shadow:none!important;}
+.fw-primary{background:linear-gradient(150deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-8e75f0, #8E75F0))!important;color:var(--wzp-0d0a1c, #0d0a1c)!important;border:none!important;text-shadow:none!important;
+  font-weight:800!important;box-shadow:0 6px 14px rgba(var(--wzq-5a2fbe, 90, 47, 190),.35)!important;}
+.fw-primary *{color:var(--wzp-0d0a1c, #0d0a1c)!important;}
+.fw-nowrap{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+html[data-theme="light"] .fw-home{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;box-shadow:0 3px 10px rgba(20,30,70,.12);}
+/* ===== FunWahr-Startstandard (in jeder App identisch) =====
+   Home oben links, App-Aktionen oben rechts, App-Icon + Titel + einzeiliger Untertitel,
+   einheitlicher Hauptknopf, „Impressum · Datenschutz“ unten. */
+.fw-s-bar{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;right:16px;z-index:70;
+  display:flex;align-items:center;justify-content:space-between;}
+.fw-s-bar .fw-s-actions{display:flex;gap:8px;}
+.fw-s-hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+.fw-s-icon{width:68px;height:68px;border-radius:17px;display:block;margin:0 auto 14px;
+  box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);}
+.fw-s-title{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif!important;
+  font-size:34px!important;font-weight:800!important;font-style:normal!important;letter-spacing:.005em!important;
+  line-height:1.15!important;margin:0 0 8px!important;padding:0!important;text-transform:none!important;text-align:center;}
+.fw-s-sub{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif!important;
+  font-size:15px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  color:rgba(var(--wzq-f1eefb, 241, 238, 251),.68)!important;margin:0 0 26px!important;line-height:1.45!important;
+  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+.fw-s-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:320px;
+  margin:0 auto!important;padding:15px 20px!important;border-radius:14px!important;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;font-size:16px!important;
+  font-weight:800!important;letter-spacing:.01em!important;text-transform:none!important;text-decoration:none!important;
+  white-space:nowrap;box-sizing:border-box;cursor:pointer;}
+.fw-s-btn:active{transform:scale(.98);}
+.fw-s-ghost{background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;
+  box-shadow:none!important;font-weight:700!important;text-shadow:none!important;}
+.fw-s-stack{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin:0 auto;}
+.fw-s-legal{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:auto;padding-top:22px;}
+.fw-s-legal--fixed{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:65;margin:0;padding:0;}
+.fw-s-legal a,.fw-s-legal button{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.6)!important;text-decoration:none!important;background:none!important;
+  border:none!important;box-shadow:none!important;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  padding:12px 6px!important;margin:0!important;min-height:0!important;width:auto!important;cursor:pointer;}
+.fw-s-legal span{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.32);font-size:13px;}
+html[data-theme="light"] .fw-s-sub{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal a,html[data-theme="light"] .fw-s-legal button{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal span{color:#9aa3c4;}
+html[data-theme="light"] .fw-s-ghost{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;}
+
+/* BeatWahr-Startbildschirm im Standard */
+.home-view{padding-top:calc(62px + env(safe-area-inset-top))!important;}
+.home-view #hubBtn{position:static!important;}
+.bw-start-main{margin:auto 0;padding-bottom:10px;}
+.home-view .fw-s-bar{z-index:5;}
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+
+<!-- ============ HOME VIEW ============ -->
+<div class="home-view" id="homeView">
+  <div class="fw-s-bar">
+    <a id="hubBtn" class="fw-home" href="./index.html#spiel" title="Zur WahrZentrale" aria-label="Zur WahrZentrale">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 11.5 12 4l9 7.5"/>
+        <path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6h3a1 1 0 0 0 1-1v-9"/>
+      </svg>
+    </a>
+  </div>
+  <div class="bw-start-main">
+    <div class="fw-s-hero">
+      <img class="fw-s-icon" src="bw-icon-192.png" alt="" width="68" height="68">
+      <h1 class="fw-title fw-s-title">BeatWahr</h1>
+      <p class="fw-s-sub">Rhythmus, Bass und Melodie mischen.</p>
+    </div>
+    <div class="fw-s-stack">
+      <button class="fw-s-btn fw-primary" id="tileSequencer">Beat bauen</button>
+      <button class="fw-s-btn fw-s-ghost" id="tileGuide">Anleitung</button>
+    </div>
+  </div>
+  <nav class="fw-s-legal" aria-label="Rechtliches">
+    <button type="button" id="tileInfo">Über</button><span>·</span><a href="./impressum.html">Impressum</a><span>·</span><a href="./datenschutz.html#bw">Datenschutz</a>
+  </nav>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app-shell" id="appShell">
+  <header>
+    <button id="homeBtn" data-icon="home" aria-label="Zur Startansicht"></button>
+    <div class="header-title">
+      <span class="name">BeatWahr</span>
+      <span class="sub" id="projLabel">Unbenanntes Projekt</span>
+    </div>
+    <button id="playBtn" data-icon="play" aria-label="Wiedergabe starten oder anhalten"></button>
+    <div class="bpm-mini">
+      <button id="bpmDown">–</button>
+      <span class="bpm-val num" id="bpmVal">100</span>
+      <button id="bpmUp">+</button>
+    </div>
+    <button id="undoBtn" title="Rückgängig" data-icon="undo"></button>
+  </header>
+
+  <!-- TAB: SEQUENCER -->
+  <div class="tab-content active" id="tab-seq">
+    <div class="pattern-bar">
+      <div class="pattern-tabs" id="patternTabs"></div>
+    </div>
+    <div class="tab-scroll">
+      <div class="seq-tracks" id="trackList"></div>
+    </div>
+    <div class="keyboard-wrap">
+      <div class="kb-head">
+        <span class="kb-title" id="kbTargetLabel">Melodie-Tastatur</span>
+        <select class="kb-select" id="octaveSelect">
+          <option value="2">Oktave 2</option>
+          <option value="3">Oktave 3</option>
+          <option value="4" selected>Oktave 4</option>
+          <option value="5">Oktave 5</option>
+          <option value="6">Oktave 6</option>
+        </select>
+      </div>
+      <div class="kb-head" style="padding-top:0;">
+        <div class="mode-seg" id="melodyModeSeg">
+          <button data-mode="single">Einzel</button>
+          <button data-mode="chord">Akkord</button>
+          <button data-mode="arp">Arp</button>
+        </div>
+        <div class="mode-seg" id="chordQualitySeg">
+          <button data-quality="major">Dur</button>
+          <button data-quality="minor">Moll</button>
+        </div>
+      </div>
+      <div style="font-size:10px; color:var(--text-dim); padding:0 4px 6px; text-align:right;">Dur/Moll wirkt auch auf den Pad-Akkord</div>
+      <div class="keys" id="keys"></div>
+    </div>
+  </div>
+
+  <!-- TAB: EINSTELLUNGEN -->
+  <div class="tab-content" id="tab-settings">
+    <div class="tab-scroll">
+
+      <div class="section-card">
+        <h3>Erscheinungsbild</h3>
+        <div class="seg" id="themeSeg">
+          <button data-val="light">Hell</button>
+          <button data-val="dark">Dunkel</button>
+        </div>
+        <p class="hint-text">Die Wahl bleibt beim nächsten Start erhalten.</p>
+      </div>
+
+      <div class="section-card">
+        <h3>Klangwelt</h3>
+        <div class="seg" id="soundThemeSeg">
+          <button data-val="beat">Beat</button>
+          <button data-val="sanft">Sanft</button>
+        </div>
+        <p class="hint-text">Beat: punchig · Sanft: weich</p>
+      </div>
+
+      <div class="section-card">
+        <h3>Tempo</h3>
+        <div class="field-row">
+          <label>Tap-Tempo</label>
+          <button class="tap-btn" id="tapBtn">TAP</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Pattern-Länge</h3>
+        <div class="seg" id="stepCountSeg">
+          <button data-val="8">8</button>
+          <button data-val="16">16</button>
+        </div>
+
+        <h3>Swing</h3>
+        <div class="field-row">
+          <input type="range" id="swingRange" min="0" max="75" value="0">
+          <span class="num" id="swingVal" style="min-width:34px; text-align:right; font-weight:700;">0%</span>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Song-Reihenfolge (Kette)</h3>
+        <div class="chain-row" id="chainRow"></div>
+        <div class="chain-add-row" id="chainAddRow"></div>
+      </div>
+
+      <div class="section-card">
+        <h3>Pattern kopieren</h3>
+        <div class="two-col">
+          <button class="wide-btn" id="copyPatternBtn">Pattern kopieren</button>
+          <button class="wide-btn" id="pastePatternBtn">Einfügen</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Spur-Reihenfolge</h3>
+        <div id="trackOrderList"></div>
+      </div>
+
+      <div class="section-card">
+        <h3>Reverb (Raumklang)</h3>
+        <div class="seg" id="reverbSizeSeg" style="margin-bottom:8px;">
+          <button data-val="room">Raum</button>
+          <button data-val="hall">Halle</button>
+        </div>
+        <div class="field-row">
+          <input type="range" id="reverbRange" min="0" max="100" value="25">
+          <span class="num" id="reverbVal" style="min-width:34px; text-align:right; font-weight:700;">25%</span>
+        </div>
+        <h3>Delay (Echo)</h3>
+        <div class="seg" id="delayToneSeg" style="margin-bottom:8px;">
+          <button data-val="bright">Hell</button>
+          <button data-val="dark">Dunkel</button>
+        </div>
+        <div class="field-row">
+          <input type="range" id="delayRange" min="0" max="100" value="15">
+          <span class="num" id="delayVal" style="min-width:34px; text-align:right; font-weight:700;">15%</span>
+        </div>
+        <h3>Metronom-Klick</h3>
+        <div class="field-row">
+          <label for="metroToggle">Klick auf jedes Viertel mitspielen</label>
+          <button class="toggle-switch" id="metroToggle"><span class="knob"></span></button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Projekt</h3>
+        <button class="wide-btn icon-label" id="saveBtn" style="margin-top:0;"><span data-icon="save"></span>Speichern</button>
+        <button class="wide-btn icon-label" id="projBtn"><span data-icon="folder"></span>Projekte verwalten</button>
+        <button class="wide-btn icon-label" id="exportAudioBtnMore"><span data-icon="export"></span>Als Audio exportieren</button>
+        <button class="wide-btn icon-label" id="resetProjectBtn" style="color:var(--danger-fill);"><span data-icon="reset"></span>Projekt zurücksetzen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar">
+    <button data-tab="seq" class="active"><span class="ticon" data-icon="tabSeq"></span><span>Sequencer</span></button>
+    <button data-tab="settings"><span class="ticon" data-icon="tabMore"></span><span>Einstellungen</span></button>
+  </nav>
+</div>
+
+<!-- PROJECTS MODAL -->
+<div class="modal-overlay" id="projModal">
+  <div class="modal">
+    <button class="modal-close" data-close="projModal" data-icon="close" aria-label="Schließen"></button>
+    <h2>Projekte</h2>
+    <div id="projList"></div>
+    <div class="new-proj-row">
+      <input type="text" id="newProjName" placeholder="Neuer Projektname" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">
+      <button id="createProjBtn">Anlegen</button>
+    </div>
+    <button class="wide-btn" id="importBtn">Projekt aus Datei importieren</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+    <button class="wide-btn icon-label" id="exportAudioBtn" style="margin-top:14px; background:var(--accent); color:#fff;"><span data-icon="export"></span>Aktuelles Pattern als Audio exportieren</button>
+    <p style="font-size:11.5px; color:var(--text-dim); margin:6px 2px 0;">Nimmt die Wiedergabe der Song-Kette einmal in Echtzeit auf und lädt sie als Audiodatei herunter (dauert also so lange wie das Stück selbst).</p>
+  </div>
+</div>
+
+<!-- INFO / LEGAL MODAL -->
+
+<div class="modal-overlay" id="infoModal">
+  <div class="modal">
+    <button class="modal-close" data-close="infoModal" data-icon="close" aria-label="Schließen"></button>
+    <h2>Über BeatWahr</h2>
+    <div class="legal-text">
+      <p>BeatWahr ist eine kostenlose Musikmaschine: Step-Sequencer für Rhythmen kombiniert mit einer spielbaren Melodie-Tastatur, Pattern-Ketten und Swing. Es gibt zwei umschaltbare Klangwelten ("Beat" und "Sanft") mit jeweils eigenem Klangcharakter und Farbschema. Alle Klänge werden direkt im Gerät per Web Audio Synthese erzeugt — es kommen keine fremden Samples, Loops oder Presets zum Einsatz.</p>
+      <p>Die App funktioniert vollständig offline und speichert Projekte ausschließlich lokal auf diesem Gerät.</p>
+      <h3>Rechtliches</h3>
+      <p>Impressum und Datenschutzerklärung gelten gemeinsam für die ganze WahrZentrale: <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html#bw">Datenschutz</a> · <a href="./lizenzen.html">Lizenzen</a></p>
+      <h3>Lizenzhinweis</h3>
+      <p>Alle in dieser App erzeugten Klänge sind eigenständig per Synthesizer-Code generiert. Es werden keine urheberrechtlich geschützten Samples, Sounds oder Kompositionen Dritter verwendet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE / ANLEITUNG MODAL -->
+<div class="modal-overlay" id="guideModal">
+  <div class="modal">
+    <button class="modal-close" data-close="guideModal" data-icon="close" aria-label="Schließen"></button>
+    <h2>Anleitung</h2>
+    <div class="legal-text">
+
+      <h3>Was ist BeatWahr?</h3>
+      <p>BeatWahr ist eine Musikmaschine mit zwei kombinierten Werkzeugen: einem <strong>Step-Sequencer</strong> für Rhythmus und Bass sowie einer <strong>Melodie-Tastatur</strong> zum Spielen und Einprogrammieren von Melodien. Alle Klänge entstehen live durch Synthese – es gibt keine Samples zum Herunterladen oder Kaufen.</p>
+
+      <h3>Die zwei Bereiche (Tab-Leiste unten)</h3>
+      <ul>
+        <li><strong>Sequencer</strong> – hier baust du den Rhythmus/die Noten Step für Step, spielst live auf der Tastatur und regelst pro Spur Lautstärke, Wellenform und FX</li>
+        <li><strong>Einstellungen</strong> – Klangwelt (Beat/Sanft), Tempo, Pattern-Länge, Swing, Song-Kette, globaler Reverb/Delay, Metronom, Projekte speichern/laden/exportieren</li>
+      </ul>
+      <p>Play, Tempo und Rückgängig-Machen sind im Header oben immer erreichbar, egal in welchem Bereich du gerade bist. Anleitung, „Über“, Impressum und Datenschutz findest du auf der Startseite (Haus-Symbol oben links).</p>
+
+      <h3>Die 8 Spuren</h3>
+      <p>Jedes Pattern hat acht Spuren, die gleichzeitig mischbar sind:</p>
+      <ul>
+        <li><strong>Kick</strong> – tiefe Basstrommel</li>
+        <li><strong>Snare</strong> – heller Schlag, das rhythmische Gegenstück zur Kick</li>
+        <li><strong>Hi-Hat</strong> – kurzer, heller Klick für den Grundpuls. Tippe zweimal für eine <strong>offene</strong> Hi-Hat (länger ausklingend, am Step als kleiner heller Ring zu erkennen), ein drittes Mal schaltet sie wieder aus.</li>
+        <li><strong>Clap</strong> – Klatsch-Sound, meist wie die Snare auf den Zählzeiten 2 und 4</li>
+        <li><strong>Perc</strong> – kurzer, heller Rimshot-artiger Akzent für zusätzlichen Groove</li>
+        <li><strong>Bass</strong> – tiefer, gehaltener Basston (fester Grundton), einfach an-/austippen wie bei den Drums</li>
+        <li><strong>Pad</strong> – warmer Hintergrund-Akkord (fester Dreiklang), einfach an-/austippen wie bei den Drums</li>
+        <li><strong>Melodie</strong> – frei spielbare/einprogrammierbare Tonspur (Lead), mit Akkord-/Arp-Modus</li>
+      </ul>
+      <p>Das sind also klassische Drums (Kick/Snare/Hi-Hat/Clap/Perc) plus Bass, Pad und Melodie – alles synthetisch erzeugt, nicht aus Aufnahmen.</p>
+
+      <h3>Rhythmus, Bass &amp; Pad programmieren</h3>
+      <p>Jede dieser Spuren zeigt ein Raster aus Steps (Kästchen). Ein Tippen aktiviert oder deaktiviert einen Step – bei Bass und Pad erklingt dabei immer ihr fester Grundton bzw. Akkord (wählbare Wellenform direkt an der Spur). Beim Abspielen wandert eine Markierung durch das Raster und löst bei jedem aktiven Step den passenden Klang aus.</p>
+
+      <h3>Melodie eingeben</h3>
+      <p>Tippe einen leeren Step in der Melodie-Spur an – er wird umrandet markiert. Drücke jetzt eine Taste auf der Tastatur unten: die Note wird in den Step geschrieben, die Markierung springt automatisch zum nächsten Step weiter. Ein Tippen auf einen bereits belegten Step löscht die Note wieder.</p>
+      <p>Hältst du eine Taste gedrückt, klingt der Ton, solange du hältst, und klingt beim Loslassen sanft aus – so kannst du auch frei spielen, ohne etwas aufzunehmen.</p>
+
+      <h3>Akkord-, Arp- &amp; Dur/Moll-Modus</h3>
+      <p>Über „Einzel / Akkord / Arp" stellst du ein, wie die Tastatur auf der Melodie-Spur reagiert: <strong>Einzel</strong> spielt nur die gedrückte Note, <strong>Akkord</strong> erzeugt automatisch einen Dreiklang, <strong>Arp</strong> spielt diesen Dreiklang als schnelle Tonfolge. Mit <strong>Dur / Moll</strong> legst du fest, ob Dreiklänge hell oder dunkel klingen – das wirkt auf die Melodie-Tastatur und zusätzlich auf den festen Pad-Akkord (Pad wechselt dann ebenfalls zwischen Dur und Moll).</p>
+
+      <h3>Feinregler direkt an der Spur</h3>
+      <p>Jede Spur zeigt Lautstärke als Plus/Minus-Regler (in 5%-Schritten) sowie die Knöpfe <strong>M</strong> (Stumm) und <strong>S</strong> (Solo). Bei Bass/Pad/Melodie steht rechts zusätzlich eine Wellenform-Auswahl (Sinus, Dreieck, Sägezahn, Rechteck, Puls, Orgel) – direkt sichtbar, ohne Pop-up. Die Spur-Reihenfolge änderst du im Einstellungen-Tab unter „Spur-Reihenfolge" per Pfeil-Knöpfen.</p>
+
+      <h3>Patterns A–H &amp; Song-Kette</h3>
+      <p>Ein Projekt besitzt acht unabhängige Patterns (A–H), umschaltbar über die Reiter oberhalb der Spuren im Sequencer. Im Einstellungen-Tab stellst du unter „Song-Reihenfolge" zusammen, in welcher Reihenfolge die Patterns beim Abspielen ablaufen (z. B. A–A–B–A).</p>
+
+      <h3>Pattern-Länge &amp; Swing</h3>
+      <p>Ebenfalls im Einstellungen-Tab: die Anzahl der Steps pro Pattern (8 oder 16) sowie der Swing-Regler, der ungerade Steps leicht verzögert und den Rhythmus dadurch lockerer/menschlicher klingen lässt (gilt immer für alle Spuren gleichzeitig).</p>
+
+      <h3>Reverb, Delay &amp; Metronom</h3>
+      <p>Ebenfalls im Einstellungen-Tab: <strong>Reverb</strong> legt einen dezenten Raumklang über alle Spuren (wählbar zwischen "Raum" und "Halle"), <strong>Delay</strong> fügt ein rhythmisches Echo hinzu (Zeit automatisch ans Tempo gekoppelt, Klangfarbe wählbar zwischen "Hell" und "Dunkel"). Der <strong>Metronom-Klick</strong> spielt beim Abspielen einen leisen Klick auf jedes Viertel.</p>
+
+      <h3>Sound-Editor pro Spur</h3>
+      <p>Das kleine Regler-Symbol neben jeder Spur öffnet den Sound-Editor: dort lässt sich die <strong>Balance</strong> (links/rechts) und der <strong>Nachhall-</strong> sowie <strong>Echo-Anteil</strong> für jede Spur einzeln einstellen (z. B. um den Nachhall bei der Melodie-Tastatur zu reduzieren), bei den Drum-Spuren zusätzlich <strong>Tonhöhe</strong> und <strong>Länge</strong>, bei Bass/Pad/Melodie die <strong>Klangfarbe</strong> (dunkel/hell).</p>
+
+      <h3>Automatisches Zwischenspeichern</h3>
+      <p>BeatWahr sichert deinen aktuellen Stand automatisch im Hintergrund (auch ohne "Speichern"-Tipp), damit beim versehentlichen Schließen nichts verloren geht. Beim nächsten Öffnen wird ein nicht gespeicherter Stand zur Wiederherstellung angeboten.</p>
+
+      <h3>Rückgängig</h3>
+      <p>Der Rückgängig-Knopf im Header macht die letzten Änderungen rückgängig – Steps/Noten, Lautstärke, Wellenform und Spur-Reihenfolge (bis zu 20 Schritte zurück).</p>
+
+      <h3>Audio-Export</h3>
+      <p>Im Einstellungen-Tab unter „Projekte verwalten" findest du „Aktuelles Pattern als Audio exportieren". BeatWahr spielt dabei die komplette Song-Kette einmal in Echtzeit ab und lädt sie danach als Audiodatei herunter – der Export dauert also so lange wie das Stück selbst.</p>
+
+      <h3>Projekte speichern, laden, exportieren</h3>
+      <p>Im Einstellungen-Tab: „Speichern" sichert den aktuellen Stand, „Projekte verwalten" lädt/löscht gespeicherte Projekte oder exportiert/importiert sie als Datei – praktisch für ein Backup oder um ein Projekt auf ein anderes Gerät zu übertragen. „Projekt zurücksetzen" leert mit einem Klick alle Patterns und Einstellungen des <strong>aktuell offenen</strong> Projekts auf den Ausgangszustand (fragt vorher nach, und ist direkt danach per Rückgängig-Pfeil wieder herstellbar) – bereits gespeicherte Projekte bleiben davon unberührt.</p>
+
+      <h3>Offline &amp; Datenschutz</h3>
+      <p>BeatWahr läuft komplett offline und speichert ausschließlich lokal auf deinem Gerät. Es werden keine Daten übertragen, außer du exportierst ein Projekt selbst als Datei.</p>
+
+      <h3>Zur Startseite zurückkehren</h3>
+      <p>Über das Haus-Symbol oben links kommst du jederzeit zur Startseite zurück, ohne dass dein aktueller Stand verloren geht. Dort findest du auch jederzeit „Anleitung“, „Über“, „Impressum“ und „Datenschutz“.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SOUND-EDITOR PRO SPUR -->
+<div class="modal-overlay" id="soundModal">
+  <div class="modal">
+    <button class="modal-close" data-close="soundModal" data-icon="close" aria-label="Schließen"></button>
+    <h2 id="soundModalTitle">Sound bearbeiten</h2>
+    <div id="soundModalBody"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG (für riskante Aktionen wie Löschen) -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmText">Wirklich löschen?</p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirmCancelBtn">Abbrechen</button>
+      <button class="confirm-ok" id="confirmOkBtn">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="bw-app.js"></script>
+<script>/* FunWahr: Zeitstempel für „Zuletzt gespielt“ auf der Startseite (nur dieser eine Wert) */try{localStorage.setItem('funwahr-zuletzt-bw',String(Date.now()));}catch(e){}</script>
+<script>
+/* Startbildschirm: „Datenschutz“ öffnet die Info-Ansicht direkt beim Abschnitt Datenschutz */
+(function(){
+  var b=document.getElementById('bwLegalDs'); if(!b) return;
+  b.addEventListener('click',function(){
+    var i=document.getElementById('tileInfo'); if(i) i.click();
+    setTimeout(function(){
+      var h=document.getElementById('bwDatenschutz'); if(!h) return;
+      var m=h.closest('.modal'); while(m && m.scrollHeight<=m.clientHeight+2) m=m.parentElement && m.parentElement.closest('.modal-overlay, .modal');
+      if(m) m.scrollTop += h.getBoundingClientRect().top - m.getBoundingClientRect().top - 16;
+      window.scrollTo(0,0);
+    },60);
+  });
+})();
+</script>
+</body>
+</html>

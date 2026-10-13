@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Himmels-Kompass – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>Himmels-Kompass</h1>
+    <p class="hw-sub">Wo stehen Sonne, Mond und Planeten gerade?</p>
+  </div>
+
+  <div class="hw-card">
+    <h2>Jetzt am Himmel</h2>
+    <svg class="hw-compass-rose" id="hw-rose" viewBox="-110 -110 220 220" role="img" aria-label="Kompassrose mit Richtung von Sonne, Mond und Planeten"></svg>
+    <div id="hw-now-list" style="margin-top:10px;"></div>
+    <p style="font-size:12px;margin:8px 0 0;">So liest du die Rose: Oben ist Norden. Je weiter außen ein Punkt, desto tiefer steht er – der Außenring ist der Horizont, die Mitte liegt genau über dir. Berechnet auf deinem Gerät aus Datum, Uhrzeit und Standort.</p>
+  </div>
+
+  <div class="hw-card">
+    <h2>Kamera-Ansicht</h2>
+    <p>Halte dein Smartphone hoch: Die Kamera zeigt den Himmel, darüber erscheinen Sonne, Mond, Planeten, helle Sterne und Sternbilder dort, wo sie tatsächlich stehen. Das Kamerabild wird nicht gespeichert und nicht übertragen.</p>
+    <p><strong>Sicherheit:</strong> Blicke niemals direkt in die Sonne – auch nicht durch Ferngläser. Richte dich nach dem Bildschirm, nicht nach dem Himmel.</p>
+    <button class="hw-btn primary" id="hwk-start-btn" style="margin:6px 0 0;">Kamera-Ansicht starten</button>
+    <p id="hwk-error" style="color:var(--red-fg);display:none;margin-top:12px;"></p>
+  </div>
+
+  <div class="hw-card" id="sonnenbahn" style="scroll-margin-top:16px;">
+    <h2>Sonnenbahn</h2>
+    <p>Legt die heutige Bahn der Sonne über das Kamerabild – mit Gradnetz, Stundenmarken, Aufgang, Höchststand und Untergang. So siehst du vor Ort, wann Terrasse, Balkon oder Garten Sonne haben und wann die Sonne hinter einem Haus oder Baum verschwindet.</p>
+    <p>Der Kompass des Smartphones kann einige Grad abweichen; über „Kalibrieren“ gleichst du die Richtung an. Die Darstellung ist eine Orientierung, keine Vermessung. Die Uhrzeiten gelten in der Zeitzone deines Smartphones. Blicke niemals direkt in die Sonne.</p>
+    <button class="hw-btn primary" id="hwk-sun-btn" style="margin:6px 0 0;">Sonnenbahn starten</button>
+  </div>
+
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<div class="hw-ar" id="hw-ar" role="dialog" aria-label="Kamera-Ansicht des Himmels">
+  <video id="hwk-video" autoplay playsinline muted></video>
+  <canvas id="hwk-canvas"></canvas>
+  <div class="hw-ar-top">
+    <button type="button" class="hw-ar-btn" id="hwk-close">Schließen</button>
+    <span class="hw-ar-title" id="hwk-title" aria-hidden="true">Sonnenbahn</span>
+    <button type="button" class="hw-ar-btn" id="hwk-cal-btn">Kalibrieren</button>
+  </div>
+  <div class="hw-ar-info" id="hwk-info">Langsam drehen und das Handy neigen.</div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('hw-kompass.html');
+
+/* ---------- Statische Übersicht (ohne Sensoren) ---------- */
+function hwRenderRose(objs){
+  var svg = document.getElementById('hw-rose');
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  /* Außenring = Horizont (0°), Innenring = 45° Höhe, Mitte = Zenit (genau über dir) */
+  var s = '<circle cx="0" cy="0" r="78" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="1"/><circle cx="0" cy="0" r="39" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-width="1" stroke-dasharray="2 3"/>' +
+    '<path d="M-3 0h6M0 -3v6" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/>' +
+    '<g font-size="7.5" fill="currentColor" fill-opacity=".55" text-anchor="middle"><text x="0" y="10.5">Zenit</text><text x="0" y="-41.5">45°</text><text x="27" y="-74.5">Horizont</text></g>';
+  /* Hindernisse (Rechtecke), die Beschriftungen nicht überdecken dürfen – auch die Ringbeschriftung */
+  var boxes = [{ x0: -11, x1: 11, y0: 3, y1: 12 }, { x0: -8, x1: 8, y0: -48, y1: -39 }, { x0: 11, x1: 44, y0: -81, y1: -72 }];
+  [['N',0],['O',90],['S',180],['W',270]].forEach(function(d){
+    var a = hwDeg2rad(d[1]), tx = Math.sin(a) * 96, ty = -Math.cos(a) * 96;
+    s += '<text x="' + tx.toFixed(1) + '" y="' + (ty + 5).toFixed(1) + '" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">' + d[0] + '</text>';
+    boxes.push({ x0: tx - 7, x1: tx + 7, y0: ty - 7, y1: ty + 7 });
+  });
+  /* Reihenfolge: Sonne, Mond, dann Planeten nach Helligkeit der Position (höher zuerst) */
+  var rank = { sun: 0, moon: 1 };
+  var vis = objs.filter(function(o){ return o.altitude >= 0; }).map(function(o){
+    var r = 78 * (1 - hwClamp01(o.altitude / 90));
+    var a = hwDeg2rad(o.azimuth);
+    var big = o.type === 'sun' || o.type === 'moon';
+    return { o: o, x: Math.sin(a) * r, y: -Math.cos(a) * r, dr: big ? 7 : 4.5,
+      col: o.type === 'sun' ? (dark ? '#F0C871' : '#E0A020') : (o.type === 'moon' ? (dark ? '#D8D0FA' : '#8C84B8') : (dark ? '#B6ABE8' : '#4B3F72')) };
+  }).sort(function(a, b){
+    var ra = rank[a.o.type] != null ? rank[a.o.type] : 2, rb = rank[b.o.type] != null ? rank[b.o.type] : 2;
+    return ra - rb || b.o.altitude - a.o.altitude;
+  });
+  vis.forEach(function(v){ boxes.push({ x0: v.x - v.dr - 1, x1: v.x + v.dr + 1, y0: v.y - v.dr - 1, y1: v.y + v.dr + 1 }); });
+  /* Punkte: größere zuerst, damit kleine darüber sichtbar bleiben; Rand trennt sich überlagernde Punkte */
+  vis.slice().sort(function(a, b){ return b.dr - a.dr; }).forEach(function(v){
+    s += '<circle cx="' + v.x.toFixed(1) + '" cy="' + v.y.toFixed(1) + '" r="' + v.dr + '" fill="' + v.col + '" stroke="var(--card-solid, #fff)" stroke-opacity=".9" stroke-width="1.2"/>';
+  });
+  function overlap(b){
+    var sum = 0;
+    for(var i = 0; i < boxes.length; i++){
+      var c = boxes[i];
+      var w = Math.min(b.x1, c.x1) - Math.max(b.x0, c.x0), h = Math.min(b.y1, c.y1) - Math.max(b.y0, c.y0);
+      if(w > 0 && h > 0) sum += w * h;
+    }
+    return sum;
+  }
+  var dirs = [[1,0],[-1,0],[0,-1],[0,1],[0.8,-0.8],[-0.8,-0.8],[0.8,0.8],[-0.8,0.8]];
+  var labels = '', lines = '';
+  vis.forEach(function(v){
+    var name = v.o.name, w = name.length * 6.3 + 2, h = 12;
+    var best = null;
+    for(var step = 0; step < 6 && !(best && best.cost === 0); step++){
+      var extra = step * 7;
+      for(var k = 0; k < dirs.length; k++){
+        var ux = dirs[k][0], uy = dirs[k][1];
+        var cx = v.x + ux * (v.dr + 3 + extra + w / 2), cy = v.y + uy * (v.dr + 2 + extra + h / 2);
+        var b = { x0: cx - w / 2, x1: cx + w / 2, y0: cy - h / 2, y1: cy + h / 2 };
+        if(b.x0 < -109 || b.x1 > 109 || b.y0 < -109 || b.y1 > 109) continue;
+        var cost = overlap(b) * 10 + step * 3 + k * 0.1;
+        if(overlap(b) === 0) cost = step * 3 + k * 0.1;
+        if(!best || cost < best.cost) best = { cx: cx, cy: cy, b: b, cost: cost, far: step > 0 };
+        if(overlap(b) === 0) break;
+      }
+      if(best && overlap(best.b) === 0) break;
+    }
+    if(!best){ best = { cx: v.x + v.dr + 3 + w / 2, cy: v.y, b: null, far: false }; }
+    if(best.b) boxes.push({ x0: best.b.x0 - 1.5, x1: best.b.x1 + 1.5, y0: best.b.y0 - 1, y1: best.b.y1 + 1 });
+    if(best.far){
+      /* dünne Hinweislinie vom Punkt zum nächstgelegenen Rand der Beschriftung */
+      var ex = Math.max(best.b.x0, Math.min(v.x, best.b.x1)), ey = Math.max(best.b.y0, Math.min(v.y, best.b.y1));
+      var dx = ex - v.x, dy = ey - v.y, dl = Math.sqrt(dx * dx + dy * dy) || 1;
+      lines += '<line x1="' + (v.x + dx / dl * v.dr).toFixed(1) + '" y1="' + (v.y + dy / dl * v.dr).toFixed(1) + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) + '" stroke="currentColor" stroke-opacity=".45" stroke-width=".8"/>';
+    }
+    labels += '<text x="' + best.cx.toFixed(1) + '" y="' + (best.cy + 3.9).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor">' + name + '</text>';
+  });
+  svg.innerHTML = s + lines + labels;
+  svg.style.color = 'var(--text)';
+}
+function hwRenderNowList(){
+  var c = hwSkyCoords();
+  var objs = hwSkyObjects(new Date(), c.lat, c.lon, false, { refract: true }).filter(function(o){ return o.type === 'sun' || o.type === 'moon' || (o.type === 'planet' && o.nakedEye); });
+  hwRenderRose(objs);
+  document.getElementById('hw-now-list').innerHTML = objs.map(function(o){
+    var up = o.altitude > 0;
+    return '<div class="hw-obj"><span><strong>' + o.name + '</strong>' + (up ? '' : '<small>unter dem Horizont</small>') + '</span><span class="r">' +
+      (up ? hwCompassWord(o.azimuth) + ' · ' + Math.round(o.azimuth) + '°<br>Höhe ' + Math.round(o.altitude) + '°' : '–') + '</span></div>';
+  }).join('');
+}
+
+/* ---------- Kamera-Ansicht ---------- */
+var AR = { on: false, stream: null, raf: 0, raw: null, absSeen: false, smQ: null, curHeading: 0, curPitch: 0, objs: [], lastCalc: 0, lat: 51, lon: 10, cal: { yaw: 0, fov: 68 }, lines: null, byName: {}, lastInfo: '' };
+try{ var c0 = JSON.parse(localStorage.getItem('hw-kompass-cal')); if(c0 && typeof c0.yaw === 'number' && typeof c0.fov === 'number') AR.cal = c0; }catch(e){}
+function arSaveCal(){ try{ localStorage.setItem('hw-kompass-cal', JSON.stringify(AR.cal)); }catch(e){} }
+function arErr(msg){ var el = document.getElementById('hwk-error'); el.textContent = msg; el.style.display = 'block'; }
+
+function arStoreOri(e, ok){
+  AR.raw = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, webkit: (e.webkitCompassHeading != null ? e.webkitCompassHeading : null), ok: ok };
+}
+function arOnAbs(e){ if(e.alpha == null) return; AR.absSeen = true; arStoreOri(e, true); }
+function arOnOri(e){
+  if(e.beta == null) return;
+  if(e.webkitCompassHeading != null){ arStoreOri(e, true); return; }
+  if(AR.absSeen) return;
+  arStoreOri(e, e.absolute === true);
+}
+/* ---------- Quaternion-Hilfsfunktionen ---------- */
+function hwQuatFromAngles(alphaDeg, betaDeg, gammaDeg){
+  var _z = hwDeg2rad(alphaDeg || 0), _x = hwDeg2rad(betaDeg || 0), _y = hwDeg2rad(gammaDeg || 0);
+  var cX = Math.cos(_x / 2), cY = Math.cos(_y / 2), cZ = Math.cos(_z / 2);
+  var sX = Math.sin(_x / 2), sY = Math.sin(_y / 2), sZ = Math.sin(_z / 2);
+  return [
+    sX * cY * cZ - cX * sY * sZ,
+    cX * sY * cZ + sX * cY * sZ,
+    cX * cY * sZ + sX * sY * cZ,
+    cX * cY * cZ - sX * sY * sZ
+  ];
+}
+function hwQuatMul(a, b){
+  return [
+    a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+    a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+    a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+    a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]
+  ];
+}
+function hwQuatFromAxisAngle(axis, rad){
+  var s = Math.sin(rad / 2);
+  return [axis[0] * s, axis[1] * s, axis[2] * s, Math.cos(rad / 2)];
+}
+function hwQuatNormalize(q){
+  var n = Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]) || 1;
+  return [q[0] / n, q[1] / n, q[2] / n, q[3] / n];
+}
+function hwQuatSlerp(a, b, t){
+  var ax = a[0], ay = a[1], az = a[2], aw = a[3], bx = b[0], by = b[1], bz = b[2], bw = b[3];
+  var dot = ax * bx + ay * by + az * bz + aw * bw;
+  if(dot < 0){ bx = -bx; by = -by; bz = -bz; bw = -bw; dot = -dot; }
+  if(dot > 0.9995) return hwQuatNormalize([ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t, aw + (bw - aw) * t]);
+  var theta0 = Math.acos(Math.min(1, dot)), theta = theta0 * t;
+  var sinTheta0 = Math.sin(theta0), sinTheta = Math.sin(theta);
+  var s0 = Math.cos(theta) - dot * sinTheta / sinTheta0, s1 = sinTheta / sinTheta0;
+  return [ax * s0 + bx * s1, ay * s0 + by * s1, az * s0 + bz * s1, aw * s0 + bw * s1];
+}
+function hwQuatRotate(q, v){
+  var qx = q[0], qy = q[1], qz = q[2], qw = q[3];
+  var vx = v[0], vy = v[1], vz = v[2];
+  var tx = 2 * (qy * vz - qz * vy), ty = 2 * (qz * vx - qx * vz), tz = 2 * (qx * vy - qy * vx);
+  return [
+    vx + qw * tx + (qy * tz - qz * ty),
+    vy + qw * ty + (qz * tx - qx * tz),
+    vz + qw * tz + (qx * ty - qy * tx)
+  ];
+}
+
+/* Kamera-Orientierung als Quaternion aus den rohen Sensorwinkeln, statt getrennter Kompass-/Neigungs-/Roll-Winkel.
+   Das vermeidet den Gimbal-Lock der alten Euler-Formel: dort wurde der Kompasskurs genau dann numerisch instabil,
+   wenn die Kamera nahe am Zenit (senkrecht über Kopf) oder Nadir zeigte, und das Bild "kippte" plötzlich weg.
+   Ein Quaternion hat diese Polstelle nicht, die Drehung bleibt beim Überkopf-Schwenk durchgehend glatt. */
+/* Ruhige Kompassrichtung: Der Magnetkompass rauscht um mehrere Grad, die Drehsensoren (Gyroskop) sind
+   dagegen ruhig, kennen aber Norden nicht. Deshalb trägt das Gyroskop die Bewegung, und der Kompass
+   liefert nur den Versatz dazu – stark geglättet, bei großer Abweichung schnell nachgeführt.
+   Im Ruhezustand ergibt sich exakt dieselbe Richtung wie zuvor, nur ohne Zittern. */
+function arMakeYawOffset(){
+  var cur = null, fast = 0, last = 0;
+  var w = function(d){ return ((d + 540) % 360) - 180; };
+  return function(target, now){
+    if (cur === null || !(now - last < 1000)) { cur = fast = target; last = now; return cur; }
+    var dt = Math.max(0, now - last); last = now;
+    // 1. Stufe: Kompassrauschen herausmitteln (ca. 0,25 s)
+    fast = (fast + w(target - fast) * (1 - Math.exp(-dt / 250)) + 360) % 360;
+    // 2. Stufe: dem beruhigten Wert nachführen – je größer die bleibende Abweichung, desto schneller
+    var bias = w(fast - cur), a = Math.abs(bias);
+    var tau = a > 20 ? 100 : a > 6 ? 300 : a > 2.5 ? 700 : 2000;
+    cur = (cur + bias * (1 - Math.exp(-dt / tau)) + 360) % 360;
+    return cur;
+  };
+}
+var arYawOffset = arMakeYawOffset();
+function arAttitude(){
+  var r = AR.raw;
+  if(!r || r.beta == null) return null;
+  var alphaEff;
+  if(r.webkit != null){
+    // Smartphone: Gyroskop-Winkel trägt die Bewegung, der Kompass liefert nur den geglätteten Versatz dazu.
+    // Der Versatz wird aus der tatsächlichen Blickrichtung berechnet (wie im Sternenhimmel), nicht aus alpha:
+    // alpha ist bei senkrecht gehaltenem Gerät (beta ≈ 90°) numerisch instabil und ließ das Bild zittern.
+    var gyroYaw = typeof r.alpha === 'number' && !isNaN(r.alpha);
+    var alpha0 = gyroYaw ? r.alpha : 0;
+    var q0 = hwQuatFromAngles(alpha0, r.beta, r.gamma || 0);
+    var f0 = hwQuatRotate(q0, [0, 0, -1]);                      // Rückkamera
+    var ref = Math.abs(f0[2]) < 0.7 ? f0 : hwQuatRotate(q0, [0, 1, 0]); // aufrecht: Kamera, sonst Oberkante
+    var h0 = hwWrap360(hwRad2deg(Math.atan2(ref[0], ref[1])));
+    var d = hwWrap360(r.webkit - h0);
+    if(gyroYaw) d = arYawOffset(d, performance.now());
+    alphaEff = hwWrap360(alpha0 - d);
+  } else alphaEff = (r.alpha || 0);
+  var dq = hwQuatFromAngles(alphaEff, r.beta, r.gamma || 0);
+  var ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0);
+  ang = ((ang % 360) + 360) % 360;
+  var sq = hwQuatFromAxisAngle([0, 0, 1], hwDeg2rad(-ang));
+  return { q: hwQuatNormalize(hwQuatMul(dq, sq)), ok: r.ok };
+}
+function arSmooth(t){
+  // Zeitbasierte Glättung (ca. 60 ms) – wirkt bei 60 Hz und 120 Hz (ProMotion) gleich stark
+  var now = performance.now();
+  if(!AR.smQ){ AR.smQ = t.q; AR.smT = now; return; }
+  var dt = Math.min(200, Math.max(0, now - (AR.smT || now))); AR.smT = now;
+  AR.smQ = hwQuatSlerp(AR.smQ, t.q, 1 - Math.exp(-dt / 60));
+}
+function arRecalc(){
+  var now = Date.now();
+  if(now - AR.lastCalc < 5000 && AR.objs.length) return;
+  AR.lastCalc = now;
+  var list = hwSkyObjects(new Date(), AR.lat, AR.lon, false, { refract: true });
+  AR.byName = {};
+  AR.objs = list.filter(function(o){
+    var show = (o.type === 'star' && (o.mag <= 2.2 || o.con)) || o.type !== 'star';
+    if(o.altitude < -3) show = false;
+    return show;
+  });
+  list.forEach(function(o){ AR.byName[o.name] = o; });
+}
+/* Heutige Sonnenbahn (alle 10 Minuten, Ortszeit des Geräts) mit Aufgang, Höchststand und Untergang */
+function arSunPath(){
+  var now = new Date(), key = now.toDateString() + '|' + AR.lat.toFixed(2) + '|' + AR.lon.toFixed(2);
+  if(AR.sunCache && AR.sunCache.key === key) return AR.sunCache;
+  var y = now.getFullYear(), mo = now.getMonth(), d = now.getDate(), pts = [], culm = null, m, sp;
+  for(m = 0; m <= 1440; m += 10){
+    sp = hwSunPosition(new Date(y, mo, d, 0, m), AR.lat, AR.lon);
+    pts.push({ az: sp.azimuth, alt: sp.altitude, min: m, v: arVec(sp.azimuth, sp.altitude) });
+  }
+  for(m = 0; m < 1440; m++){
+    sp = hwSunPosition(new Date(y, mo, d, 0, m), AR.lat, AR.lon);
+    if(!culm || sp.altitude > culm.alt) culm = { az: sp.azimuth, alt: sp.altitude, min: m };
+  }
+  function at(ms){
+    if(ms == null) return null;
+    var t = new Date(ms), p = hwSunPosition(t, AR.lat, AR.lon);
+    return { az: p.azimuth, alt: 0, min: t.getHours() * 60 + t.getMinutes() };
+  }
+  var ev = hwDayEvents(new Date(y, mo, d).getTime(), AR.lat, AR.lon);
+  AR.sunCache = { key: key, pts: pts, rise: at(ev.sunrise), set: at(ev.sunset), culm: culm.alt > 0 ? culm : null };
+  return AR.sunCache;
+}
+function arHm(min){ var h = Math.floor(min / 60) % 24, m = min % 60; return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; }
+function arVec(az, alt){
+  var A = hwDeg2rad(az), L = hwDeg2rad(alt);
+  return [Math.sin(A) * Math.cos(L), Math.cos(A) * Math.cos(L), Math.sin(L)];
+}
+function arDot(a, b){ return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+function arDraw(){
+  if(!AR.on) return;
+  AR.raf = requestAnimationFrame(arDraw);
+  var cv = document.getElementById('hwk-canvas'), ctx = cv.getContext('2d');
+  var dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+  if(cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)){ cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  var att = arAttitude();
+  if(!att){ ctx.fillStyle = '#fff'; ctx.font = '600 15px -apple-system,sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Warte auf Bewegungssensor …', W / 2, H / 2); return; }
+  arSmooth(att);
+  arRecalc();
+  var rawFw = hwQuatRotate(AR.smQ, [0, 0, -1]);
+  AR.curHeading = hwWrap360(hwRad2deg(Math.atan2(rawFw[0], rawFw[1])));
+  AR.curPitch = hwRad2deg(Math.asin(Math.max(-1, Math.min(1, rawFw[2]))));
+  var qCal = hwQuatFromAxisAngle([0, 0, 1], hwDeg2rad(-AR.cal.yaw));
+  var qView = hwQuatNormalize(hwQuatMul(qCal, AR.smQ));
+  var fw = hwQuatRotate(qView, [0, 0, -1]);
+  var rt = hwQuatRotate(qView, [1, 0, 0]);
+  var up = hwQuatRotate(qView, [0, 1, 0]);
+  var video = document.getElementById('hwk-video');
+  var vw = video.videoWidth || 0, vh = video.videoHeight || 0;
+  if(vw && ((vw > vh) !== (W > H))){ var tt = vw; vw = vh; vh = tt; }
+  var fpx = vw ? (Math.max(vw, vh) / 2) / Math.tan(hwDeg2rad(AR.cal.fov) / 2) * Math.max(W / vw, H / vh)
+               : (Math.max(W, H) / 2) / Math.tan(hwDeg2rad(AR.cal.fov) / 2);
+  function proj(az, alt){
+    var e = arVec(az, alt), zc = arDot(e, fw);
+    if(zc < 0.05) return null;
+    return { x: W / 2 + fpx * arDot(e, rt) / zc, y: H / 2 - fpx * arDot(e, up) / zc };
+  }
+  function label(txt, x, y, size, color){
+    ctx.font = '600 ' + size + 'px -apple-system,sans-serif';
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(10,8,30,0.75)'; ctx.strokeText(txt, x, y);
+    ctx.fillStyle = color || '#fff'; ctx.fillText(txt, x, y);
+  }
+  var sunMode = AR.mode === 'sun', DARK = 'rgba(10,8,30,', GRID = 'rgba(226,220,255,', GOLD = '#FFD27A';
+  var MONO = 'ui-monospace, Menlo, -apple-system, sans-serif';
+  var viewAz = hwWrap360(AR.curHeading + AR.cal.yaw);
+  /* Messschrift: schmale Ziffern mit dunkler Kontur, ohne Schild */
+  function mono(txt, x, y, size, col, align){
+    ctx.font = '600 ' + size + 'px ' + MONO; ctx.textAlign = align || 'center';
+    ctx.lineWidth = 3; ctx.strokeStyle = DARK + '0.8)'; ctx.lineJoin = 'round'; ctx.strokeText(txt, x, y);
+    ctx.fillStyle = col; ctx.fillText(txt, x, y);
+  }
+  function line(pts){
+    var prev = null; ctx.beginPath();
+    pts.forEach(function(q){
+      if(!q){ prev = null; return; }
+      if(prev && Math.hypot(q.x - prev.x, q.y - prev.y) < Math.max(W, H)) ctx.lineTo(q.x, q.y); else ctx.moveTo(q.x, q.y);
+      prev = q;
+    });
+    ctx.stroke();
+  }
+  function inView(q, pad){ return q && q.x > -pad && q.x < W + pad && q.y > -pad && q.y < H + pad; }
+  var gi, gj, gp;
+  if(sunMode){
+    /* Gradnetz: Höhenkreise alle 10 Grad, Azimutlinien alle 30 Grad */
+    ctx.lineWidth = 1; ctx.setLineDash([2, 6]);
+    for(gi = 10; gi <= 80; gi += 10){
+      ctx.strokeStyle = GRID + (gi % 30 === 0 ? '0.5)' : '0.28)');
+      gp = []; for(gj = 0; gj <= 360; gj += 3) gp.push(proj(gj, gi));
+      line(gp);
+    }
+    ctx.strokeStyle = GRID + '0.28)';
+    for(gi = 0; gi < 360; gi += 30){
+      gp = []; for(gj = 0; gj <= 85; gj += 5) gp.push(proj(gi, gj));
+      line(gp);
+    }
+    ctx.setLineDash([]);
+    for(gi = 10; gi <= 80; gi += 10){
+      gp = proj(viewAz - 17, gi);
+      if(inView(gp, 0)) mono(gi + '°', gp.x, gp.y - 4, 10.5, GRID + '0.9)');
+    }
+  }
+  ctx.textAlign = 'left';
+
+  /* Horizont und Himmelsrichtungen */
+  ctx.strokeStyle = sunMode ? GRID + '0.95)' : 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.5; ctx.beginPath();
+  var first = true;
+  for(var az = 0; az <= 360; az += 3){
+    var q = proj(az, 0);
+    if(!q){ first = true; continue; }
+    if(first){ ctx.moveTo(q.x, q.y); first = false; } else ctx.lineTo(q.x, q.y);
+  }
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  if(sunMode){
+    /* Azimut-Skala am Horizont: Strich alle 5 Grad, Beschriftung alle 15 Grad */
+    var CARD = { 0: 'N', 45: 'NO', 90: 'O', 135: 'SO', 180: 'S', 225: 'SW', 270: 'W', 315: 'NW' };
+    ctx.strokeStyle = GRID + '0.95)'; ctx.lineWidth = 1;
+    for(gi = 0; gi < 360; gi += 5){
+      var h0 = proj(gi, 0), h1 = proj(gi, gi % 15 === 0 ? -1.5 : -0.75);
+      if(!inView(h0, 10) || !h1) continue;
+      ctx.beginPath(); ctx.moveTo(h0.x, h0.y); ctx.lineTo(h1.x, h1.y); ctx.stroke();
+      if(gi % 15 === 0){
+        var hl = proj(gi, -3.4);
+        if(hl) mono((CARD[gi] ? CARD[gi] + ' ' : '') + gi + '°', hl.x, hl.y + 4, CARD[gi] ? 12 : 10.5, CARD[gi] ? '#fff' : GRID + '0.9)');
+      }
+    }
+  } else {
+    [['N',0],['NO',45],['O',90],['SO',135],['S',180],['SW',225],['W',270],['NW',315]].forEach(function(d){
+      var q = proj(d[1], 0);
+      if(q && q.x > -30 && q.x < W + 30) label(d[0], q.x, q.y - 8, d[0].length === 1 ? 20 : 14, '#FFD98A');
+    });
+  }
+
+  /* Sonnenbahn heute. Himmelsansicht: dezente Linie mit Stundenzahlen. Sonnenbahn-Ansicht: Messlinie mit Skalenstrichen. */
+  var sun = arSunPath(), sunHitMin = null, sp2 = sun.pts.map(function(pt){ return pt.alt < -0.8 ? null : proj(pt.az, pt.alt); });
+  ctx.lineJoin = 'round';
+  if(sunMode){
+    ctx.strokeStyle = DARK + '0.55)'; ctx.lineWidth = 4.5; line(sp2);
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 2; line(sp2);
+  } else {
+    ctx.strokeStyle = '#FFD27A'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8; line(sp2); ctx.globalAlpha = 1;
+  }
+  var bestA = -2, bestPt = null;
+  sun.pts.forEach(function(pt, i){
+    if(pt.alt >= 0){ var c = arDot(pt.v, fw); if(c > bestA){ bestA = c; bestPt = pt; } }
+    if(pt.min % 30 !== 0 || pt.alt < 0 || pt.min === 1440) return;
+    var q = sp2[i];
+    if(!inView(q, 20)) return;
+    var hour = pt.min % 60 === 0;
+    if(!sunMode){
+      if(!hour) return;
+      ctx.fillStyle = '#FFD27A'; ctx.beginPath(); ctx.arc(q.x, q.y, 3, 0, 6.283); ctx.fill();
+      ctx.textAlign = 'center'; label((pt.min / 60) + '', q.x, q.y - 8, 11, '#FFE7A8'); return;
+    }
+    /* Skalenstrich senkrecht zur Bahn: lang zur vollen, kurz zur halben Stunde */
+    var a = sp2[i - 1] || q, b = sp2[i + 1] || q, tx = b.x - a.x, ty = b.y - a.y, tl = Math.hypot(tx, ty) || 1;
+    var nx = -ty / tl, ny = tx / tl; if(ny > 0){ nx = -nx; ny = -ny; }
+    var len = hour ? 7 : 3.5;
+    ctx.strokeStyle = DARK + '0.6)'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(q.x - nx * len, q.y - ny * len); ctx.lineTo(q.x + nx * len, q.y + ny * len); ctx.stroke();
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(q.x - nx * len, q.y - ny * len); ctx.lineTo(q.x + nx * len, q.y + ny * len); ctx.stroke();
+    if(hour) mono((pt.min / 60) + 'h', q.x + nx * 19, q.y + ny * 19 + 4, 11.5, GOLD);
+  });
+  if(sunMode){
+    /* Aufgang, Höchststand, Untergang */
+    [[sun.rise, 'AUFGANG'], [sun.culm, 'HÖCHSTSTAND'], [sun.set, 'UNTERGANG']].forEach(function(e){
+      var pt = e[0]; if(!pt) return;
+      var q = proj(pt.az, pt.alt);
+      if(!inView(q, 10)) return;
+      ctx.strokeStyle = DARK + '0.6)'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(q.x, q.y - 6); ctx.lineTo(q.x + 6, q.y); ctx.lineTo(q.x, q.y + 6); ctx.lineTo(q.x - 6, q.y); ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = DARK + '0.9)'; ctx.fill(); ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.stroke();
+      /* Höchststand unter der Linie (darüber stehen die Stundenzahlen), Auf- und Untergang über dem Horizont */
+      mono(e[1] + ' ' + arHm(pt.min), q.x, e[1] === 'HÖCHSTSTAND' ? q.y + 24 : q.y - 16, 10.5, '#fff');
+    });
+    if(bestPt && bestA > 0.9976) sunHitMin = bestPt.min;
+  }
+
+  /* Sternbildlinien */
+  ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(160,190,255,0.55)';
+  var conVis = {};
+  /* Punkte nahe am Projektionsrand (kleines zc) werden bei der Perspektivteilung riesig/instabil
+     und lassen vor allem große, weit über den Bildschirm reichende Sternbilder "rutschen". Solche
+     Randpunkte fließen daher nicht in die Linien und nicht in die Positionsberechnung des Namens ein. */
+  function projStable(az, alt){
+    var e = arVec(az, alt), zc = arDot(e, fw);
+    if(zc < 0.18) return null;
+    return { x: W / 2 + fpx * arDot(e, rt) / zc, y: H / 2 - fpx * arDot(e, up) / zc };
+  }
+  if(!sunMode) Object.keys(HW_CONSTELLATION_LINES).forEach(function(k){
+    HW_CONSTELLATION_LINES[k].forEach(function(pr){
+      var A = AR.byName[pr[0]], B = AR.byName[pr[1]];
+      if(!A || !B) return;
+      var pa = projStable(A.azimuth, A.altitude), pb = projStable(B.azimuth, B.altitude);
+      if(!pa || !pb) return;
+      ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+      (conVis[k] = conVis[k] || []).push(pa, pb);
+    });
+  });
+  ctx.textAlign = 'left';
+  if(!AR.conLbl) AR.conLbl = {};
+  Object.keys(conVis).forEach(function(k){
+    var pts = conVis[k], mx = 0, my = 0;
+    pts.forEach(function(q){ mx += q.x; my += q.y; });
+    mx /= pts.length; my /= pts.length;
+    if(mx < -40 || mx > W + 40 || my < -40 || my > H + 40) return;
+    /* Ziel-Position sanft einregeln statt jeden Frame hart zu übernehmen, damit der Name nicht springt/rutscht */
+    var prev = AR.conLbl[k];
+    if(!prev || Math.hypot(mx - prev.x, my - prev.y) > Math.max(W, H) * 0.5){ prev = { x: mx, y: my }; }
+    else { prev = { x: prev.x + (mx - prev.x) * 0.15, y: prev.y + (my - prev.y) * 0.15 }; }
+    AR.conLbl[k] = prev;
+    if(prev.x > 0 && prev.x < W && prev.y > 0 && prev.y < H) label(HW_CONSTELLATION_NAMES[k] || k, prev.x - 20, prev.y + 22, 12, 'rgba(190,210,255,0.95)');
+  });
+
+  /* Objekte */
+  var best = null, bestD = 1e9;
+  AR.objs.forEach(function(o){
+    if(sunMode && o.type !== 'sun') return;
+    var q = proj(o.azimuth, o.altitude);
+    if(!q || q.x < -40 || q.x > W + 40 || q.y < -40 || q.y > H + 40) return;
+    if(sunMode){
+      /* astronomisches Sonnenzeichen: Kreis mit Mittelpunkt */
+      ctx.strokeStyle = DARK + '0.6)'; ctx.lineWidth = 4.5; ctx.beginPath(); ctx.arc(q.x, q.y, 10, 0, 6.283); ctx.stroke();
+      ctx.strokeStyle = GOLD; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q.x, q.y, 10, 0, 6.283); ctx.stroke();
+      ctx.fillStyle = GOLD; ctx.beginPath(); ctx.arc(q.x, q.y, 2.6, 0, 6.283); ctx.fill();
+      mono('SONNE', q.x + 17, q.y - 1, 10.5, '#fff', 'left');
+      mono('Az ' + Math.round(o.azimuth) + '°  h ' + o.altitude.toFixed(1).replace('.', ',') + '°', q.x + 17, q.y + 12, 10.5, GOLD, 'left');
+      return;
+    }
+    var r, col, size = 13;
+    if(o.type === 'sun'){ r = 13; col = '#FFD24A'; size = 15; }
+    else if(o.type === 'moon'){ r = 12; col = '#F1EDFB'; size = 15; }
+    else if(o.type === 'planet'){ r = 6; col = '#FFB27A'; }
+    else if(o.type === 'deepsky'){ r = 5; col = '#9AE6C8'; }
+    else { r = Math.max(1.8, 4.2 - o.mag * 0.9); col = '#FFFFFF'; }
+    ctx.fillStyle = col;
+    if(o.type === 'deepsky'){ ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.283); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.283); ctx.fill(); }
+    if(o.type !== 'star' || o.mag <= 1.5 || o.type === 'planet'){
+      ctx.textAlign = 'left'; label(o.name, q.x + r + 5, q.y + 4, size, o.type === 'sun' ? '#FFE28A' : '#fff');
+    }
+    var dx = q.x - W / 2, dy = q.y - H / 2, dd = Math.sqrt(dx * dx + dy * dy);
+    if(dd < bestD){ bestD = dd; best = o; }
+  });
+
+  /* Fadenkreuz */
+  if(sunMode){ ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(W / 2, H / 2, 1.6, 0, 6.283); ctx.fill(); }
+  ctx.strokeStyle = sunMode ? '#fff' : 'rgba(255,255,255,0.8)'; ctx.lineWidth = sunMode ? 1.25 : 1.5;
+  ctx.beginPath(); ctx.arc(W / 2, H / 2, 14, 0, 6.283); ctx.moveTo(W / 2 - 22, H / 2); ctx.lineTo(W / 2 - 8, H / 2); ctx.moveTo(W / 2 + 8, H / 2); ctx.lineTo(W / 2 + 22, H / 2);
+  ctx.moveTo(W / 2, H / 2 - 22); ctx.lineTo(W / 2, H / 2 - 8); ctx.moveTo(W / 2, H / 2 + 8); ctx.lineTo(W / 2, H / 2 + 22); ctx.stroke();
+
+  var hd = hwWrap360(AR.curHeading + AR.cal.yaw), pd = AR.curPitch;
+  var info = 'Blickrichtung ' + hwCompassWord(hd) + ' · ' + Math.round(hd) + '° · Neigung ' + Math.round(pd) + '°';
+  var near = best && bestD < 60 ? '<strong>' + best.name + '</strong> – Höhe ' + Math.round(best.altitude) + '°, Richtung ' + hwCompassWord(best.azimuth) + ' (' + Math.round(best.azimuth) + '°)' : 'Nichts im Fadenkreuz';
+  if(sunMode){
+    var cell = function(k, v, sub, cls){ return '<div' + (cls ? ' class="' + cls + '"' : '') + '><span>' + k + '</span><b>' + v + '</b>' + (sub ? '<i>' + sub + '</i>' : '') + '</div>'; };
+    var dirOf = function(p){ return p ? Math.round(p.az) + '° ' + hwCompassDirection(p.az) : ''; };
+    near = '<div class="hw-sun-grid">' +
+      cell('Fadenkreuz', 'Az ' + Math.round(hd) + '° · h ' + (pd >= 0 ? '+' : '−') + Math.abs(Math.round(pd)) + '°', hwCompassWord(hd)) +
+      cell('Sonne an dieser Stelle', sunHitMin !== null ? arHm(sunHitMin) + ' Uhr' : '–', sunHitMin !== null ? 'heute' : 'Fadenkreuz auf die Linie richten', 'gold') + '</div>' +
+      '<div class="hw-sun-ev">' +
+      cell('Aufgang', sun.rise ? arHm(sun.rise.min) : '–', dirOf(sun.rise)) +
+      cell('Höchststand', sun.culm ? arHm(sun.culm.min) : '–', sun.culm ? sun.culm.alt.toFixed(1).replace('.', ',') + '° hoch' : '') +
+      cell('Untergang', sun.set ? arHm(sun.set.min) : '–', dirOf(sun.set)) + '</div>';
+    info = '';
+  }
+  var warn = att.ok ? '' : (info ? ' · ' : '') + 'Kompass ungenau (Gerät ohne absoluten Nordbezug)';
+  var html = near + (info || warn ? '<small>' + info + warn + '</small>' : '');
+  if(html !== AR.lastInfo && !AR.calOpen){ document.getElementById('hwk-info').innerHTML = html; AR.lastInfo = html; }
+}
+
+/* Kalibrierung: Richtung (Nordabweichung) und Sichtfeld */
+function arOpenCal(){
+  AR.calOpen = true;
+  var el = document.getElementById('hwk-info');
+  el.innerHTML =
+    '<div class="hw-field" style="color:#fff;"><label for="hwk-yaw" style="min-width:76px;">Richtung</label><input type="range" id="hwk-yaw" min="-30" max="30" step="0.5"><output id="hwk-yaw-o"></output></div>' +
+    '<div class="hw-field" style="color:#fff;"><label for="hwk-fov" style="min-width:76px;">Sichtfeld</label><input type="range" id="hwk-fov" min="45" max="95" step="1"><output id="hwk-fov-o"></output></div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+      '<button type="button" class="hw-ar-btn" id="hwk-align-sun">Sonne im Fadenkreuz</button><button type="button" class="hw-ar-btn" id="hwk-align-moon">Mond im Fadenkreuz</button>' +
+      '<button type="button" class="hw-ar-btn" id="hwk-reset">Zurücksetzen</button><button type="button" class="hw-ar-btn" id="hwk-done">Fertig</button></div>' +
+    '<small>Tipp: Ziele mit dem Fadenkreuz auf Sonne oder Mond (Sonne nur über den Bildschirm, nie mit dem Auge) und tippe den Knopf – das gleicht die Nordabweichung aus.</small>';
+  var yaw = document.getElementById('hwk-yaw'), fov = document.getElementById('hwk-fov');
+  function sync(){ document.getElementById('hwk-yaw-o').textContent = AR.cal.yaw.toFixed(1) + '°'; document.getElementById('hwk-fov-o').textContent = Math.round(AR.cal.fov) + '°'; yaw.value = AR.cal.yaw; fov.value = AR.cal.fov; }
+  sync();
+  yaw.oninput = function(){ AR.cal.yaw = parseFloat(yaw.value); sync(); arSaveCal(); };
+  fov.oninput = function(){ AR.cal.fov = parseFloat(fov.value); sync(); arSaveCal(); };
+  function align(name){
+    if(!AR.smQ) return;
+    var o = AR.byName[name];
+    if(!o || o.altitude < 0){ alert(name + ' steht gerade unter dem Horizont.'); return; }
+    AR.cal.yaw = Math.max(-45, Math.min(45, hwWrap180(o.azimuth - AR.curHeading)));
+    sync(); arSaveCal();
+  }
+  document.getElementById('hwk-align-sun').onclick = function(){ align('Sonne'); };
+  document.getElementById('hwk-align-moon').onclick = function(){ align('Mond'); };
+  document.getElementById('hwk-reset').onclick = function(){ AR.cal = { yaw: 0, fov: 68 }; sync(); arSaveCal(); };
+  document.getElementById('hwk-done').onclick = function(){ AR.calOpen = false; AR.lastInfo = ''; };
+}
+
+function arStop(){
+  AR.on = false;
+  cancelAnimationFrame(AR.raf);
+  window.removeEventListener('deviceorientation', arOnOri, true);
+  window.removeEventListener('deviceorientationabsolute', arOnAbs, true);
+  if(AR.stream){ AR.stream.getTracks().forEach(function(t){ t.stop(); }); AR.stream = null; }
+  var v = document.getElementById('hwk-video'); v.srcObject = null;
+  document.getElementById('hw-ar').classList.remove('on');
+  document.getElementById('hw-nav').style.display = '';
+  AR.smQ = null; AR.raw = null; AR.absSeen = false; AR.calOpen = false;
+}
+function arStart(mode){
+  AR.mode = mode === 'sun' ? 'sun' : 'sky';
+  document.getElementById('hw-ar').classList.toggle('sun', AR.mode === 'sun');
+  document.getElementById('hwk-title').textContent = 'Sonnenbahn\n' + new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  document.getElementById('hwk-error').style.display = 'none';
+  var perm = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')
+    ? DeviceOrientationEvent.requestPermission() : Promise.resolve('granted');
+  perm.then(function(st){
+    if(st !== 'granted') throw new Error('Der Zugriff auf die Bewegungssensoren wurde nicht erlaubt. Erlaube ihn in den Browser- bzw. App-Einstellungen.');
+    return hwGetActiveLocation();
+  }).then(function(pos){
+    AR.lat = pos.lat; AR.lon = pos.lon; AR.lastCalc = 0; AR.objs = []; AR.conLbl = {};
+    window.addEventListener('deviceorientationabsolute', arOnAbs, true);
+    window.addEventListener('deviceorientation', arOnOri, true);
+    document.getElementById('hw-ar').classList.add('on');
+    document.getElementById('hw-nav').style.display = 'none';
+    AR.on = true;
+    var cam = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+      ? navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }) : Promise.reject(new Error('Kamera nicht verfügbar'));
+    return cam.then(function(stream){
+      AR.stream = stream;
+      var v = document.getElementById('hwk-video'); v.srcObject = stream; v.play().catch(function(){});
+    }).catch(function(){
+      document.getElementById('hwk-info').textContent = 'Kamera nicht verfügbar – es wird nur die Überlagerung auf dunklem Hintergrund gezeigt.';
+    }).then(function(){ AR.raf = requestAnimationFrame(arDraw); });
+  }).catch(function(err){
+    arStop();
+    arErr((err && err.message) ? err.message : 'Start nicht möglich.');
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  window.hwPageReload = hwRenderNowList;
+  hwRenderNowList();
+  setInterval(hwRenderNowList, 60000);
+  document.getElementById('hwk-start-btn').onclick = function(){ arStart('sky'); };
+  document.getElementById('hwk-sun-btn').onclick = function(){ arStart('sun'); };
+  document.getElementById('hwk-close').onclick = arStop;
+  document.getElementById('hwk-cal-btn').onclick = arOpenCal;
+});
+document.addEventListener('visibilitychange', function(){ if(document.hidden && AR.on) arStop(); });
+
+</script>
+</body>
+</html>

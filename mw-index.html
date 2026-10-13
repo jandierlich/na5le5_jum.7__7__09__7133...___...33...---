@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="mw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>MessWahr</title>
+<meta name="description" content="MessWahr – Höhen messen mit Kamera und Neigung, Wasserwaage, Gefälle und Gewitter-Peiler. 100% lokal, keine Datensammlung.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="./mw-icon-192.png">
+<!-- MessWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<style>@view-transition{navigation:auto}.wzi{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.22em;fill:currentColor;flex-shrink:0}
+  [hidden]{display:none!important}
+  :root{
+    --bg:var(--wzp-f1eefa, #F1EEFA); --card:var(--wzp-f8f6fc, #F8F6FC); --card2:var(--wzp-dac7f2, #DAC7F2); --btn-warm:var(--wzp-dac7f2, #DAC7F2); --text:var(--wzp-241e3f, #241E3F); --sub:var(--wzp-524370, #524370); --sub-onbg:var(--wzp-4a3d56, #4A3D56);
+    --border:var(--wzp-c7b3ec, #C7B3EC); --cta-bg:var(--wzp-5a2fbe, #5A2FBE); --cta-text:#FFFFFF; --accent:var(--wzp-5a2fbe, #5A2FBE); --soft:var(--wzp-e6ddf7, #E6DDF7);
+    --red:#FF3B30; --tint-red:#FBD6D6; --pill-red:#7A1F1F;
+    --shadow-dark-soft: rgba(var(--wzq-241e3f, 36, 30, 63),.16); --shadow-light-soft: rgba(255,255,255,.75);
+    --mono: ui-monospace, Menlo, -apple-system, sans-serif;
+  }
+  html.theme-dark{
+    --bg:var(--wzp-1e1b2e, #1E1B2E); --card:var(--wzp-2a2440, #2A2440); --card2:var(--wzp-3a2e52, #3A2E52); --btn-warm:var(--card2); --text:var(--wzp-eeeaf8, #EEEAF8); --sub:var(--wzp-c3b2f0, #C3B2F0); --sub-onbg:var(--wzp-c3b2f0, #C3B2F0);
+    --border:var(--wzp-5c4c82, #5C4C82); --cta-bg:var(--wzp-b9a6f5, #B9A6F5); --cta-text:var(--wzp-241e3f, #241E3F); --accent:var(--wzp-b9a6f5, #B9A6F5); --soft:var(--wzp-362c52, #362C52);
+    --tint-red:#331A1A; --pill-red:#F5A3A3;
+    --shadow-dark-soft: rgba(0,0,0,.45); --shadow-light-soft: rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);width:100%;overflow-x:hidden;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;touch-action:manipulation}
+  body{font-family:-apple-system,sans-serif;color:var(--text);line-height:1.5}
+  .app{max-width:480px;margin:0 auto;min-height:var(--wz-vh, 100dvh);padding:0 16px 28px;position:relative}
+  .safe-top{padding-top:calc(env(safe-area-inset-top) + 60px)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  header{background:linear-gradient(150deg,var(--cta-bg) 0%,var(--wzp-241748, #241748) 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top,0px) + 6px) 24px 26px;margin:calc(-1 * (env(safe-area-inset-top,0px) + 60px)) -16px 20px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10);top:-75px;right:-55px}
+  header::after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-45px;left:30px}
+  .logo-badge{position:relative;width:72px;height:72px;margin:0 auto 14px}
+  .logo-badge img{width:100%;height:100%;display:block;object-fit:contain;box-shadow:0 14px 30px rgba(var(--wzq-141023, 20, 16, 35),.35);border-radius:18px}
+  header h1{font-size:23px;margin:0;font-weight:700;letter-spacing:-.01em;color:#fff;position:relative;font-family:ui-rounded,-apple-system,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+  header p{font-size: 13.5px;color:rgba(255,255,255,.88);margin:8px 0 0;position:relative;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+  .theme-toggle,.home-link{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:9999;width:40px;height:40px;border-radius:20px;border:1px solid rgba(120,120,128,0.3);background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:16px;text-align:center;line-height:38px;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);text-decoration:none;color:var(--wzp-241e3f, #241E3F)}
+  .theme-toggle{right:16px}
+  .home-link{right:64px}
+  @media (min-width:640px){.theme-toggle{right:calc(50vw - 195px + 16px) !important}.home-link{right:calc(50vw - 195px + 64px) !important}}
+
+  .tabs{display:flex;gap:6px;background:var(--card2);border-radius:14px;padding:4px;margin:14px 0 18px}
+  .tab{flex:1;text-align:center;padding:9px 4px;border-radius:11px;font-size: 14.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;border:none;background:transparent;font-family:inherit}
+  .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:6px 6px 14px var(--shadow-dark-soft),-6px -6px 14px var(--shadow-light-soft)}
+  .card h2{font-size:15px;margin:0 0 10px;font-weight:600}
+  .card h3{font-size:14px;margin:14px 0 6px;font-weight:600}
+  .muted{color:var(--sub-onbg);font-size: 13.5px;line-height:1.5}
+  .muted p{margin:0 0 8px}
+  .small{font-size:12.5px}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--btn-warm);color:var(--text);border:none;border-radius:16px;padding:16px 14px;font-size:16px;font-weight:700;text-align:center;cursor:pointer;font-family:inherit}
+  .cta:active{transform:scale(.98)}
+  .cta:disabled{opacity:.5;cursor:default}
+  .cta.primary{background:var(--wz-primary-bg, var(--cta-bg)) !important;color:var(--wz-primary-fg, var(--cta-text)) !important;box-shadow:var(--wz-primary-shadow, none) !important;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .cta.danger{background:var(--tint-red);color:var(--pill-red)}
+  .cta.slim{padding:12px 12px;font-size:15px;border-radius:14px}
+  .btn-row{display:flex;gap:10px;margin-top:10px}
+  .btn-row .cta{flex:1}
+
+  .stat-row{display:flex;gap:10px;margin-top:12px}
+  .stat{flex:1;background:var(--card2);border-radius:14px;padding:10px 12px;text-align:center;min-width:0}
+  .stat b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat span{display:block;font-size: 12.5px;color:var(--sub-onbg);margin-top:2px}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0}
+  .toggle-row .label{font-size: 14.5px;font-weight:600}
+  .toggle-row .desc{font-size: 13px;color:var(--sub-onbg);margin-top:2px}
+  .switch{position:relative;width:46px;height:27px;border-radius:999px;background:var(--card2);border:1px solid var(--border);flex-shrink:0;cursor:pointer;padding:0}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+  .switch.on{background:var(--cta-bg);border-color:var(--cta-bg)}
+  .switch.on::after{transform:translateX(19px)}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{padding:6px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--border);font-size: 13.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .field:last-child{border-bottom:none}
+  .field label{font-size:14.5px;font-weight:600}
+  .field .hint{display:block;font-size:12.5px;font-weight:400;color:var(--sub-onbg)}
+  .num-input{width:108px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;text-align:right;font-variant-numeric:tabular-nums;-webkit-appearance:none;appearance:none}
+  .text-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none}
+  input[type=range]{accent-color:var(--accent);width:100%}
+
+  .history-item{background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .history-item .row1{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .history-item .when{font-size: 13px;color:var(--sub-onbg)}
+  .history-item .vals{font-size: 15px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+  .history-item .note{font-size: 13.5px;color:var(--sub-onbg);margin-top:3px}
+  .history-item .actions{display:flex;gap:14px;margin-top:8px}
+  .icon-btn{background:none;border:none;font-size:14px;cursor:pointer;color:var(--sub-onbg);padding:2px 0;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+  .empty-hint{text-align:center;color:var(--sub-onbg);font-size: 14px;padding:22px 10px}
+
+  .scale-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size: 14px}
+  .scale-row:last-child{border-bottom:none}
+  .scale-row .v{font-weight:600;color:var(--sub-onbg);font-size: 13.5px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .steps{margin:0;padding:0 0 0 20px;font-size:13.5px;color:var(--sub-onbg)}
+  .steps li{margin:0 0 6px}
+  .notice{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--soft);color:var(--text);font-size: 13.5px}
+  .notice.warn{background:var(--tint-red);color:var(--pill-red);font-weight:600}
+
+  /* Messanzeige (dunkle Instrumentenfläche, wie die Sonnenbahn in HimmelsWahr) */
+  .instr{background:linear-gradient(165deg,var(--wzp-241748, #241748) 0%,var(--wzp-15102a, #15102A) 100%);border-radius:16px;color:#fff;position:relative;overflow:hidden;border:1px solid rgba(226,220,255,.14)}
+  .instr-lbl{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .instr-val{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .instr-sub{display:block;font:500 11px var(--mono);color:rgba(226,220,255,.72);margin-top:2px}
+  .instr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;border-top:1px solid rgba(226,220,255,.14)}
+
+  /* Vollbild-Kamera (gleiche Optik wie die Sonnenbahn in HimmelsWahr) */
+  .ar{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:2000;display:none;color:#fff}
+  .ar.on{display:block}
+  .ar video,.ar canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ar video{object-fit:cover}
+  .ar-top{position:absolute;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;z-index:3}
+  .ar-btn{border-radius:10px;border:1px solid rgba(226,220,255,0.24);background:rgba(12,10,32,0.72);color:#fff;font:inherit;font-size:13px;font-weight:650;padding:10px 13px;min-height:44px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+  .ar-btn.main{background:linear-gradient(150deg,var(--wzp-6e4fe0, #6E4FE0) 0%,var(--wzp-5a2fbe, #5A2FBE) 100%);border-color:transparent;font-size:15px;padding:13px 16px}
+  .ar-btn:disabled{opacity:.45}
+  .ar-title{background:rgba(12,10,32,0.72);border:1px solid rgba(226,220,255,0.24);border-radius:10px;padding:6px 10px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);align-self:center;text-align:center;white-space:pre-line;line-height:1.35;color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px rgba(10,8,30,.85);font-variant-numeric:tabular-nums}
+  .ar-info{position:absolute;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;border-radius:12px;padding:12px 14px;background:rgba(12,10,32,0.84);border:1px solid rgba(226,220,255,0.24);line-height:1.3;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .ar-info small{display:block;opacity:.85;font-size:12px;margin-top:6px;line-height:1.4}
+  .ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ar-grid.three{grid-template-columns:repeat(3,1fr)}
+  .ar-grid span,.ar-ev span{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .ar-grid b,.ar-ev b{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ar-grid .gold b{color:#FFD27A}
+  .ar-grid i,.ar-ev i{display:block;font:500 11px var(--mono);font-style:normal;color:rgba(226,220,255,0.72);margin-top:2px}
+  .ar-row{display:flex;gap:8px;margin-top:10px}
+  .ar-row .ar-btn{flex:1}
+  .ar-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;color:#fff}
+  .ar-field label{min-width:76px;font-size:13px}
+  .ar-field input[type=range]{flex:1;min-width:0;accent-color:#B9A6F5}
+  .ar-field output{min-width:44px;text-align:right;font:600 13px var(--mono)}
+  .ar-sep{margin-top:10px;padding-top:10px;border-top:1px solid rgba(226,220,255,0.18)}
+  html:has(.ar.on) .wz-hbtn, html:has(.ar.on) .home-link, html:has(.ar.on) .theme-toggle{display:none !important}
+
+  footer{text-align:center;padding:22px 0 6px;font-size:14px;font-weight:600;color:var(--text)}
+  footer a,footer button{color:var(--text);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:14px;font-weight:600;font-family:inherit;-webkit-appearance:none;appearance:none;padding:0;margin:0}
+  .field > span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+  .muted a{color:var(--accent);font-weight:600}
+  /* MessWahr */
+  .level-instr{margin-top:12px}
+  #mwLevelSvg{display:block;width:100%;max-width:300px;margin:0 auto;height:auto}
+  #mwInclSvg{display:block;width:100%;height:auto}
+  .instr .instr-grid div{min-width:0}
+  .mw-ok{color:#FFD27A !important}
+  .mw-res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
+  .mw-res .big{font:600 22px var(--mono);color:#fff;display:block;white-space:nowrap}
+  .mw-type{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub-onbg)}
+  .mw-name-input{margin-top:6px}
+  #mwIncl{margin-top:12px}
+  /* ===== Gewitter-Peiler (Messkonsole) ===== */
+  .tabs.five .tab{font-size:13.5px;padding:9px 2px;letter-spacing:-.01em}
+  .gw-card{padding:16px}
+  .gw-eyebrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 12px;font:700 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .gw-eyebrow span:last-child{font-weight:600;letter-spacing:.06em;color:var(--sub-onbg);font-variant-numeric:tabular-nums;text-transform:none}
+  .gw-console{padding:0}
+  .gw-k{font:700 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#B9A6F5}
+  .gw-m{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .gw-dim{color:rgba(226,220,255,.62)}
+  .gw-gold{color:#FFD27A}
+  /* Statusleiste */
+  .gw-status{display:grid;grid-template-columns:1.12fr 1.12fr .9fr .9fr;border-bottom:1px solid rgba(226,220,255,.14)}
+  .gw-status > div{padding:9px 8px 8px;min-width:0;border-right:1px solid rgba(226,220,255,.10)}
+  .gw-status > div:last-child{border-right:none}
+  .gw-status .gw-k{font-size:8.5px;letter-spacing:.1em;white-space:nowrap}
+  .gw-status b{display:block;font:600 12.5px var(--mono);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-variant-numeric:tabular-nums}
+  .gw-led{display:inline-block;width:7px;height:7px;border-radius:50%;background:rgba(226,220,255,.3);margin-right:5px;vertical-align:1px}
+  .gw-led.on{background:#5BE49B;box-shadow:0 0 8px rgba(91,228,155,.8)}
+  .gw-led.warn{background:#FFD27A;box-shadow:0 0 8px rgba(255,210,122,.7)}
+  .gw-led.off{background:#FF6B5E}
+  /* Start / bereit */
+  .gw-body{padding:16px}
+  .gw-intro{font-size:13.5px;line-height:1.5;color:rgba(226,220,255,.86);margin:0 0 14px}
+  .gw-checks{display:grid;gap:8px;margin:0 0 16px}
+  .gw-checks div{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;font-size:13px;color:rgba(226,220,255,.8);line-height:1.4}
+  .gw-checks .wzi{color:#B9A6F5;width:18px;height:18px;margin-top:1px}
+  .gw-trigger-wrap{position:relative;width:196px;height:196px;margin:2px auto 8px}
+  .gw-trigger-wrap svg.gw-ring{position:absolute;inset:0;width:100%;height:100%}
+  .gw-trigger{position:absolute;left:28px;top:28px;width:140px;height:140px;border-radius:50%;border:none;cursor:pointer;color:#fff;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    background:radial-gradient(circle at 50% 35%,var(--wzp-7a5cf0, #7A5CF0) 0%,var(--wzp-5a2fbe, #5A2FBE) 52%,var(--wzp-2e1870, #2E1870) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 0 1px rgba(185,166,245,.35),0 16px 34px rgba(0,0,0,.5);transition:transform .1s}
+  .gw-trigger:active{transform:scale(.95)}
+  .gw-trigger .wzi{width:44px;height:44px;color:#FFD27A;filter:drop-shadow(0 0 10px rgba(255,210,122,.45))}
+  .gw-trigger b{font-size:18px;font-weight:700;letter-spacing:.02em}
+  .gw-trigger small{font:600 9.5px var(--mono);letter-spacing:.14em;color:rgba(255,255,255,.7);text-transform:uppercase}
+  .gw-hint{font-size:13px;line-height:1.45;color:rgba(226,220,255,.78);margin:0 auto;max-width:300px;text-align:center}
+  .gw-flash{margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(255,210,122,.10);border:1px solid rgba(255,210,122,.28);color:#FFE3A6;font-size:13px;line-height:1.45}
+  .gw-flash b{color:#fff}
+  .gw-flash.err{background:rgba(255,107,94,.10);border-color:rgba(255,107,94,.35);color:#FFC2BC}
+  .gw-meter{display:block;width:100%;height:58px}
+  .gw-meter-box{margin-top:14px;border:1px solid rgba(226,220,255,.12);border-radius:12px;padding:8px 10px 6px;background:rgba(0,0,0,.18)}
+  .gw-meter-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .gw-meter-head .gw-m{font-size:11px;color:rgba(226,220,255,.7)}
+  .gw-linkrow{display:flex;justify-content:center;gap:18px;margin-top:12px}
+  .gw-link{background:none;border:none;color:rgba(226,220,255,.75);font:600 12.5px inherit;font-family:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px}
+  /* Laufende Messung */
+  .gw-run-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 0}
+  .gw-big-t{text-align:center;padding:10px 16px 2px}
+  .gw-big-t .t{font:600 50px var(--mono);letter-spacing:-.03em;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+  .gw-big-t .t small{font-size:20px;color:rgba(226,220,255,.6);margin-left:4px;letter-spacing:0}
+  .gw-big-t .d{font:600 18px var(--mono);color:#FFD27A;margin-top:6px;font-variant-numeric:tabular-nums}
+  .gw-big-t .c{font:500 10.5px var(--mono);color:rgba(226,220,255,.55);margin-top:4px}
+  .gw-lane{margin:12px 12px 0;border:1px solid rgba(226,220,255,.14);border-radius:14px;padding:10px 12px 12px;background:rgba(255,255,255,.025)}
+  .gw-lane.done{border-color:rgba(91,228,155,.38);background:rgba(91,228,155,.05)}
+  .gw-lane-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .gw-pill{font:700 9.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:rgba(185,166,245,.16);color:#D9CCFF;white-space:nowrap}
+  .gw-pill.live{background:rgba(255,210,122,.16);color:#FFD27A}
+  .gw-pill.ok{background:rgba(91,228,155,.16);color:#7EEDB1}
+  .gw-pill.err{background:rgba(255,107,94,.16);color:#FF9A90}
+  .gw-lane-res{font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums}
+  .gw-lane-sub{font-size:12px;color:rgba(226,220,255,.62);margin-top:3px;line-height:1.4}
+  .gw-tape{display:block;width:100%;height:46px;border-radius:8px;background:rgba(0,0,0,.22)}
+  .gw-head-row{display:flex;justify-content:space-between;align-items:baseline;margin:8px 2px 0}
+  .gw-head-val{font:600 22px var(--mono);color:#fff;font-variant-numeric:tabular-nums}
+  .gw-row{display:flex;gap:8px;margin-top:10px}
+  .gw-row .ar-btn{flex:1}
+  .gw-chips{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:8px}
+  .gw-chips button{border-radius:8px;border:1px solid rgba(226,220,255,.22);background:rgba(255,255,255,.05);color:#fff;font:600 11.5px var(--mono);padding:8px 0;cursor:pointer;min-height:36px}
+  .gw-chips button:active{background:rgba(185,166,245,.3)}
+  .gw-next{display:flex;align-items:center;gap:12px;margin:12px;padding:10px 12px;border-radius:14px;border:1px dashed rgba(226,220,255,.25)}
+  .gw-next button{flex-shrink:0;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;color:#FFD27A;background:radial-gradient(circle at 50% 35%,#6E4FE0,#3B1F8A);box-shadow:0 0 0 1px rgba(185,166,245,.35)}
+  .gw-next button .wzi{width:26px;height:26px}
+  .gw-next span{font-size:12.5px;color:rgba(226,220,255,.72);line-height:1.4}
+  /* Lagebild */
+  .gw-alert{border-radius:14px;padding:11px 13px;margin-bottom:12px;font-size:13.5px;line-height:1.45;display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+  .gw-alert .wzi{width:19px;height:19px;margin-top:1px}
+  .gw-alert.red{background:var(--tint-red);color:var(--pill-red)}
+  .gw-alert.amber{background:var(--soft);color:var(--text)}
+  .gw-alert b{font-weight:700}
+  .gw-scope-wrap{padding:0}
+  .gw-scope{display:block;width:100%;height:auto}
+  .gw-legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:0 14px 10px;font:500 10.5px var(--mono);color:rgba(226,220,255,.7)}
+  .gw-legend i{display:inline-block;vertical-align:-1px;margin-right:5px}
+  .gw-metrics{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(226,220,255,.14)}
+  .gw-metrics > div{padding:10px 10px;min-width:0;border-right:1px solid rgba(226,220,255,.10);border-bottom:1px solid rgba(226,220,255,.10)}
+  .gw-metrics > div:nth-child(3n){border-right:none}
+  .gw-metrics > div:nth-last-child(-n+3){border-bottom:none}
+  .gw-metrics .gw-k{white-space:nowrap}
+  .gw-metrics b{display:block;font:600 14px var(--mono);letter-spacing:-.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-variant-numeric:tabular-nums}
+  .gw-metrics i{display:block;font:500 10.5px var(--mono);font-style:normal;color:rgba(226,220,255,.6);margin-top:2px;line-height:1.3}
+  .gw-report{margin-top:14px;padding:2px 2px 0}
+  .gw-report h3{margin:0 0 6px;font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sub-onbg)}
+  .gw-report p{margin:0 0 8px;font-size:14px;line-height:1.55;color:var(--text)}
+  .gw-q{display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--card2);color:var(--sub-onbg)}
+  .gw-q i{display:inline-flex;gap:2px}
+  .gw-q i span{width:5px;height:10px;border-radius:1px;background:currentColor;opacity:.25}
+  .gw-q i span.on{opacity:1}
+  .gw-chart-wrap{padding:6px 4px 2px}
+  .gw-chart{display:block;width:100%;height:auto}
+  .gw-table-wrap{overflow-x:auto;margin:0 -4px}
+  .gw-table{width:100%;border-collapse:collapse;font:500 12.5px var(--mono);font-variant-numeric:tabular-nums}
+  .gw-table th{font:700 9.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sub-onbg);text-align:right;padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap}
+  .gw-table td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+  .gw-table th:first-child,.gw-table td:first-child{text-align:left}
+  .gw-table tr:last-child td{border-bottom:none}
+  .gw-table .n{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;background:var(--card2);font-weight:700;font-size:11px}
+  .gw-table tr.new .n{background:#FFD27A;color:#2A1B05}
+  .gw-table .src{color:var(--sub-onbg);font-size:11px}
+  .gw-table .x{background:none;border:none;color:var(--sub-onbg);cursor:pointer;padding:2px}
+  .gw-field-col{flex-direction:column;align-items:stretch;gap:8px}
+  .gw-range{display:flex;align-items:center;gap:12px}
+  .gw-range output{min-width:52px;text-align:right;font:600 14px var(--mono);font-variant-numeric:tabular-nums}
+  .gw-sens{margin:0}
+  .gw-demo-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px}
+  @media (prefers-reduced-motion:reduce){.gw-pulse{animation:none!important}}
+  @keyframes gwPulse{0%{opacity:.9;r:9}100%{opacity:0;r:24}}
+  .gw-pulse{animation:gwPulse 1.8s ease-out infinite}
+</style>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+<symbol id="wzi-home" viewBox="0 0 24 24"><path d="M4 11.5L12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h5v-5.5h2V20h5v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-close" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></g></symbol>
+<symbol id="wzi-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 8.2h3.2L8.6 6h6.8l1.4 2.2H20v10.6H4z"/><circle cx="12" cy="13" r="3.3"/></g></symbol>
+<symbol id="wzi-height" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17"/><path d="M17.5 20.5V4.5"/><path d="M15.5 6.5l2-2 2 2M15.5 18.5l2 2 2-2" /><path d="M4.5 20.5L17.5 4.5" stroke-dasharray="0.1 2.6"/></g></symbol>
+<symbol id="wzi-level" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="8" rx="4"/><circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/><path d="M8.6 8v8M15.4 8v8"/></g></symbol>
+<symbol id="wzi-incline" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19.5h18"/><path d="M3 19.5L20 9"/><path d="M9.5 19.5a6.5 6.5 0 0 0-1.3-3.9"/></g></symbol>
+<symbol id="wzi-crosshair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 12.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5L17.5 7"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></g></symbol>
+<symbol id="wzi-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M6 11H5a1.5 1.5 0 0 0-1.5 1.5v6.5A1.5 1.5 0 0 0 5 20.5h14a1.5 1.5 0 0 0 1.5-1.5v-6.5A1.5 1.5 0 0 0 19 11h-1"/></g></symbol>
+<symbol id="wzi-check" viewBox="0 0 24 24"><polyline points="4.5 12.5 9.5 17.5 19.5 6.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5L21.5 20h-19z"/><line x1="12" y1="9.2" x2="12" y2="14.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-bookmark" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></g></symbol>
+<symbol id="wzi-ruler" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="8" rx="1.6"/><path d="M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5"/></g></symbol>
+<symbol id="wzi-bolt" viewBox="0 0 24 24"><path d="M13.6 2.8L5.8 13.4h5.4l-1.4 7.8 8.4-11.3h-5.5z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-sound" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4v5.2h3.6l4.8 3.9V5.5L7.4 9.4z" fill="currentColor"/><path d="M15.6 9.2a4 4 0 0 1 0 5.6M18.3 6.6a7.6 7.6 0 0 1 0 10.8"/></g></symbol>
+</defs>
+</svg>
+<a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<div class="app safe-top safe-bottom">
+  <header class="wz-hero">
+    <div class="logo-badge"><img class="wz-logo-light" src="./mw-icon-512.png" alt="MessWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>MessWahr</h1>
+    <p>Höhe, Wasserwaage, Neigung und Gewitter-Peiler – mit Kamera, Mikrofon und Lagesensor. 100% lokal.</p>
+  </header>
+
+  <div class="tabs five" role="tablist">
+    <button class="tab active" data-tab="hoehe" role="tab">Höhe</button>
+    <button class="tab" data-tab="waage" role="tab">Waage</button>
+    <button class="tab" data-tab="neigung" role="tab">Neigung</button>
+    <button class="tab" data-tab="gewitter" role="tab">Gewitter</button>
+    <button class="tab" data-tab="liste" role="tab">Liste</button>
+  </div>
+
+  <!-- ===== HÖHE ===== -->
+  <section class="screen active" id="screen-hoehe">
+    <div class="card">
+      <h2>Höhe messen</h2>
+      <p class="muted">Baum, Haus, Mast oder Turm: Du peilst mit dem Fadenkreuz der Kamera an, MessWahr rechnet aus Neigung und Entfernung die Höhe aus. Das Kamerabild wird nur live angezeigt, nie gespeichert.</p>
+      <div class="field">
+        <label for="mwEye">Kamerahöhe<span class="hint">Augenhöhe beim Messen, ca. Körpergröße minus 12 cm</span></label>
+        <span><input class="num-input" id="mwEye" type="text" inputmode="decimal" value="1,55" aria-describedby="mwEyeUnit"> <span id="mwEyeUnit" class="muted">m</span></span>
+      </div>
+      <h3>Entfernung zum Objekt</h3>
+      <div class="chip-row" id="mwModeRow" role="radiogroup" aria-label="Entfernung">
+        <button type="button" class="chip active" data-mode="fuss" role="radio" aria-checked="true">Fußpunkt anpeilen</button>
+        <button type="button" class="chip" data-mode="abstand" role="radio" aria-checked="false">Entfernung eingeben</button>
+      </div>
+      <div class="field" id="mwDistRow" hidden>
+        <label for="mwDist">Waagerechte Entfernung<span class="hint">z. B. abgeschritten oder aus der Karte</span></label>
+        <span><input class="num-input" id="mwDist" type="text" inputmode="decimal" placeholder="z. B. 25"> <span class="muted">m</span></span>
+      </div>
+      <p class="muted small" id="mwModeHint">Du peilst zuerst den Fuß des Objekts an (wo es den Boden berührt), dann die Spitze. Der Boden sollte dazwischen ungefähr eben sein.</p>
+      <div style="height:6px"></div>
+      <button class="cta primary" id="mwHeightStart"><svg class="wzi" aria-hidden="true"><use href="#wzi-camera"></use></svg> Kamera-Messung starten</button>
+      <p class="muted small" id="mwHeightErr" role="alert" hidden></p>
+    </div>
+
+    <div class="card" id="mwLastCard" hidden>
+      <h2>Letzte Messung</h2>
+      <div class="instr" id="mwLastInstr"></div>
+      <div class="btn-row">
+        <button class="cta slim" id="mwLastSave"><svg class="wzi" aria-hidden="true"><use href="#wzi-bookmark"></use></svg> Speichern</button>
+        <button class="cta slim" id="mwLastAgain">Noch einmal</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>So misst du genau</h2>
+      <ol class="steps">
+        <li>Stell dich so weit weg, dass du die Spitze ohne Verrenkung anpeilen kannst – etwa so weit, wie das Objekt hoch ist.</li>
+        <li>Halte das Smartphone hochkant vor die Augen und ziele ruhig. Beim Tippen wird die Neigung eine halbe Sekunde lang gemittelt.</li>
+        <li>Je genauer die Kamerahöhe und die Entfernung stimmen, desto genauer die Höhe. Die angezeigte Spanne zeigt, wie sehr ein halbes Grad Zielfehler ausmacht.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== WAAGE ===== -->
+  <section class="screen" id="screen-waage">
+    <div class="card">
+      <h2>Wasserwaage</h2>
+      <p class="muted" id="mwLevelHint">Leg das Smartphone flach auf eine Fläche oder stell es auf eine Kante. Die Ansicht wechselt von selbst.</p>
+      <button class="cta primary" id="mwSensorBtn1" hidden><svg class="wzi" aria-hidden="true"><use href="#wzi-level"></use></svg> Lagesensor freigeben</button>
+      <div class="instr level-instr" id="mwLevel">
+        <svg id="mwLevelSvg" viewBox="0 0 300 300" role="img" aria-label="Wasserwaage"></svg>
+        <div class="instr-grid">
+          <div><span class="instr-lbl">Lage</span><b class="instr-val" id="mwLvMode">–</b><i class="instr-sub" id="mwLvModeSub">&nbsp;</i></div>
+          <div><span class="instr-lbl" id="mwLvL1">Quer</span><b class="instr-val" id="mwLvA">–</b><i class="instr-sub" id="mwLvAs">&nbsp;</i></div>
+          <div><span class="instr-lbl" id="mwLvL2">Längs</span><b class="instr-val" id="mwLvB">–</b><i class="instr-sub" id="mwLvBs">&nbsp;</i></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="cta slim" id="mwLvHold">Halten</button>
+        <button class="cta slim" id="mwLvCal">Kalibrieren</button>
+      </div>
+      <div class="notice" id="mwLvCalBox" hidden></div>
+    </div>
+    <div class="card">
+      <h2>Gut zu wissen</h2>
+      <p class="muted">„Kalibrieren" gleicht kleine Fehler des Sensors aus: Du misst einmal, drehst das Smartphone auf derselben Stelle um 180° und misst noch einmal – der Mittelwert ist der echte Nullpunkt. Hüllen mit Kamerabuckel kippen das Gerät; leg es für genaue Werte ohne Hülle oder auf die Kante.</p>
+    </div>
+  </section>
+
+  <!-- ===== NEIGUNG ===== -->
+  <section class="screen" id="screen-neigung">
+    <div class="card">
+      <h2>Neigung und Gefälle</h2>
+      <p class="muted">Leg das Smartphone auf die geneigte Fläche (Rampe, Dach, Tisch) oder stell es mit der langen Kante auf eine Schräge (Geländer, Treppe).</p>
+      <button class="cta primary" id="mwSensorBtn2" hidden><svg class="wzi" aria-hidden="true"><use href="#wzi-incline"></use></svg> Lagesensor freigeben</button>
+      <div class="instr" id="mwIncl">
+        <svg id="mwInclSvg" viewBox="0 0 300 170" role="img" aria-label="Neigung"></svg>
+        <div class="instr-grid">
+          <div><span class="instr-lbl">Winkel</span><b class="instr-val" id="mwInDeg">–</b><i class="instr-sub">Grad</i></div>
+          <div><span class="instr-lbl">Gefälle</span><b class="instr-val" id="mwInPct">–</b><i class="instr-sub">Prozent</i></div>
+          <div><span class="instr-lbl">Verhältnis</span><b class="instr-val" id="mwInRatio">–</b><i class="instr-sub">Höhe : Länge</i></div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label for="mwInLen">Waagerechte Länge<span class="hint">ergibt den Höhenunterschied</span></label>
+        <span><input class="num-input" id="mwInLen" type="text" inputmode="decimal" placeholder="z. B. 4"> <span class="muted">m</span></span>
+      </div>
+      <div class="scale-row"><span>Höhenunterschied</span><span class="v" id="mwInRise">–</span></div>
+      <div class="btn-row">
+        <button class="cta slim" id="mwInHold">Halten</button>
+        <button class="cta slim" id="mwInSave"><svg class="wzi" aria-hidden="true"><use href="#wzi-bookmark"></use></svg> Speichern</button>
+      </div>
+      <p class="muted small" style="margin:10px 0 0">Noch genauer: Unter „Waage“ einmal kalibrieren – der Nullpunkt gilt auch hier.</p>
+    </div>
+    <div class="card">
+      <h2>Zum Vergleich</h2>
+      <div class="scale-row"><span>Ablauf auf Terrasse oder Balkon</span><span class="v">ca. 1,5–2 %</span></div>
+      <div class="scale-row"><span>Barrierefreie Rampe</span><span class="v">höchstens 6 %</span></div>
+      <div class="scale-row"><span>45° entsprechen</span><span class="v">100 %</span></div>
+      <p class="muted small" style="margin-top:8px">Orientierungswerte ohne Gewähr. Für Bauabnahmen und Vermessung gelten die einschlägigen Regeln und geeichte Messgeräte.</p>
+    </div>
+  </section>
+
+  <!-- ===== GEWITTER ===== -->
+  <section class="screen" id="screen-gewitter">
+    <div class="card gw-card">
+      <div class="gw-eyebrow"><span>Gewitter-Peiler</span><span id="gwClock">--:--:--</span></div>
+      <div class="notice gw-demo-bar" id="gwDemoBar" hidden><span id="gwDemoTxt">Du siehst ein Beispiel-Gewitter.</span><button type="button" class="icon-btn" id="gwDemoEnd">Beispiel beenden</button></div>
+      <div class="instr gw-console" id="gwConsole" aria-live="polite"></div>
+    </div>
+
+    <div class="card gw-card" id="gwLageCard" hidden>
+      <div class="gw-eyebrow"><span>Lagebild</span><span id="gwLageStand">–</span></div>
+      <div class="gw-alert" id="gwSafety" hidden></div>
+      <div class="instr gw-scope-wrap">
+        <svg id="gwScope" class="gw-scope" viewBox="0 0 360 360" role="img" aria-label="Lagebild: Blitze, Gewitterfront und Zugrichtung rund um deinen Standort"></svg>
+        <div class="gw-legend" id="gwLegend"></div>
+        <div class="gw-metrics" id="gwMetrics"></div>
+      </div>
+      <div class="gw-report" id="gwReport"></div>
+      <div class="btn-row">
+        <button class="cta slim" id="gwSave"><svg class="wzi" aria-hidden="true"><use href="#wzi-bookmark"></use></svg> Speichern</button>
+        <button class="cta slim" id="gwReset">Neue Beobachtung</button>
+      </div>
+    </div>
+
+    <div class="card gw-card" id="gwTrendCard" hidden>
+      <div class="gw-eyebrow"><span>Abstand über die Zeit</span><span id="gwTrendTag">–</span></div>
+      <div class="instr gw-chart-wrap"><svg id="gwChart" class="gw-chart" viewBox="0 0 340 170" role="img" aria-label="Entfernung der Blitze über die Zeit"></svg></div>
+    </div>
+
+    <div class="card gw-card" id="gwLogCard" hidden>
+      <div class="gw-eyebrow"><span>Messprotokoll</span><span id="gwLogCount">–</span></div>
+      <div class="gw-table-wrap"><table class="gw-table" id="gwLog"></table></div>
+    </div>
+
+    <div class="card gw-card">
+      <div class="gw-eyebrow"><span>Messparameter</span><span id="gwParamTag">–</span></div>
+      <div class="field">
+        <label for="gwTemp">Lufttemperatur<span class="hint">bestimmt die Schallgeschwindigkeit</span></label>
+        <span><input class="num-input" id="gwTemp" type="text" inputmode="decimal" value="20"> <span class="muted">°C</span></span>
+      </div>
+      <div class="field gw-field-col">
+        <label for="gwReact">Reaktionszeit beim Blitz<span class="hint">wird automatisch zur gemessenen Zeit addiert</span></label>
+        <div class="gw-range"><input type="range" id="gwReact" min="0.10" max="0.45" step="0.01" value="0.25"><output id="gwReactOut" for="gwReact">0,25 s</output></div>
+      </div>
+      <div class="field gw-field-col">
+        <label>Empfindlichkeit der Donnererkennung<span class="hint">bei Wind oder Verkehrslärm „gering“ wählen</span></label>
+        <div class="chip-row gw-sens" id="gwSens" role="radiogroup" aria-label="Empfindlichkeit">
+          <button type="button" class="chip" data-sens="1" role="radio">gering</button>
+          <button type="button" class="chip" data-sens="2" role="radio">mittel</button>
+          <button type="button" class="chip" data-sens="3" role="radio">hoch</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card gw-card">
+      <div class="gw-eyebrow"><span>Messprinzip</span><span>c ≈ 343 m/s</span></div>
+      <ol class="steps">
+        <li><b>Blitz:</b> Du tippst einmal, sobald es aufleuchtet. Weil jeder Mensch etwas verzögert reagiert, rechnet MessWahr deine Reaktionszeit automatisch dazu.</li>
+        <li><b>Donner:</b> Das Mikrofon lauscht und erkennt den Einsatz des Donners selbst – am Anstieg der tiefen Frequenzen. Ohne Reaktionsverzögerung.</li>
+        <li><b>Richtung:</b> Du richtest das Smartphone in Ruhe auf die Stelle aus, an der es geblitzt hat, und bestätigst mit einem zweiten Tipp. Das geht auch, während der Donner noch unterwegs ist.</li>
+        <li><b>Front:</b> Ab drei gepeilten Blitzen über mindestens drei Minuten berechnet MessWahr Lage, Ausrichtung und Zug der Gewitterfront.</li>
+      </ol>
+      <div style="height:6px"></div>
+      <div class="scale-row"><span>3 Sekunden</span><span class="v">ca. 1 km</span></div>
+      <div class="scale-row"><span>10 Sekunden</span><span class="v">ca. 3,4 km</span></div>
+      <div class="scale-row"><span>30 Sekunden</span><span class="v">ca. 10 km – Schutz suchen</span></div>
+      <p class="muted small" style="margin-top:8px">Mikrofon und Lagesensor werden nur live ausgewertet. Es wird nichts aufgenommen, gespeichert oder übertragen. Alle Werte sind Schätzungen zur Orientierung und keine Unwetterwarnung; eine berechnete Ankunftszeit kann deutlich abweichen, Gewitter können sich schnell neu bilden oder die Richtung ändern. Peile nur von einem geschützten Ort aus, etwa im Haus am Fenster oder im Auto. Bei Gewitter gilt: früh in ein festes Gebäude oder ins Auto, amtliche Unwetterwarnungen beachten.</p>
+      <div style="height:10px"></div>
+      <button class="cta slim" id="gwDemo">Beispiel-Gewitter ansehen</button>
+    </div>
+  </section>
+
+  <!-- ===== LISTE ===== -->
+  <section class="screen" id="screen-liste">
+    <div class="card">
+      <h2>Gespeicherte Messungen</h2>
+      <div id="mwList"></div>
+      <div class="btn-row" id="mwListActions" hidden>
+        <button class="cta slim" id="mwShare"><svg class="wzi" aria-hidden="true"><use href="#wzi-share"></use></svg> Als Text teilen</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Genauigkeit</h2>
+      <p class="muted">MessWahr nutzt den Lagesensor deines Smartphones. Er ist auf etwa ein halbes bis ein Grad genau; dazu kommen dein Zielen und die angenommene Kamerahöhe. Die Werte sind eine gute Orientierung, aber keine Vermessung und kein Ersatz für ein geeichtes Messgerät.</p>
+    </div>
+    <div class="card">
+      <h2>Über diese App</h2>
+      <p class="muted">Teil der WahrZentrale</p>
+      <div style="height:10px"></div>
+      <button class="cta" id="showOnboardingBtn">Einführung erneut anzeigen</button>
+    </div>
+  </section>
+
+  <footer class="wz-footer">
+    <button type="button" onclick="MW.showOnboarding()">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#mw">Datenschutz</a>
+  </footer>
+</div>
+
+<!-- Vollbild: Höhe peilen -->
+<div class="ar" id="mwAr" role="dialog" aria-label="Höhe messen mit der Kamera">
+  <video id="mwVideo" autoplay playsinline muted></video>
+  <canvas id="mwCanvas"></canvas>
+  <div class="ar-top">
+    <button type="button" class="ar-btn" id="mwArClose">Schließen</button>
+    <span class="ar-title" id="mwArTitle">Höhe messen</span>
+    <button type="button" class="ar-btn" id="mwArReset">Neu</button>
+  </div>
+  <div class="ar-info" id="mwArInfo">
+    <div class="ar-grid three" id="mwArGrid"></div>
+    <div id="mwArStep" class="ar-sep" style="font-size:13.5px;line-height:1.4"></div>
+    <div class="ar-row" id="mwArRow"></div>
+  </div>
+</div>
+
+<script src="./wz-ui.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script>function wzIcon(id,cls){return '<svg class="wzi'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#wzi-'+id+'"></use></svg>';}</script>
+<script>
+/* ---------- Lage des Geräts (gleiche Rechnung wie Himmels-Kompass und Sternenhimmel) ----------
+   Kamera-Orientierung als Quaternion aus den Sensorwinkeln – ohne Polstelle beim Blick nach oben/unten.
+   Auf dem Smartphone trägt das Gyroskop die Bewegung, der Kompass liefert nur den geglätteten Versatz. */
+var ORI = (function(){
+  var D2R = Math.PI / 180;
+  function wrap360(d){ d %= 360; return d < 0 ? d + 360 : d; }
+  function wrap180(d){ d = wrap360(d); return d > 180 ? d - 360 : d; }
+  function qFromAngles(a, b, g){
+    var _z = (a || 0) * D2R, _x = (b || 0) * D2R, _y = (g || 0) * D2R;
+    var cX = Math.cos(_x / 2), cY = Math.cos(_y / 2), cZ = Math.cos(_z / 2), sX = Math.sin(_x / 2), sY = Math.sin(_y / 2), sZ = Math.sin(_z / 2);
+    return [sX * cY * cZ - cX * sY * sZ, cX * sY * cZ + sX * cY * sZ, cX * cY * sZ + sX * sY * cZ, cX * cY * cZ - sX * sY * sZ];
+  }
+  function qMul(a, b){
+    return [a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1], a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+            a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3], a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]];
+  }
+  function qAxis(ax, rad){ var s = Math.sin(rad / 2); return [ax[0] * s, ax[1] * s, ax[2] * s, Math.cos(rad / 2)]; }
+  function qNorm(q){ var n = Math.hypot(q[0], q[1], q[2], q[3]) || 1; return [q[0] / n, q[1] / n, q[2] / n, q[3] / n]; }
+  function qSlerp(a, b, t){
+    var bx = b[0], by = b[1], bz = b[2], bw = b[3], dot = a[0] * bx + a[1] * by + a[2] * bz + a[3] * bw;
+    if(dot < 0){ bx = -bx; by = -by; bz = -bz; bw = -bw; dot = -dot; }
+    if(dot > 0.9995) return qNorm([a[0] + (bx - a[0]) * t, a[1] + (by - a[1]) * t, a[2] + (bz - a[2]) * t, a[3] + (bw - a[3]) * t]);
+    var th0 = Math.acos(Math.min(1, dot)), th = th0 * t, s0 = Math.cos(th) - dot * Math.sin(th) / Math.sin(th0), s1 = Math.sin(th) / Math.sin(th0);
+    return [a[0] * s0 + bx * s1, a[1] * s0 + by * s1, a[2] * s0 + bz * s1, a[3] * s0 + bw * s1];
+  }
+  function qRot(q, v){
+    var qx = q[0], qy = q[1], qz = q[2], qw = q[3], tx = 2 * (qy * v[2] - qz * v[1]), ty = 2 * (qz * v[0] - qx * v[2]), tz = 2 * (qx * v[1] - qy * v[0]);
+    return [v[0] + qw * tx + (qy * tz - qz * ty), v[1] + qw * ty + (qz * tx - qx * tz), v[2] + qw * tz + (qx * ty - qy * tx)];
+  }
+  function makeYawOffset(){
+    var cur = null, fast = 0, last = 0, w = function(d){ return ((d + 540) % 360) - 180; };
+    return function(target, now){
+      if(cur === null || !(now - last < 1000)){ cur = fast = target; last = now; return cur; }
+      var dt = Math.max(0, now - last); last = now;
+      fast = (fast + w(target - fast) * (1 - Math.exp(-dt / 250)) + 360) % 360;
+      var bias = w(fast - cur), a = Math.abs(bias), tau = a > 20 ? 100 : a > 6 ? 300 : a > 2.5 ? 700 : 2000;
+      cur = (cur + bias * (1 - Math.exp(-dt / tau)) + 360) % 360;
+      return cur;
+    };
+  }
+  var st = { raw: null, absSeen: false, smQ: null, smT: 0, yaw: makeYawOffset(), on: false };
+  function store(e, ok){ st.raw = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, webkit: (e.webkitCompassHeading != null ? e.webkitCompassHeading : null), ok: ok, t: performance.now() }; }
+  function onAbs(e){ if(e.alpha == null) return; st.absSeen = true; store(e, true); }
+  function onOri(e){
+    if(e.beta == null) return;
+    if(e.webkitCompassHeading != null){ store(e, true); return; }
+    if(st.absSeen) return;
+    store(e, e.absolute === true);
+  }
+  /* Erlaubnis (Smartphone) muss aus einem Tipp heraus angefragt werden */
+  function permit(){
+    var p = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')
+      ? DeviceOrientationEvent.requestPermission() : Promise.resolve(typeof DeviceOrientationEvent !== 'undefined' ? 'granted' : 'unsupported');
+    return p.then(function(r){
+      if(r === 'unsupported') throw new Error('Dieses Gerät liefert keine Lagedaten.');
+      if(r !== 'granted') throw new Error('Der Zugriff auf die Bewegungs- und Lagesensoren wurde nicht erlaubt. Du kannst ihn in den Einstellungen deines Browsers wieder erlauben.');
+    });
+  }
+  function start(){
+    if(st.on) return;
+    st.on = true;
+    window.addEventListener('deviceorientationabsolute', onAbs, true);
+    window.addEventListener('deviceorientation', onOri, true);
+  }
+  function stop(){
+    st.on = false;
+    window.removeEventListener('deviceorientationabsolute', onAbs, true);
+    window.removeEventListener('deviceorientation', onOri, true);
+    st.raw = null; st.absSeen = false; st.smQ = null;
+  }
+  /* compass=false: nur Gyroskop (stabil, ohne Nordbezug) – genügt für Neigungen und eigene Marken */
+  function attitude(compass){
+    var r = st.raw;
+    if(!r || r.beta == null) return null;
+    var alphaEff;
+    if(compass && r.webkit != null){
+      var gyroYaw = typeof r.alpha === 'number' && !isNaN(r.alpha), a0 = gyroYaw ? r.alpha : 0;
+      var q0 = qFromAngles(a0, r.beta, r.gamma || 0), f0 = qRot(q0, [0, 0, -1]);
+      var ref = Math.abs(f0[2]) < 0.7 ? f0 : qRot(q0, [0, 1, 0]);
+      var h0 = wrap360(Math.atan2(ref[0], ref[1]) / D2R), d = wrap360(r.webkit - h0);
+      if(gyroYaw) d = st.yaw(d, performance.now());
+      alphaEff = wrap360(a0 - d);
+    } else alphaEff = (r.alpha || 0);
+    var q = qFromAngles(alphaEff, r.beta, r.gamma || 0);
+    var ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0);
+    ang = ((ang % 360) + 360) % 360;
+    return { q: qNorm(qMul(q, qAxis([0, 0, 1], -ang * D2R))), ok: compass ? (r.webkit != null || r.ok) : true, beta: r.beta, gamma: r.gamma || 0 };
+  }
+  /* zeitbasierte Glättung (ca. tau ms), gleich stark bei 60 und 120 Hz */
+  function smooth(att, tau){
+    var now = performance.now();
+    if(!st.smQ){ st.smQ = att.q; st.smT = now; return st.smQ; }
+    var dt = Math.min(200, Math.max(0, now - st.smT)); st.smT = now;
+    st.smQ = qSlerp(st.smQ, att.q, 1 - Math.exp(-dt / (tau || 60)));
+    return st.smQ;
+  }
+  function vec(az, alt){ var A = az * D2R, L = alt * D2R; return [Math.sin(A) * Math.cos(L), Math.cos(A) * Math.cos(L), Math.sin(L)]; }
+  function dot(a, b){ return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  /* Blickrichtung und Bildachsen für eine Orientierung; yawCal dreht um die Hochachse (Kalibrierung) */
+  function view(q, yawCal){
+    var qv = yawCal ? qNorm(qMul(qAxis([0, 0, 1], -yawCal * D2R), q)) : q;
+    var fw = qRot(qv, [0, 0, -1]);
+    return { fw: fw, rt: qRot(qv, [1, 0, 0]), up: qRot(qv, [0, 1, 0]),
+      az: wrap360(Math.atan2(fw[0], fw[1]) / D2R), alt: Math.asin(Math.max(-1, Math.min(1, fw[2]))) / D2R };
+  }
+  /* Brennweite in Bildpunkten für das Kamerabild (object-fit: cover) */
+  function focal(video, W, H, fov){
+    var vw = video && video.videoWidth || 0, vh = video && video.videoHeight || 0;
+    if(vw && ((vw > vh) !== (W > H))){ var t = vw; vw = vh; vh = t; }
+    return vw ? (Math.max(vw, vh) / 2) / Math.tan(fov * D2R / 2) * Math.max(W / vw, H / vh) : (Math.max(W, H) / 2) / Math.tan(fov * D2R / 2);
+  }
+  function projector(v, W, H, f){
+    return function(az, alt, minZ){
+      var e = vec(az, alt), zc = dot(e, v.fw);
+      if(zc < (minZ || 0.05)) return null;
+      return { x: W / 2 + f * dot(e, v.rt) / zc, y: H / 2 - f * dot(e, v.up) / zc };
+    };
+  }
+  /* Richtung „nach oben" im Gerät (für Wasserwaage und Neigung), aus beta/gamma */
+  function upVector(){
+    var r = st.raw; if(!r || r.beta == null) return null;
+    var b = r.beta * D2R, g = (r.gamma || 0) * D2R;
+    return [-Math.sin(g) * Math.cos(b), Math.sin(b), Math.cos(g) * Math.cos(b)];
+  }
+  return { permit: permit, start: start, stop: stop, attitude: attitude, smooth: smooth, view: view, focal: focal, projector: projector,
+    vec: vec, dot: dot, wrap360: wrap360, wrap180: wrap180, upVector: upVector, state: st, D2R: D2R };
+})();
+
+/* Kamera (Rückseite) – nur Live-Bild, nichts wird gespeichert */
+function camStart(video){
+  if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return Promise.reject(new Error('Kamera nicht verfügbar'));
+  return navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }).then(function(s){
+    video.srcObject = s; var p = video.play(); if(p && p.catch) p.catch(function(){});
+    return s;
+  });
+}
+function camStop(stream, video){
+  if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
+  if(video) video.srcObject = null;
+}
+
+/* ============================================================
+   MessWahr – Höhe (Kamera + Neigung), Wasserwaage, Neigung/Gefälle
+   Alles wird auf dem Gerät berechnet; es wird nichts übertragen.
+   © 2026 Jan Dierlich – Alle Rechte vorbehalten.
+   ============================================================ */
+(function(){
+  "use strict";
+  var LS_CFG = "messwahr_cfg", LS_LIST = "messwahr_messungen", LS_ONB = "messwahr_onboarded";
+  var $ = function(id){ return document.getElementById(id); };
+  var D2R = Math.PI / 180;
+
+  function load(k, d){ try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } }
+  function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function num(s){ var n = parseFloat(String(s || "").replace(",", ".")); return isFinite(n) ? n : null; }
+  function f(n, d){ return n == null || !isFinite(n) ? "–" : n.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function sgn(n, d){ return (n > 0.0499 ? "+" : n < -0.0499 ? "−" : "") + f(Math.abs(n), d); }
+  function toast(t){ if(window.wzToast) wzToast(t); }
+
+  var cfg = load(LS_CFG, {}) || {};
+  if(!cfg.cal) cfg.cal = { fx: 0, fy: 0, e: 0 };
+  function saveCfg(){ save(LS_CFG, cfg); }
+
+  /* ---------- Tabs ---------- */
+  var current = "hoehe";
+  function showTab(id){
+    if(current === "gewitter" && id !== "gewitter" && typeof GW !== "undefined") GW.leave();
+    current = id;
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ var on = t.getAttribute("data-tab") === id; t.classList.toggle("active", on); t.setAttribute("aria-selected", on ? "true" : "false"); });
+    Array.prototype.forEach.call(document.querySelectorAll(".screen"), function(s){ s.classList.toggle("active", s.id === "screen-" + id); });
+    if(id === "waage" || id === "neigung") sensorsOn(); else sensorsOffIfIdle();
+    if(id === "liste") renderList();
+    try { history.replaceState(null, "", "#" + id); } catch(e){}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ t.addEventListener("click", function(){ showTab(t.getAttribute("data-tab")); }); });
+
+  /* ---------- Lagesensor für Waage und Neigung ---------- */
+  var loopOn = false, waitTimer = 0;
+  function sensorsOn(){
+    ORI.start();
+    if(!loopOn){ loopOn = true; requestAnimationFrame(loop); }
+    clearTimeout(waitTimer);
+    waitTimer = setTimeout(function(){
+      var need = !ORI.state.raw;
+      $("mwSensorBtn1").hidden = !need; $("mwSensorBtn2").hidden = !need;
+    }, 700);
+  }
+  function sensorsOffIfIdle(){
+    loopOn = false;
+    if(!AR.on) ORI.stop();
+  }
+  function askSensors(){
+    ORI.permit().then(function(){ ORI.start(); $("mwSensorBtn1").hidden = true; $("mwSensorBtn2").hidden = true; })
+      .catch(function(e){ if(window.wzAlert) wzAlert(e.message); });
+  }
+  $("mwSensorBtn1").addEventListener("click", askSensors);
+  $("mwSensorBtn2").addEventListener("click", askSensors);
+
+  /* Neigungen aus der Richtung „oben" im Gerät:
+     flach: Quer = Kippung um die Längsachse (rechts tiefer = +), Längs = Kippung um die Querachse (oben höher = +)
+     Kante: Drehung in der Bildschirmebene, Abweichung zur nächsten Kante */
+  var smU = null;
+  function readLevel(){
+    var u = ORI.upVector(); if(!u) return null;
+    if(!smU) smU = u.slice();
+    for(var i = 0; i < 3; i++) smU[i] += (u[i] - smU[i]) * 0.25;
+    var x = smU[0], y = smU[1], z = smU[2];
+    var flat = Math.abs(z) > 0.8;
+    var qx = Math.atan2(-x, Math.abs(z)) / D2R, qy = Math.atan2(y, Math.abs(z)) / D2R;
+    var th = Math.atan2(-x, y) / D2R, k = Math.round(th / 90) * 90, dev = th - k;
+    return { flat: flat, face: z >= 0, qx: qx - cfg.cal.fx, qy: qy - cfg.cal.fy, rqx: qx, rqy: qy, k: ((k % 360) + 360) % 360, dev: dev - cfg.cal.e, rdev: dev };
+  }
+
+  /* ---------- Wasserwaage ---------- */
+  var holdLv = null, holdIn = null;
+  function lvSvg(m){
+    var s = '<defs><radialGradient id="mwBub" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#B9A6F5" stop-opacity=".55"/></radialGradient></defs>';
+    var GR = 'rgba(226,220,255,', ok;
+    if(m.flat){
+      /* Dosenlibelle: Ringe bei 1°, 2°, 5° und 10° (wurzelförmige Skala, damit kleine Werte gut lesbar sind) */
+      var R = 118, sc = function(d){ return R * Math.min(1, Math.sqrt(Math.abs(d) / 10)); };
+      s += '<circle cx="150" cy="150" r="' + R + '" fill="none" stroke="' + GR + '.35)" stroke-width="1"/>';
+      [1, 2, 5].forEach(function(d){ s += '<circle cx="150" cy="150" r="' + sc(d).toFixed(1) + '" fill="none" stroke="' + GR + (d === 1 ? '.6)' : '.28)') + '" stroke-width="1" stroke-dasharray="' + (d === 1 ? '0' : '2 5') + '"/>'; });
+      s += '<path d="M150 26v248M26 150h248" stroke="' + GR + '.22)" stroke-width="1"/>';
+      [1, 2, 5, 10].forEach(function(d){ s += '<text x="' + (152 + sc(d)).toFixed(1) + '" y="146" fill="' + GR + '.75)" font-size="10" font-family="ui-monospace,Menlo,sans-serif">' + d + '°</text>'; });
+      var dx = m.qx, dy = m.qy, tot = Math.hypot(dx, dy), r = sc(tot), a = Math.atan2(dy, -dx);
+      var bx = 150 + (tot ? Math.cos(a) * r : 0), by = 150 - (tot ? Math.sin(a) * r : 0);
+      ok = tot < 0.25;
+      s += '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="17" fill="url(#mwBub)" stroke="' + (ok ? '#FFD27A' : '#fff') + '" stroke-width="' + (ok ? 2.2 : 1.2) + '"/>';
+      s += '<circle cx="150" cy="150" r="2" fill="#fff"/>';
+    } else {
+      /* Röhrenlibelle entlang der aufliegenden Kante */
+      var dev = m.dev, rot = -m.k;
+      s += '<g transform="rotate(' + rot + ' 150 150)">';
+      s += '<rect x="30" y="126" width="240" height="48" rx="24" fill="rgba(185,166,245,.08)" stroke="' + GR + '.4)" stroke-width="1"/>';
+      for(var t = -10; t <= 10; t++){ var tx = 150 + t * 10.5, big = t % 5 === 0; if(t === 0) continue; s += '<path d="M' + tx + ' ' + (big ? 126 : 130) + 'v' + (big ? 10 : 5) + 'M' + tx + ' ' + (big ? 174 : 170) + 'v-' + (big ? 10 : 5) + '" stroke="' + GR + (big ? '.6)' : '.3)') + '" stroke-width="1"/>'; }
+      s += '<path d="M131 126v48M169 126v48" stroke="' + GR + '.75)" stroke-width="1.2"/>';
+      var off = Math.max(-1, Math.min(1, -dev / 10)) * 100;
+      ok = Math.abs(dev) < 0.2;
+      s += '<rect x="' + (131 + off).toFixed(1) + '" y="136" width="38" height="28" rx="14" fill="url(#mwBub)" stroke="' + (ok ? '#FFD27A' : '#fff') + '" stroke-width="' + (ok ? 2.2 : 1.2) + '"/>';
+      s += '</g>';
+      /* Drehlinie (zeigt die echte Waagerechte) */
+      s += '<g transform="rotate(' + (rot - m.dev).toFixed(2) + ' 150 150)"><path d="M40 150h220" stroke="#FFD27A" stroke-width="1" stroke-dasharray="3 5" opacity=".75"/></g>';
+    }
+    return s;
+  }
+  function renderLevel(m){
+    var v = holdLv || m;
+    $("mwLevelSvg").innerHTML = lvSvg(v);
+    if(v.flat){
+      $("mwLvMode").textContent = "flach";
+      $("mwLvModeSub").textContent = v.face ? "Bildschirm oben" : "Bildschirm unten";
+      $("mwLvL1").textContent = "Quer"; $("mwLvL2").textContent = "Längs";
+      $("mwLvA").textContent = sgn(v.qx, 1) + "°"; $("mwLvB").textContent = sgn(v.qy, 1) + "°";
+      $("mwLvAs").textContent = Math.abs(v.qx) < 0.15 ? "eben" : (v.qx > 0 ? "rechts tiefer" : "links tiefer");
+      $("mwLvBs").textContent = Math.abs(v.qy) < 0.15 ? "eben" : (v.qy > 0 ? "oben höher" : "oben tiefer");
+      $("mwLvA").classList.toggle("mw-ok", Math.abs(v.qx) < 0.15); $("mwLvB").classList.toggle("mw-ok", Math.abs(v.qy) < 0.15);
+    } else {
+      var landscape = v.k === 90 || v.k === 270;
+      $("mwLvMode").textContent = "Kante";
+      $("mwLvModeSub").textContent = landscape ? "lange Kante unten" : "kurze Kante unten";
+      $("mwLvL1").textContent = "Abweichung"; $("mwLvL2").textContent = "Gefälle";
+      $("mwLvA").textContent = sgn(v.dev, 1) + "°"; $("mwLvB").textContent = f(Math.abs(Math.tan(v.dev * D2R) * 100), 1) + " %";
+      $("mwLvAs").textContent = Math.abs(v.dev) < 0.15 ? "waagerecht" : "zur Waagerechten";
+      $("mwLvBs").textContent = "auf der Kante";
+      $("mwLvA").classList.toggle("mw-ok", Math.abs(v.dev) < 0.15); $("mwLvB").classList.remove("mw-ok");
+    }
+  }
+  $("mwLvHold").addEventListener("click", function(){
+    if(holdLv){ holdLv = null; this.textContent = "Halten"; return; }
+    var m = readLevel(); if(!m){ toast("Noch keine Sensordaten"); return; }
+    holdLv = m; this.textContent = "Weiter messen";
+  });
+
+  /* Kalibrieren: Umschlagmessung (messen – um 180° drehen – messen) */
+  var calStep = 0, calFirst = null;
+  $("mwLvCal").addEventListener("click", function(){
+    var box = $("mwLvCalBox");
+    var m = readLevel();
+    if(!m){ toast("Noch keine Sensordaten"); return; }
+    if(calStep === 0){
+      calStep = 1; calFirst = null; box.hidden = false;
+      box.innerHTML = "<b>Schritt 1:</b> Smartphone ruhig auf die Fläche legen (oder auf die Kante stellen) und unten auf „Erste Messung“ tippen.";
+      this.textContent = "Erste Messung"; return;
+    }
+    if(calStep === 1){
+      calFirst = m; calStep = 2;
+      box.innerHTML = "<b>Schritt 2:</b> Jetzt das Smartphone auf <b>derselben Stelle</b> um 180° drehen (oben ↔ unten) und auf „Zweite Messung“ tippen.";
+      this.textContent = "Zweite Messung"; return;
+    }
+    if(calStep === 2){
+      if(calFirst.flat !== m.flat){ box.innerHTML = "Die Lage hat sich geändert (flach ↔ Kante). Bitte neu beginnen."; calStep = 0; this.textContent = "Kalibrieren"; return; }
+      if(m.flat){ cfg.cal.fx = (calFirst.rqx + m.rqx) / 2; cfg.cal.fy = (calFirst.rqy + m.rqy) / 2; }
+      else { cfg.cal.e = (calFirst.rdev + m.rdev) / 2; }
+      saveCfg(); calStep = 0; this.textContent = "Kalibrieren";
+      box.innerHTML = "Fertig – der Nullpunkt ist " + (m.flat ? "für flache Lage" : "für die Kante") + " gespeichert. <button type=\"button\" class=\"icon-btn\" id=\"mwCalReset\" style=\"text-decoration:underline\">Zurücksetzen</button>";
+      $("mwCalReset").addEventListener("click", function(){ cfg.cal = { fx: 0, fy: 0, e: 0 }; saveCfg(); box.innerHTML = "Kalibrierung zurückgesetzt."; });
+    }
+  });
+
+  /* ---------- Neigung ---------- */
+  function slopeOf(m){
+    if(m.flat){ var tx = Math.tan(m.qx * D2R), ty = Math.tan(m.qy * D2R); return Math.atan(Math.hypot(tx, ty)) / D2R; }
+    return Math.abs(m.dev);
+  }
+  function inSvg(deg){
+    var a = Math.min(60, deg), L = 230, x0 = 35, y0 = 140, x1 = x0 + L * Math.cos(a * D2R), y1 = y0 - L * Math.sin(a * D2R);
+    var GR = 'rgba(226,220,255,';
+    var s = '<path d="M20 ' + y0 + 'h260" stroke="' + GR + '.45)" stroke-width="1"/>';
+    for(var d = 10; d <= 60; d += 10){ var xx = x0 + 250 * Math.cos(d * D2R), yy = y0 - 250 * Math.sin(d * D2R); s += '<path d="M' + x0 + ' ' + y0 + 'L' + xx.toFixed(1) + ' ' + yy.toFixed(1) + '" stroke="' + GR + '.12)" stroke-width="1" stroke-dasharray="2 6"/>'; }
+    s += '<path d="M' + x0 + ' ' + y0 + 'L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'L' + x1.toFixed(1) + ' ' + y0 + 'z" fill="rgba(185,166,245,.16)"/>';
+    s += '<path d="M' + x0 + ' ' + y0 + 'L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + '" stroke="#FFD27A" stroke-width="2" stroke-linecap="round"/>';
+    var r = 54; s += '<path d="M' + (x0 + r) + ' ' + y0 + 'A' + r + ' ' + r + ' 0 0 0 ' + (x0 + r * Math.cos(a * D2R)).toFixed(1) + ' ' + (y0 - r * Math.sin(a * D2R)).toFixed(1) + '" fill="none" stroke="#fff" stroke-width="1.2"/>';
+    s += '<text x="' + (x0 + r + 8) + '" y="' + (y0 - 8) + '" fill="#fff" font-size="12" font-family="ui-monospace,Menlo,sans-serif">' + f(deg, 1) + '°</text>';
+    s += '<circle cx="' + x0 + '" cy="' + y0 + '" r="3" fill="#fff"/>';
+    return s;
+  }
+  var lastSlope = null;
+  function renderIncline(m){
+    var deg = holdIn != null ? holdIn : slopeOf(m);
+    lastSlope = deg;
+    $("mwInclSvg").innerHTML = inSvg(deg);
+    var t = Math.tan(deg * D2R);
+    $("mwInDeg").textContent = f(deg, 1) + "°";
+    $("mwInPct").textContent = deg >= 89.5 ? "–" : f(t * 100, 1) + " %";
+    $("mwInRatio").textContent = deg < 0.05 ? "eben" : deg >= 89.5 ? "senkrecht" : "1 : " + f(1 / t, 1 / t >= 100 ? 0 : 1);
+    var L = num($("mwInLen").value);
+    $("mwInRise").textContent = L && deg < 89.5 ? f(L * t * 100, 1) + " cm" : "–";
+  }
+  $("mwInHold").addEventListener("click", function(){
+    if(holdIn != null){ holdIn = null; this.textContent = "Halten"; return; }
+    if(lastSlope == null){ toast("Noch keine Sensordaten"); return; }
+    holdIn = lastSlope; this.textContent = "Weiter messen";
+  });
+  $("mwInLen").addEventListener("input", function(){ cfg.len = this.value; saveCfg(); });
+  if(cfg.len) $("mwInLen").value = cfg.len;
+  $("mwInSave").addEventListener("click", function(){
+    if(lastSlope == null){ toast("Noch keine Sensordaten"); return; }
+    var t = Math.tan(lastSlope * D2R);
+    addItem({ typ: "neigung", wert: lastSlope, name: "Neigung", detail: f(t * 100, 1) + " % · 1 : " + (lastSlope < 0.05 ? "–" : f(1 / t, 1)) });
+    toast("Neigung gespeichert");
+  });
+
+  function loop(){
+    if(!loopOn) return;
+    requestAnimationFrame(loop);
+    var m = readLevel(); if(!m) return;
+    if(current === "waage") renderLevel(m);
+    else if(current === "neigung") renderIncline(m);
+  }
+
+  /* ---------- Höhe: Eingaben ---------- */
+  var mode = cfg.mode === "abstand" ? "abstand" : "fuss";
+  if(cfg.eye) $("mwEye").value = cfg.eye;
+  if(cfg.dist) $("mwDist").value = cfg.dist;
+  function setMode(m){
+    mode = m; cfg.mode = m; saveCfg();
+    Array.prototype.forEach.call($("mwModeRow").children, function(c){ var on = c.getAttribute("data-mode") === m; c.classList.toggle("active", on); c.setAttribute("aria-checked", on ? "true" : "false"); });
+    $("mwDistRow").hidden = m !== "abstand";
+    $("mwModeHint").textContent = m === "fuss"
+      ? "Du peilst zuerst den Fuß des Objekts an (wo es den Boden berührt), dann die Spitze. Der Boden sollte dazwischen ungefähr eben sein."
+      : "Du peilst nur die Spitze an. Die Entfernung misst du waagerecht vom eigenen Standort bis zum Fuß des Objekts.";
+  }
+  Array.prototype.forEach.call($("mwModeRow").children, function(c){ c.addEventListener("click", function(){ setMode(c.getAttribute("data-mode")); }); });
+  setMode(mode);
+  $("mwEye").addEventListener("input", function(){ cfg.eye = this.value; saveCfg(); });
+  $("mwDist").addEventListener("input", function(){ cfg.dist = this.value; saveCfg(); });
+
+  /* ---------- Höhe: Kamera-Ansicht ---------- */
+  var AR = { on: false, stream: null, raf: 0, step: "fuss", foot: null, top: null, sampling: null, live: null, fov: 68 };
+  function err(t){ var e = $("mwHeightErr"); e.textContent = t || ""; e.hidden = !t; }
+  function eye(){ var h = num($("mwEye").value); return h && h > 0.3 && h < 30 ? h : null; }
+  function dist(){ var d = num($("mwDist").value); return d && d > 0.5 && d < 5000 ? d : null; }
+
+  $("mwHeightStart").addEventListener("click", function(){
+    err("");
+    if(!eye()){ err("Bitte eine Kamerahöhe zwischen 0,3 und 30 m eintragen."); $("mwEye").focus(); return; }
+    if(mode === "abstand" && !dist()){ err("Bitte die waagerechte Entfernung eintragen (mindestens 0,5 m)."); $("mwDist").focus(); return; }
+    ORI.permit().then(function(){
+      ORI.start();
+      AR.on = true; AR.step = mode === "fuss" ? "fuss" : "spitze"; AR.foot = AR.top = null; AR.sampling = null;
+      $("mwAr").classList.add("on");
+      renderStep();
+      camStart($("mwVideo")).then(function(s){ AR.stream = s; }).catch(function(){
+        $("mwArStep").textContent = "Kamera nicht verfügbar – du kannst trotzdem über die Oberkante des Smartphones peilen.";
+      });
+      cancelAnimationFrame(AR.raf); AR.raf = requestAnimationFrame(draw);
+    }).catch(function(e){ err(e.message); });
+  });
+  function arStop(){
+    AR.on = false; cancelAnimationFrame(AR.raf);
+    camStop(AR.stream, $("mwVideo")); AR.stream = null;
+    $("mwAr").classList.remove("on");
+    if(current !== "waage" && current !== "neigung") ORI.stop();
+  }
+  $("mwArClose").addEventListener("click", arStop);
+  $("mwArReset").addEventListener("click", function(){ AR.step = mode === "fuss" ? "fuss" : "spitze"; AR.foot = AR.top = null; renderStep(); });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden && AR.on) arStop(); });
+
+  function compute(footAlt, topAlt){
+    var h = eye(), d;
+    if(mode === "fuss"){ if(!(footAlt < -0.3)) return null; d = h / Math.tan(-footAlt * D2R); }
+    else d = dist();
+    if(!(topAlt < 89)) return null;
+    return { H: h + d * Math.tan(topAlt * D2R), d: d };
+  }
+  function result(){
+    var fa = AR.foot ? AR.foot.alt : null, ta = AR.top.alt, r = compute(fa, ta); if(!r) return null;
+    /* Spanne: halbes Grad Zielfehler je Peilung */
+    var vals = [];
+    [-0.5, 0.5].forEach(function(e1){ [-0.5, 0.5].forEach(function(e2){ var x = compute(fa == null ? null : fa + e1, ta + e2); if(x && x.H > 0) vals.push(x.H); }); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    return { H: r.H, d: r.d, pm: vals.length ? (hi - lo) / 2 : null, fa: fa, ta: ta };
+  }
+  function grid(cells){
+    return cells.map(function(c){ return '<div' + (c[3] ? ' class="' + c[3] + '"' : '') + '><span>' + c[0] + '</span><b>' + c[1] + '</b><i>' + (c[2] || "&nbsp;") + '</i></div>'; }).join("");
+  }
+  function renderStep(){
+    var row = $("mwArRow"), st = $("mwArStep");
+    if(AR.step === "fuss"){
+      st.innerHTML = "<b>1 / 2 · Fußpunkt:</b> Richte das Fadenkreuz auf die Stelle, an der das Objekt den Boden berührt.";
+      row.innerHTML = '<button type="button" class="ar-btn main" id="mwMark">Fußpunkt setzen</button>';
+    } else if(AR.step === "spitze"){
+      st.innerHTML = "<b>" + (mode === "fuss" ? "2 / 2" : "1 / 1") + " · Spitze:</b> Richte das Fadenkreuz auf den höchsten Punkt.";
+      row.innerHTML = '<button type="button" class="ar-btn main" id="mwMark">Spitze setzen</button>';
+    } else {
+      var r = result();
+      st.innerHTML = r ? "Das Ergebnis steht auch unter „Letzte Messung“. Dauerhaft sichern mit „Speichern“." : "Das ging nicht auf – bitte neu messen.";
+      row.innerHTML = '<button type="button" class="ar-btn main" id="mwArSave">Speichern</button><button type="button" class="ar-btn" id="mwArAgain">Neu messen</button>';
+      $("mwArSave").addEventListener("click", function(){ saveHeight(); arStop(); showTab("liste"); });
+      $("mwArAgain").addEventListener("click", function(){ $("mwArReset").click(); });
+      return;
+    }
+    $("mwMark").addEventListener("click", startSample);
+  }
+  /* Beim Tippen eine halbe Sekunde mitteln – ruhiger als ein Einzelwert */
+  function startSample(){
+    if(!AR.live){ return; }
+    AR.sampling = { t0: performance.now(), n: 0, alt: 0, sx: 0, sy: 0 };
+    $("mwMark").disabled = true; $("mwMark").textContent = "Ruhig halten …";
+  }
+  function finishSample(){
+    var s = AR.sampling; AR.sampling = null;
+    var p = { alt: s.alt / s.n, az: ORI.wrap360(Math.atan2(s.sx, s.sy) / D2R) };
+    if(AR.step === "fuss"){
+      if(p.alt > -0.5){ $("mwArStep").innerHTML = "<b>Der Fußpunkt muss unter der Waagerechten liegen.</b> Weiter weg stellen oder tiefer zielen."; renderStepButtonsOnly(); return; }
+      AR.foot = p; AR.step = "spitze";
+    } else {
+      if(AR.foot && p.alt <= AR.foot.alt + 0.5){ $("mwArStep").innerHTML = "<b>Die Spitze muss über dem Fußpunkt liegen.</b>"; renderStepButtonsOnly(); return; }
+      if(p.alt >= 85){ $("mwArStep").innerHTML = "<b>Zu steil.</b> Stell dich weiter weg."; renderStepButtonsOnly(); return; }
+      AR.top = p; AR.step = "fertig"; showLast();
+    }
+    renderStep();
+  }
+  function renderStepButtonsOnly(){ var b = $("mwMark"); if(b){ b.disabled = false; b.textContent = AR.step === "fuss" ? "Fußpunkt setzen" : "Spitze setzen"; } }
+
+  function draw(){
+    if(!AR.on) return;
+    AR.raf = requestAnimationFrame(draw);
+    var cv = $("mwCanvas"), ctx = cv.getContext("2d"), dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    if(cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)){ cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    var att = ORI.attitude(false);
+    if(!att){ ctx.fillStyle = "#fff"; ctx.font = "600 15px -apple-system,sans-serif"; ctx.textAlign = "center"; ctx.fillText("Warte auf Lagesensor …", W / 2, H / 2); return; }
+    var q = ORI.smooth(att, 70), v = ORI.view(q, 0), fpx = ORI.focal($("mwVideo"), W, H, AR.fov), P = ORI.projector(v, W, H, fpx);
+    AR.live = v;
+    if(AR.sampling){
+      var s = AR.sampling; s.n++; s.alt += v.alt; s.sx += Math.sin(v.az * D2R); s.sy += Math.cos(v.az * D2R);
+      if(performance.now() - s.t0 > 500 && s.n >= 5) finishSample();
+    }
+    var DARK = "rgba(10,8,30,", GRID = "rgba(226,220,255,", GOLD = "#FFD27A", MONO = "ui-monospace, Menlo, -apple-system, sans-serif";
+    function mono(t, x, y, size, col, align){ ctx.font = "600 " + size + "px " + MONO; ctx.textAlign = align || "center"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.strokeStyle = DARK + "0.8)"; ctx.strokeText(t, x, y); ctx.fillStyle = col; ctx.fillText(t, x, y); }
+    function line(pts){ var prev = null; ctx.beginPath(); pts.forEach(function(p){ if(!p){ prev = null; return; } if(prev) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); prev = p; }); ctx.stroke(); }
+    /* Schild mit dunklem Grund: auf jedem Kamerabild lesbar, auch über hellen Wänden und Himmel */
+    function tag(t, x, y, col, align){
+      ctx.font = "600 12px " + MONO; ctx.textAlign = "left";
+      var w = ctx.measureText(t).width + 12, h = 20, x0 = align === "left" ? x : align === "right" ? x - w : x - w / 2, y0 = y - h / 2;
+      ctx.fillStyle = "rgba(12,10,32,0.78)"; ctx.strokeStyle = "rgba(226,220,255,0.35)"; ctx.lineWidth = 1;
+      ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x0, y0, w, h, 6); else ctx.rect(x0, y0, w, h); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = col || "#fff"; ctx.fillText(t, x0 + 6, y0 + 14.5);
+    }
+    /* Neigungsleiter: Waagerechte und Linien alle 5° (Beschriftung alle 10°) rund um die Blickrichtung */
+    var a0 = v.az, g, k, pts, ladder = [];
+    for(g = -80; g <= 80; g += 5){
+      pts = []; for(k = -30; k <= 30; k += 3) pts.push(P(a0 + k, g));
+      ctx.lineWidth = g === 0 ? 1.5 : 1; ctx.setLineDash(g === 0 ? [] : [2, 6]);
+      ctx.strokeStyle = g === 0 ? GRID + "0.95)" : GRID + (g % 10 === 0 ? "0.5)" : "0.25)");
+      line(pts);
+      /* Beschriftung am linken Rand, dort wo die Linie den Rand erreicht */
+      if(g % 10 === 0){
+        var best = null; pts.forEach(function(q){ if(q && q.x > 0 && (!best || Math.abs(q.x - 46) < Math.abs(best.x - 46))) best = q; });
+        if(best && best.y > 110 && best.y < H - 230) ladder.push([g, best]);
+      }
+    }
+    ctx.setLineDash([]);
+    ladder.forEach(function(l){ tag(l[0] === 0 ? "0° WAAGERECHT" : (l[0] > 0 ? "+" : "−") + Math.abs(l[0]) + "°", 12, l[1].y, l[0] === 0 ? "#fff" : "#E6DDF7", "left"); });
+    /* gesetzte Punkte */
+    function mark(p, label){
+      var q = P(p.az, p.alt); if(!q) return null;
+      ctx.strokeStyle = DARK + "0.6)"; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(q.x, q.y - 7); ctx.lineTo(q.x + 7, q.y); ctx.lineTo(q.x, q.y + 7); ctx.lineTo(q.x - 7, q.y); ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = DARK + "0.9)"; ctx.fill(); ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.stroke();
+      tag(label, q.x + 13, q.y, GOLD, "left");
+      return q;
+    }
+    var qf = AR.foot ? mark(AR.foot, "FUSS " + sgn(AR.foot.alt, 1) + "°") : null;
+    var qt = AR.top ? mark(AR.top, "SPITZE " + sgn(AR.top.alt, 1) + "°") : null;
+    if(AR.foot){
+      var col = []; for(g = AR.foot.alt; g <= Math.min(85, (AR.top ? AR.top.alt : v.alt)); g += 1) col.push(P(AR.foot.az, g));
+      ctx.strokeStyle = GOLD; ctx.lineWidth = 1.2; ctx.setLineDash([4, 5]); line(col); ctx.setLineDash([]);
+    }
+    /* Fadenkreuz */
+    var cx = W / 2, cy = H / 2;
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.25;
+    ctx.save(); ctx.strokeStyle = "rgba(10,8,30,0.55)"; ctx.lineWidth = 3.6; ctx.beginPath(); ctx.arc(cx, cy, 14, 0, 6.283); ctx.moveTo(cx - 24, cy); ctx.lineTo(cx - 8, cy); ctx.moveTo(cx + 8, cy); ctx.lineTo(cx + 24, cy); ctx.moveTo(cx, cy - 24); ctx.lineTo(cx, cy - 8); ctx.moveTo(cx, cy + 8); ctx.lineTo(cx, cy + 24); ctx.stroke(); ctx.restore(); ctx.beginPath(); ctx.arc(cx, cy, 14, 0, 6.283); ctx.moveTo(cx - 24, cy); ctx.lineTo(cx - 8, cy); ctx.moveTo(cx + 8, cy); ctx.lineTo(cx + 24, cy); ctx.moveTo(cx, cy - 24); ctx.lineTo(cx, cy - 8); ctx.moveTo(cx, cy + 8); ctx.lineTo(cx, cy + 24); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx, cy, 1.6, 0, 6.283); ctx.fill();
+    if(AR.sampling){ var pr = Math.min(1, (performance.now() - AR.sampling.t0) / 500); ctx.strokeStyle = GOLD; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, 20, -Math.PI / 2, -Math.PI / 2 + pr * 6.283); ctx.stroke(); }
+
+    /* Anzeige unten */
+    if(!AR.lastGrid || performance.now() - AR.lastGrid > 120){
+      AR.lastGrid = performance.now();
+      var h = eye(), cells = [["Neigung", sgn(v.alt, 1) + "°", v.alt >= 0 ? "über waagerecht" : "unter waagerecht"]];
+      if(AR.step === "fertig"){
+        var r = result();
+        cells = r ? [["Höhe", f(r.H, r.H < 10 ? 2 : 1) + " m", r.pm != null ? "± " + f(r.pm, r.pm < 1 ? 2 : 1) + " m" : "", "gold"], ["Entfernung", f(r.d, 1) + " m", mode === "fuss" ? "aus Kamerahöhe" : "eingegeben"], ["Winkel", sgn(r.ta, 1) + "°", r.fa != null ? "Fuß " + sgn(r.fa, 1) + "°" : "Spitze"]] : cells;
+      } else {
+        var d = mode === "fuss" ? (AR.foot ? h / Math.tan(-AR.foot.alt * D2R) : (v.alt < -0.5 ? h / Math.tan(-v.alt * D2R) : null)) : dist();
+        cells.push(["Entfernung", d ? (AR.foot || mode === "abstand" ? "" : "≈ ") + f(d, 1) + " m" : "–", AR.foot ? "zum Fußpunkt" : mode === "fuss" ? (v.alt < -0.5 ? "Bodenpunkt im Kreuz" : "tiefer zielen") : "eingegeben"]);
+        var live = d && AR.step === "spitze" && v.alt < 85 ? h + d * Math.tan(v.alt * D2R) : null;
+        cells.push(["Höhe im Kreuz", live != null && live > 0 ? f(live, live < 10 ? 2 : 1) + " m" : "–", live != null ? "live" : (AR.step === "fuss" ? "nach dem Fußpunkt" : ""), "gold"]);
+      }
+      var html = grid(cells);
+      if(html !== AR.gridHtml){ $("mwArGrid").innerHTML = html; AR.gridHtml = html; }
+    }
+  }
+  function showLast(){
+    var r = result(); if(!r) return;
+    AR.lastResult = { H: r.H, d: r.d, pm: r.pm, ta: r.ta, fa: r.fa, mode: mode, eye: eye(), ts: Date.now() };
+    $("mwLastCard").hidden = false;
+    $("mwLastInstr").innerHTML = '<div class="mw-res">' +
+      '<div><span class="instr-lbl">Höhe</span><b class="big" style="color:#FFD27A">' + f(r.H, r.H < 10 ? 2 : 1) + ' m</b><i class="instr-sub">' + (r.pm != null ? "± " + f(r.pm, r.pm < 1 ? 2 : 1) + " m" : "") + '</i></div>' +
+      '<div><span class="instr-lbl">Entfernung</span><b class="instr-val">' + f(r.d, 1) + ' m</b><i class="instr-sub">' + (mode === "fuss" ? "aus Kamerahöhe" : "eingegeben") + '</i></div>' +
+      '<div><span class="instr-lbl">Winkel</span><b class="instr-val">' + sgn(r.ta, 1) + '°</b><i class="instr-sub">' + (r.fa != null ? "Fuß " + sgn(r.fa, 1) + "°" : "Spitze") + '</i></div></div>';
+  }
+  function saveHeight(){
+    var r = AR.lastResult; if(!r) return;
+    addItem({ typ: "hoehe", wert: r.H, name: "Höhe", detail: "Entfernung " + f(r.d, 1) + " m · Winkel " + sgn(r.ta, 1) + "°" + (r.pm != null ? " · ± " + f(r.pm, r.pm < 1 ? 2 : 1) + " m" : "") });
+    toast("Höhe gespeichert");
+    r.saved = true;
+  }
+  $("mwLastSave").addEventListener("click", function(){ if(AR.lastResult && AR.lastResult.saved){ toast("Schon gespeichert"); return; } saveHeight(); });
+  $("mwLastAgain").addEventListener("click", function(){ $("mwHeightStart").click(); });
+
+  /* ---------- Liste ---------- */
+  function list(){ var l = load(LS_LIST, []); return Array.isArray(l) ? l : []; }
+  function addItem(it){
+    var l = list();
+    it.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); it.ts = Date.now();
+    l.unshift(it); save(LS_LIST, l.slice(0, 300));
+  }
+  function valueText(it){ if(it.typ === "gewitter") return "nächster Blitz " + f(it.wert, it.wert < 10 ? 1 : 0) + " km"; return it.typ === "hoehe" ? f(it.wert, it.wert < 10 ? 2 : 1) + " m" : f(it.wert, 1) + "°"; }
+  function renderList(){
+    var l = list(), box = $("mwList");
+    $("mwListActions").hidden = !l.length;
+    if(!l.length){ box.innerHTML = '<div class="empty-hint">Noch nichts gespeichert. Miss eine Höhe, eine Neigung oder peile ein Gewitter und tippe auf „Speichern“.</div>'; return; }
+    box.innerHTML = l.map(function(it){
+      return '<div class="history-item" data-id="' + esc(it.id) + '"><div class="row1"><span class="mw-type">' + wzIcon(it.typ === "hoehe" ? "height" : it.typ === "gewitter" ? "bolt" : "incline") + (it.typ === "hoehe" ? "Höhe" : it.typ === "gewitter" ? "Gewitter" : "Neigung") + '</span><span class="when">' + new Date(it.ts).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) + '</span></div>' +
+        '<div class="vals">' + esc(it.name && it.name !== "Höhe" && it.name !== "Neigung" && it.name !== "Gewitter" ? it.name + " · " : "") + valueText(it) + '</div>' +
+        '<div class="note">' + esc(it.detail || "") + '</div>' +
+        '<div class="actions"><button type="button" class="icon-btn" data-act="name">Benennen</button><button type="button" class="icon-btn" data-act="del">' + wzIcon("trash") + 'Löschen</button></div></div>';
+    }).join("");
+  }
+  $("mwList").addEventListener("click", function(e){
+    var b = e.target.closest("[data-act]"); if(!b) return;
+    var item = b.closest(".history-item"), id = item.getAttribute("data-id"), l = list(), it = l.filter(function(x){ return x.id === id; })[0];
+    if(!it) return;
+    if(b.getAttribute("data-act") === "del"){
+      Promise.resolve(window.wzConfirm ? wzConfirm("Diese Messung löschen?", { okLabel: "Löschen", cancelLabel: "Abbrechen" }) : true).then(function(ok){
+        if(!ok) return; save(LS_LIST, l.filter(function(x){ return x.id !== id; })); renderList();
+      });
+    } else {
+      if(item.querySelector("input")) return;
+      var inp = document.createElement("input"); inp.className = "text-input mw-name-input"; inp.maxLength = 60; inp.placeholder = "z. B. Eiche im Garten";
+      inp.value = it.name === "Höhe" || it.name === "Neigung" || it.name === "Gewitter" ? "" : it.name;
+      item.insertBefore(inp, item.querySelector(".actions")); inp.focus();
+      var done = function(){ var v = inp.value.trim(); it.name = v || (it.typ === "hoehe" ? "Höhe" : it.typ === "gewitter" ? "Gewitter" : "Neigung"); save(LS_LIST, l); renderList(); };
+      inp.addEventListener("blur", done); inp.addEventListener("keydown", function(ev){ if(ev.key === "Enter") inp.blur(); });
+    }
+  });
+  $("mwShare").addEventListener("click", function(){
+    var txt = "MessWahr – Messungen\n\n" + list().map(function(it){ return new Date(it.ts).toLocaleDateString("de-DE") + " · " + (it.name || "") + ": " + valueText(it) + (it.detail ? " (" + it.detail + ")" : ""); }).join("\n");
+    if(navigator.share){ navigator.share({ title: "MessWahr", text: txt }).catch(function(){}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ toast("In die Zwischenablage kopiert"); }); }
+  });
+
+  /* ---------- Gewitter-Peiler ----------
+     Blitz antippen → Donner erkennt das Mikrofon selbst → Richtung per eigenem Tipp bestätigen.
+     Reaktionszeit wird automatisch addiert. Aus mehreren gepeilten Blitzen: Front, Zug und Ankunft.
+     Mikrofon und Lagesensor werden nur live ausgewertet – nichts wird aufgenommen oder übertragen. */
+  var GW = (function(){
+    var LS_GW = "messwahr_gewitter";
+    var KEEP_MS = 3 * 3600e3, MAX_S = 75, IGN_S = 0.6, IDLE_OFF_MS = 15 * 60e3;
+    var D16 = ["N", "NNO", "NO", "ONO", "O", "OSO", "SO", "SSO", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+    var D16L = ["Norden", "Nordnordost", "Nordosten", "Ostnordost", "Osten", "Ostsüdost", "Südosten", "Südsüdost", "Süden", "Südsüdwest", "Südwesten", "Westsüdwest", "Westen", "Westnordwest", "Nordwesten", "Nordnordwest"];
+    var D8 = ["N", "NO", "O", "SO", "S", "SW", "W", "NW"];
+    var ADJ8 = ["nördlich", "nordöstlich", "östlich", "südöstlich", "südlich", "südwestlich", "westlich", "nordwestlich"];
+    var SENS_DB = { 1: 12, 2: 9, 3: 6.5 };
+    var W360 = ORI.wrap360;
+    function d16(az){ return Math.round(W360(az) / 22.5) % 16; }
+    function d8(az){ return Math.round(W360(az) / 45) % 8; }
+    function bearing(x, y){ return W360(Math.atan2(x, y) / D2R); }
+    function deg3(az){ var a = Math.round(W360(az)) % 360; return (a < 10 ? "00" : a < 100 ? "0" : "") + a + "°"; }
+    function hm(t, sec){ return new Date(t).toLocaleTimeString("de-DE", sec ? { hour: "2-digit", minute: "2-digit", second: "2-digit" } : { hour: "2-digit", minute: "2-digit" }); }
+    function fKm(d){ return d == null || !isFinite(d) ? "–" : f(d, d < 10 ? 1 : 0) + " km"; }
+    function icon(id){ return '<svg class="wzi" aria-hidden="true"><use href="#wzi-' + id + '"></use></svg>'; }
+
+    if(!cfg.gw) cfg.gw = { temp: 20, react: 0.25, sens: 2 };
+    function cSound(){ var T = cfg.gw.temp; if(!(T > -40 && T < 50)) T = 20; return 331.3 * Math.sqrt(1 + T / 273.15); }
+    function kmOf(sec, c){ return sec * (c || cSound()) / 1000; }
+
+    var gs = load(LS_GW, null);
+    if(!gs || !Array.isArray(gs.s) || (gs.s.length && Date.now() - gs.s[gs.s.length - 1].t > KEEP_MS)) gs = { s: [], demo: false };
+    gs.demo = false;
+    function persist(){ if(!gs.demo) save(LS_GW, gs); }
+
+    /* ================= Mikrofon: Donnereinsatz erkennen ================= */
+    var MIC = (function(){
+      var ctx = null, stream = null, anL, anH, bufL, bufH, timer = 0, sim = false, simAt = 0;
+      var m = { on: false, sim: false, base: null, baseH: null, lvl: -100, hist: [], det: null, onsets: [] };
+      function rms(an, buf){ an.getFloatTimeDomainData(buf); var s = 0; for(var i = 0; i < buf.length; i++) s += buf[i] * buf[i]; return 10 * Math.log10(s / buf.length + 1e-12); }
+      function noise(){ return (Math.random() + Math.random() + Math.random() - 1.5) * 1.6; }
+      function tick(){
+        var now = performance.now(), l, h;
+        if(sim){
+          var env = 0;
+          if(simAt && now > simAt){ var dt = now - simAt; env = 26 * Math.min(1, dt / 140) * Math.exp(-dt / 4200) * (0.75 + 0.25 * Math.sin(dt / 230) * Math.sin(dt / 97)); }
+          l = -62 + noise() + env; h = -58 + noise() + env * 0.35;
+        } else { l = rms(anL, bufL); h = rms(anH, bufH); }
+        if(m.base === null){ m.base = l; m.baseH = h; }
+        if(!m.det){
+          var k = l < m.base + 4 ? 0.03 : 0.003;
+          m.base += (l - m.base) * k; m.baseH += (h - m.baseH) * k;
+        }
+        m.lvl = l;
+        m.hist.push([now, l]); while(m.hist.length && now - m.hist[0][0] > 9000) m.hist.shift();
+        while(m.onsets.length && now - m.onsets[0] > 9000) m.onsets.shift();
+        if(m.det) detect(now, l, h);
+      }
+      function recent(ms){ var now = performance.now(), s = 0, n = 0; for(var i = m.hist.length - 1; i >= 0 && now - m.hist[i][0] <= ms; i--){ s += m.hist[i][1]; n++; } return n ? s / n : m.base; }
+      /* Donnereinsatz: tiefer Frequenzbereich steigt deutlich über den Grundpegel und bleibt dort,
+         und zwar stärker als der hohe Bereich (Stimmen, Klicks). Als Zeitpunkt zählt der Beginn des Anstiegs. */
+      function detect(now, l, h){
+        var d = m.det;
+        /* klingt noch Donner eines früheren Blitzes nach, folgt die Bezugslinie dem abfallenden Pegel */
+        if(d.cand === null){
+          if(l < d.ref) d.ref = Math.max(m.base == null ? l : Math.min(m.base, l), d.ref + (l - d.ref) * 0.06);
+          if(h < d.refH) d.refH += (h - d.refH) * 0.06;
+        }
+        if((now - d.t0) / 1000 < IGN_S) return;
+        var rise = l - d.ref, riseH = h - d.refH, lowish = rise >= riseH - 3;
+        if(d.cand === null){
+          if(rise >= d.thr * 0.6 && lowish){ d.cand = now - 10; d.held = 0; d.last = now; }
+        } else {
+          if(rise >= d.thr && lowish) d.held += now - d.last;
+          d.last = now;
+          if(d.held >= 150){ var at = d.cand, cb = d.cb; m.onsets.push(at); m.det = null; cb(at); return; }
+          if(rise < d.thr * 0.35 || now - d.cand > 600) d.cand = null;
+        }
+      }
+      function start(useSim){
+        if(m.on) return Promise.resolve();
+        if(useSim){ sim = m.sim = true; m.on = true; m.base = null; m.hist = []; timer = setInterval(tick, 20); return Promise.resolve(); }
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if(!AC || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return Promise.reject(new Error("Dieses Gerät stellt kein Mikrofon bereit."));
+        try { ctx = new AC(); if(ctx.resume) ctx.resume(); } catch(e){ return Promise.reject(new Error("Die Tonverarbeitung ließ sich nicht starten.")); }
+        return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false }).then(function(s){
+          stream = s;
+          var src = ctx.createMediaStreamSource(s);
+          var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 25;
+          var lp1 = ctx.createBiquadFilter(); lp1.type = "lowpass"; lp1.frequency.value = 220;
+          var lp2 = ctx.createBiquadFilter(); lp2.type = "lowpass"; lp2.frequency.value = 220;
+          var hh = ctx.createBiquadFilter(); hh.type = "highpass"; hh.frequency.value = 450;
+          anL = ctx.createAnalyser(); anL.fftSize = 1024; anH = ctx.createAnalyser(); anH.fftSize = 1024;
+          src.connect(hp); hp.connect(lp1); lp1.connect(lp2); lp2.connect(anL); src.connect(hh); hh.connect(anH);
+          bufL = new Float32Array(1024); bufH = new Float32Array(1024);
+          if(ctx.state === "suspended" && ctx.resume) ctx.resume();
+          sim = m.sim = false; m.on = true; m.base = null; m.hist = []; timer = setInterval(tick, 20);
+        }).catch(function(e){
+          try { ctx.close(); } catch(x){} ctx = null;
+          throw new Error(e && e.name === "NotAllowedError" ? "Das Mikrofon wurde nicht freigegeben. Du kannst es in den Einstellungen deines Browsers erlauben." : "Das Mikrofon ist nicht verfügbar.");
+        });
+      }
+      function stop(){
+        clearInterval(timer); timer = 0;
+        if(stream) stream.getTracks().forEach(function(t){ t.stop(); }); stream = null;
+        if(ctx) try { ctx.close(); } catch(e){} ctx = null;
+        m.on = false; m.sim = sim = false; m.det = null; m.hist = []; m.base = null; m.onsets = []; simAt = 0;
+      }
+      function arm(t0, cb){
+        var ref = Math.max(m.base == null ? -100 : m.base, recent(300));
+        m.det = { t0: t0, ref: ref, refH: m.baseH == null ? -100 : m.baseH, thr: SENS_DB[cfg.gw.sens] || 9, cand: null, cb: cb };
+        if(sim) simAt = t0 + (7 + Math.random() * 9) * 1000;
+      }
+      function disarm(){ m.det = null; }
+      m.start = start; m.stop = stop; m.arm = arm; m.disarm = disarm;
+      return m;
+    })();
+
+    /* ================= Zustand ================= */
+    var armed = false, micErr = "", run = null, flash = "", flashErr = false, raf = 0, lastPaint = 0, wake = null, idleTimer = 0;
+    var headLive = null, headOk = false, headBuf = [];
+
+    function keepAwake(){ try { if(navigator.wakeLock && !wake) navigator.wakeLock.request("screen").then(function(w){ wake = w; w.addEventListener("release", function(){ wake = null; }); }).catch(function(){}); } catch(e){} }
+    function releaseAwake(){ try { if(wake) wake.release(); } catch(e){} wake = null; }
+    function bumpIdle(){ clearTimeout(idleTimer); idleTimer = setTimeout(function(){ if(armed && !run){ deactivate(); flash = "Der Peiler wurde nach 15 Minuten ohne Blitz beendet, um den Akku zu schonen."; flashErr = false; render(); } }, IDLE_OFF_MS); }
+
+    function activate(useSim){
+      micErr = "";
+      ORI.start();
+      ORI.permit().then(function(){ ORI.start(); }).catch(function(){});
+      MIC.start(useSim).then(function(){ render(); }).catch(function(e){ micErr = e.message; render(); });
+      armed = true; keepAwake(); bumpIdle(); render();
+    }
+    function deactivate(){
+      armed = false; run = null; MIC.stop(); releaseAwake(); clearTimeout(idleTimer); stopLoop(); headOk = false; headLive = null;
+      if(!AR.on && current !== "waage" && current !== "neigung") ORI.stop();
+    }
+
+    /* ================= Messablauf ================= */
+    function onFlash(){
+      var now = performance.now();
+      if(run && run.thunder != null) commit(); /* Donner schon da: Messung ohne Richtung sichern */
+      if(gs.demo){ gs = { s: [], demo: false }; }
+      run = { t0: now, date: Date.now(), thunder: null, raw: null, tsrc: null, dir: null, c: cSound(), react: cfg.gw.react };
+      flash = ""; headBuf = headBuf.slice(-2);
+      if(MIC.on) MIC.arm(now, function(at){ if(run) setThunder((at - run.t0) / 1000, "auto"); });
+      bumpIdle(); render(); startLoop();
+    }
+    function setThunder(raw, src){
+      if(!run || run.thunder != null) return;
+      run.raw = raw; run.tsrc = src;
+      run.thunder = src === "auto" ? raw + run.react : raw; /* von Hand: beide Tipps verzögert, gleicht sich aus */
+      MIC.disarm(); maybeCommit(); render();
+    }
+    function setDir(az, src){ if(!run) return; run.dir = { az: az == null ? null : Math.round(W360(az)), src: src }; maybeCommit(); render(); }
+    function maybeCommit(){ if(run && run.thunder != null && run.dir) commit(); }
+    function commit(){
+      var r = run; if(!r || r.thunder == null) return;
+      var st = { t: r.date, raw: +r.raw.toFixed(2), sec: +r.thunder.toFixed(2), react: r.tsrc === "auto" ? r.react : 0, c: +r.c.toFixed(1), d: +kmOf(r.thunder, r.c).toFixed(2),
+        az: r.dir && r.dir.az != null ? r.dir.az : null, src: r.dir && r.dir.az != null ? r.dir.src : null, tsrc: r.tsrc };
+      gs.s.push(st); persist();
+      flash = "Blitz " + gs.s.length + " erfasst: <b>" + fKm(st.d) + "</b>" + (st.az != null ? " · " + D16[d16(st.az)] + " " + deg3(st.az) : " · ohne Richtung") + " · " + f(st.sec, 2) + " s";
+      flashErr = false; run = null; MIC.disarm(); render();
+    }
+    function headingMean(){
+      var now = performance.now(), sx = 0, sy = 0, n = 0;
+      headBuf.forEach(function(h){ if(now - h[0] <= 450){ sx += Math.sin(h[1] * D2R); sy += Math.cos(h[1] * D2R); n++; } });
+      return n ? bearing(sx, sy) : headLive;
+    }
+
+    /* ================= Schleife: Zeit, Pegel, Kompass ================= */
+    function startLoop(){ if(!raf) raf = requestAnimationFrame(tick); }
+    function stopLoop(){ if(raf) cancelAnimationFrame(raf); raf = 0; }
+    function tick(now){
+      raf = 0;
+      if(current !== "gewitter" || !armed) return;
+      var a = ORI.attitude(true);
+      if(a && a.ok){
+        var v = ORI.view(ORI.smooth(a, 110));
+        var az = Math.abs(v.alt) < 55 ? v.az : bearing(v.up[0], v.up[1]);
+        headLive = az; headOk = true; headBuf.push([now, az]); while(headBuf.length && now - headBuf[0][0] > 1200) headBuf.shift();
+      }
+      if(run && run.thunder == null && (now - run.t0) / 1000 > MAX_S){
+        MIC.disarm(); run = null; flashErr = true;
+        flash = "Kein Donner erkannt. Über rund 25 km ist er meist nicht mehr zu hören – die Messung wurde verworfen.";
+        render();
+      }
+      if(now - lastPaint > 66){ lastPaint = now; paintLive(now); }
+      raf = requestAnimationFrame(tick);
+    }
+    function paintLive(now){
+      var el;
+      if((el = $("gwClock"))) el.textContent = hm(Date.now(), true);
+      if((el = $("gwStHead"))) el.textContent = headOk && headLive != null ? deg3(headLive) : "–";
+      if((el = $("gwStHeadLed"))) el.className = "gw-led " + (headOk ? "on" : "warn");
+      if(run){
+        var s = run.thunder != null ? run.thunder : (now - run.t0) / 1000 + run.react;
+        if((el = $("gwT"))) el.innerHTML = f(s, run.thunder != null ? 2 : 1) + "<small>s</small>";
+        if((el = $("gwTd"))) el.textContent = "≈ " + f(kmOf(s, run.c), 2) + " km";
+      }
+      drawMeter(now); drawTape();
+      if(headOk && (el = $("gwHeadVal"))) el.textContent = D16[d16(headLive)] + " " + deg3(headLive);
+      if(headOk && (el = $("gwTakeDir"))) el.disabled = false;
+      scopeCone();
+    }
+    function sizeCanvas(cv){
+      var dpr = Math.min(3, window.devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight;
+      if(cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){ cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      var g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); return { g: g, w: w, h: h };
+    }
+    function drawMeter(now){
+      var cv = $("gwMeter"); if(!cv || !MIC.on) return;
+      var o = sizeCanvas(cv), g = o.g, W = o.w, H = o.h, span = 8000;
+      var ref = MIC.det ? MIC.det.ref : (MIC.base == null ? -70 : MIC.base), thr = MIC.det ? MIC.det.thr : (SENS_DB[cfg.gw.sens] || 9);
+      var lo = ref - 12, hi = ref + thr + 22, Y = function(db){ return H - 4 - (Math.max(lo, Math.min(hi, db)) - lo) / (hi - lo) * (H - 8); };
+      g.strokeStyle = "rgba(226,220,255,.08)"; g.lineWidth = 1;
+      for(var i = 1; i < 4; i++){ g.beginPath(); g.moveTo(0, H * i / 4); g.lineTo(W, H * i / 4); g.stroke(); }
+      g.setLineDash([3, 4]);
+      g.strokeStyle = "rgba(226,220,255,.35)"; g.beginPath(); g.moveTo(0, Y(ref)); g.lineTo(W, Y(ref)); g.stroke();
+      g.strokeStyle = "rgba(255,210,122,.75)"; g.beginPath(); g.moveTo(0, Y(ref + thr)); g.lineTo(W, Y(ref + thr)); g.stroke();
+      g.setLineDash([]);
+      var hs = MIC.hist; if(hs.length > 1){
+        g.beginPath();
+        hs.forEach(function(p, k){ var x = W - (now - p[0]) / span * W; if(k) g.lineTo(x, Y(p[1])); else g.moveTo(x, Y(p[1])); });
+        g.strokeStyle = "#B9A6F5"; g.lineWidth = 1.6; g.stroke();
+        g.lineTo(W, H); g.lineTo(W - (now - hs[0][0]) / span * W, H); g.closePath();
+        var gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, "rgba(185,166,245,.30)"); gr.addColorStop(1, "rgba(185,166,245,0)"); g.fillStyle = gr; g.fill();
+      }
+      g.font = "700 9px ui-monospace,Menlo,monospace";
+      if(run){ var xf = W - (now - run.t0) / span * W; if(xf > 0){ g.strokeStyle = "rgba(255,255,255,.55)"; g.lineWidth = 1; g.beginPath(); g.moveTo(xf, 0); g.lineTo(xf, H); g.stroke(); g.fillStyle = "rgba(255,255,255,.8)"; g.fillText("BLITZ", xf + 3, 10); } }
+      MIC.onsets.forEach(function(t){ var x = W - (now - t) / span * W; if(x > 0){ g.strokeStyle = "#FFD27A"; g.lineWidth = 2; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); g.fillStyle = "#FFD27A"; g.fillText("DONNER", x + 3, H - 5); } });
+      var lv = $("gwLvl"); if(lv){ var dv = Math.round(MIC.lvl - ref); lv.textContent = (dv > 0 ? "+" : dv < 0 ? "−" : "±") + Math.abs(dv) + " dB"; }
+    }
+    function drawTape(){
+      var cv = $("gwTape"); if(!cv) return;
+      var o = sizeCanvas(cv), g = o.g, W = o.w, H = o.h, ppd = W / 100, hd = headOk && headLive != null ? headLive : null;
+      g.textAlign = "center";
+      if(hd == null){ g.fillStyle = "rgba(226,220,255,.55)"; g.font = "600 10px ui-monospace,Menlo,monospace"; g.fillText("KOMPASS WIRD GESUCHT – SONST UNTEN WÄHLEN", W / 2, H / 2 + 4); return; }
+      var start = Math.floor((hd - 55) / 5) * 5;
+      for(var d = start; d <= hd + 55; d += 5){
+        var x = W / 2 + (d - hd) * ppd, a = W360(d), big = a % 30 === 0, mid = a % 10 === 0;
+        g.strokeStyle = "rgba(226,220,255," + (big ? .9 : mid ? .55 : .25) + ")"; g.lineWidth = big ? 1.6 : 1;
+        g.beginPath(); g.moveTo(x, H); g.lineTo(x, H - (big ? 16 : mid ? 11 : 6)); g.stroke();
+        if(big){ var card = a % 90 === 0, lbl = card ? ["N", "O", "S", "W"][a / 90] : String(a); g.fillStyle = card ? (a === 0 ? "#FFD27A" : "#fff") : "rgba(226,220,255,.8)"; g.font = (card ? "700 12px " : "600 10px ") + "ui-monospace,Menlo,monospace"; g.fillText(lbl, x, H - 21); }
+      }
+      g.fillStyle = "#FFD27A"; g.beginPath(); g.moveTo(W / 2 - 6, 0); g.lineTo(W / 2 + 6, 0); g.lineTo(W / 2, 8); g.closePath(); g.fill();
+      g.strokeStyle = "#FFD27A"; g.lineWidth = 1.4; g.beginPath(); g.moveTo(W / 2, 8); g.lineTo(W / 2, H); g.stroke();
+    }
+
+    /* ================= Konsole (Bedienfeld) ================= */
+    function statusBar(){
+      var micTxt = MIC.on ? (MIC.sim ? "Test" : "lauscht") : micErr ? "aus" : "startet …";
+      var micLed = MIC.on ? "on" : micErr ? "off" : "warn";
+      return '<div class="gw-status">' +
+        '<div><span class="gw-k"><span class="gw-led ' + micLed + '"></span>Mikro</span><b>' + micTxt + '</b></div>' +
+        '<div><span class="gw-k"><span class="gw-led ' + (headOk ? "on" : "warn") + '" id="gwStHeadLed"></span>Kompass</span><b id="gwStHead">–</b></div>' +
+        '<div><span class="gw-k">Schall</span><b>' + f(cSound(), 0) + ' m/s</b></div>' +
+        '<div><span class="gw-k">Reaktion</span><b>+' + f(cfg.gw.react, 2) + ' s</b></div></div>';
+    }
+    function ringSvg(){
+      var t = "";
+      for(var i = 0; i < 72; i++){ var A = i * 5 * D2R, big = i % 6 === 0, r1 = big ? 84 : 88;
+        t += '<line x1="' + (98 + Math.sin(A) * r1).toFixed(1) + '" y1="' + (98 - Math.cos(A) * r1).toFixed(1) + '" x2="' + (98 + Math.sin(A) * 94).toFixed(1) + '" y2="' + (98 - Math.cos(A) * 94).toFixed(1) + '" stroke="rgba(185,166,245,' + (big ? .7 : .28) + ')" stroke-width="' + (big ? 1.6 : 1) + '"/>'; }
+      return '<svg class="gw-ring" viewBox="0 0 196 196" aria-hidden="true"><circle cx="98" cy="98" r="78" fill="none" stroke="rgba(185,166,245,.18)"/>' + t + '</svg>';
+    }
+    function render(){
+      var c = $("gwConsole"); if(!c) return;
+      $("gwDemoBar").hidden = !gs.demo;
+      var fl = flash ? '<div class="gw-flash' + (flashErr ? " err" : "") + '">' + flash + '</div>' : "";
+      if(!armed){
+        c.innerHTML = '<div class="gw-body">' +
+          '<p class="gw-intro">Tippe einmal, wenn es blitzt. Den Donner erkennt MessWahr selbst über das Mikrofon. Die Richtung bestätigst du in Ruhe mit einem zweiten Tipp. Daraus entstehen Entfernung, Lage der Front und Zugrichtung.</p>' +
+          '<div class="gw-checks">' +
+            '<div>' + icon("sound") + '<span><b style="color:#fff">Mikrofon</b> – erkennt den Donnereinsatz. Es wird nur live ausgewertet, nichts aufgenommen.</span></div>' +
+            '<div>' + icon("crosshair") + '<span><b style="color:#fff">Kompass</b> – peilt die Richtung, in die du das Smartphone hältst.</span></div>' +
+            '<div>' + icon("lock") + '<span><b style="color:#fff">100% lokal</b> – nichts verlässt dein Gerät. Solange der Peiler läuft, zeigt dein Gerät an, dass das Mikrofon aktiv ist.</span></div>' +
+            '<div>' + icon("warning") + '<span><b style="color:#FFD27A">Sicher peilen</b> – nur von einem geschützten Ort aus, etwa im Haus am Fenster oder im Auto. Geh zum Peilen nicht nach draußen. Der Peiler ersetzt keine amtliche Unwetterwarnung.</span></div></div>' +
+          '<button type="button" class="ar-btn main" id="gwArm" style="width:100%">Peiler starten</button>' + fl + '</div>';
+        $("gwArm").addEventListener("click", function(){ activate(false); });
+      } else if(!run){
+        var n = gs.demo ? 0 : gs.s.length;
+        c.innerHTML = statusBar() + '<div class="gw-body">' +
+          '<div class="gw-trigger-wrap">' + ringSvg() + '<button type="button" class="gw-trigger" id="gwFlashBtn" aria-label="Blitz gesehen"><small>' + (n ? "Blitz " + (n + 1) : "Bereit") + '</small>' + icon("bolt") + '<b>Blitz</b></button></div>' +
+          '<p class="gw-hint">Tippe genau in dem Moment, in dem es aufleuchtet. Den Rest übernimmt der Peiler.</p>' +
+          (MIC.on ? '<div class="gw-meter-box"><div class="gw-meter-head"><span class="gw-k">Tiefton-Pegel</span><span class="gw-m" id="gwLvl">–</span></div><canvas class="gw-meter" id="gwMeter"></canvas></div>' : "") +
+          (micErr ? '<div class="gw-flash err">' + esc(micErr) + ' Den Donner setzt du dann mit einem Tipp von Hand.</div><div class="gw-linkrow"><button type="button" class="gw-link" id="gwSim">Mit simuliertem Donner testen</button></div>' : "") +
+          fl + '<div class="gw-linkrow"><button type="button" class="gw-link" id="gwOff">Peiler beenden</button></div></div>';
+        $("gwFlashBtn").addEventListener("click", onFlash);
+        $("gwOff").addEventListener("click", function(){ deactivate(); flash = ""; render(); });
+        if($("gwSim")) $("gwSim").addEventListener("click", function(){ micErr = ""; MIC.start(true).then(function(){ render(); }); });
+      } else {
+        var thDone = run.thunder != null, dirDone = !!run.dir;
+        var thPill = thDone ? '<span class="gw-pill ok">' + (run.tsrc === "auto" ? "erkannt" : "von Hand") + '</span>' : MIC.on ? '<span class="gw-pill live">lauscht …</span>' : '<span class="gw-pill">warten</span>';
+        var dirPill = dirDone ? '<span class="gw-pill ok">übernommen</span>' : '<span class="gw-pill live">ausrichten</span>';
+        c.innerHTML = statusBar() +
+          '<div class="gw-run-head"><span class="gw-k">Messung ' + (gs.s.length + 1) + ' · ' + hm(run.date, true) + '</span><button type="button" class="gw-link" id="gwCancel" style="padding:0">Verwerfen</button></div>' +
+          '<div class="gw-big-t"><div class="t" id="gwT">0,0<small>s</small></div><div class="d" id="gwTd">≈ 0,00 km</div>' +
+            '<div class="c">c = ' + f(run.c, 1) + ' m/s · inkl. +' + f(run.react, 2) + ' s Reaktionszeit</div></div>' +
+          '<div class="gw-lane' + (thDone ? " done" : "") + '"><div class="gw-lane-head"><span class="gw-k">1 · Donner</span>' + thPill + '</div>' +
+            (thDone ? '<div class="gw-lane-res">' + f(run.thunder, 2) + ' s → ' + f(kmOf(run.thunder, run.c), 2) + ' km</div><div class="gw-lane-sub">' + (run.tsrc === "auto" ? "Einsatz nach " + f(run.raw, 2) + " s erkannt, Reaktionszeit addiert." : "Von Hand gesetzt – beide Tipps sind gleich verzögert, daher ohne Zuschlag.") + '</div>'
+              : (MIC.on ? '<canvas class="gw-meter" id="gwMeter"></canvas><div class="gw-lane-sub">Der Donner wird automatisch erkannt. Gelbe Linie = Auslöseschwelle.</div>' : '<div class="gw-lane-sub">Kein Mikrofon – tippe, sobald du den Donner hörst.</div>') +
+              '<div class="gw-row"><button type="button" class="ar-btn' + (MIC.on ? "" : " main") + '" id="gwManual">' + (MIC.on ? "Donner von Hand setzen" : "Donner jetzt") + '</button></div>') + '</div>' +
+          '<div class="gw-lane' + (dirDone ? " done" : "") + '"><div class="gw-lane-head"><span class="gw-k">2 · Richtung</span>' + dirPill + '</div>' +
+            (dirDone ? '<div class="gw-lane-res">' + (run.dir.az != null ? D16[d16(run.dir.az)] + " " + deg3(run.dir.az) : "ohne Richtung") + '</div><div class="gw-lane-sub">' + (run.dir.az == null ? "Nur die Entfernung wird verwendet." : run.dir.src === "Sensor" ? "Gepeilt – Mittelwert der letzten halben Sekunde." : "Grob gewählt (± 22°).") + (thDone ? "" : " Warte auf den Donner …") + '</div>'
+              : '<canvas class="gw-tape" id="gwTape"></canvas><div class="gw-head-row"><span class="gw-k">Peilung</span><span class="gw-head-val" id="gwHeadVal">–</span></div>' +
+                '<div class="gw-row"><button type="button" class="ar-btn" id="gwNoDir">Ohne</button><button type="button" class="ar-btn main" id="gwTakeDir" style="flex:2.4"' + (headOk ? "" : " disabled") + '>Richtung übernehmen</button></div>' +
+                '<div class="gw-chips">' + D8.map(function(d, i){ return '<button type="button" data-az="' + (i * 45) + '">' + d + '</button>'; }).join("") + '</div>' +
+                '<div class="gw-lane-sub">Rückseite des Smartphones auf die Blitzstelle richten, dann bestätigen. Geht auch noch nach dem Donner.</div>') + '</div>' +
+          '<div class="gw-next"><button type="button" id="gwFlashBtn" aria-label="Neuer Blitz">' + icon("bolt") + '</button><span>Neuer Blitz? Tippen startet die nächste Messung' + (thDone ? " – diese wird ohne Richtung gesichert." : " – diese wird verworfen.") + '</span></div>';
+        $("gwFlashBtn").addEventListener("click", onFlash);
+        $("gwCancel").addEventListener("click", function(){ run = null; MIC.disarm(); flash = ""; render(); });
+        if($("gwManual")) $("gwManual").addEventListener("click", function(){ if(run) setThunder((performance.now() - run.t0) / 1000, "hand"); });
+        if($("gwTakeDir")) $("gwTakeDir").addEventListener("click", function(){ var h = headingMean(); if(h != null) setDir(h, "Sensor"); });
+        if($("gwNoDir")) $("gwNoDir").addEventListener("click", function(){ setDir(null, null); });
+        Array.prototype.forEach.call(c.querySelectorAll(".gw-chips button"), function(b){ b.addEventListener("click", function(){ setDir(+b.getAttribute("data-az"), "gewählt"); }); });
+      }
+      if(armed) startLoop();
+      paintLive(performance.now());
+      renderLage();
+    }
+
+    /* ================= Auswertung ================= */
+    function regressW(pts){ /* [x, y, Gewicht] */
+      var sw = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
+      pts.forEach(function(p){ var w = p[2] == null ? 1 : p[2]; sw += w; sx += w * p[0]; sy += w * p[1]; sxx += w * p[0] * p[0]; sxy += w * p[0] * p[1]; });
+      var den = sw * sxx - sx * sx; if(!sw || Math.abs(den) < 1e-9) return null;
+      var b = (sw * sxy - sx * sy) / den; return { b: b, a: (sy - b * sx) / sw };
+    }
+    function analyse(){
+      var s = gs.s; if(!s.length) return null;
+      var last = s[s.length - 1], T = last.t;
+      var rec = s.filter(function(x){ return T - x.t <= 30 * 60e3; });
+      var A = { last: last, n: rec.length, rec: rec, since: (Date.now() - last.t - last.sec * 1000) / 60e3, now: T };
+      A.span = (T - rec[0].t) / 60e3;
+      if(rec.length >= 3 && A.span >= 3) A.dTrend = regressW(rec.map(function(x){ return [(x.t - T) / 60e3, x.d, 1]; }));
+      var wd = rec.filter(function(x){ return x.az != null; });
+      A.nDir = wd.length; A.nPeil = wd.filter(function(x){ return x.src === "Sensor"; }).length;
+      var P = wd.map(function(x){ return { t: (x.t - T) / 60e3, x: x.d * Math.sin(x.az * D2R), y: x.d * Math.cos(x.az * D2R), w: x.src === "gewählt" ? 0.4 : 1 }; });
+      var spanDir = wd.length ? (wd[wd.length - 1].t - wd[0].t) / 60e3 : 0;
+      if(wd.length >= 3 && spanDir >= 3){
+        var rx = regressW(P.map(function(p){ return [p.t, p.x, p.w]; })), ry = regressW(P.map(function(p){ return [p.t, p.y, p.w]; }));
+        if(rx && ry){
+          var v = [rx.b, ry.b], speed = Math.hypot(v[0], v[1]) * 60, moving = speed >= 4;
+          /* alle Blitze mit dem Zug auf „jetzt" verschieben, dann Hauptachse der Verteilung = Frontlinie */
+          var Q = P.map(function(p){ return [p.x - v[0] * p.t, p.y - v[1] * p.t, p.w]; });
+          var sw = 0, cx = 0, cy = 0; Q.forEach(function(q){ sw += q[2]; cx += q[2] * q[0]; cy += q[2] * q[1]; }); cx /= sw; cy /= sw;
+          var sxx = 0, syy = 0, sxy = 0; Q.forEach(function(q){ var dx = q[0] - cx, dy = q[1] - cy; sxx += q[2] * dx * dx; syy += q[2] * dy * dy; sxy += q[2] * dx * dy; }); sxx /= sw; syy /= sw; sxy /= sw;
+          var tr = (sxx + syy) / 2, dd = Math.sqrt(Math.max(0, (sxx - syy) * (sxx - syy) / 4 + sxy * sxy)), l1 = tr + dd, l2 = Math.max(0, tr - dd);
+          var e1 = Math.abs(sxy) > 1e-9 ? [l1 - syy, sxy] : (sxx >= syy ? [1, 0] : [0, 1]); var el = Math.hypot(e1[0], e1[1]) || 1; e1 = [e1[0] / el, e1[1] / el];
+          var vh = moving ? [v[0] / (speed / 60), v[1] / (speed / 60)] : null, u, axisSrc, elong = Math.sqrt(l1) >= 1 && l1 / (l2 + 0.05) >= 2.5;
+          if(elong && (!vh || Math.abs(e1[0] * vh[0] + e1[1] * vh[1]) < 0.85)){ u = e1; axisSrc = "Verteilung"; }
+          else if(vh){ u = [vh[1], -vh[0]]; axisSrc = "Zugrichtung"; }
+          else { u = e1; axisSrc = "Verteilung"; }
+          var nrm = [u[1], -u[0]]; if(vh && nrm[0] * vh[0] + nrm[1] * vh[1] < 0) nrm = [-nrm[0], -nrm[1]];
+          var half = Math.min(20, Math.max(2.5, 2 * Math.sqrt(l1) + 1));
+          var res = 0; P.forEach(function(p){ var px = p.x - v[0] * p.t - cx, py = p.y - v[1] * p.t - cy, along = px * u[0] + py * u[1]; res += p.w * (Math.pow(px - along * u[0], 2) + Math.pow(py - along * u[1], 2)); }); res = Math.sqrt(res / sw);
+          var F = { elong: elong, cell: !moving && !elong, c: [cx, cy], u: u, n: nrm, half: half, len: 2 * half, axisSrc: axisSrc, v: v, speed: speed, moving: moving, az: moving ? bearing(v[0], v[1]) : null, res: res, span: spanDir };
+          F.dist = Math.hypot(cx, cy); F.cAz = bearing(cx, cy);
+          var d0 = -(cx * nrm[0] + cy * nrm[1]), s0 = -(cx * u[0] + cy * u[1]), vn = v[0] * nrm[0] + v[1] * nrm[1];
+          F.d0 = d0; F.s0 = s0;
+          if(!moving) F.rel = "steht";
+          else if(d0 > 0.4 && vn > 0.02){ if(Math.abs(s0) <= half + 1.5){ F.rel = "kommt"; F.eta = d0 / vn; } else F.rel = "vorbei"; }
+          else if(d0 >= -1.2 && Math.abs(s0) <= half + 1.5) F.rel = "über";
+          else F.rel = "weg";
+          if(moving){ var vv = v[0] * v[0] + v[1] * v[1], tc = -(cx * v[0] + cy * v[1]) / vv; F.tc = tc; var px = cx + v[0] * Math.max(0, tc), py = cy + v[1] * Math.max(0, tc); F.dmin = Math.hypot(px, py); F.sideAz = bearing(px, py); }
+          A.front = F;
+        }
+      }
+      var q = 0, why = [];
+      if(A.nDir >= 5) q++; if(A.nDir >= 8) q++;
+      if(A.span >= 8) q++;
+      if(A.front && A.front.res < 1.6) q++;
+      if(A.nDir && A.nPeil / A.nDir >= 0.7) q++;
+      A.q = A.front ? (q >= 4 ? 3 : q >= 2 ? 2 : 1) : 0;
+      if(A.front){
+        if(A.nDir < 5) why.push("noch wenige gepeilte Blitze");
+        if(A.span < 8) why.push("kurzer Beobachtungszeitraum");
+        if(A.front.res >= 1.6) why.push("Blitze streuen stark");
+        if(A.nDir && A.nPeil / A.nDir < 0.7) why.push("viele Richtungen nur grob gewählt");
+        if(!why.length) why.push(A.nDir + " Peilungen über " + f(Math.round(A.front.span), 0) + " Minuten, geringe Streuung");
+      }
+      A.why = why;
+      return A;
+    }
+
+    function qBadge(q){ var lbl = ["–", "gering", "mittel", "hoch"][q]; return '<span class="gw-q"><i><span class="' + (q >= 1 ? "on" : "") + '"></span><span class="' + (q >= 2 ? "on" : "") + '"></span><span class="' + (q >= 3 ? "on" : "") + '"></span></i>Güte ' + lbl + '</span>'; }
+    function mins(x){ return x < 1.5 ? "gut einer Minute" : f(Math.round(x), 0) + " Minuten"; }
+    function addMin(mm){ return hm(Date.now() + mm * 60e3); }
+
+    function reportHtml(A){
+      var L = A.last, F = A.front, p = [];
+      p.push("<b>" + A.n + (A.n === 1 ? " Blitz" : " Blitze") + "</b> " + (A.span >= 1 ? "in " + f(Math.round(A.span), 0) + " Minuten" : "bisher") + ", davon " + A.nDir + " mit Richtung. Der letzte lag <b>" + fKm(L.d) + "</b> entfernt" + (L.az != null ? " im " + D16L[d16(L.az)] : "") + ".");
+      if(F){
+        var from = D16L[d16(bearing(F.u[0], F.u[1]))], to = D16L[d16(bearing(-F.u[0], -F.u[1]))];
+        if(F.cell) p.push("Die Blitze stammen aus einer <b>Gewitterzelle</b>, deren Zentrum " + fKm(F.dist) + " " + ADJ8[d8(F.cAz)] + " von dir liegt.");
+        else p.push("Die <b>Gewitterfront</b> verläuft von " + from + " nach " + to + " und ist etwa " + f(Math.round(F.len), 0) + " km breit. Ihr Zentrum liegt " + fKm(F.dist) + " " + ADJ8[d8(F.cAz)] + " von dir.");
+        if(F.moving) p.push("Sie zieht mit rund <b>" + f(Math.round(F.speed), 0) + " km/h nach " + D16L[d16(F.az)] + "</b>.");
+        if(F.rel === "kommt") p.push("Bei gleichbleibendem Zug <b>erreicht die Front deinen Standort in etwa " + mins(F.eta) + "</b> (gegen " + addMin(F.eta) + " Uhr).");
+        else if(F.rel === "vorbei") p.push("Sie zieht voraussichtlich <b>" + ADJ8[d8(F.sideAz)] + " an dir vorbei</b>. Am nächsten kommt ihr Zentrum mit etwa " + fKm(F.dmin) + (F.tc > 0.5 ? " in rund " + mins(F.tc) : "") + ".");
+        else if(F.rel === "über") p.push("<b>Die Front liegt gerade über deinem Standort.</b>");
+        else if(F.rel === "weg") p.push("Die Front hat deinen Standort passiert und <b>entfernt sich</b>.");
+        else p.push("Das Gewitter <b>verlagert sich kaum</b> (unter 4 km/h) und kann sich an Ort und Stelle weiter entladen.");
+      } else {
+        if(A.dTrend){ var tr = A.dTrend.b * 60; p.push(Math.abs(tr) < 4 ? "Der Abstand bleibt in etwa gleich." : tr < 0 ? "Der Abstand nimmt um etwa " + f(-tr, 0) + " km/h ab – <b>das Gewitter kommt näher</b>." : "Der Abstand nimmt um etwa " + f(tr, 0) + " km/h zu – das Gewitter entfernt sich."); }
+        p.push("Für Lage und Zug der Front braucht der Peiler mindestens <b>drei Blitze mit Richtung</b> über mindestens drei Minuten.");
+      }
+      var q = A.q ? '<p style="margin-top:4px">' + qBadge(A.q) + ' <span class="muted small">' + esc(A.why.join(", ")) + "</span></p>" : "";
+      return "<h3>Lagebericht " + hm(A.now) + " Uhr</h3>" + p.map(function(t){ return "<p>" + t + "</p>"; }).join("") + q;
+    }
+
+    function renderLage(){
+      var A = analyse();
+      ["gwLageCard", "gwTrendCard", "gwLogCard"].forEach(function(id){ $(id).hidden = !A; });
+      $("gwParamTag").textContent = "c = " + f(cSound(), 1) + " m/s";
+      if(!A) return;
+      var L = A.last, F = A.front;
+      $("gwLageStand").textContent = "Stand " + hm(A.now) + " Uhr";
+      var sf = $("gwSafety"), wait = Math.max(0, Math.ceil(30 - A.since)), minD = Math.min.apply(null, A.rec.map(function(x){ return x.d; }));
+      sf.hidden = false;
+      if(A.since < 30 && (L.d < 10 || (F && F.rel === "kommt" && F.eta < 20))){
+        sf.className = "gw-alert red";
+        sf.innerHTML = icon("warning") + "<span><b>" + (L.d < 10 ? "Blitzschlag in Reichweite (" + fKm(L.d) + ")." : "Die Front erreicht dich bald.") + "</b> Geh in ein festes Gebäude oder ins Auto, meide freie Flächen, einzelne Bäume und Wasser." + (wait ? " Entwarnung frühestens 30 Minuten nach dem letzten Donner – noch " + wait + " min." : "") + "</span>";
+      } else if(A.since < 30){
+        sf.className = "gw-alert amber";
+        sf.innerHTML = icon("info") + "<span>Nächster Blitz " + fKm(minD) + ". Blitze können weit vor einem Gewitter einschlagen – behalte die Lage im Blick und such rechtzeitig Schutz.</span>";
+      } else { sf.className = "gw-alert amber"; sf.innerHTML = icon("info") + "<span>Seit über 30 Minuten kein Donner erfasst. Hörst du wieder Donner, tippe erneut auf „Blitz“.</span>"; }
+      scope(A); metrics(A); chart(A); table();
+      $("gwReport").innerHTML = reportHtml(A);
+    }
+
+    function metrics(A){
+      var L = A.last, F = A.front, cells = [];
+      cells.push(["Letzter", fKm(L.d), f(L.sec, 2) + " s · " + hm(L.t)]);
+      cells.push(["Peilung", L.az != null ? D16[d16(L.az)] + " " + deg3(L.az) : "–", L.az != null ? (L.src === "Sensor" ? "gepeilt ± 5°" : "grob ± 22°") : "nicht erfasst"]);
+      var tr = A.dTrend ? A.dTrend.b * 60 : null;
+      cells.push(["Annäherung", tr == null ? "–" : (tr < 0 ? "−" : "+") + f(Math.abs(tr), 0) + " km/h", tr == null ? "ab 3 Blitzen" : Math.abs(tr) < 4 ? "Abstand gleich" : tr < 0 ? "kommt näher" : "entfernt sich"]);
+      cells.push([F && F.cell ? "Zelle" : "Front", F ? fKm(F.dist) : "–", F ? D16[d16(F.cAz)] + (F.cell ? " · Zentrum" : " · " + f(Math.round(F.len), 0) + " km breit") : "ab 3 Peilungen"]);
+      cells.push(["Zug", F && F.moving ? D16[d16(F.az)] + " · " + f(Math.round(F.speed), 0) : F ? "kaum" : "–", F && F.moving ? "km/h · " + deg3(F.az) : F ? "unter 4 km/h" : "ab 3 Peilungen"]);
+      var eta = "–", es = "ab 3 Peilungen";
+      if(F){ if(F.rel === "kommt"){ eta = "≈ " + f(Math.round(F.eta), 0) + " min"; es = "gegen " + addMin(F.eta) + " Uhr"; } else if(F.rel === "vorbei"){ eta = "vorbei"; es = ADJ8[d8(F.sideAz)] + ", " + fKm(F.dmin); } else if(F.rel === "über"){ eta = "jetzt"; es = "Front über dir"; } else if(F.rel === "weg"){ eta = "zieht ab"; es = "entfernt sich"; } else { eta = "–"; es = "stationär"; } }
+      cells.push(["Ankunft", eta, es]);
+      $("gwMetrics").innerHTML = cells.map(function(c){ return '<div><span class="gw-k">' + c[0] + "</span><b>" + c[1] + "</b><i>" + c[2] + "</i></div>"; }).join("");
+    }
+
+    function scope(A){
+      var s = gs.s, F = A.front, cx = 180, cy = 180, rr = 146;
+      var need = Math.max.apply(null, A.rec.map(function(x){ return x.d; }));
+      if(F) need = Math.max(need, F.dist + F.half * 0.5);
+      var R = [5, 10, 15, 20, 30, 40].filter(function(r){ return r >= need * 1.08; })[0] || 40;
+      var step = { 5: 1, 10: 2.5, 15: 5, 20: 5, 30: 10, 40: 10 }[R];
+      var k = rr / R, P = function(x, y){ return [cx + x * k, cy - y * k]; }, o = "", W = "rgba(226,220,255,";
+      o += '<defs><radialGradient id="gwSg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#5A2FBE" stop-opacity=".30"/><stop offset=".7" stop-color="#2A1B66" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>' +
+        '<marker id="gwAr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker>' +
+        '<linearGradient id="gwCone" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFD27A" stop-opacity="0"/><stop offset="1" stop-color="#FFD27A" stop-opacity=".28"/></linearGradient>' +
+        '<clipPath id="gwClip"><circle cx="180" cy="180" r="' + rr + '"/></clipPath></defs>';
+      o += '<circle cx="180" cy="180" r="' + rr + '" fill="url(#gwSg)"/>';
+      for(var b = 0; b < 360; b += 30){ var A1 = b * D2R; o += '<line x1="180" y1="180" x2="' + (cx + Math.sin(A1) * rr).toFixed(1) + '" y2="' + (cy - Math.cos(A1) * rr).toFixed(1) + '" stroke="' + W + '.07)"/>'; }
+      if(R > 10) o += '<circle cx="180" cy="180" r="' + (10 * k).toFixed(1) + '" fill="rgba(255,107,94,.08)" stroke="rgba(255,120,110,.6)" stroke-dasharray="3 4"/>';
+      else o += '<circle cx="180" cy="180" r="' + rr + '" fill="rgba(255,107,94,.06)"/>';
+      for(var r = step; r <= R + 0.01; r += step){
+        var isOuter = Math.abs(r - R) < .01, is10 = Math.abs(r - 10) < .01 && R > 10;
+        if(!is10) o += '<circle cx="180" cy="180" r="' + (r * k).toFixed(1) + '" fill="none" stroke="' + W + (isOuter ? ".38" : ".14") + ')"/>';
+        var la = 22 * D2R; o += '<text x="' + (cx + Math.sin(la) * r * k + 3).toFixed(1) + '" y="' + (cy - Math.cos(la) * r * k - 3).toFixed(1) + '" font-size="9" fill="' + (is10 ? "rgba(255,150,140,.85)" : W + ".55)") + '" font-family="ui-monospace,Menlo,monospace">' + f(r, r % 1 ? 1 : 0) + '</text>';
+      }
+      for(var g = 0; g < 360; g += 5){ var A2 = g * D2R, big = g % 30 === 0, mid = g % 10 === 0, r1 = rr + 2, r2 = rr + (big ? 9 : mid ? 6 : 3.5);
+        o += '<line x1="' + (cx + Math.sin(A2) * r1).toFixed(1) + '" y1="' + (cy - Math.cos(A2) * r1).toFixed(1) + '" x2="' + (cx + Math.sin(A2) * r2).toFixed(1) + '" y2="' + (cy - Math.cos(A2) * r2).toFixed(1) + '" stroke="' + W + (big ? ".8" : mid ? ".45" : ".22") + ')" stroke-width="' + (big ? 1.4 : 1) + '"/>';
+        if(big){ var lab = g % 90 === 0 ? ["N", "O", "S", "W"][g / 90] : String(g), rl = rr + 19;
+          o += '<text x="' + (cx + Math.sin(A2) * rl).toFixed(1) + '" y="' + (cy - Math.cos(A2) * rl + 3.5).toFixed(1) + '" text-anchor="middle" font-size="' + (g % 90 === 0 ? 12 : 9) + '" font-weight="' + (g % 90 === 0 ? 700 : 500) + '" fill="' + (g === 0 ? "#FFD27A" : g % 90 === 0 ? "#fff" : W + ".6)") + '" font-family="ui-monospace,Menlo,monospace">' + lab + '</text>'; }
+      }
+      o += '<g id="gwConeG"></g><g clip-path="url(#gwClip)">';
+      if(F){
+        var seg = function(c, dash, op, sym){
+          var a = P(c[0] - F.u[0] * F.half, c[1] - F.u[1] * F.half), e = P(c[0] + F.u[0] * F.half, c[1] + F.u[1] * F.half), t = "";
+          t += '<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '" stroke="#FFD27A" stroke-width="' + (sym ? 3 : 1.8) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="5 5"' : "") + ' opacity="' + op + '"/>';
+          if(sym){ var nT = Math.max(3, Math.min(9, Math.round(F.len * k / 26)));
+            for(var i = 0; i < nT; i++){ var fr = (i + 0.5) / nT * 2 - 1, mx = c[0] + F.u[0] * F.half * fr, my = c[1] + F.u[1] * F.half * fr, b0 = 5 / k, h0 = 8 / k;
+              var p1 = P(mx - F.u[0] * b0, my - F.u[1] * b0), p2 = P(mx + F.u[0] * b0, my + F.u[1] * b0), p3 = P(mx + F.n[0] * h0, my + F.n[1] * h0);
+              t += '<path d="M' + p1[0].toFixed(1) + " " + p1[1].toFixed(1) + "L" + p3[0].toFixed(1) + " " + p3[1].toFixed(1) + "L" + p2[0].toFixed(1) + " " + p2[1].toFixed(1) + 'z" fill="#FFD27A"/>'; } }
+          return t;
+        };
+        if(F.moving){
+          var c15 = [F.c[0] + F.v[0] * 15, F.c[1] + F.v[1] * 15];
+          o += '<path d="M' + P(F.c[0] - F.u[0] * F.half, F.c[1] - F.u[1] * F.half).join(" ") + "L" + P(F.c[0] + F.u[0] * F.half, F.c[1] + F.u[1] * F.half).join(" ") + "L" + P(c15[0] + F.u[0] * F.half, c15[1] + F.u[1] * F.half).join(" ") + "L" + P(c15[0] - F.u[0] * F.half, c15[1] - F.u[1] * F.half).join(" ") + 'z" fill="#FFD27A" opacity=".07"/>';
+          o += seg(c15, true, .75, false);
+          var lp = P(c15[0] - F.u[0] * F.half * 0.15, c15[1] - F.u[1] * F.half * 0.15);
+          o += '<text x="' + (lp[0] + 6).toFixed(1) + '" y="' + (lp[1] - 6).toFixed(1) + '" font-size="9" font-weight="700" fill="#FFD27A" font-family="ui-monospace,Menlo,monospace">+15 MIN</text>';
+        }
+        if(F.cell){ var cc = P(F.c[0], F.c[1]); o += '<circle cx="' + cc[0].toFixed(1) + '" cy="' + cc[1].toFixed(1) + '" r="' + Math.max(10, F.half * k * 0.8).toFixed(1) + '" fill="rgba(255,210,122,.10)" stroke="#FFD27A" stroke-width="1.6" stroke-dasharray="4 3"/>'; }
+        else o += seg(F.c, false, 1, true);
+      }
+      var lastNoDir = null;
+      s.forEach(function(x, i){
+        var age = (A.now - x.t) / 60e3, isLast = i === s.length - 1;
+        if(age > 30) return;
+        if(x.az == null){ if(isLast) lastNoDir = x; return; }
+        var p = P(x.d * Math.sin(x.az * D2R), x.d * Math.cos(x.az * D2R)), op = Math.max(.35, 1 - age / 30);
+        if(isLast){
+          o += '<circle class="gw-pulse" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="9" fill="none" stroke="#FFD27A" stroke-width="1.5"/>';
+          o += '<path transform="translate(' + p[0].toFixed(1) + " " + p[1].toFixed(1) + ') scale(1.05)" d="M1.5-9L-6 1.5h5.2L-2 9l8-11H.7z" fill="#FFD27A" stroke="#15102A" stroke-width="1"/>';
+        } else o += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="4.2" fill="#B9A6F5" stroke="#15102A" stroke-width="1.2" opacity="' + op.toFixed(2) + '"/>';
+      });
+      if(lastNoDir) o += '<circle cx="180" cy="180" r="' + (lastNoDir.d * k).toFixed(1) + '" fill="none" stroke="#FFD27A" stroke-width="1.6" stroke-dasharray="2 5"/>';
+      if(F && F.moving){
+        var c0 = P(F.c[0], F.c[1]), vl = R * 0.3, c1 = P(F.c[0] + F.v[0] / (F.speed / 60) * vl, F.c[1] + F.v[1] / (F.speed / 60) * vl);
+        o += '<line x1="' + c0[0].toFixed(1) + '" y1="' + c0[1].toFixed(1) + '" x2="' + c1[0].toFixed(1) + '" y2="' + c1[1].toFixed(1) + '" stroke="#fff" stroke-width="2.2" stroke-linecap="round" marker-end="url(#gwAr)"/>';
+        var ldx = c1[0] - c0[0];
+        o += '<text x="' + (c1[0] + (ldx >= 0 ? 6 : -6)).toFixed(1) + '" y="' + (c1[1] + 14).toFixed(1) + '" text-anchor="' + (ldx >= 0 ? "start" : "end") + '" font-size="10" font-weight="700" fill="#fff" font-family="ui-monospace,Menlo,monospace">' + f(Math.round(F.speed), 0) + ' km/h</text>';
+      }
+      o += '</g><circle cx="180" cy="180" r="4.5" fill="#fff"/><circle cx="180" cy="180" r="9" fill="none" stroke="#fff" stroke-opacity=".5"/>';
+      o += '<text x="180" y="200" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="ui-monospace,Menlo,monospace" letter-spacing="1">DU</text>';
+      o += '<text x="8" y="354" font-size="9" fill="' + W + '.55)" font-family="ui-monospace,Menlo,monospace">RADIUS ' + R + ' KM</text>';
+      $("gwScope").innerHTML = o;
+      $("gwLegend").innerHTML = '<span><i style="width:9px;height:9px;border-radius:50%;background:#B9A6F5"></i>Blitz</span><span><i style="width:10px;height:10px;background:#FFD27A;clip-path:polygon(60% 0,0 58%,45% 58%,35% 100%,100% 38%,55% 38%)"></i>letzter</span>' +
+        (F ? (F.cell ? '<span><i style="width:10px;height:10px;border-radius:50%;border:1.5px dashed #FFD27A"></i>Zelle</span>' : '<span><i style="width:16px;height:3px;background:#FFD27A"></i>Front</span>') + (F.moving ? '<span><i style="width:16px;border-top:2px dashed #FFD27A"></i>in 15 min</span><span><i style="width:14px;height:2px;background:#fff"></i>Zug</span>' : "") : "") +
+        '<span><i style="width:12px;border-top:1.5px dashed rgba(255,120,110,.9)"></i>10-km-Zone</span>';
+      scopeCone();
+    }
+    function scopeCone(){
+      var gC = document.getElementById("gwConeG"); if(!gC) return;
+      if(!armed || !headOk || headLive == null){ if(gC.firstChild) gC.innerHTML = ""; return; }
+      if(!gC.firstChild) gC.innerHTML = '<path d="M180 180L' + (180 + Math.sin(-9 * D2R) * 146).toFixed(1) + " " + (180 - Math.cos(-9 * D2R) * 146).toFixed(1) + "A146 146 0 0 1 " + (180 + Math.sin(9 * D2R) * 146).toFixed(1) + " " + (180 - Math.cos(9 * D2R) * 146).toFixed(1) + 'z" fill="url(#gwCone)"/><line x1="180" y1="180" x2="180" y2="34" stroke="#FFD27A" stroke-opacity=".55" stroke-dasharray="2 4"/>';
+      gC.setAttribute("transform", "rotate(" + headLive.toFixed(1) + " 180 180)");
+    }
+
+    function chart(A){
+      var rec = A.rec, W = 340, H = 170, l = 30, r = 12, t = 14, b = 26, T = A.now;
+      var tMin = Math.min(-5, Math.floor((rec[0].t - T) / 60e3) - 1), tMax = 15;
+      var dMax = Math.max(15, Math.ceil((Math.max.apply(null, rec.map(function(x){ return x.d; })) + 1) / 5) * 5);
+      var X = function(mm){ return l + (mm - tMin) / (tMax - tMin) * (W - l - r); }, Y = function(d){ return t + (1 - Math.max(0, Math.min(dMax, d)) / dMax) * (H - t - b); };
+      var o = "", Wc = "rgba(226,220,255,";
+      o += '<rect x="' + l + '" y="' + Y(10).toFixed(1) + '" width="' + (W - l - r) + '" height="' + (Y(0) - Y(10)).toFixed(1) + '" fill="rgba(255,107,94,.07)"/>';
+      for(var d = 0; d <= dMax; d += 5){ o += '<line x1="' + l + '" x2="' + (W - r) + '" y1="' + Y(d).toFixed(1) + '" y2="' + Y(d).toFixed(1) + '" stroke="' + (d === 10 ? "rgba(255,120,110,.6)" : Wc + (d ? ".08" : ".25") + ")") + '"' + (d === 10 ? ' stroke-dasharray="3 4"' : "") + '/><text x="' + (l - 6) + '" y="' + (Y(d) + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="' + Wc + '.55)" font-family="ui-monospace,Menlo,monospace">' + d + '</text>'; }
+      var stepT = (tMax - tMin) > 32 ? 10 : 5;
+      for(var mm = Math.ceil(tMin / stepT) * stepT; mm <= tMax; mm += stepT){ o += '<line x1="' + X(mm).toFixed(1) + '" x2="' + X(mm).toFixed(1) + '" y1="' + t + '" y2="' + (H - b) + '" stroke="' + Wc + (mm === 0 ? ".4" : ".06") + ')"' + (mm === 0 ? ' stroke-dasharray="2 3"' : "") + '/><text x="' + X(mm).toFixed(1) + '" y="' + (H - b + 13) + '" text-anchor="middle" font-size="9" fill="' + Wc + (mm === 0 ? ".9" : ".55") + ')" font-family="ui-monospace,Menlo,monospace">' + (mm === 0 ? "jetzt" : (mm > 0 ? "+" : "−") + Math.abs(mm)) + '</text>'; }
+      o += '<text x="' + (W - r) + '" y="' + (H - 2) + '" text-anchor="end" font-size="8.5" fill="' + Wc + '.45)" font-family="ui-monospace,Menlo,monospace">MIN</text><text x="2" y="9" font-size="8.5" fill="' + Wc + '.45)" font-family="ui-monospace,Menlo,monospace">KM</text>';
+      o += '<text x="' + (X(tMax) - 3).toFixed(1) + '" y="' + (Y(10) - 4).toFixed(1) + '" text-anchor="end" font-size="8.5" fill="rgba(255,150,140,.85)" font-family="ui-monospace,Menlo,monospace">10-KM-ZONE</text>';
+      if(A.dTrend){
+        var a0 = (rec[0].t - T) / 60e3, y0 = A.dTrend.a + A.dTrend.b * a0, y1 = A.dTrend.a, y2 = A.dTrend.a + A.dTrend.b * 15;
+        o += '<line x1="' + X(a0).toFixed(1) + '" y1="' + Y(y0).toFixed(1) + '" x2="' + X(0).toFixed(1) + '" y2="' + Y(y1).toFixed(1) + '" stroke="#B9A6F5" stroke-width="1.6"/>';
+        o += '<line x1="' + X(0).toFixed(1) + '" y1="' + Y(y1).toFixed(1) + '" x2="' + X(15).toFixed(1) + '" y2="' + Y(y2).toFixed(1) + '" stroke="#B9A6F5" stroke-width="1.6" stroke-dasharray="4 4"/>';
+      }
+      rec.forEach(function(x, i){ var m2 = (x.t - T) / 60e3, isLast = i === rec.length - 1; o += '<circle cx="' + X(m2).toFixed(1) + '" cy="' + Y(x.d).toFixed(1) + '" r="' + (isLast ? 4.5 : 3.6) + '" fill="' + (isLast ? "#FFD27A" : "#B9A6F5") + '" stroke="#15102A" stroke-width="1"/>'; });
+      $("gwChart").innerHTML = o;
+      var tr = A.dTrend ? A.dTrend.b * 60 : null;
+      $("gwTrendTag").textContent = tr == null ? "ab 3 Blitzen" : "Trend " + (tr < 0 ? "−" : "+") + f(Math.abs(tr), 0) + " km/h";
+    }
+
+    function table(){
+      var s = gs.s;
+      $("gwLogCount").textContent = s.length + (s.length === 1 ? " Blitz" : " Blitze");
+      $("gwLog").innerHTML = '<thead><tr><th>#</th><th>Zeit</th><th>Δt</th><th>km</th><th>Peilung</th><th></th></tr></thead><tbody>' +
+        s.slice().reverse().map(function(x, i){ var idx = s.length - i;
+          return '<tr' + (i === 0 ? ' class="new"' : "") + '><td><span class="n">' + idx + '</span></td><td>' + hm(x.t, true) + '</td><td>' + f(x.sec, 2) + ' s<div class="src">' + (x.tsrc === "hand" ? "von Hand" : "auto +" + f(x.react || 0, 2)) + '</div></td><td>' + f(x.d, 2) + '</td><td>' + (x.az != null ? D16[d16(x.az)] + " " + deg3(x.az) + '<div class="src">' + (x.src === "Sensor" ? "gepeilt" : "grob") + "</div>" : "–") + '</td><td>' +
+            (gs.demo ? "" : '<button type="button" class="x" data-del="' + (idx - 1) + '" aria-label="Blitz ' + idx + ' entfernen">' + icon("trash") + "</button>") + "</td></tr>"; }).join("") + "</tbody>";
+    }
+
+    /* ================= Parameter ================= */
+    $("gwTemp").value = f(cfg.gw.temp, cfg.gw.temp % 1 ? 1 : 0);
+    $("gwTemp").addEventListener("change", function(){ var v = num($("gwTemp").value); if(v == null || v < -30 || v > 45){ $("gwTemp").value = f(cfg.gw.temp, 0); return; } cfg.gw.temp = v; saveCfg(); render(); });
+    $("gwReact").value = cfg.gw.react;
+    var reactOut = function(){ $("gwReactOut").textContent = f(cfg.gw.react, 2) + " s"; };
+    reactOut();
+    $("gwReact").addEventListener("input", function(){ cfg.gw.react = +$("gwReact").value; reactOut(); saveCfg(); });
+    $("gwReact").addEventListener("change", function(){ render(); });
+    var sensUi = function(){ Array.prototype.forEach.call(document.querySelectorAll("#gwSens .chip"), function(b){ var on = +b.getAttribute("data-sens") === cfg.gw.sens; b.classList.toggle("active", on); b.setAttribute("aria-checked", on ? "true" : "false"); }); };
+    sensUi();
+    $("gwSens").addEventListener("click", function(e){ var b = e.target.closest("[data-sens]"); if(!b) return; cfg.gw.sens = +b.getAttribute("data-sens"); saveCfg(); sensUi(); });
+
+    /* ================= Aktionen ================= */
+    $("gwLog").addEventListener("click", function(e){
+      var b = e.target.closest("[data-del]"); if(!b) return;
+      gs.s.splice(+b.getAttribute("data-del"), 1); persist(); flash = ""; render();
+    });
+    $("gwReset").addEventListener("click", function(){
+      Promise.resolve(gs.demo || !window.wzConfirm ? true : wzConfirm("Alle Blitze dieser Beobachtung verwerfen?", { okLabel: "Verwerfen", cancelLabel: "Abbrechen" })).then(function(ok){
+        if(!ok) return; gs = { s: [], demo: false }; persist(); flash = ""; run = null; MIC.disarm(); render();
+      });
+    });
+    $("gwSave").addEventListener("click", function(){
+      var A = analyse(); if(!A) return;
+      if(gs.demo){ toast("Beispieldaten werden nicht gespeichert"); return; }
+      var F = A.front, near = Math.min.apply(null, gs.s.map(function(x){ return x.d; }));
+      addItem({ typ: "gewitter", wert: near, name: "Gewitter",
+        detail: gs.s.length + (gs.s.length === 1 ? " Blitz" : " Blitze") + " · zuletzt " + fKm(A.last.d) + (A.last.az != null ? " " + D16[d16(A.last.az)] : "") + (F && F.moving ? " · Front zog nach " + D16[d16(F.az)] + " mit " + f(Math.round(F.speed), 0) + " km/h" : "") });
+      toast("Gespeichert");
+    });
+    $("gwDemo").addEventListener("click", function(){
+      /* Beispiel: Gewitterlinie SSW–NNO, zieht mit rund 27 km/h nach Ostnordost auf den Standort zu */
+      var now = Date.now(), mn = 60e3, c = cSound();
+      var v = [0.42, 0.15], c0 = [-16.5, -1.2], u = [-0.342, 0.94];
+      var pts = [[-20, -3.2, .2, "Sensor"], [-17.5, 2.4, -.3, "Sensor"], [-15, 4.1, .25, "Sensor"], [-12.5, -1.1, -.2, "gewählt"], [-10, -4.0, .3, "Sensor"], [-7.5, 3.1, -.15, "Sensor"], [-5.5, 0.4, .2, "Sensor"], [-3.5, -2.2, -.25, "Sensor"], [-1.5, 1.6, .1, "Sensor"]];
+      gs = { demo: true, s: pts.map(function(p){
+        var tt = p[0] + 20, x = c0[0] + v[0] * tt + u[0] * p[1] + p[2], y = c0[1] + v[1] * tt + u[1] * p[1] - p[2] * .5;
+        var d = Math.hypot(x, y), az = Math.round(bearing(x, y)); if(p[3] === "gewählt") az = Math.round(az / 45) * 45 % 360;
+        var sec = d * 1000 / c; return { t: now + p[0] * mn, raw: +(sec - cfg.gw.react).toFixed(2), sec: +sec.toFixed(2), react: cfg.gw.react, c: +c.toFixed(1), d: +d.toFixed(2), az: az, src: p[3], tsrc: "auto" };
+      }) };
+      flash = ""; run = null; MIC.disarm(); render();
+      try { $("gwLageCard").scrollIntoView({ behavior: "smooth", block: "start" }); } catch(e){}
+    });
+    $("gwDemoEnd").addEventListener("click", function(){ var l0 = load(LS_GW, null); gs = l0 && Array.isArray(l0.s) ? l0 : { s: [] }; gs.demo = false; flash = ""; render(); });
+
+    function leave(){ if(armed){ deactivate(); flash = "Der Peiler wurde beim Verlassen beendet. Mikrofon und Kompass sind aus."; flashErr = false; render(); } }
+    window.addEventListener("pagehide", function(){ if(armed) deactivate(); });
+    document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible" && armed) keepAwake(); });
+    render();
+    return { render: render, leave: leave, _activate: activate, _head: function(az){ headLive = az; headOk = true; } };
+  })();
+
+  /* ---------- Einführung (einheitlich über wz-onboarding.js) ---------- */
+  var onb = wzOnboarding({
+    key: LS_ONB,
+    slides: [
+      { icon: "height", title: "Willkommen bei MessWahr", text: "Miss die Höhe von Bäumen, Häusern und Türmen mit der Kamera – dazu Wasserwaage und Neigung in einer App." },
+      { icon: "crosshair", title: "Peilen statt klettern", text: "Fadenkreuz auf den Fuß, dann auf die Spitze – aus den Winkeln und deiner Kamerahöhe ergibt sich die Höhe, mit Spanne für die Messgenauigkeit." },
+      { icon: "level", title: "Waage und Gefälle", text: "Flach hingelegt oder auf der Kante: Grad, Prozent und Verhältnis auf einen Blick. Mit „Kalibrieren“ wird es noch genauer." },
+      { icon: "bolt", title: "Gewitter-Peiler", text: "Blitz sehen, einmal tippen – den Donner erkennt MessWahr selbst. Richtung bestätigen, und du siehst Entfernung, Gewitterfront und Zugrichtung." },
+      { icon: "lock", title: "100% lokal & privat", text: "Kamera, Mikrofon und Lagesensor werden nur live ausgewertet. Gespeichert werden nur Messungen, die du selbst sicherst – auf deinem Gerät." }
+    ]
+  });
+  window.MW = { showOnboarding: function(){ onb.show(); } };
+  $("showOnboardingBtn").addEventListener("click", function(){ onb.show(); });
+
+  var h0 = (location.hash || "").slice(1);
+  if(["hoehe", "waage", "neigung", "gewitter", "liste"].indexOf(h0) !== -1) showTab(h0);
+  window.addEventListener("pagehide", function(){ if(AR.on) arStop(); ORI.stop(); });
+})();
+
+</script>
+</body>
+</html>

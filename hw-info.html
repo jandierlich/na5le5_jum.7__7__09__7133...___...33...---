@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Einführung – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+<style>/* Einführung als gut lesbare Liste statt seitlich wischbarer Karten */
+.hw-slides{flex-direction:column;overflow:visible;scroll-snap-type:none;gap:12px;}
+.hw-slide{min-width:0;}
+.hw-slide h2{font-size:17px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+.hw-slide p{margin:0;}
+</style>
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>So funktioniert HimmelsWahr</h1>
+    <p class="hw-sub">Alle Bereiche kurz erklärt.</p>
+  </div>
+  <div class="hw-slides">
+    <div class="hw-slide">
+      <h2><span data-hwi="sparkles" data-hwi-size="20"></span> Der ganze Himmel</h2>
+      <p>Der Hintergrund der App zeigt den echten Himmel an deinem Standort: Morgenrot, Mittag, Goldene Stunde, Dämmerung oder Nacht – berechnet aus der Sonnenhöhe. Im Himmelsfenster oben stehen Sonne und Mond an ihrer tatsächlichen Position, darunter zeigt das Tagesband den ganzen Tag mit Sonnenauf- und -untergang und Regenwahrscheinlichkeit.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="sparkles" data-hwi-size="20"></span> Heute lohnt sich …</h2>
+      <p>Die Karte auf der Startseite fasst zusammen, was sich heute lohnt: die besten Stunden für den Sternenhimmel (mit sichtbaren Planeten), eine Regenbogen-Chance mit Blickrichtung sowie Frost, Bodenfrost, Tau oder Nebel in der kommenden Nacht. Jeder Hinweis erscheint nur, wenn er gerade zutrifft. Antippen zeigt, woraus er berechnet wurde. In den Einstellungen lassen sich einzelne Hinweise ausblenden. Der wichtigste Hinweis erscheint auch als „Himmels-Tipp“ auf der Startseite der WahrZentrale.</p>
+    </div>
+    <div class="hw-slide">
+      <h2>Wetter und Regen</h2>
+      <p>Aktuelle Lage, Stundenverlauf, 5-Tage-Vorhersage und Details wie gefühlte Temperatur, Böen und Luftdruck-Trend. „Regen in den nächsten 2 Stunden“ nutzt 15-Minuten-Modelldaten (kein Regenradar). Der Regen-Alarm meldet Regen, solange die App geöffnet ist.</p>
+    </div>
+    <div class="hw-slide">
+      <h2>Die Ampel-Farben</h2>
+      <div class="hw-row"><span><span class="hw-dot hw-dot-gruen"></span>Grün</span><span>Gut / hohe Chance</span></div>
+      <div class="hw-row"><span><span class="hw-dot hw-dot-gelb"></span>Gelb</span><span>Durchwachsen / möglich</span></div>
+      <div class="hw-row"><span><span class="hw-dot hw-dot-rot"></span>Rot</span><span>Ungünstig / erhöhte Vorsicht</span></div>
+      <p style="margin-top:8px;">Die Ampel erscheint beim Draußen-Score, bei Luft &amp; Pollen, beim Abendrot und beim Nachthimmel.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="leaf" data-hwi-size="20"></span> Luft &amp; Pollen</h2>
+      <p>Feinstaub, Ozon, Stickstoffdioxid, UV-Index und Pollenbelastung, zusammengefasst im europäischen Luftqualitätsindex (EAQI) mit Ampel-Einschätzung.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="sunset" data-hwi-size="20"></span> Abend- und Morgenrot</h2>
+      <p>Die Schätzung schaut nicht nur über dich, sondern auch 60 und 150 km in Richtung der Sonne: Ein freier Horizont und ein lockerer Wolkenschleier darüber bringen Farbe. Dazu die Zeiten von Goldener und Blauer Stunde.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="moon" data-hwi-size="20"></span> Nachthimmel</h2>
+      <p>Bewertung der Nacht Stunde für Stunde (Wolken, Mond, Restdämmerung, Lichtverschmutzung), dazu Mondphase mit Auf- und Untergang, sichtbare Planeten, kommende Mondphasen, Sternschnuppen-Maxima und die nächste Jahreszeit.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="compass" data-hwi-size="20"></span> Himmels-Kompass</h2>
+      <p>Die Kamera-Ansicht zeigt Sonne, Mond, Planeten, helle Sterne, Sternbilder, den Horizont und die heutige Sonnenbahn dort, wo sie stehen. Die eigene Sonnenbahn-Ansicht zeigt die heutige Bahn als Messlinie mit Gradnetz, Stundenmarken, Aufgang, Höchststand und Untergang und nennt die Uhrzeit, zu der die Sonne im Fadenkreuz steht. Über „Kalibrieren“ gleichst du Nordabweichung und Sichtfeld deines Smartphones an. Blicke nie direkt in die Sonne.</p>
+    </div>
+    <div class="hw-slide">
+      <h2><span data-hwi="pin" data-hwi-size="20"></span> Standort wählen</h2>
+      <p>Über „Mehr“ oder das Ortssymbol oben wechselst du zwischen deinem automatischen Standort und beliebigen Orten, auch als Favoriten.</p>
+    </div>
+    <div class="hw-slide">
+      <h2>Deine Daten</h2>
+      <p>Für Wetterdaten wird dein Standort an Open-Meteo.com übermittelt – nur wenn du eine Wetterfunktion nutzt. Sonne, Mond, Planeten und Sterne werden auf deinem Gerät berechnet. Mehr dazu in der Datenschutzerklärung.</p>
+    </div>
+  </div>
+  <a class="hw-btn primary" href="hw-index.html">Zur Startseite</a>
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('');
+
+</script>
+</body>
+</html>

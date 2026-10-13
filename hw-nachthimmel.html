@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Nachthimmel – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>Nachthimmel</h1>
+    <p class="hw-sub">Sterne, Mond und Planeten – und wann sich das Hinsehen lohnt.</p>
+  </div>
+
+  <div class="hw-card" id="hw-card-status">
+    <p class="hw-loc-current" id="hw-active-loc-label"></p>
+    <p id="hw-status">Standort wird benötigt.</p>
+    <button class="hw-btn primary" onclick="hwLoadNight()">Standort verwenden</button>
+  </div>
+
+  <div id="hw-night-result" style="display:none;">
+    <div class="hw-card">
+      <h2 id="hw-night-title">Diese Nacht</h2>
+      <div class="hw-score">
+        <div class="hw-score-num" id="hw-score-num">–</div>
+        <div class="hw-score-side"><div id="hw-ampel-box"></div></div>
+      </div>
+      <p id="hw-night-text" style="font-size:15px;line-height:1.55;color:var(--text);margin:12px 0 0;"></p>
+      <p id="hw-best" style="font-size:14px;line-height:1.5;color:var(--text-secondary);margin:8px 0 0;"></p>
+      <div class="hw-nightstrip" id="hw-nightstrip" role="img" aria-label="Bewertung des Sternenhimmels je Stunde"></div>
+      <div class="hw-legend"><span><span class="hw-dot hw-dot-gruen"></span> gut</span><span><span class="hw-dot hw-dot-gelb"></span> mittel</span><span><span class="hw-dot hw-dot-rot"></span> schlecht</span><span>helle Kante: Mond über dem Horizont</span></div>
+      <p id="hw-night-updated" style="font-size:12px;color:var(--text-secondary);text-align:center;margin-top:10px;"></p>
+      <p class="hw-attrib">Wetterdaten von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), aufbereitet und umgerechnet</p>
+    </div>
+
+    <div class="hw-card">
+      <h2>Lichtverschmutzung</h2>
+      <p style="font-size:13px;margin-top:-6px;">Stelle die Helligkeit deines Himmels nach der Bortle-Skala ein (1 = sehr dunkel, 9 = Innenstadt). Sie fließt in die Bewertung ein und bleibt auf deinem Gerät.</p>
+      <div class="hw-field"><input type="range" id="hw-bortle" min="1" max="9" step="1" aria-label="Bortle-Stufe" oninput="hwBortleInput(this.value)" onchange="hwBortleChange(this.value)"><output id="hw-bortle-out">5</output></div>
+      <p id="hw-bortle-desc" style="font-size:13px;margin:4px 0 0;"></p>
+    </div>
+
+    <div class="hw-card">
+      <h2>Der Mond</h2>
+      <div class="hw-moonline"><span class="disc" id="hw-moon-disc"></span><div><div id="hw-moon-name" style="font-weight:650;font-size:16px;color:var(--text);"></div><div id="hw-moon-sub" style="font-size:13px;color:var(--text-secondary);margin-top:2px;"></div></div></div>
+      <div id="hw-moon-times" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="hw-card">
+      <h2>Am Himmel</h2>
+      <p style="font-size:13px;margin-top:-6px;">Über 5° Höhe und bei dunklem Himmel (Sonne tiefer als −4°). Berechnet auf deinem Gerät.</p>
+      <div id="hw-objects"></div>
+      <a class="hw-btn" href="./sternewahr-index.html" style="margin-top:12px;">Sternenhimmel live öffnen</a>
+    </div>
+
+    <div class="hw-card">
+      <h2>Kalender</h2>
+      <h3>Mondphasen</h3>
+      <div id="hw-phases"></div>
+      <h3 style="margin-top:14px;">Sternschnuppen</h3>
+      <div id="hw-showers"></div>
+      <h3 style="margin-top:14px;">Jahreszeit</h3>
+      <div id="hw-season"></div>
+      <p style="font-size:12px;margin-top:10px;">Zeiten mit „ca.“ sind berechnet (Genauigkeit etwa eine Stunde). Sternschnuppen-Maxima sind gerundet und schwanken um ±1 Tag.</p>
+    </div>
+  </div>
+
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('hw-nachthimmel.html');
+
+var HW_BORTLE_TEXT = {
+  1:'Außergewöhnlich dunkel – Milchstraße wirft Schatten.', 2:'Sehr dunkel – abgelegenes Land.', 3:'Ländlich – Milchstraße gut sichtbar.',
+  4:'Ländlich bis Vorstadt – Lichtkuppeln am Horizont.', 5:'Vorstadt – Milchstraße nur bei klarer Luft zu ahnen.', 6:'Helle Vorstadt – Milchstraße kaum sichtbar.',
+  7:'Vorstadt bis Stadt – nur helle Sterne.', 8:'Stadt – wenige hundert Sterne.', 9:'Innenstadt – nur Mond, Planeten und sehr helle Sterne.'
+};
+var hwNightLast = null;
+function hwBortleInput(v){
+  document.getElementById('hw-bortle-out').textContent = v;
+  document.getElementById('hw-bortle-desc').textContent = HW_BORTLE_TEXT[v] || '';
+}
+function hwBortleChange(v){ hwSetBortle(parseInt(v, 10)); hwLoadNight(); }
+function hwDirWord(az){ return hwCompassWord(az).replace('Norden','Norden'); }
+function hwLoadNight(){
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  document.getElementById('hw-status').textContent = 'Standort wird ermittelt …';
+  document.getElementById('hw-card-status').style.display = 'block';
+  hwGetActiveLocation().then(function(pos){
+    document.getElementById('hw-status').textContent = 'Nachthimmel wird berechnet …';
+    return hwComputeNight(pos.lat, pos.lon);
+  }).then(function(n){
+    hwNightLast = n;
+    var off = n.off;
+    var b = hwGetBortle();
+    document.getElementById('hw-bortle').value = b; hwBortleInput(b);
+
+    document.getElementById('hw-night-title').textContent = 'Nacht auf ' + hwFmtLocalDay(n.end, off) + ' (' + hwFmtLocal(n.start, off) + '–' + hwFmtLocal(n.end, off) + ' Uhr)';
+    var cls = hwNightClass(n.avg);
+    document.getElementById('hw-score-num').innerHTML = n.avg == null ? '–' : n.avg + '<small>/100</small>';
+    document.getElementById('hw-ampel-box').innerHTML = cls ? '<span class="hw-ampel ' + cls.s + '"><span class="hw-dot hw-dot-' + cls.s + '"></span>' + cls.l + '</span>' : '';
+    if(n.best){
+      var bcls = hwNightClass(n.best.q);
+      var bestNote = bcls.s === 'rot' ? ' – bleibt aber schwierig' : (bcls.s === 'gelb' ? ' – noch nicht ideal' : '');
+      document.getElementById('hw-best').innerHTML = '<span class="hw-dot hw-dot-' + bcls.s + '"></span>Bestes Fenster: ' + hwFmtLocal(n.best.from, off) + '–' + hwFmtLocal(n.best.to, off) + ' Uhr (' + n.best.q + '/100)' + bestNote;
+    } else {
+      document.getElementById('hw-best').textContent = '';
+    }
+
+    var txt;
+    if(n.offline) txt = 'Für die Wolkenbewertung fehlt die Internetverbindung. Mond, Planeten und Kalender unten sind trotzdem verfügbar.';
+    else if(n.avg == null) txt = 'In dieser Nacht wird es nicht dunkel genug (Sonne sinkt nur bis ' + Math.round(n.minSun) + '°) – für Sterne reicht es nur eingeschränkt.';
+    else if(n.minSun > -18) txt = 'Es wird nicht völlig dunkel: Die Sonne sinkt nur bis ' + Math.round(n.minSun) + '°. Helle Sterne und Planeten sind trotzdem gut zu sehen.';
+    else txt = n.avg >= 65 ? 'Klare, dunkle Bedingungen – ein guter Abend zum Beobachten.' : (n.avg >= 35 ? 'Teils Wolken oder Mondlicht – mit Geduld gibt es Fenster zum Beobachten.' : 'Viele Wolken oder helles Mondlicht – heute eher schwierig.');
+    document.getElementById('hw-night-text').textContent = txt;
+
+    document.getElementById('hw-nightstrip').innerHTML = n.slots.map(function(s){
+      var q = s.q, h = q == null ? 3 : Math.max(3, q);
+      return '<div class="hw-night-col' + (s.moonAlt > 0 ? ' moon' : '') + '"><div class="hw-night-bar" style="height:' + h + '%;background:' + hwNightQualityColor(q) + ';opacity:' + (q == null ? 0.35 : 1) + ';" title="' +
+        hwFmtLocal(s.ms, off) + ' Uhr: ' + (q == null ? 'noch zu hell' : q + ' von 100') + ', Wolken ' + Math.round(s.cloud) + ' %"></div><b>' + hwFmtLocal(s.ms, off).slice(0, 2) + '</b></div>';
+    }).join('');
+    document.getElementById('hw-night-updated').innerHTML = hwIcon('refresh', 13) + ' Zuletzt aktualisiert: ' + new Date().toLocaleTimeString('de-DE');
+
+    /* Mond */
+    document.getElementById('hw-moon-disc').innerHTML = hwMoonDiscSvg(n.moon.elongation, 56, '#F1EDFB', '#1B1840');
+    document.getElementById('hw-moon-name').textContent = n.moon.name + ' · ' + n.moon.illumination + ' % beleuchtet';
+    var mrows = '';
+    n.moonEvents.forEach(function(e){ mrows += '<div class="hw-row"><span>' + (e.rising ? 'Mondaufgang' : 'Monduntergang') + '</span><span>' + hwFmtLocal(e.ms, off) + ' Uhr</span></div>'; });
+    if(!mrows) mrows = '<p style="font-size:13px;margin:0;">In dieser Nacht geht der Mond weder auf noch unter.</p>';
+    document.getElementById('hw-moon-sub').textContent = n.moon.illumination >= 60 ? 'Helles Mondlicht überstrahlt schwache Sterne.' : (n.moon.illumination <= 25 ? 'Wenig Mondlicht – gut für schwache Objekte.' : 'Mäßiges Mondlicht.');
+    document.getElementById('hw-moon-times').innerHTML = mrows;
+
+    /* Planeten und Mond am Himmel */
+    var objHtml = n.objects.map(function(o){
+      var range = hwFmtLocal(o.first, off) + '–' + hwFmtLocal(o.last, off) + ' Uhr';
+      var note = o.nakedEye ? '' : '<small>nur mit Fernglas oder Teleskop</small>';
+      return '<div class="hw-obj"><span><strong>' + o.name + '</strong>' + note + '</span><span class="r">' + range + '<br>max. ' + Math.round(o.peakAlt) + '° im ' + hwCompassWord(o.peakAz) + '</span></div>';
+    }).join('');
+    document.getElementById('hw-objects').innerHTML = objHtml || '<p style="font-size:14px;margin:0;">In dieser Nacht steht kein Planet über 5° Höhe bei dunklem Himmel.</p>';
+
+    /* Kalender */
+    document.getElementById('hw-phases').innerHTML = hwNextMoonPhases(new Date()).map(function(p){
+      return '<div class="hw-row"><span>' + p.name + '</span><span>' + hwFmtLocalDay(p.date.getTime(), off) + ' ca. ' + hwFmtLocal(p.date.getTime(), off) + ' Uhr</span></div>';
+    }).join('');
+    document.getElementById('hw-showers').innerHTML = hwUpcomingShowers(new Date(), 3).map(function(s){
+      var when = s.days <= 0 ? 'jetzt aktiv' : 'in ' + s.days + ' Tagen';
+      var moon = s.moon >= 60 ? 'Mond stört stark' : (s.moon >= 25 ? 'Mond stört etwas' : 'dunkler Himmel');
+      return '<div class="hw-obj"><span><strong>' + s.name + '</strong><small>' + moon + ' (Mond ' + s.moon + ' %) · bis ca. ' + s.zhr + ' pro Std.</small></span><span class="r"><strong>' + s.peak.getDate() + '.' + (s.peak.getMonth() + 1) + '.</strong><br>' + when + '</span></div>';
+    }).join('');
+    var se = hwNextSeason(new Date());
+    document.getElementById('hw-season').innerHTML = se ? '<div class="hw-row"><span>' + se.name + '</span><span>' + hwFmtLocalDay(se.date.getTime(), off) + ' ca. ' + hwFmtLocal(se.date.getTime(), off) + ' Uhr</span></div>' : '';
+
+    document.getElementById('hw-card-status').style.display = 'none';
+    document.getElementById('hw-night-result').style.display = 'block';
+  }).catch(function(err){
+    document.getElementById('hw-night-result').style.display = 'none';
+    document.getElementById('hw-card-status').style.display = 'block';
+    document.getElementById('hw-status').textContent = 'Nicht verfügbar: ' + (err && err.message ? err.message : 'Standort nicht erreichbar');
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  window.hwPageReload = hwLoadNight;
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  if(hwHasActiveLocationReady()) hwLoadNight();
+  setInterval(function(){ if(!document.hidden && hwHasActiveLocationReady()) hwLoadNight(); }, 600000);
+});
+
+</script>
+</body>
+</html>

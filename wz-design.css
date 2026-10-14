@@ -67,6 +67,8 @@ html.theme-dark body .wzd-head, html[data-wz-fixed="dark"] body .wzd-head { box-
   background: no-repeat right bottom / 300px 120px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 120'%3E%3Cpath d='M-10 118 Q150 30 310 118' fill='none' stroke='%23ffffff' stroke-opacity='.16' stroke-width='1' stroke-dasharray='3 5'/%3E%3Cg stroke='%23ffffff' stroke-opacity='.2' stroke-width='.8' fill='none'%3E%3Cpath d='M196 34 L222 48 L247 38 L270 58 L286 50'/%3E%3C/g%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='196' cy='34' r='1.6' fill-opacity='.6'/%3E%3Ccircle cx='222' cy='48' r='1.2' fill-opacity='.5'/%3E%3Ccircle cx='247' cy='38' r='2' fill-opacity='.7'/%3E%3Ccircle cx='270' cy='58' r='1.3' fill-opacity='.5'/%3E%3Ccircle cx='286' cy='50' r='1' fill-opacity='.45'/%3E%3C/g%3E%3C/svg%3E");
 }
 .wzd-head > .wzd-orig { display: none !important; }
+/* auch gegen die Dunkelmodus-Regel für App-Symbole (sonst erscheint in ProduktWahr/VorratsWahr ein zweites Symbol im Kopf) */
+html:root body .wzd-head > .wzd-orig.wzd-orig.wzd-orig.wzd-orig.wzd-orig { display: none !important; }
 .wzd-headin { position: relative; z-index: 1; }
 .wzd-row { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .wzd-lead:empty { display: none; }
@@ -105,8 +107,8 @@ html body .wzd-head .wzd-act.wzd-wide, html body .wzd-head .hw-hero-loc.wzd-act,
 html body .wzd-head .hw-hero-loc.wzd-act { max-width: 200px !important; min-width: 0 !important; }
 html body .wzd-head .hw-hero-loc.wzd-act .txt { display: inline-flex; align-items: center; gap: 5px; color: #fff !important; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html body .wzd-head .hw-hero-loc.wzd-act svg { width: 15px !important; height: 15px !important; }
-html body .wzd-head #help-btn.wzd-act { font-size: 0 !important; width: 40px !important; padding: 0 !important; }
-html body .wzd-head #help-btn.wzd-act::before { content: ""; width: 19px; height: 19px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.2'/%3E%3Cpath d='M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6'/%3E%3Ccircle cx='12' cy='16.9' r='.5' fill='black'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.2'/%3E%3Cpath d='M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6'/%3E%3Ccircle cx='12' cy='16.9' r='.5' fill='black'/%3E%3C/svg%3E") center / contain no-repeat; }
+html body .wzd-head #help-btn.wzd-act { font-size: 0 !important; width: 40px !important; padding: 0 !important; gap: 0 !important; letter-spacing: 0 !important; color: #fff !important; }
+html body .wzd-head #help-btn.wzd-act::before { flex: 0 0 19px; margin: 0; content: ""; width: 19px; height: 19px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.2'/%3E%3Cpath d='M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6'/%3E%3Ccircle cx='12' cy='16.9' r='.5' fill='black'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.2'/%3E%3Cpath d='M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6'/%3E%3Ccircle cx='12' cy='16.9' r='.5' fill='black'/%3E%3C/svg%3E") center / contain no-repeat; }
 html body .wzd-head #open-drawer-btn.wzd-act .bookmark-count { background: rgba(255,255,255,.22) !important; color: #fff !important; border-radius: 9px; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; padding: 0 5px; }
 
 .wzd-id { display: flex; align-items: center; gap: 15px; margin-top: 16px; }
@@ -139,6 +141,15 @@ html body .wzd-meta > .wzd-kept {
   background: rgba(255, 255, 255, .14) !important; color: #fff !important; border: 1px solid rgba(255, 255, 255, .18) !important;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* Ort-/Merkliste-Pille: läuft direkt hinter der Kurzbeschreibung mit, statt eine eigene Zeile
+   unter dem Kopf zu belegen – so sind alle Köpfe gleich hoch (HimmelsWahr, KompassWahr, Keysglade). */
+.wzd-subline { margin: 5px 0 0; color: rgba(255, 255, 255, .82); font: 400 13.5px/1.55 -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.wzd-subline > .wzd-sub { display: inline; margin: 0 !important; }
+.wzd-subline > .wzd-meta { display: inline-flex; flex-wrap: nowrap; vertical-align: 1px; gap: 6px; margin: 0 0 0 6px; max-width: 100%; }
+html body .wzd-subline > .wzd-meta > .wzd-kept { padding: 3px 10px !important; font-size: 12px !important; line-height: 1.25 !important; }
+html body .wzd-subline > .wzd-meta > .hw-hero-loc.wzd-kept svg, html body .wzd-subline > .wzd-meta > #open-drawer-btn.wzd-kept svg { width: 13px; height: 13px; }
+html body .wzd-subline > .wzd-meta > #open-drawer-btn.wzd-kept .bookmark-count { min-width: 16px; height: 16px; font-size: 10.5px; }
 
 /* Unterseiten: kompakter Kopf „Zurück · Titel“ */
 html.wzd-subview body .wzd-head { padding-bottom: 14px !important; border-radius: 0 0 24px 24px !important; }
@@ -203,16 +214,56 @@ html.wzd-on body .sn-card, html.wzd-on body .lb-card, html.wzd-on body .panel-ca
 html.wzd-on body .card, html.wzd-on body .kw-card, html.wzd-on body .hint-card {
   border: 1px solid var(--wzd-hair) !important;
 }
+/* Knöpfe – eine Regel für alle Apps, hell und dunkel gleich:
+   Hauptaktion = kräftiges Violett mit weißer Schrift (Kontrast ≥ 5 : 1).
+   Nebenaktion = blasses Lavendel mit dunkler Schrift (dunkel: gedämpftes Violett mit heller Schrift).
+   Löschen/Stopp = eigene rote Fläche der App (Warnfarbe bleibt erkennbar). */
+:root { --wzd-sec-bg: var(--wzp-dac7f2, #DAC7F2); --wzd-sec-fg: var(--wzp-241e3f, #241E3F); }
+html.theme-dark, html[data-wz-fixed="dark"] { --wzd-sec-bg: var(--wzp-3a2e52, #3A2E52); --wzd-sec-fg: var(--wzp-eeeaf8, #EEEAF8); }
 /* Haupt-Knopf */
-html.wzd-on body .cta:not(.secondary):not(.ghost), html.wzd-on body .btn-primary, html.wzd-on body .hw-btn:not(.hw-btn-ghost):not(.ghost) {
+html.wzd-on body .cta.primary, html.wzd-on body .btn-primary, html.wzd-on body .hw-btn.primary,
+html.wzd-on[data-wz-app="lw"] body .cta:not(.secondary):not(.danger):not(.ghost),
+html.wzd-on[data-wz-app="qr"] body .cta:not(.secondary):not(.danger):not(.ghost) {
   border-radius: var(--wzd-r-ctl) !important;
-  background: linear-gradient(158deg, var(--wz-accent-2, #7C5CFF) 0%, var(--wz-accent) 100%) !important;
-  box-shadow: 0 6px 18px rgba(var(--wzq-5a2fbe, 90, 47, 190), .28) !important;
+  background: var(--wz-primary-bg) !important;
+  color: var(--wz-primary-fg, #fff) !important;
+  -webkit-text-fill-color: currentColor;
+  box-shadow: var(--wz-primary-shadow) !important;
   border: 0 !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .12);
 }
-html.theme-dark.wzd-on body .cta:not(.secondary):not(.ghost), html.theme-dark.wzd-on body .btn-primary, html.theme-dark.wzd-on body .hw-btn:not(.hw-btn-ghost):not(.ghost) {
-  background: linear-gradient(158deg, var(--wzp-8e75f0, #8E75F0) 0%, var(--wzp-6a4fd8, #6A4FD8) 100%) !important; color: #fff !important;
+html.wzd-on body .cta.primary svg, html.wzd-on body .btn-primary svg, html.wzd-on body .hw-btn.primary svg,
+html.wzd-on[data-wz-app="lw"] body .cta:not(.secondary):not(.danger) svg, html.wzd-on[data-wz-app="qr"] body .cta:not(.secondary):not(.danger) svg { color: inherit !important; }
+/* Neben-Knopf */
+html.wzd-on body .cta:not(.primary):not(.danger):not(.stop):not(.ghost),
+html body .btn-secondary:not(.active),
+html.wzd-on body .hw-btn:not(.primary):not(.hw-btn-ghost):not(.ghost) {
+  border-radius: var(--wzd-r-ctl) !important;
+  background: var(--wzd-sec-bg) !important;
+  color: var(--wzd-sec-fg) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  text-shadow: none !important;
 }
+html.wzd-on body .cta:not(.primary):not(.danger):not(.stop) svg, html.wzd-on body .btn-secondary svg, html.wzd-on body .hw-btn:not(.primary) svg { color: inherit !important; }
+/* LautstärkeWahr und QRWahr: dort ist der schlichte .cta die Hauptaktion (siehe oben) */
+html.wzd-on[data-wz-app="lw"] body .cta:not(.secondary):not(.danger):not(.ghost),
+html.wzd-on[data-wz-app="qr"] body .cta:not(.secondary):not(.danger):not(.ghost) { background: var(--wz-primary-bg) !important; color: var(--wz-primary-fg, #fff) !important; box-shadow: var(--wz-primary-shadow) !important; text-shadow: 0 1px 1px rgba(0, 0, 0, .12) !important; }
+/* Keysglade: aktive Reiter, Unterreiter und Auswahlknöpfe wie überall kräftig violett */
+html[data-wz-app="kg"] body .tab-btn.active, html[data-wz-app="kg"] body .subtab-btn.active, html[data-wz-app="kg"] body .tip-percent-btn.active, html[data-wz-app="kg"] body .btn-secondary.active {
+  background: var(--wz-primary-bg) !important; color: #fff !important; box-shadow: var(--wz-primary-shadow) !important;
+}
+/* Gewählte Auswahl-Chips (Umkreis, Messart, Filter …): überall kräftiges Violett mit weißer Schrift –
+   wie in Keysglade, ProduktWahr und VorratsWahr (vorher teils Dunkelblau, teils nur umrandet) */
+html.wzd-on body .chip.active, html.wzd-on body .chip[aria-checked="true"], html[data-wz-app="aw"] body .filter-chip.selected {
+  background: var(--wz-primary-bg) !important; color: #fff !important; border-color: transparent !important;
+}
+html.wzd-on body .chip.active svg, html[data-wz-app="aw"] body .filter-chip.selected svg { color: inherit !important; }
+/* ProduktWahr, VorratsWahr: gleiche Schriftstärke auf allen Knöpfen wie in den übrigen Apps */
+html[data-wz-app="pw"] body .btn, html[data-wz-app="vw"] body .btn { font-weight: 650 !important; }
+/* Gesperrte Knöpfe bleiben erkennbar, aber zurückgenommen */
+html.wzd-on body .cta:disabled, html.wzd-on body .hw-btn:disabled, html.wzd-on body .btn:disabled { opacity: .5 !important; }
 /* Eingabefelder */
 html.wzd-on body input[type="text"], html.wzd-on body input[type="search"], html.wzd-on body input[type="number"], html.wzd-on body input:not([type]), html.wzd-on body textarea, html.wzd-on body select {
   border-radius: 12px !important;
@@ -231,6 +282,8 @@ html[data-wz-app="bp"] body .header, html[data-wz-app="wow"] body .home-head {
   box-shadow: 0 14px 34px rgba(var(--wzq-241748, 36, 23, 72), .26) !important;
   color: #fff !important;
 }
+/* BelegParkWahr im Dunkelmodus: Kopf im selben Nachthimmel-Verlauf wie alle Apps (nicht im helleren Knopf-Violett) */
+html[data-wz-app="bp"] body.dark .header { background: linear-gradient(158deg, var(--wz-hdr-a) 0%, var(--wz-hdr-b) 100%) !important; }
 html.theme-dark[data-wz-app="bp"] body .header, html.theme-dark[data-wz-app="wow"] body .home-head { box-shadow: 0 14px 34px rgba(0, 0, 0, .4) !important; }
 html[data-wz-app="bp"] body .header::before, html[data-wz-app="wow"] body .home-head::before,
 html[data-wz-app="bp"] body .header::after, html[data-wz-app="wow"] body .home-head::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
@@ -298,6 +351,9 @@ html[data-wz-app="wow"] body .home-head .hh-txt small {
   grid-area: eb; color: rgba(255, 255, 255, .72) !important; font: 650 11px/1.2 -apple-system, system-ui, sans-serif !important;
   letter-spacing: .14em; text-transform: uppercase; margin: 0 !important;
 }
+/* Dachzeile wie in allen Apps: „WahrZentrale · Unterwegs“ (statt Tagesgruß) */
+html[data-wz-app="wow"] body .home-head .hh-txt small { font-size: 0 !important; letter-spacing: 0 !important; }
+html[data-wz-app="wow"] body .home-head .hh-txt small::before { content: "WahrZentrale · Unterwegs"; font: 650 11px/1.2 -apple-system, system-ui, sans-serif; letter-spacing: .14em; }
 html[data-wz-app="wow"] body .home-head .hh-txt h1 {
   grid-area: ti; display: grid !important; grid-template-columns: 58px 1fr; column-gap: 15px; align-items: center; margin: 0 !important;
   color: #fff !important; font: 700 25px/1.12 var(--wzd-title-font) !important; letter-spacing: -.02em !important;
@@ -317,6 +373,12 @@ html[data-wz-app="bp"] body .nav-tile-strip.wzd-bar .tile-icon-wrap { background
 html[data-wz-app="bp"] body .nav-tile-strip.wzd-bar .tile-icon-wrap span { width: 22px !important; height: 22px !important; }
 html[data-wz-app="bp"] body .nav-tile-strip.wzd-bar .tile-icon-wrap svg { width: 22px !important; height: 22px !important; }
 html[data-wz-app="bp"] body:has(.nav-tile-strip) .fab { bottom: calc(var(--wzd-bar-space) + 6px) !important; }
+/* BelegParkWahr scrollt nicht die Seite, sondern einen inneren Bereich. Als App vom Home-Bildschirm
+   meldet das System dann eine zu kleine Fensterhöhe, und fest verankerte Leisten rutschen nach oben.
+   Leiste und Kamera-Knopf richten sich deshalb – wie in allen anderen Apps – am unteren Bildschirmrand
+   aus: Bezugsrahmen ist die App-Fläche mit der gemessenen vollen Höhe (--wz-vh). */
+html[data-wz-app="bp"], html[data-wz-app="bp"] body { height: var(--wz-vh, 100%) !important; }
+html[data-wz-app="bp"] body #app { position: relative; transform: translateZ(0); }
 /* WowarWahr: Kopf bis an den Rand, Unterseiten kompakt, Tableiste als schwebende Leiste */
 html[data-wz-app="wow"] { --tabh: 76px; }
 html[data-wz-app="wow"] body .view.scroll > .home-head { margin: calc(-1 * (env(safe-area-inset-top, 0px) + 8px)) -16px 18px !important; }
@@ -390,9 +452,33 @@ html body .fw-s-bar > .fw-s-actions { order: 1 !important; display: flex !import
 html body .fw-s-bar > .fw-s-actions:empty { display: none !important; }
 html body .fw-primary {
   border-radius: var(--wzd-r-ctl) !important;
-  background: linear-gradient(158deg, var(--wzp-8e75f0, #8E75F0) 0%, var(--wzp-6a4fd8, #6A4FD8) 100%) !important;
-  box-shadow: 0 8px 22px rgba(var(--wzq-5a2fbe, 90, 47, 190), .35) !important; color: #fff !important; border: 0 !important;
+  background: var(--wz-primary-bg) !important;
+  box-shadow: var(--wz-primary-shadow) !important; color: #fff !important; border: 0 !important;
 }
+
+/* =================== 6. Lesbarkeit: Einzelkorrekturen ===================
+   Stellen, an denen Schrift und Fläche zu wenig Kontrast hatten (hell und dunkel geprüft). */
+/* AlltagWahr: Löschen-Knöpfe in derselben Warnfarbe wie in den übrigen Apps (statt Orange auf Gelb) */
+html[data-wz-app="aw"] body .btn-delete { background: #FBD6D6 !important; color: #7A1F1F !important; }
+html.theme-dark[data-wz-app="aw"] body .btn-delete { background: #3A1E24 !important; color: #F5A3A3 !important; }
+html[data-wz-app="aw"] body .entry-flag-warn { color: var(--warn-text, #7A5A00) !important; }
+/* AlltagWahr: Plus-Knopf im Dunkelmodus kräftig violett mit weißem Zeichen (wie BelegParkWahr) */
+html.theme-dark[data-wz-app="aw"] body .fab { background: linear-gradient(135deg, var(--wzp-6e4fe0, #6E4FE0) 0%, var(--wzp-3b2585, #3B2585) 100%) !important; color: #fff !important; }
+/* NaviWahr: „Rückgängig“ in der dunklen bzw. hellen Hinweisleiste */
+html[data-wz-app="wk"] body .undotoast button { color: var(--wzp-c9b8ff, #C9B8FF) !important; text-decoration: underline; text-underline-offset: 2px; }
+html[data-wz-app="wk"][data-theme="dark"] body .undotoast button { color: var(--wzp-5a2fbe, #5A2FBE) !important; }
+/* BelegParkWahr: gewählte Filter/Monate (Inline-Farbe) im Dunkelmodus kräftig violett, damit die weiße Schrift lesbar bleibt */
+html[data-wz-app="bp"] body.dark [style*="background:var(--violet);color:#fff"],
+html[data-wz-app="bp"] body.dark [style*="background:var(--violet); color:#fff"] { background: var(--wz-primary-bg) !important; }
+/* BeatWahr: TAP-Knopf im Dunkelmodus mit heller Akzentschrift */
+html[data-wz-app="bw"][data-theme="dark"] body .tap-btn { color: var(--accent-text, #B9A6F5) !important; }
+/* Sternenhimmel: „Beenden“ im Zeitraffer liegt über dem Himmel – dunkle Glasfläche, weiße Schrift */
+html[data-wz-app="zh"] body #cine .btn.ghost { background: rgba(var(--wzq-15102a, 21, 16, 42), .62) !important; color: #fff !important; border-color: rgba(255, 255, 255, .26) !important; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+/* Karten (Leaflet) bilden eine eigene Ebene: Ihre inneren Schichten (z-index 400–1000) dürfen
+   nicht über die Tableiste oder Blätter der App wachsen – sonst verschwindet die Leiste, sobald eine
+   Karte dahinter liegt (z. B. Keysglade › Karte). Die Vollbild-Karte bleibt davon unberührt. */
+html body .leaflet-container { isolation: isolate; }
 
 /* Tastatur offen: Leiste tritt zurück */
 html.wzd-typing body .wzd-bar, html.wzd-typing[data-wz-app="wow"] body nav.tabbar {

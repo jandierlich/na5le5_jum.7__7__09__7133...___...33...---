@@ -124,6 +124,13 @@
       '<div class="wzd-id"><img class="wzd-ico" src="./icon-192.png" alt="" width="56" height="56" decoding="async">' +
       '<div class="wzd-txt"><div class="wzd-title" role="heading" aria-level="1">' + esc(title) + '</div><p class="wzd-sub">' + esc(DOCSUB[page]) + "</p></div></div></div>";
     wrapEl.parentNode.insertBefore(h, wrapEl);
+    // Hell/Dunkel wie in allen Apps rechts neben dem Haus-Knopf
+    if (window.wzTheme && wzTheme.bind) {
+      var dt = document.createElement("button");
+      dt.type = "button"; dt.className = "wzd-act wzd-theme-added"; dt.setAttribute("data-wz-theme-toggle", "");
+      h.querySelector(".wzd-acts").appendChild(dt);
+      wzTheme.bind(dt);
+    }
     if (h1) h1.classList.add("wzd-h1-hidden");
     root.classList.add("wzd-on", "wzd-doc");
   }
@@ -174,6 +181,7 @@
       var el = h.querySelector(s); if (el) { el.classList.add("wzd-kept"); meta.appendChild(el); }
     });
     if (!meta.children.length) meta.remove();
+    else placeMeta(wrap, meta);
     (cfg.move || []).forEach(function (m) {
       var el = h.querySelector(m.sel); if (el && m.after) h.parentNode.insertBefore(el, h.nextSibling);
     });
@@ -188,10 +196,48 @@
       hb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.2L12 4.5l8 6.7"/><path d="M6.2 9.5v10h11.6v-10"/><path d="M10 19.5v-5h4v5"/></svg>';
       acts.insertBefore(hb, acts.firstChild);
     }
+    if (app === "hw" && !acts.querySelector("[data-wz-theme-toggle]") && window.wzTheme && wzTheme.bind) {
+      // HimmelsWahr: Hell/Dunkel sitzt wie in allen anderen Apps rechts im Kopf (bisher nur im Hinweise-Blatt)
+      var tb = document.createElement("button");
+      tb.type = "button"; tb.className = "wzd-act wzd-theme-added"; tb.setAttribute("data-wz-theme-toggle", "");
+      acts.appendChild(tb);
+      wzTheme.bind(tb);
+      if (wzTheme.onChange) wzTheme.onChange(function () { try { if (window.hwUpdateThemeMeta) hwUpdateThemeMeta(wzTheme.isDark() ? "dark" : "light"); if (window.hwApplySky) hwApplySky(); } catch (e) { } });
+    }
+    if (app === "as" && !acts.querySelector("[data-wz-theme-toggle], #themeToggle") && window.wzTheme && wzTheme.bind) {
+      // AstroWahr: Hell/Dunkel wie überall rechts im Kopf (bisher nur unter „Mehr“ › Einstellungen)
+      var ab = document.createElement("button");
+      ab.type = "button"; ab.className = "wzd-act wzd-theme-added"; ab.setAttribute("data-wz-theme-toggle", "");
+      acts.appendChild(ab);
+      wzTheme.bind(ab);
+    }
+    if (app === "wk" && window.wzTheme && wzTheme.paint) {
+      // NaviWahr: gleiches Mond-/Sonnen-Symbol wie in allen Apps (Mond = Dunkelmodus einschalten)
+      var wb = document.getElementById("btnTheme"); if (wb && !wb.__wzThemePainted) wzTheme.paint(wb);
+    }
     if (app === "kw") kwSubview(wrap, eyebrow);
     bleed(h);
     window.addEventListener("resize", function () { bleed(h); });
     window.addEventListener("orientationchange", function () { setTimeout(function () { bleed(h); }, 300); });
+  }
+
+  /* Ort- bzw. Merkliste-Pille: läuft hinter der Kurzbeschreibung mit (eine Zeile weniger im Kopf).
+     Auf kompakten Unterseiten (KompassWahr), wo Symbol und Beschreibung ausgeblendet sind,
+     steht sie wie bisher unter der Kopfzeile. */
+  function placeMeta(wrap, meta) {
+    var txtBox = wrap.querySelector(".wzd-txt"); if (!txtBox) return;
+    var line = document.createElement("div");
+    line.className = "wzd-subline";
+    var sub = txtBox.querySelector(".wzd-sub");
+    if (sub) line.appendChild(sub);
+    txtBox.appendChild(line);
+    function sync() {
+      var compact = root.classList.contains("wzd-subview");
+      if (compact && meta.parentNode !== wrap) wrap.appendChild(meta);
+      else if (!compact && meta.parentNode !== line) line.appendChild(meta);
+    }
+    sync();
+    try { new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ["class"] }); } catch (e) { }
   }
 
   /* Knöpfe, die bisher frei über der Seite schwebten (Home, Hell/Dunkel,

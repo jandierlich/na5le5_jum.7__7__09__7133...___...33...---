@@ -170,7 +170,7 @@ svg.ic { width: 18px; height: 18px; display: block; }
   text-align: left; min-height: 46px;
 }
 .date-wrap input[type="date"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; } /* Eingabefelder bleiben auf einer Linie, auch wenn eine Beschriftung zweizeilig ist */
 .sheet-actions { display: flex; gap: 10px; margin-top: 20px; }
 .btn { flex: 1; padding: 14px; border-radius: var(--radius-sm); border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font); }
 .btn-primary { background: linear-gradient(135deg, var(--violet), var(--violet-deep)); color: white; }

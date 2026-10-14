@@ -326,6 +326,8 @@
     set: set,
     toggle: toggle,
     bind: bind,
+    // nur das Symbol (Mond/Sonne) setzen – für App-eigene Knöpfe, die selbst umschalten
+    paint: function (btn) { if (btn) { paintButton(btn, isDark()); if (buttons.indexOf(btn) === -1 && !btn.__wzThemeBound) { btn.__wzThemePainted = true; listeners.push(function () { paintButton(btn, isDark()); }); } } },
     onChange: function (fn) { if (typeof fn === "function") listeners.push(fn); },
     palettes: function () { return [{ id: "nachthimmel", name: "Nachthimmel" }, { id: "eigene", name: "Eigene Farbwelt" }]; },
     palette: storedPalette,

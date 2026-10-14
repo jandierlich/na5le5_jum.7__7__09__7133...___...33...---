@@ -22,6 +22,7 @@
   .seg { display: flex; background: var(--wz-soft); border-radius: 14px; padding: 4px; gap: 4px; }
   .seg button { flex: 1; border: 0; border-radius: 11px; padding: 11px 8px; background: transparent; color: var(--wz-text); font: 700 14.5px -apple-system, sans-serif; cursor: pointer; }
   .seg button[aria-pressed="true"] { background: var(--wz-card-solid); color: var(--wz-accent); box-shadow: 0 2px 8px var(--wz-shadow-d); }
+  html.theme-dark .seg button[aria-pressed="true"] { background: var(--wzp-4a3d6b, #4A3D6B); color: #fff; }
   .st-btn { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; padding: 13px 12px;
     font: 700 15px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; background: var(--wz-accent); color: var(--wz-accent-text); text-decoration: none; }
   .st-btn.sec { background: var(--wz-soft); color: var(--wz-text); }
@@ -189,6 +190,7 @@
   $("thLight").addEventListener("click", function () { wzTheme.set(false); paintTheme(); });
   $("thDark").addEventListener("click", function () { wzTheme.set(true); paintTheme(); });
   paintTheme();
+  if (wzTheme.onChange) wzTheme.onChange(paintTheme); // auch beim Umschalten über den Knopf im Kopf
 
   /* Farbwelt: Nachthimmel oder eine eigene, mit zwei Reglern gemischte Farbwelt */
   var BASE = ["#5A2FBE", "#241748", "#B9A6F5", "#F1EEFA"];

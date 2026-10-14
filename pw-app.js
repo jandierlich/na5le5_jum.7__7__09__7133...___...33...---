@@ -628,9 +628,14 @@
   var aktiverScanTimeout = null;
   var warenkorbAktiv = false;
   var warenkorb = [];
+  /* Scan-Ergebnisse werden NICHT dauerhaft gespeichert: Sie liegen nur im Arbeitsspeicher, solange
+     ProduktWahr geöffnet ist (damit derselbe Code beim Live-Scan nicht mehrfach abgefragt wird),
+     und sind beim Schließen weg. Ein Zwischenspeicher früherer Fassungen wird beim Start gelöscht. */
   var CACHE_KEY = "sw_barcode_cache";
-  function ladeCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; }catch(e){ return {}; } }
-  function speichereCache(c){ try{ localStorage.setItem(CACHE_KEY, JSON.stringify(c)); }catch(e){} }
+  try{ localStorage.removeItem(CACHE_KEY); }catch(e){}
+  var sitzungsCache = {};
+  function ladeCache(){ return sitzungsCache; }
+  function speichereCache(c){ sitzungsCache = c || {}; }
 
   function loadZXing(){
     return new Promise(function(resolve, reject){
@@ -697,7 +702,7 @@
 
   function holeProdukt(code){
     if(!navigator.onLine){
-      zeigeOverlay({code:code, name:"Offline", ampel:null, meta:"Kein Internet — Produkt nicht im lokalen Speicher", gefunden:false});
+      zeigeOverlay({code:code, name:"Offline", ampel:null, meta:"Kein Internet — Produktdaten können gerade nicht abgerufen werden", gefunden:false});
       return;
     }
     fetch("https://world.openfoodfacts.org/api/v2/product/" + encodeURIComponent(code) + ".json")

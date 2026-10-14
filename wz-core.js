@@ -608,7 +608,96 @@
     try { global.fetch = wrapped; } catch (e) { }
   })();
 
+  /* ---------- Overpass (OpenStreetMap-Suche) für KompassWahr und HorizontWahr ----------
+     Dieselben drei Server wie bisher (Datenschutzerklärung Abschnitt 6) – kein neuer Dienst.
+     1. Der Server, der zuletzt gültig geantwortet hat, wird zuerst gefragt. Gemerkt wird nur
+        seine Adresse (Eintrag "wz_overpass"), keine Suchanfrage und kein Standort.
+     2. Lehnt ein Server ab (überlastet, Fehler, Zeitüberschreitung), geht es sofort beim nächsten
+        weiter – ohne zweiten Versuch am selben Server.
+     3. Antwortet ein Server nach "hedgeMs" noch nicht, geht dieselbe Anfrage zusätzlich an den
+        nächsten Server; die erste gültige Antwort gilt, die übrigen Anfragen werden abgebrochen.
+        So bleibt eine langsame, aber gültige Antwort möglich, ohne auf sie warten zu müssen.
+     Fehler tragen .heavy (Abfrage für den Server zu umfangreich) bzw. .cancel (abgebrochen). */
+  var OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
+  var OP_KEY = "wz_overpass";
+  function overpassOrder() {
+    var pref = get(OP_KEY), list = OVERPASS.slice();
+    var i = list.indexOf(pref);
+    if (i > 0) { list.splice(i, 1); list.unshift(pref); }
+    return list;
+  }
+  function overpass(query, o) {
+    o = o || {};
+    var order = overpassOrder(), maxMs = o.maxMs || 70000, hedgeMs = o.hedgeMs || 10000, perMs = o.perMs || 40000;
+    var t0 = Date.now(), round = 0;
+    return new Promise(function (resolve, reject) {
+      var next = 0, running = [], finished = false, lastErr = null, hedgeT = null, overallT = null;
+      function cancelled() { return typeof o.cancelled === "function" && o.cancelled(); }
+      function end(fn, v) {
+        if (finished) return; finished = true;
+        clearTimeout(hedgeT); clearTimeout(overallT);
+        running.forEach(function (r) { try { r.ctrl.abort(); } catch (e) { } clearTimeout(r.timer); });
+        running = [];
+        fn(v);
+      }
+      function cancelErr() { var c = new Error("abgebrochen"); c.cancel = true; return c; }
+      function armHedge() {
+        clearTimeout(hedgeT);
+        hedgeT = setTimeout(function () {
+          if (finished) return;
+          if (cancelled()) return end(reject, cancelErr());
+          if (next < order.length) launch();
+          armHedge();
+        }, hedgeMs);
+      }
+      function launch() {
+        if (finished) return;
+        if (cancelled()) return end(reject, cancelErr());
+        var left = maxMs - (Date.now() - t0);
+        if (left < 3000) { if (!running.length) end(reject, lastErr || new Error("Zeit abgelaufen")); return; }
+        if (next >= order.length) {
+          // alle Server einmal gefragt und keiner läuft mehr: höchstens eine zweite Runde
+          if (!running.length) {
+            if (round >= 1 || (lastErr && lastErr.heavy)) return end(reject, lastErr || new Error("Kein Overpass-Server erreichbar"));
+            round++; next = 0;
+            setTimeout(launch, 800);
+          }
+          return;
+        }
+        var url = order[next++];
+        var ctrl = new AbortController();
+        var r = { ctrl: ctrl, url: url, timer: setTimeout(function () { try { ctrl.abort(); } catch (e) { } }, Math.min(perMs, left)) };
+        running.push(r);
+        if (o.track) try { o.track(ctrl); } catch (e) { }
+        if (next > 1 && o.onSlow) try { o.onSlow(); } catch (e) { }
+        fetch(url, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" }, body: "data=" + encodeURIComponent(query), signal: ctrl.signal })
+          .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+          .then(function (j) {
+            if (!j || !Array.isArray(j.elements)) throw new Error("Unerwartete Antwort");
+            if (j.remark && /error|timed out|out of memory/i.test(j.remark)) { var e = new Error("Overpass: " + j.remark); e.heavy = /timed out|out of memory/i.test(j.remark); throw e; }
+            if (finished) return;
+            try { if (get(OP_KEY) !== url) localStorage.setItem(OP_KEY, url); } catch (e) { }
+            end(resolve, j);
+          })
+          .catch(function (e) {
+            clearTimeout(r.timer);
+            running = running.filter(function (x) { return x !== r; });
+            if (finished) return;
+            if (cancelled()) return end(reject, cancelErr());
+            lastErr = e;
+            // war der gemerkte Server der Ausfall, beim nächsten Mal nicht mehr zuerst fragen
+            try { if (get(OP_KEY) === url) localStorage.removeItem(OP_KEY); } catch (e2) { }
+            launch();
+          });
+      }
+      overallT = setTimeout(function () { end(reject, lastErr || new Error("Zeit abgelaufen")); }, maxMs);
+      launch();
+      armHedge();
+    });
+  }
+
   global.wzCore = {
+    overpass: overpass,
     sheet: sheet,
     loadScript: loadScript,
     loadCss: loadCss,

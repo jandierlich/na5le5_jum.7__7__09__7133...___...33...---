@@ -1244,7 +1244,7 @@ async function kwSearchPOIs(){
   const listEl = document.getElementById("kw-poi-list");
   if (kwState.lat === null) { statusEl.textContent = "Standort wird benötigt."; return; }
   if (!kwState.poiTypesSelected.size) { statusEl.textContent = "Bitte zuerst mindestens einen Ortstyp oben auswählen."; return; }
-  if (!await kwAskOnce("kw-consent-overpass", "Orte in der Nähe suchen? Dein Standort + Radius wird dafür an einen von mehreren Overpass-Servern gesendet (overpass-api.de oder Spiegelserver, OSM Community). Daten: © OpenStreetMap ODbL.")) return;
+  if (!await kwAskOnce("kw-consent-overpass", "Orte in der Nähe suchen? Dein Standort + Radius wird dafür an einen von mehreren Overpass-Servern gesendet (overpass-api.de oder Spiegelserver, OSM Community; antwortet einer langsam, zusätzlich an den nächsten). Daten: © OpenStreetMap ODbL.")) return;
 
   const searchId = ++kwPoiSearchId;
   listEl.innerHTML = "";
@@ -1295,8 +1295,17 @@ async function kwSearchPOIs(){
   // ab – schwere, aber gültige Antworten kamen dadurch nie an und wurden als "überlastet" gemeldet.
   const perRequestMs = 33000;
   const fetchType = async t => {
-    const deadline = Date.now() + 70000;
     const query = qFor(t);
+    // Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
+    // bei Ablehnung sofort der nächste, nach 10 s ohne Antwort zusätzlich der nächste.
+    if (window.wzCore && wzCore.overpass) {
+      try {
+        return await wzCore.overpass(query, { perMs: perRequestMs, maxMs: 70000, hedgeMs: 10000,
+          onSlow: () => { statusEl.textContent = `Server antwortet langsam (${t.label}) – versuche es weiter …`; },
+          cancelled: () => searchId !== kwPoiSearchId });
+      } catch (e) { if (e && e.cancel) e.stale = true; throw e; }
+    }
+    const deadline = Date.now() + 70000;
     let lastErr = null;
     for (let m = 0; m < mirrors.length; m++) {
       // Pro Server bis zu 2 Versuche; bei "zu viele Anfragen" (429) oder Serverfehler direkt weiter.

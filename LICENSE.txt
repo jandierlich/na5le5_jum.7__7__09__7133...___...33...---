@@ -3,7 +3,7 @@ Alle Rechte vorbehalten / All Rights Reserved.
 Copyright (c) 2026 Jan Dierlich
 
 Dieses Repository (WahrZentrale) enthält die WahrZentrale mit allen darin
-zusammengeführten Apps (HimmelsWahr, Sternenhimmel (ZeitHimmel), AstroWahr,
+zusammengeführten Apps (HimmelsWahr, Sternenhimmel, AstroWahr,
 KompassWahr, NaviWahr, Keysglade, WowarWahr, BelegParkWahr, AlltagWahr,
 ProduktWahr, VorratsWahr, QRWahr, LautstärkeWahr, LosDenkWahr, MessWahr,
 LabWahr, AufwindWahr, ZahlenturmWahr, Korvanthiel, HerzKaroDrei,

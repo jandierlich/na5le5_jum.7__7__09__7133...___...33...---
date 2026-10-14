@@ -650,7 +650,15 @@ function camStop(stream, video){
   }
   var MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
   function overpass(query, status, tmo){
-    var per = ((tmo || 30) + 10) * 1000, deadline = Date.now() + per * 2, m = 0, attempt = 0;
+    var per = ((tmo || 30) + 10) * 1000;
+    /* Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
+       bei Ablehnung sofort der nächste, bei langer Wartezeit zusätzlich der nächste. */
+    if(window.wzCore && wzCore.overpass){
+      return wzCore.overpass(query, { perMs: per, maxMs: per * 2, hedgeMs: (tmo || 30) > 30 ? 20000 : 10000,
+        onSlow: status, cancelled: function(){ return !!loadCtl.stop; },
+        track: function(c){ (loadCtl.all = loadCtl.all || []).push(c); } });
+    }
+    var deadline = Date.now() + per * 2, m = 0, attempt = 0;
     function tryNext(lastErr){
       if(loadCtl.stop){ var c = new Error("abgebrochen"); c.cancel = true; return Promise.reject(c); }
       if(m >= MIRRORS.length || Date.now() > deadline - 3000) return Promise.reject(lastErr || new Error("Kein Overpass-Server erreichbar"));
@@ -702,7 +710,7 @@ function camStop(stream, video){
   }
   function askOnce(){
     try { if(localStorage.getItem(LS_OK) === "1") return Promise.resolve(true); } catch(e){}
-    return wzConfirm("Umgebung laden? Dafür werden dein Standort und der Umkreis an einen Overpass-Server gesendet (overpass-api.de, ersatzweise Spiegelserver in Österreich, OSM-Gemeinschaft). Für genauere Höhenwinkel gehen außerdem die Koordinaten deines Standorts und der gefundenen Objekte an Open-Meteo (Geländehöhen). Daten © OpenStreetMap-Mitwirkende (ODbL).\n\nDieser Hinweis erscheint nur einmal – die Angaben stehen dauerhaft in der Datenschutzerklärung.", { okLabel: "Zustimmen", cancelLabel: "Ablehnen" })
+    return wzConfirm("Umgebung laden? Dafür werden dein Standort und der Umkreis an einen Overpass-Server gesendet (overpass-api.de oder Spiegelserver in Österreich, OSM-Gemeinschaft; antwortet einer langsam, zusätzlich an den nächsten). Für genauere Höhenwinkel gehen außerdem die Koordinaten deines Standorts und der gefundenen Objekte an Open-Meteo (Geländehöhen). Daten © OpenStreetMap-Mitwirkende (ODbL).\n\nDieser Hinweis erscheint nur einmal – die Angaben stehen dauerhaft in der Datenschutzerklärung.", { okLabel: "Zustimmen", cancelLabel: "Ablehnen" })
       .then(function(ok){ if(ok){ try { localStorage.setItem(LS_OK, "1"); } catch(e){} } return ok; });
   }
   var loading = false, loadCtl = { stop: false, ctrl: null };

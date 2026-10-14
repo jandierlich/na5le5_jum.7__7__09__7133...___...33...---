@@ -48,7 +48,7 @@
 </nav>
 
 <h1>Datenschutzerklärung</h1>
-<p>Diese Datenschutzerklärung gilt für die gesamte WahrZentrale – die Startseite und alle darin enthaltenen Apps. Stand: 13. Oktober 2026.</p>
+<p>Diese Datenschutzerklärung gilt für die gesamte WahrZentrale – die Startseite und alle darin enthaltenen Apps. Stand: 14. Oktober 2026.</p>
 
 <div class="ds-toc">
   <strong>Inhalt</strong>
@@ -99,6 +99,7 @@
   <tr><td><code>wz_nav_last</code>, <code>wz_nav_stack</code>, <code>wz_nav_skip</code></td><td>von welcher App du gekommen bist, damit „Zurück zu …“ funktioniert – nur für die laufende Sitzung (sessionStorage), wird beim Schließen gelöscht</td></tr>
   <tr><td><code>wz_scan_handoff</code></td><td>was Scanner, Schnelleingabe oder „Hier merken“ an eine App übergeben (Text, bei Belegen das Foto, bei „Hier merken“ die Koordinaten) – nur für diesen einen Wechsel im Sitzungsspeicher (sessionStorage); wird beim Öffnen der App gelöscht</td></tr>
   <tr><td><code>wz_today_wx</code></td><td>das zuletzt geladene Wetter für „Heute“ samt gerundetem Ort, höchstens 30 Minuten zwischengespeichert</td></tr>
+  <tr><td><code>wz_overpass</code></td><td>nur die Adresse des Overpass-Servers, der zuletzt geantwortet hat – damit KompassWahr und HorizontWahr ihn zuerst fragen (kein Standort, keine Suchanfrage)</td></tr>
   <tr><td><code>wz_onboarded</code></td><td>dass die kurze Einführung der Startseite schon gezeigt wurde (die Apps merken sich das jeweils mit einem eigenen Eintrag, z. B. <code>hw-onboarded</code>, <code>bp_onboarded</code>)</td></tr>
 </table>
 <p>Die Startseite der WahrZentrale liest einzelne Werte der Apps, um sie dir in „Heute“, in den Kacheln und in der Suche anzuzeigen (z. B. Anzahl offener Gedanken, letzte Fahrt, Reise-Countdown, Rekorde). Das geschieht nur auf deinem Gerät; es wird dabei nichts verändert oder übertragen.</p>
@@ -120,7 +121,7 @@
   <tr><th>Dienst</th><th>Wofür, was wird gesendet</th><th>Genutzt in</th></tr>
   <tr><td><strong>Open-Meteo</strong> (api.open-meteo.com, air-quality-api.open-meteo.com, geocoding-api.open-meteo.com; OpenMeteo GmbH, Bürglen, Schweiz – Angemessenheitsbeschluss; Server nach Angaben des Anbieters in Europa und Nordamerika; Server-Protokolle werden nach Angaben des Anbieters nach 90 Tagen gelöscht)</td><td>Wetter, Niederschlag, Wolken, Luftqualität, Pollen, Höhe, Ortssuche. Gesendet: Koordinaten bzw. Suchtext. Für Abend-/Morgenrot zusätzlich zwei aus deinem Standort berechnete, gerundete Punkte in Richtung Sonnenuntergang/-aufgang. Keysglade fragt beim Öffnen eine kurze Wettervorschau für die gewählte Florida-Stadt ab (Koordinaten der Stadt, nicht deines Standorts), die ausführliche Vorhersage erst im Wetter-Tab. HorizontWahr fragt beim Laden der Umgebung – nach einmaligem Hinweis – die Geländehöhen deines Standorts und der gefundenen Objekte ab (Koordinaten auf 4 Nachkommastellen ≈ 10 m gerundet). KompassWahr sendet die Koordinaten für Wetter und Luftqualität auf 2 Nachkommastellen (≈ 1 km) und für die Geländehöhe auf 4 Nachkommastellen (≈ 10 m) gerundet, NaviWahr für das Wetter am Start auf 2 Nachkommastellen (≈ 1 km).</td><td>Zentrale („Heute“ und Ortssuche in den Einstellungen), HimmelsWahr, KompassWahr, HorizontWahr, NaviWahr, Keysglade</td></tr>
   <tr><td><strong>Photon</strong> (photon.komoot.io; komoot GmbH mit Sitz in Deutschland)</td><td>Adresssuche und Ortsname zu Koordinaten auf Grundlage der OpenStreetMap-Daten. Gesendet: Suchtext bzw. Koordinaten. In KompassWahr vor der ersten Nutzung jeweils mit eigenem Hinweis. Die Startseite fragt den Ortsnamen für den Kopfbereich nur ab, wenn zum bekannten GPS-Standort noch kein Name vorliegt – mit auf 2 Nachkommastellen (≈ 1 km) gerundeten Koordinaten, einmal je Ort; abschaltbar in den Einstellungen.</td><td>Zentrale (Ortsname im Kopfbereich), KompassWahr, NaviWahr</td></tr>
-  <tr><td><strong>Overpass API</strong> (overpass-api.de, Betreiber in Deutschland; ersatzweise overpass.kumi.systems bzw. overpass.private.coffee, Betreiber in Österreich)</td><td>Orte in der Nähe (KompassWahr) bzw. markante Punkte im gewählten Umkreis von 5 bis 30 km (HorizontWahr). Gesendet: Standort und Umkreis. Nur auf Tipp, beim ersten Mal mit Hinweis.</td><td>KompassWahr, HorizontWahr</td></tr>
+  <tr><td><strong>Overpass API</strong> (overpass-api.de, Betreiber in Deutschland; daneben overpass.kumi.systems bzw. overpass.private.coffee, Betreiber in Österreich)</td><td>Orte in der Nähe (KompassWahr) bzw. markante Punkte im gewählten Umkreis von 5 bis 30 km (HorizontWahr). Gesendet: Standort und Umkreis. Nur auf Tipp, beim ersten Mal mit Hinweis. Zuerst wird der Server gefragt, der zuletzt geantwortet hat; antwortet er nicht oder nur langsam, geht dieselbe Anfrage an den nächsten der genannten Server.</td><td>KompassWahr, HorizontWahr</td></tr>
   <tr><td><strong>OSRM-Routing der FOSSGIS e.V.</strong> (routing.openstreetmap.de, Deutschland)</td><td>Auto- oder Fußgängerroute bei aktiver Navigation. Gesendet: aktueller Standort und Ziel, bei einer Neuberechnung unterwegs zusätzlich die Fahrtrichtung (in Grad). Der Betreiber speichert Anfragen nach eigenen Angaben in Server-Logs.</td><td>NaviWahr</td></tr>
   <tr><td><strong>Open Food Facts, Open Beauty Facts, Open Products Facts</strong> (Open Food Facts, Verein nach französischem Recht mit Sitz in Frankreich)</td><td>Produktdaten zu einem Barcode. Gesendet: der erkannte Barcode – beim Live-Scanner automatisch, sobald ein Code erkannt wird.</td><td>ProduktWahr</td></tr>
 </table>
@@ -152,7 +153,7 @@
 <div class="ds-app" id="as"><h3>AstroWahr</h3>
 <p>Speichert lokal: Geburtshoroskope (Bezeichnung, Geburtsdatum/-zeit, Zeitzone, Ort mit Koordinaten), Tarot-Favoriten und anonyme Zähler, zuletzt genutzten Ort. Nutzt den Standort nur für Sonnenzeiten und Sternenhimmel; die Ortsbestimmung erfolgt ohne Online-Abfrage mit einer mitgelieferten Städteliste. Keine externen Dienste.</p></div>
 
-<div class="ds-app" id="zh"><h3>Sternenhimmel (ZeitHimmel)</h3>
+<div class="ds-app" id="zh"><h3>Sternenhimmel</h3>
 <p>Speichert lokal (Präfix <code>zh:</code>): Ort, Zeit- und Anzeigeeinstellungen, Kompass-Kalibrierung, deine „Erinnerungen“ (Name, Zeitpunkt, Ort, Blickrichtung) und ggf. das für „Meine Geburtsnacht“ eingegebene Datum. Nutzt Standort, Lagesensor und Kamera (nur Live-Bild) auf Wunsch. Himmelsbilder werden nur auf deinen Tipp erzeugt und über das Teilen-Menü weitergegeben. Keine externen Dienste.</p></div>
 
 <div class="ds-app" id="kw"><h3>KompassWahr</h3>

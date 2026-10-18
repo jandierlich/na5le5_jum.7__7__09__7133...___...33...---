@@ -23,7 +23,7 @@
   var page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
 
   var AREA = {
-    hw: "Himmel", zh: "Himmel", as: "Himmel", kw: "Himmel", hz: "Himmel", sn: "Himmel",
+    hw: "Himmel", zh: "Himmel", as: "Himmel", kw: "Himmel", hz: "Himmel", sn: "Himmel", wd: "Alltag",
     wk: "Unterwegs", kg: "Unterwegs", wow: "Unterwegs", bp: "Unterwegs",
     aw: "Alltag", pw: "Alltag", vw: "Alltag", ld: "Alltag", qr: "Alltag", lw: "Alltag", mw: "Alltag", lb: "Alltag",
     af: "Spiel & Klang", zw: "Spiel & Klang", kv: "Spiel & Klang", hk: "Spiel & Klang", pk: "Spiel & Klang",
@@ -84,7 +84,7 @@
   var DOC = { eyebrow: "WahrZentrale", icon: "icon-192.png" };
   var HEAD = {
     lw: { head: "header.wz-hero" }, mw: { head: "header.wz-hero" }, hz: { head: "header.wz-hero" },
-    kl: { head: "header.wz-hero" }, lb: { head: "header.wz-hero" }, sn: { head: "header.wz-hero" },
+    kl: { head: "header.wz-hero" }, lb: { head: "header.wz-hero" }, sn: { head: "header.wz-hero" }, wd: { head: "header.wz-hero" },
     qr: { head: "header.wz-hero" }, aw: { head: "header.wz-hero" },
     pw: { head: ".pw-hero" }, vw: { head: "#home > .wz-hero, #home > div:first-child" },
     kw: { head: "header.kw-header", keep: ["#kw-location-name"] },
@@ -307,7 +307,7 @@
 
   /* ---------- Tableiste unten ---------- */
   var BAR = [".tabs", "nav.sn-tabs", "nav.bottom-nav", "nav.hw-nav", "nav.main-nav"];
-  var BAR_APPS = { lw: 1, mw: 1, hz: 1, kl: 1, lb: 1, sn: 1, as: 1, hw: 1, kg: 1 };
+  var BAR_APPS = { lw: 1, mw: 1, hz: 1, kl: 1, lb: 1, sn: 1, wd: 1, as: 1, hw: 1, kg: 1 };
   function decorateBar() {
     if (!BAR_APPS[app]) return true;
     var bar = null;

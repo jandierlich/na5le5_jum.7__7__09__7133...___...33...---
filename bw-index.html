@@ -265,6 +265,10 @@ input[type=range]::-webkit-slider-thumb{
 .confirm-actions .confirm-cancel{ background:var(--bg-track); color:var(--text); }
 .confirm-actions .confirm-ok{ background:var(--danger); color:#fff; }
 .confirm-actions .confirm-ok.neutral{ background:var(--accent); }
+/* Lesbarkeit (FINAL-94): Warnfarben mit ausreichendem Kontrast */
+#resetProjectBtn{ color:#9E2A22 !important; }
+html[data-theme="dark"] #resetProjectBtn{ color:#FFA196 !important; }
+html[data-theme="dark"] .confirm-actions .confirm-ok:not(.neutral){ background:#B8352B; }
 
 /* Sound-Editor pro Spur */
 .field-col{ padding:8px 0; }

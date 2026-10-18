@@ -9,7 +9,7 @@
 
    Bewusst unverändert bleiben:
    - Ampelfarben (rot/gelb/grün) für Bewertungen
-   - inhaltliche Farben: echter Himmel in HimmelsWahr/ZeitHimmel,
+   - inhaltliche Farben: echter Himmel in HimmelsWahr/Sternenhimmel,
      Kartenrouten, Spielsteine und Effekte in den Spielen
    - Gold als Stern-/Sonnen-Akzent (AstroWahr, LosDenkWahr)
 
@@ -138,7 +138,7 @@ html[data-wz-app="as"][data-theme="dark"] {
   --good: var(--wzp-b9a6f5, #B9A6F5);
 }
 
-/* ---------- ZeitHimmel (Sternenhimmel) ---------- */
+/* ---------- Sternenhimmel ---------- */
 html[data-wz-app="zh"]:not(.red) {
   --panel: rgba(var(--wzq-f8f6fc, 248, 246, 252), .88); --panel-solid: var(--wzp-f8f6fc, #F8F6FC); --panel-2: rgba(var(--wzq-5a2fbe, 90, 47, 190), .07);
   --line: rgba(var(--wzq-5a2fbe, 90, 47, 190), .16); --line-2: rgba(var(--wzq-5a2fbe, 90, 47, 190), .26);

@@ -46,7 +46,7 @@
   function dist(km) { return km >= 1 ? fmt(km, 2) + " km" : km >= 0.001 ? fmt(km * 1000) + " m" : km > 0 ? fmt(km * 1e5, 0) + " cm" : "am Start"; }
   function icon(id) { return '<svg class="wzi" aria-hidden="true"><use href="#wzi-' + id + '"></use></svg>'; }
   function seeded(n) { var s = (n * 2654435761) % 4294967296; return function () { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
-  function stats() { return load("thaumorawahr_stats", { quizOk: 0, quizAll: 0, shared: 0, cam: 0 }); }
+  function stats() { return load("thaumorawahr_stats", { shared: 0, cam: 0 }); }
   function bump(k, n) { var s = stats(); s[k] = (s[k] || 0) + (n || 1); save("thaumorawahr_stats", s); checkBadges(); }
 
   /* Eigenes Blatt (Bottom Sheet) */
@@ -317,18 +317,17 @@
     var id = tage[ymd(yd)], w = id && D.byId(id);
     if (!w || !e[w.id] || offset !== 0) { el.hidden = true; return; }
     var qa = load("thaumorawahr_quiz", {}), done = qa[ymd(today)];
+    if (Object.keys(qa).some(function (k) { return k !== ymd(today); })) { qa = {}; if (done) qa[ymd(today)] = done; save("thaumorawahr_quiz", qa); }
     var q = quizFor(w, daysBetween(new Date(2026, 0, 1), today) * 7 + 3);
     el.hidden = false;
     el.innerHTML = '<h2 class="wd-head">Quiz zu gestern <small>' + icon("quiz") + '</small></h2><p class="wd-quiz-q">' + q.q + '</p><div class="wd-quiz-o" role="group" aria-label="Antworten">' +
       q.opts.map(function (o) { return '<button type="button" data-o="' + esc(o) + '"' + (done ? ' disabled' : '') + (done && o === q.ok ? ' class="ok"' : done && o === done.a && o !== q.ok ? ' class="no"' : '') + '>' + (done && o === q.ok ? icon("check") : '') + esc(o) + '</button>'; }).join("") +
-      '</div><p class="wd-quiz-r" id="fbQuizR" aria-live="polite">' + (done ? (done.ok ? "Richtig! Morgen gibt es die nächste Frage." : "Knapp daneben – die richtige Antwort ist markiert.") + ' <span class="muted">(' + fmt(stats().quizOk) + ' von ' + fmt(stats().quizAll) + ' richtig)</span>' : '') + '</p>';
+      '</div><p class="wd-quiz-r" id="fbQuizR" aria-live="polite">' + (done ? (done.ok ? "Richtig! Morgen gibt es die nächste Frage." : "Knapp daneben – die richtige Antwort ist markiert. Morgen gibt es die nächste Frage.") : '') + '</p>';
     if (done) return;
     el.querySelectorAll("[data-o]").forEach(function (b) {
       b.onclick = function () {
         var a = b.getAttribute("data-o"), ok = a === q.ok;
-        qa[ymd(today)] = { a: a, ok: ok }; var ks = Object.keys(qa).sort(); if (ks.length > 800) delete qa[ks[0]];
-        save("thaumorawahr_quiz", qa);
-        var s = stats(); s.quizAll = (s.quizAll || 0) + 1; if (ok) s.quizOk = (s.quizOk || 0) + 1; save("thaumorawahr_stats", s);
+        var only = {}; only[ymd(today)] = { a: a, ok: ok }; save("thaumorawahr_quiz", only); // nur die heutige Antwort, keine Auswertung
         buzz(ok ? 15 : [10, 60, 10]); renderQuiz();
       };
     });
@@ -917,6 +916,7 @@
     var el = $("fbSchaetz"); if (!el) return;
     if (offset !== 0) { el.hidden = true; return; }
     var today = new Date(), key = ymd(today), store = load("thaumorawahr_schaetz", {}), done = store[key];
+    if (Object.keys(store).some(function (k) { return k !== key; })) { store = done ? (function () { var o = {}; o[key] = done; return o; })() : {}; save("thaumorawahr_schaetz", store); }
     var pool = schPool(), n = daysBetween(new Date(2026, 0, 1), today), r = seeded(n * 13 + 5);
     var w = done ? D.byId(done.id) : null;
     if (!w) { var todayCard = wonderFor(today).id; for (var k = 0; k < 20; k++) { var c = pool[Math.floor(r() * pool.length)]; if (c.id !== todayCard) { w = c; break; } } }
@@ -934,19 +934,14 @@
       rg.oninput = upd; upd();
       $("fbSchGo").onclick = function () {
         var g = val(), f = Math.max(g / v, v / g);
-        store[key] = { id: w.id, g: g, v: v, f: f }; var ks = Object.keys(store).sort(); if (ks.length > 800) delete store[ks[0]];
-        save("thaumorawahr_schaetz", store); buzz(); renderSchaetz();
+        var only = {}; only[key] = { id: w.id, g: g }; save("thaumorawahr_schaetz", only); buzz(); renderSchaetz(); // nur heute, keine Auswertung
       };
       return;
     }
-    var hist = Object.keys(store).sort().slice(-30).map(function (k) { return store[k].f; }).sort(function (a, b) { return a - b; });
-    var med = hist[Math.floor(hist.length / 2)], in2 = hist.filter(function (f) { return f <= 2; }).length;
-    var lg = Math.log10(done.f);
     el.innerHTML = '<h2 class="wd-head">Größenordnung schätzen <small>' + esc(w.k) + '</small></h2><p class="wd-quiz-q">' + esc(w.x) + '</p>' +
-      '<div class="wd-kv"><div><span>Deine Schätzung</span><b>' + sig(done.g) + '</b></div><div><span>Tatsächlicher Wert</span><b>' + esc(t.tok) + '</b></div>' +
-      '<div><span>Abweichung</span><b>Faktor ' + fmt(done.f, done.f < 10 ? 2 : 0) + '</b></div><div><span>in Größenordnungen</span><b>' + fmt(lg, 2) + '</b></div></div>' +
+      '<div class="wd-kv"><div><span>Deine Schätzung</span><b>' + sig(done.g) + '</b></div><div><span>Tatsächlicher Wert</span><b>' + esc(t.tok) + '</b></div></div>' +
       '<p class="small" style="margin:10px 0 0">' + esc(w.w) + '</p>' +
-      '<p class="muted small" style="margin:8px 0 0">Letzte ' + hist.length + ' Schätzungen: Median-Abweichung Faktor ' + fmt(med, 2) + ' · ' + in2 + ' innerhalb Faktor 2. Morgen folgt die nächste Frage.</p>';
+      '<p class="muted small" style="margin:8px 0 0">Morgen folgt die nächste Frage.</p>';
   }
 
   /* ---------- Vollbild-Präsentation ---------- */
@@ -983,22 +978,18 @@
   function yearData(y) {
     var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
     var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
-    var qa = load("thaumorawahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
-    var sc = load("thaumorawahr_schaetz", {}), sy = Object.keys(sc).filter(function (k) { return k.slice(0, 4) === String(y); }).map(function (k) { return sc[k].f; }).sort(function (a, b) { return a - b; });
     var R = reisen(), km = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
-    return { n: ids.length, kc: kc, quiz: qy.filter(function (k) { return qa[k].ok; }).length, quizAll: qy.length, sch: sy.length, schMed: sy.length ? sy[Math.floor(sy.length / 2)] : null, merk: sammlung().length, km: km };
+    return { n: ids.length, kc: kc, merk: sammlung().length, km: km };
   }
   function renderYearCard() {
     var y = new Date().getFullYear(), d = yearData(y);
-    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Jahresstatistik ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt · ' + (d.quizAll ? fmt(d.quiz / d.quizAll * 100) + ' % Quiz-Trefferquote' : 'noch kein Quiz') + '</span></div><button type="button" class="wd-mini" id="fbYearBtn">Details</button>';
+    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Jahresstatistik ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt · ' + fmt(Object.keys(d.kc).length) + ' von ' + KATS.length + ' Themen</span></div><button type="button" class="wd-mini" id="fbYearBtn">Details</button>';
     $("fbYearBtn").onclick = function () { openYear(y); };
   }
   function openYear(y) {
     var d = yearData(y), maxK = Math.max.apply(null, KATS.map(function (k) { return d.kc[k] || 0; }).concat([1]));
     sheet('<h2>Jahresstatistik ' + y + '</h2><p class="muted small" style="margin:0">Alle Werte werden lokal aus deinen Einträgen berechnet.</p>' +
       '<div class="wd-ystats"><div><b>' + fmt(d.n) + '</b><span>Wunder entdeckt</span></div><div><b>' + fmt(d.merk) + '</b><span>Karten gemerkt</span></div>' +
-      '<div><b>' + (d.quizAll ? fmt(d.quiz / d.quizAll * 100) + ' %' : '–') + '</b><span>Quiz-Trefferquote (' + d.quiz + '/' + d.quizAll + ')</span></div>' +
-      '<div><b>' + (d.schMed ? '× ' + fmt(d.schMed, 2) : '–') + '</b><span>Median-Abweichung Schätzungen (' + d.sch + ')</span></div>' +
       '<div><b>' + fmt(d.km, 2) + ' km</b><span>auf Zeitreisen gelaufen</span></div><div><b>' + fmt(Object.keys(d.kc).length) + ' / ' + KATS.length + '</b><span>Themen abgedeckt</span></div></div>' +
       '<h3 class="wd-sub">Verteilung nach Themen</h3>' + KATS.map(function (k) { var v = d.kc[k] || 0; return '<div class="wd-hbar"><span>' + esc(k) + '</span><i><b style="width:' + (v / maxK * 100).toFixed(1) + '%"></b></i><em>' + v + '</em></div>'; }).join(""));
   }
@@ -1481,7 +1472,7 @@
     slides: [
       { icon: "tages", title: "Willkommen bei ThaumoraWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
       { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Am nächsten Tag wartet ein Quiz, und jede Karte landet in deinem Wunderalbum." },
-      { icon: "quiz", title: "Prüfen und schätzen", text: "Jeden Tag eine Quizfrage zum Wunder von gestern und eine Schätzfrage zur Größenordnung – mit Abweichungsfaktor statt Punkten. Alle Karten landen im Wunderalbum und lassen sich als Bildkarte teilen." },
+      { icon: "quiz", title: "Quiz und Schätzfrage", text: "Jeden Tag eine Quizfrage zum Wunder von gestern und eine Schätzfrage zu einer erstaunlichen Zahl – einfach zum Mitraten, ohne Punkte und ohne Wertung. Alle Karten landen im Wunderalbum und lassen sich als Bildkarte teilen." },
       { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
       { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live, prüfe die wahre Größe von Ländern, zoome von deinem Standort bis an den Rand des Universums – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
       { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },

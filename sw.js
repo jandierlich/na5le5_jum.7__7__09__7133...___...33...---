@@ -23,7 +23,7 @@
    BUILD ändert sich dabei, damit Geräte die neue Liste übernehmen.
    ============================================================ */
 
-const BUILD = 'wz94final';
+const BUILD = 'wz95final';
 const CACHE = 'wahrzentrale-' + BUILD;
 const LIBS_CACHE = 'wahrzentrale-libs-v4';
 // Große Geodaten von WowarWahr: eigener Speicher, der Updates der App überdauert
@@ -204,10 +204,12 @@ const PRECACHE = [
 "./sn-icon-512.png",
 "./sn-index.html",
 "./wd-app.js",
+"./wd-cam.js",
 "./wd-data.js",
 "./wd-icon-192.png",
 "./wd-icon-512.png",
 "./wd-index.html",
+"./wd-share.js",
 "./sternewahr-app.js",
 "./sternewahr-astro.js",
 "./sternewahr-index.html",

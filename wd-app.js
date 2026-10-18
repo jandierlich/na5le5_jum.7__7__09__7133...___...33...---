@@ -1,9 +1,12 @@
 /* ============================================================
    WunderWahr – jeden Tag ein Grund zu staunen
-   Bereiche: TagesWahr (Tageswunder), KilometerWahr (Meilensteine & Lebensuhr),
-   WeitblickWahr (geradeaus um die Welt, Tag und Nacht), ZeitWahr (Erdgeschichte zu Fuß).
+   Bereiche: TagesWahr (Tageswunder, Rechenwunder, Quiz, Sammelalbum, Abzeichen, Wunderjahr),
+   KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
+   WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
+   ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
    Alles wird auf dem Gerät berechnet; es wird nichts gesendet.
-   Speicher (Präfix wunderwahr_): Personen/Geburtsdaten, Sammlung, Fortschritt des ZeitWahrs, Einstellungen.
+   Speicher (Präfix wunderwahr_): Personen/Geburtsdaten, entdeckte und gemerkte Karten, Tageskarten,
+   Serie, Quiz-Antworten, Abzeichen, Fortschritt der Zeitreisen, Einstellungen.
    © 2026 Jan Dierlich – Alle Rechte vorbehalten.
    ============================================================ */
 (function () {
@@ -32,9 +35,34 @@
   function dShort(d) { return d.getDate() + ". " + MO[d.getMonth()] + " " + d.getFullYear(); }
   function midnight(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
   function daysBetween(a, b) { return Math.round((midnight(b) - midnight(a)) / DAY); }
-  function toast(t) { if (window.wzToast) wzToast(t); }
+  function toast(t, ms) { if (window.wzToast) wzToast(t, ms); }
   function wrap360(a) { return ((a % 360) + 360) % 360; }
   function wrap180(a) { return ((a + 540) % 360) - 180; }
+  function ymd(d) { return D.ymd(d); }
+  function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  var acted = false; document.addEventListener("pointerdown", function () { acted = true; }, { capture: true, once: true });
+  function buzz(ms) { try { if (acted && navigator.vibrate) navigator.vibrate(ms || 12); } catch (e) { } }
+  function dist(km) { return km >= 1 ? fmt(km, 2) + " km" : km >= 0.001 ? fmt(km * 1000) + " m" : km > 0 ? fmt(km * 1e5, 0) + " cm" : "am Start"; }
+  function icon(id) { return '<svg class="wzi" aria-hidden="true"><use href="#wzi-' + id + '"></use></svg>'; }
+  function seeded(n) { var s = (n * 2654435761) % 4294967296; return function () { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
+  function stats() { return load("wunderwahr_stats", { quizOk: 0, quizAll: 0, shared: 0, cam: 0 }); }
+  function bump(k, n) { var s = stats(); s[k] = (s[k] || 0) + (n || 1); save("wunderwahr_stats", s); checkBadges(); }
+
+  /* Eigenes Blatt (Bottom Sheet) */
+  function sheet(html, onReady) {
+    var bg = document.createElement("div"); bg.className = "wd-sheet-bg";
+    bg.innerHTML = '<div class="wd-sheet" role="dialog" aria-modal="true"><button type="button" class="wd-x" aria-label="Schließen">' + icon("close") + '</button>' + html + '</div>';
+    var last = document.activeElement;
+    function close() { if (bg.parentNode) bg.parentNode.removeChild(bg); document.removeEventListener("keydown", key); if (last && last.focus) last.focus(); }
+    function key(e) { if (e.key === "Escape") close(); }
+    bg.addEventListener("click", function (e) { if (e.target === bg) close(); });
+    bg.querySelector(".wd-x").onclick = close;
+    document.addEventListener("keydown", key);
+    document.body.appendChild(bg);
+    setTimeout(function () { var f = bg.querySelector(".wd-sheet button:not(.wd-x), .wd-sheet .wd-x"); if (f) f.focus(); }, 30);
+    if (onReady) onReady(bg.querySelector(".wd-sheet"), close);
+    return close;
+  }
 
   /* ---------------- Reiter ---------------- */
   var tabs = document.querySelectorAll(".sn-tab");
@@ -45,52 +73,382 @@
     if (id === "weitblick") renderWeitblick();
     if (id === "kilometer") renderKilometer();
     if (id === "zeit") renderZeit();
+    if (id === "tages") renderTages();
   }
+  if ($("wdSplashD")) $("wdSplashD").textContent = dLong(new Date());
   tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
 
   /* =========================================================
-     1. TagesWahr – Tageswunder
+     1. TagesWahr – Tageswunder, Rechenwunder, Quiz, Album, Abzeichen
      ========================================================= */
   var offset = 0; // 0 = heute, -1 = gestern …
+  var SELTEN = {}; (D.SELTEN || []).forEach(function (id) { SELTEN[id] = 1; });
+  var KATS = []; D.WUNDER.forEach(function (w) { if (KATS.indexOf(w.k) < 0) KATS.push(w.k); });
   function wonderFor(date) { return D.wonderFor(date); }
   function sammlung() { return load("wunderwahr_sammlung", []); }
-  function renderTages() {
-    var day = new Date(Date.now() + offset * DAY);
-    var w = wonderFor(day), saved = sammlung().indexOf(w.id) >= 0;
-    $("fbDate").textContent = offset === 0 ? "Heute · " + dLong(day) : dLong(day);
-    $("fbCard").innerHTML =
+  function entdeckt() { return load("wunderwahr_entdeckt", {}); }
+  function discover(id, date) {
+    var e = entdeckt(); if (e[id]) return false;
+    e[id] = ymd(date || new Date()); save("wunderwahr_entdeckt", e); return true;
+  }
+  (function migrate() { // bereits gemerkte Karten zählen als entdeckt
+    var e = entdeckt(), ch = false;
+    sammlung().forEach(function (id) { if (!e[id]) { e[id] = ymd(new Date()); ch = true; } });
+    var t = load("wunderwahr_tage", {}); Object.keys(t).forEach(function (k) { if (!e[t[k]]) { e[t[k]] = k; ch = true; } });
+    if (ch) save("wunderwahr_entdeckt", e);
+  })();
+
+  /* Serie: an wie vielen Tagen hintereinander TagesWahr geöffnet wurde */
+  function serie() {
+    var s = load("wunderwahr_serie", { last: null, n: 0, best: 0 }), today = ymd(new Date());
+    if (s.last !== today) {
+      s.n = s.last === ymd(addDays(new Date(), -1)) ? s.n + 1 : 1;
+      s.last = today; s.best = Math.max(s.best || 0, s.n); save("wunderwahr_serie", s);
+    }
+    return s;
+  }
+
+  function renderCard(day) {
+    var w = wonderFor(day), saved = sammlung().indexOf(w.id) >= 0, rare = !!SELTEN[w.id];
+    var neu = discover(w.id, day);
+    if (neu && rare && offset === 0) setTimeout(function () { toast("Eine Sternstunde! Diese Karte ist besonders selten."); buzz(30); }, 600);
+    var card = $("fbCard");
+    card.classList.toggle("gold", rare);
+    card.setAttribute("aria-label", "Tageswunder: " + w.t);
+    card.innerHTML =
+      (rare ? '<div class="wd-rare">' + icon("starfill") + 'Sternstunde</div>' : '') +
       '<div class="wd-over">' + esc(w.k) + '</div>' +
       '<h2 class="wd-card-t">' + esc(w.t) + '</h2>' +
       '<p class="wd-card-x">' + esc(w.x) + '</p>' +
       '<details class="wd-more"><summary>Wie kann das sein?</summary><p>' + esc(w.w) + '</p></details>' +
       '<div class="wd-card-acts">' +
-      '<button type="button" class="wd-glass" id="fbPrev" aria-label="Vorheriger Tag"><svg class="wzi"><use href="#wzi-left"></use></svg></button>' +
-      '<button type="button" class="wd-glass wd-keep' + (saved ? ' on' : '') + '" id="fbKeep"><svg class="wzi"><use href="#wzi-' + (saved ? 'starfill' : 'star') + '"></use></svg>' + (saved ? 'In der Sammlung' : 'Sammeln') + '</button>' +
-      '<button type="button" class="wd-glass" id="fbNext" aria-label="Nächster Tag"' + (offset >= 0 ? ' disabled' : '') + '><svg class="wzi"><use href="#wzi-right"></use></svg></button>' +
+      '<button type="button" class="wd-glass wd-icon" id="fbPrev" aria-label="Vorheriger Tag">' + icon("left") + '</button>' +
+      '<button type="button" class="wd-glass wd-keep' + (saved ? ' on' : '') + '" id="fbKeep" aria-pressed="' + saved + '">' + icon(saved ? 'starfill' : 'star') + (saved ? 'Gemerkt' : 'Merken') + '</button>' +
+      '<button type="button" class="wd-glass wd-icon" id="fbShare" aria-label="Als Bild teilen">' + icon("share") + '</button>' +
+      '<button type="button" class="wd-glass wd-icon" id="fbNext" aria-label="Nächster Tag"' + (offset >= 0 ? ' disabled' : '') + '>' + icon("right") + '</button>' +
       '</div>';
-    $("fbPrev").onclick = function () { if (offset > -6) { offset--; renderTages(); } else toast("Ältere Karten findest du in deiner Sammlung."); };
-    $("fbNext").onclick = function () { if (offset < 0) { offset++; renderTages(); } };
+    $("fbPrev").onclick = function () { go(-1); };
+    $("fbNext").onclick = function () { go(1); };
     $("fbKeep").onclick = function () {
       var s = sammlung(), i = s.indexOf(w.id);
-      if (i >= 0) s.splice(i, 1); else s.unshift(w.id);
-      save("wunderwahr_sammlung", s); renderTages();
+      if (i >= 0) s.splice(i, 1); else { s.unshift(w.id); buzz(); }
+      save("wunderwahr_sammlung", s); renderCard(day); renderAlbum(); checkBadges();
     };
+    $("fbShare").onclick = function () { shareWonder(w, day); };
+    return w;
+  }
+  function shareWonder(w, day) {
+    if (!window.WDShare) return;
+    WDShare.wonderCard({ over: w.k, title: w.t, text: w.x, more: w.w, gold: !!SELTEN[w.id], foot: day ? "Tageswunder vom " + dShort(day) : "Aus meinem Wunderalbum" })
+      .then(function (b) { return WDShare.share(b, "Wunder-" + w.id + ".png", w.t); })
+      .then(function (ok) { if (ok) bump("shared"); });
+  }
+  function go(dir) {
+    var n = offset + dir;
+    if (n > 0) return;
+    if (n < -6) { toast("Ältere Karten findest du in deinem Album."); return; }
+    var card = $("fbCard"), reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    offset = n;
+    if (reduce) { renderTages(); return; }
+    card.classList.add(dir < 0 ? "out-r" : "out-l");
+    setTimeout(function () {
+      card.classList.add("drag"); card.classList.remove("out-r", "out-l"); card.classList.add(dir < 0 ? "out-l" : "out-r");
+      renderTages(true);
+      void card.offsetWidth; card.classList.remove("drag", "out-l", "out-r");
+    }, 180);
+  }
+  /* Wischen über die Karte */
+  (function () {
+    var el = $("fbSwipe"), st = null;
+    el.addEventListener("pointerdown", function (e) { if (e.target.closest("button,summary,a")) return; st = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false }; });
+    el.addEventListener("pointermove", function (e) {
+      if (!st || e.pointerId !== st.id) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!st.moved && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) { st.moved = true; try { el.setPointerCapture(e.pointerId); } catch (x) { } $("fbCard").classList.add("drag"); }
+      if (st.moved) { var lim = (dx > 0 && offset <= -6) || (dx < 0 && offset >= 0) ? 0.25 : 1; $("fbCard").style.transform = "translateX(" + dx * lim + "px) rotate(" + dx * lim / 40 + "deg)"; }
+    });
+    function end(e) {
+      if (!st) return; var dx = e.clientX - st.x, moved = st.moved; st = null;
+      var c = $("fbCard"); c.classList.remove("drag"); c.style.transform = "";
+      if (!moved) return;
+      if (dx > 70) go(-1); else if (dx < -70) go(1);
+    }
+    el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  })();
+
+  function renderTages() {
+    var day = new Date(Date.now() + offset * DAY);
+    var s = serie();
+    $("fbDate").textContent = offset === 0 ? "Heute · " + dLong(day) : dLong(day);
+    $("fbStreak").hidden = s.n < 2;
+    $("fbStreak").innerHTML = icon("flame") + s.n + " Tage in Folge";
+    $("fbStreak").setAttribute("aria-label", "Serie: " + s.n + " Tage in Folge");
+    renderCard(day);
+    renderCalc(day);
     // Heute vor … Jahren
     var key = String(day.getMonth() + 1).padStart(2, "0") + "-" + String(day.getDate()).padStart(2, "0");
     var hv = D.HEUTE[key];
     $("fbHeute").hidden = !hv;
     if (hv) {
-      $("fbHeute").innerHTML = '<h2>Heute vor …</h2>' + hv.map(function (e) {
-        return '<div class="sn-fact"><div class="ic wd-yr">' + (day.getFullYear() - e[0]) + '</div><div><b>' + (day.getFullYear() - e[0]) + ' Jahren · ' + e[0] + '</b><span>' + esc(e[1]) + '</span></div></div>';
+      $("fbHeute").innerHTML = '<h2>' + (offset === 0 ? 'Heute vor …' : 'An diesem Tag vor …') + '</h2>' + hv.map(function (e) {
+        var y = day.getFullYear() - e[0];
+        return '<div class="sn-fact"><div class="ic wd-yr">' + fmt(y) + '</div><div><b>' + fmt(y) + ' Jahren · ' + e[0] + '</b><span>' + esc(e[1]) + '</span></div></div>';
       }).join("");
     }
-    // Sammlung
-    var s = sammlung(), list = s.map(function (id) { return D.WUNDER.filter(function (x) { return x.id === id; })[0]; }).filter(Boolean);
-    $("fbSamCount").textContent = list.length ? list.length + (list.length === 1 ? " Karte" : " Karten") : "noch leer";
-    $("fbSam").innerHTML = list.length ? list.map(function (x) {
-      return '<details class="wd-sam"><summary><span class="wd-dot"></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p></details>';
-    }).join("") : '<p class="muted small" style="margin:0">Tippe auf „Sammeln“, um eine Karte aufzuheben. Deine Sammlung wächst mit jedem Tag.</p>';
+    renderQuiz();
+    renderAlbum();
+    renderBadges();
+    renderYearCard();
   }
+
+  /* ---------- Rechenwunder: jeden Tag frisch berechnet ---------- */
+  function sunTimes(day) {
+    if (!A || !A.riseSet) return null;
+    var j0 = A.toJD(midnight(day)), r = A.riseSet("sun", j0, LOC.lat, LOC.lon, "rise", 1), s2 = A.riseSet("sun", j0, LOC.lat, LOC.lon, "set", 1);
+    if (!r || !s2) return null;
+    var a = A.fromJD(r), b = A.fromJD(s2); if (b < a) b = new Date(b.getTime() + DAY);
+    return { rise: a, set: b, len: (b - a) / 60000 };
+  }
+  function sunAltAt(t) { var jd = A.toJD(t), s = A.sun(jd), aa = A.enuToAltAz(A.eqToEnu(s.v, A.lst(jd, LOC.lon), LOC.lat)); return aa.alt; }
+  function hm(min) { var h = Math.floor(min / 60), m = Math.round(min - h * 60); if (m === 60) { h++; m = 0; } return h + " Std. " + m + " Min."; }
+  var CALC = [
+    function mond(day) {
+      var t = new Date(day); t.setHours(12, 0, 0, 0);
+      var d0 = A.moon(A.toJD(t)).dist, d7 = A.moon(A.toJD(addDays(t, -7))).dist;
+      var best = null; for (var i = 1; i <= 30; i++) { var di = A.moon(A.toJD(addDays(t, i))).dist; if (!best || di < best.d) best = { d: di, i: i }; }
+      return { over: "Rechenwunder · Mond", n: fmt(Math.round(d0 / 10) * 10) + " km", t: "So weit ist der Mond heute entfernt", x: "Das sind " + fmt(Math.abs(d0 - d7)) + " km " + (d0 < d7 ? "weniger" : "mehr") + " als vor einer Woche. Am " + dShort(addDays(t, best.i)) + " kommt er der Erde mit rund " + fmt(Math.round(best.d / 100) * 100) + " km am nächsten. Sein Licht braucht heute " + fmt(d0 / 299792.458, 2) + " Sekunden bis zu dir." };
+    },
+    function sonne(day) {
+      var t = new Date(day); t.setHours(12, 0, 0, 0);
+      var au = A.sun(A.toJD(t)).dist, km = au * 149597870.7, s = km / 299792.458;
+      var m = Math.floor(s / 60), sec = Math.round(s - m * 60);
+      return { over: "Rechenwunder · Sonne", n: fmt(km / 1e6, 2) + " Mio. km", t: "So weit ist die Sonne heute entfernt", x: "Ihr Licht ist bis zu dir " + m + " Minuten und " + sec + " Sekunden unterwegs. Anfang Januar ist die Erde der Sonne am nächsten (rund 147 Mio. km), Anfang Juli am fernsten (rund 152 Mio. km) – die Jahreszeiten kommen trotzdem von der schrägen Erdachse." };
+    },
+    function tag(day) {
+      var a = sunTimes(day), b = sunTimes(addDays(day, -7)); if (!a || !b) return null;
+      var diff = a.len - b.len, y = day.getFullYear(), sol = day < new Date(y, 5, 21) ? new Date(y, 5, 21) : day < new Date(y, 11, 21) ? new Date(y, 11, 21) : new Date(y + 1, 5, 21);
+      var dsol = daysBetween(day, sol), summer = sol.getMonth() === 5;
+      return { over: "Rechenwunder · " + (LOC.name || "Dein Ort"), n: hm(a.len), t: "So lang ist der Tag heute", x: "Sonnenaufgang " + a.rise.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr, Sonnenuntergang " + a.set.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr. Das sind " + fmt(Math.abs(diff)) + " Minuten " + (diff >= 0 ? "mehr" : "weniger") + " Tageslicht als vor einer Woche. " + (dsol === 0 ? "Heute ist Sonnenwende!" : "Noch " + fmt(dsol) + " Tage bis zur " + (summer ? "Sommer" : "Winter") + "sonnenwende.") };
+    },
+    function schatten(day) {
+      var best = -90, at = null;
+      for (var m = 600; m <= 900; m += 5) { var t = new Date(day); t.setHours(0, m, 0, 0); var al = sunAltAt(t); if (al > best) { best = al; at = t; } }
+      if (best < 3) return null;
+      var len = 1.8 / Math.tan(best * D2R);
+      return { over: "Rechenwunder · Schatten", n: fmt(len, len < 10 ? 2 : 1) + " m", t: "So lang ist dein Mittagsschatten heute", x: "Ein 1,80 Meter großer Mensch wirft in " + (LOC.name || "deiner Gegend") + " um " + at.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr – wenn die Sonne mit " + fmt(best, 1) + "° am höchsten steht – einen Schatten dieser Länge. Im Juni ist er bei uns am kürzesten, im Dezember am längsten." };
+    },
+    function bahn(day) {
+      var ps = persons(), now = new Date(), from, wer;
+      if (ps.length) { var b = birth(ps[0]); from = new Date(now.getFullYear(), b.getMonth(), b.getDate()); if (from > now) from = new Date(now.getFullYear() - 1, b.getMonth(), b.getDate()); wer = "Seit deinem letzten Geburtstag"; }
+      else { from = new Date(now.getFullYear(), 0, 1); wer = "Seit dem 1. Januar"; }
+      var km = (now - from) / 1000 * ORBIT_KM_S;
+      return { over: "Rechenwunder · Erdbahn", n: fmt(km / 1e6, 1) + " Mio. km", t: wer + " bist du so weit um die Sonne gereist", x: "Die Erde rast mit 29,78 Kilometern pro Sekunde auf ihrer Bahn – über 100.000 km/h. Eine ganze Runde sind rund 940 Millionen Kilometer." };
+    },
+    function mondphase(day) {
+      var t = new Date(day); t.setHours(21, 0, 0, 0); var jd = A.toJD(t);
+      var s = A.sun(jd), m = A.moon(jd), cosE = s.v[0] * m.v[0] + s.v[1] * m.v[1] + s.v[2] * m.v[2];
+      var illum = (1 - cosE) / 2 * 100;
+      var nf = A.moonPhaseTime ? A.moonPhaseTime(jd, 180, 1) : null, nn = A.moonPhaseTime ? A.moonPhaseTime(jd, 0, 1) : null;
+      var nfD = nf ? A.fromJD(nf) : null, nnD = nn ? A.fromJD(nn) : null;
+      return { over: "Rechenwunder · Mondphase", n: fmt(illum) + " %", t: "So viel vom Mond ist heute Abend beleuchtet", x: (nfD ? "Nächster Vollmond: " + dLong(nfD) + ". " : "") + (nnD ? "Nächster Neumond: " + dLong(nnD) + ". " : "") + "Von einem Vollmond zum nächsten vergehen im Mittel 29 Tage, 12 Stunden und 44 Minuten." };
+    },
+    function planet(day) {
+      var pl = [["mars", "Mars"], ["jupiter", "Jupiter"], ["venus", "Venus"], ["saturn", "Saturn"]][Math.floor(daysBetween(new Date(2026, 0, 1), day) / 10) % 4];
+      var t = new Date(day); t.setHours(12, 0, 0, 0); var p = A.planet(pl[0], A.toJD(t)), km = p.dist * 149597870.7, lt = km / 299792.458;
+      var p30 = A.planet(pl[0], A.toJD(addDays(t, 30))).dist * 149597870.7;
+      return { over: "Rechenwunder · " + pl[1], n: fmt(km / 1e6) + " Mio. km", t: "So weit ist der " + pl[1] + " heute von dir entfernt", x: "Sein Licht braucht " + (lt >= 3600 ? fmt(lt / 3600, 1) + " Stunden" : fmt(lt / 60) + " Minuten") + " bis zur Erde. In 30 Tagen ist er " + fmt(Math.abs(p30 - km) / 1e6, 1) + " Mio. km " + (p30 < km ? "näher" : "weiter weg") + ". Mit dem Auto bei 100 km/h wärst du " + fmt(km / 100 / 24 / 365.25) + " Jahre unterwegs." };
+    },
+    function drehung(day) {
+      var v = 1674.4 * Math.cos(LOC.lat * D2R), now = new Date(), h = offset === 0 ? (now - midnight(now)) / 3600000 : 24;
+      return { over: "Rechenwunder · Erddrehung", n: fmt(v) + " km/h", t: "So schnell drehst du dich gerade mit der Erde", x: "In " + (LOC.name || "deiner Gegend") + " trägt dich die Erddrehung mit dieser Geschwindigkeit nach Osten. " + (offset === 0 ? "Seit Mitternacht sind das schon " + fmt(v * h) + " Kilometer" : "An einem ganzen Tag sind das " + fmt(v * 24) + " Kilometer") + " – ohne dass du es merkst." };
+    },
+    function jahr(day) {
+      var y = day.getFullYear(), a = new Date(y, 0, 1), b = new Date(y + 1, 0, 1), p = (day - a) / (b - a) * 100, rest = daysBetween(day, b);
+      return { over: "Rechenwunder · Jahr", n: fmt(p, 1) + " %", t: "So viel von " + y + " ist schon vorbei", x: "Noch " + fmt(rest) + " Tage bis Silvester. Die Erde hat damit schon " + fmt(p * 9.4, 0) + " Millionen Kilometer ihrer Runde um die Sonne geschafft – rund " + fmt(940 - p * 9.4, 0) + " Millionen liegen noch vor ihr." };
+    },
+    function leben(day) {
+      var ps = persons(); if (!ps.length) return null;
+      var p = ps[0], n = daysBetween(birth(p), day) + 1, next = Math.ceil(n / 1000) * 1000; if (next === n) next += 1000;
+      return { over: "Rechenwunder · Dein Leben", n: fmt(n) + ". Tag", t: "Heute ist dein " + fmt(n) + ". Lebenstag", x: "Dein " + fmt(next) + ". Lebenstag ist am " + dLong(addDays(day, next - n)) + ". Bis dahin hat dein Herz noch rund " + big((next - n) * 86400 * HR) + "-mal geschlagen." };
+    }
+  ];
+  function renderCalc(day) {
+    var el = $("fbCalc"), n = daysBetween(new Date(2026, 0, 1), day), out = null;
+    for (var k = 0; k < CALC.length && !out; k++) { try { out = CALC[((n + k) % CALC.length + CALC.length) % CALC.length](day); } catch (e) { out = null; } }
+    if (!out) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = '<div class="wd-over">' + esc(out.over) + '</div><span class="wd-calc-n">' + esc(out.n) + '</span><h2 class="wd-card-t" style="font-size:19px">' + esc(out.t) + '</h2><p class="wd-card-x" style="font-size:14.5px">' + esc(out.x) + '</p>' +
+      '<div class="wd-card-acts"><button type="button" class="wd-glass" id="fbCalcShare">' + icon("share") + 'Teilen</button></div>';
+    $("fbCalcShare").onclick = function () {
+      WDShare.wonderCard({ over: out.over, title: out.n + " – " + out.t, text: out.x, foot: "Berechnet am " + dShort(day) })
+        .then(function (b) { return WDShare.share(b, "Rechenwunder.png", out.t); }).then(function (ok) { if (ok) bump("shared"); });
+    };
+  }
+
+  /* ---------- Quiz zum Wunder von gestern ---------- */
+  function quizFor(w, seed) {
+    var r = seeded(seed), m = w.x.match(/(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?)/);
+    function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    if (m) {
+      var tok = m[1], dec = (tok.split(",")[1] || "").length, v = parseFloat(tok.replace(/\./g, "").replace(",", ".")), grp = tok.indexOf(".") >= 0;
+      var year = !grp && !dec && v >= 1000 && v <= new Date().getFullYear() && /^\d{4}$/.test(tok);
+      var f = function (x) { return year ? String(Math.round(x)) : x.toLocaleString("de-DE", { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: grp || x >= 10000 }); };
+      var opts = [], cand = year ? [-120, -60, -35, 40, 75, 110] : [2, 3, 5, 10, .5, .2, .1, 1 / 3, 4, 1.5];
+      cand = shuffle(cand.slice());
+      for (var i = 0; i < cand.length && opts.length < 2; i++) {
+        var x = year ? v + cand[i] : v * cand[i];
+        if (year && x > new Date().getFullYear()) continue;
+        if (!year) { var mag = Math.pow(10, Math.max(0, Math.floor(Math.log10(Math.abs(x) || 1)) - 1)); x = dec ? Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec) : Math.round(x / mag) * mag; }
+        var s = f(x); if (x > 0 && s !== f(v) && opts.indexOf(s) < 0) opts.push(s);
+      }
+      if (opts.length === 2) {
+        var q = esc(w.x.slice(0, m.index)) + '<mark>?</mark>' + esc(w.x.slice(m.index + tok.length));
+        return { q: q, opts: shuffle([tok].concat(opts)), ok: tok, typ: "zahl" };
+      }
+    }
+    var e = entdeckt(), pool = D.WUNDER.filter(function (x) { return x.id !== w.id && !e[x.id]; });
+    var o = [w.t]; while (o.length < 3 && pool.length) { var k = Math.floor(r() * pool.length); o.push(pool.splice(k, 1)[0].t); }
+    return { q: "Welches dieser Wunder hast du gestern entdeckt?", opts: shuffle(o), ok: w.t, typ: "titel" };
+  }
+  function renderQuiz() {
+    var el = $("fbQuiz"), today = new Date(), yd = addDays(today, -1), tage = load("wunderwahr_tage", {}), e = entdeckt();
+    var id = tage[ymd(yd)], w = id && D.byId(id);
+    if (!w || !e[w.id] || offset !== 0) { el.hidden = true; return; }
+    var qa = load("wunderwahr_quiz", {}), done = qa[ymd(today)];
+    var q = quizFor(w, daysBetween(new Date(2026, 0, 1), today) * 7 + 3);
+    el.hidden = false;
+    el.innerHTML = '<h2 class="wd-head">Quiz zu gestern <small>' + icon("quiz") + '</small></h2><p class="wd-quiz-q">' + q.q + '</p><div class="wd-quiz-o" role="group" aria-label="Antworten">' +
+      q.opts.map(function (o) { return '<button type="button" data-o="' + esc(o) + '"' + (done ? ' disabled' : '') + (done && o === q.ok ? ' class="ok"' : done && o === done.a && o !== q.ok ? ' class="no"' : '') + '>' + (done && o === q.ok ? icon("check") : '') + esc(o) + '</button>'; }).join("") +
+      '</div><p class="wd-quiz-r" id="fbQuizR" aria-live="polite">' + (done ? (done.ok ? "Richtig! Morgen gibt es die nächste Frage." : "Knapp daneben – die richtige Antwort ist markiert.") + ' <span class="muted">(' + fmt(stats().quizOk) + ' von ' + fmt(stats().quizAll) + ' richtig)</span>' : '') + '</p>';
+    if (done) return;
+    el.querySelectorAll("[data-o]").forEach(function (b) {
+      b.onclick = function () {
+        var a = b.getAttribute("data-o"), ok = a === q.ok;
+        qa[ymd(today)] = { a: a, ok: ok }; var ks = Object.keys(qa).sort(); if (ks.length > 800) delete qa[ks[0]];
+        save("wunderwahr_quiz", qa);
+        var s = stats(); s.quizAll = (s.quizAll || 0) + 1; if (ok) s.quizOk = (s.quizOk || 0) + 1; save("wunderwahr_stats", s);
+        buzz(ok ? 15 : [10, 60, 10]); renderQuiz(); checkBadges(); renderBadges();
+      };
+    });
+  }
+
+  /* ---------- Sammelalbum ---------- */
+  var albumKat = null, albumFilter = "alle", albumMax = 20;
+  function renderAlbum() {
+    var e = entdeckt(), sam = sammlung(), ids = Object.keys(e), total = D.WUNDER.length;
+    var rareN = ids.filter(function (id) { return SELTEN[id]; }).length;
+    var html = '<h2 class="wd-head">Dein Wunderalbum <small>' + fmt(ids.length) + ' von ' + fmt(total) + '</small></h2>' +
+      '<div class="wd-bigbar" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + ids.length + '" aria-label="Entdeckte Wunder"><i style="width:' + (ids.length / total * 100).toFixed(1) + '%"></i></div>' +
+      '<div class="wd-cats">' + KATS.map(function (k) {
+        var all = D.WUNDER.filter(function (w) { return w.k === k; }), got = all.filter(function (w) { return e[w.id]; }).length;
+        return '<button type="button" class="wd-cat' + (albumKat === k ? ' on' : '') + '" data-k="' + esc(k) + '" aria-pressed="' + (albumKat === k) + '" aria-label="' + esc(k) + ': ' + got + ' von ' + all.length + '"><span class="wd-ring" style="--p:' + Math.round(got / all.length * 100) + '"><b>' + got + '</b></span><span>' + esc(k) + '</span></button>';
+      }).join("") + '</div>' +
+      '<div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"], ["selten", "Sternstunden (" + rareN + "/" + (D.SELTEN || []).length + ")"]].map(function (f) {
+        return '<button type="button" class="chip' + (albumFilter === f[0] ? ' active' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>';
+      }).join("") + '</div>';
+    var list = ids.map(function (id) { return D.byId(id); }).filter(Boolean)
+      .filter(function (w) { return (!albumKat || w.k === albumKat) && (albumFilter !== "merk" || sam.indexOf(w.id) >= 0) && (albumFilter !== "selten" || SELTEN[w.id]); })
+      .sort(function (a, b) { return (e[b.id] || "").localeCompare(e[a.id] || ""); });
+    html += '<div class="wd-albumlist">' + (list.length ? list.slice(0, albumMax).map(function (x) {
+      return '<details class="wd-sam' + (SELTEN[x.id] ? ' gold' : '') + '"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
+        '<div class="wd-sam-a"><button type="button" class="wd-mini" data-share="' + x.id + '">' + icon("share") + 'Teilen</button><button type="button" class="wd-mini" data-keep="' + x.id + '">' + icon(sam.indexOf(x.id) >= 0 ? "starfill" : "star") + (sam.indexOf(x.id) >= 0 ? "Gemerkt" : "Merken") + '</button></div></details>';
+    }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere ' + fmt(Math.min(20, list.length - albumMax)) + ' zeigen</button>' : '')
+      : '<p class="muted small" style="margin:6px 0 0">' + (albumFilter === "merk" ? "Noch nichts gemerkt. Tippe bei einer Karte auf „Merken“." : albumFilter === "selten" ? "Noch keine Sternstunde – sie tauchen zufällig zwischen den anderen Karten auf." : "Hier sammeln sich alle Wunder, die du entdeckst.") + '</p>') + '</div>';
+    var el = $("fbAlbum"); el.innerHTML = html;
+    el.querySelectorAll("[data-k]").forEach(function (b) { b.onclick = function () { var k = b.getAttribute("data-k"); albumKat = albumKat === k ? null : k; albumMax = 20; renderAlbum(); }; });
+    el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 20; renderAlbum(); }; });
+    el.querySelectorAll("[data-share]").forEach(function (b) { b.onclick = function () { shareWonder(D.byId(b.getAttribute("data-share")), null); }; });
+    el.querySelectorAll("[data-keep]").forEach(function (b) {
+      b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("wunderwahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
+    });
+    if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 20; renderAlbum(); };
+  }
+
+  /* ---------- Abzeichen ---------- */
+  function reisen() { return load("wunderwahr_reisen", null) || migrateReisen(); }
+  function badgeState() {
+    var e = entdeckt(), ids = Object.keys(e), s = stats(), se = load("wunderwahr_serie", { best: 0 }), R = reisen();
+    var kats = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kats[w.k] = 1; });
+    var walked = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
+    var fertig = Object.keys(R.fertig || {}).length;
+    return { n: ids.length, best: se.best || 0, quiz: s.quizOk || 0, rare: ids.filter(function (id) { return SELTEN[id]; }).length, kats: Object.keys(kats).length, shared: s.shared || 0, persons: persons().length, cam: s.cam || 0, fertig: fertig, km: walked };
+  }
+  var BADGES = [
+    ["neugier", "Neugierig", "10 Wunder entdecken", "tages", function (b) { return [b.n, 10]; }],
+    ["staunend", "Staunend", "50 Wunder entdecken", "tages", function (b) { return [b.n, 50]; }],
+    ["kenner", "Wunderkenner", "100 Wunder entdecken", "tages", function (b) { return [b.n, 100]; }],
+    ["wunderjahr", "Ein Wunderjahr", "365 Wunder entdecken", "medal", function (b) { return [b.n, 365]; }],
+    ["allesgesehen", "Alles gesehen", "Alle 730 Wunder entdecken", "eye", function (b) { return [b.n, 730]; }],
+    ["woche", "Eine Woche dabei", "7 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 7]; }],
+    ["monat", "Ein Monat Staunen", "30 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 30]; }],
+    ["hundert", "Hundert Tage", "100 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 100]; }],
+    ["gedaechtnis", "Gutes Gedächtnis", "10 Quizfragen richtig beantworten", "quiz", function (b) { return [b.quiz, 10]; }],
+    ["wundergedaechtnis", "Wundergedächtnis", "50 Quizfragen richtig beantworten", "quiz", function (b) { return [b.quiz, 50]; }],
+    ["sternstunde", "Sternstunde", "Eine seltene Sternstunden-Karte finden", "starfill", function (b) { return [b.rare, 1]; }],
+    ["sternensammler", "Sternensammler", "10 Sternstunden-Karten finden", "starfill", function (b) { return [b.rare, 10]; }],
+    ["allrounder", "Allrounder", "In allen " + KATS.length + " Themen mindestens ein Wunder entdecken", "globe", function (b) { return [b.kats, KATS.length]; }],
+    ["erzaehlt", "Weitererzählt", "Ein Wunder oder eine Urkunde teilen", "share", function (b) { return [b.shared, 1]; }],
+    ["vermesser", "Lebensvermesser", "In KilometerWahr ein Geburtsdatum eintragen", "kilometer", function (b) { return [b.persons, 1]; }],
+    ["weitblick", "Weitblick", "Den Kamera-Modus in WeitblickWahr ausprobieren", "camera", function (b) { return [b.cam, 1]; }],
+    ["zehnkm", "Zeitwanderer", "10 km auf Zeitreisen laufen", "walk", function (b) { return [b.km, 10]; }],
+    ["zeitreisend", "Zeitreisend", "Eine Zeitreise bis in die Gegenwart laufen", "zeit", function (b) { return [b.fertig, 1]; }],
+    ["allezeiten", "Durch alle Zeiten", "Alle drei Zeitreisen abschließen", "universe", function (b) { return [b.fertig, 3]; }]
+  ];
+  function checkBadges() {
+    var got = load("wunderwahr_abzeichen", {}), b = badgeState(), neu = [];
+    BADGES.forEach(function (x) { var p = x[4](b); if (p[0] >= p[1] && !got[x[0]]) { got[x[0]] = ymd(new Date()); neu.push(x[1]); } });
+    if (neu.length) { save("wunderwahr_abzeichen", got); setTimeout(function () { toast("Neues Abzeichen: " + neu.join(", "), 2600); buzz([20, 40, 20]); }, 300); if ($("fbBadges")) renderBadges(); }
+  }
+  function renderBadges() {
+    var got = load("wunderwahr_abzeichen", {}), n = Object.keys(got).length;
+    $("fbBadges").innerHTML = '<h2 class="wd-head">Abzeichen <small>' + n + ' von ' + BADGES.length + '</small></h2><div class="wd-badges">' + BADGES.map(function (x) {
+      var on = !!got[x[0]];
+      return '<button type="button" class="wd-badge' + (on ? ' got' : '') + '" data-b="' + x[0] + '" aria-label="' + esc(x[1]) + (on ? ' – erreicht' : ' – noch offen') + '"><span class="wd-medal">' + icon(x[3]) + '</span><span>' + esc(x[1]) + '</span></button>';
+    }).join("") + '</div>';
+    $("fbBadges").querySelectorAll("[data-b]").forEach(function (el) {
+      el.onclick = function () {
+        var x = BADGES.filter(function (y) { return y[0] === el.getAttribute("data-b"); })[0], p = x[4](badgeState()), on = got[x[0]];
+        sheet('<h2>' + esc(x[1]) + '</h2><p class="muted" style="margin:0 0 12px">' + esc(x[2]) + '</p>' +
+          (on ? '<p><b>Erreicht am ' + dShort(new Date(on)) + '.</b></p>' : '<div class="wd-bigbar"><i style="width:' + Math.min(100, p[0] / p[1] * 100).toFixed(1) + '%"></i></div><p class="small">' + fmt(Math.min(p[0], p[1]), p[0] % 1 ? 1 : 0) + ' von ' + fmt(p[1]) + '</p>'));
+      };
+    });
+  }
+
+  /* ---------- Dein Wunderjahr ---------- */
+  function yearData(y) {
+    var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
+    var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
+    var fav = Object.keys(kc).sort(function (a, b) { return kc[b] - kc[a]; })[0];
+    var qa = load("wunderwahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
+    var ok = qy.filter(function (k) { return qa[k].ok; }).length;
+    var got = load("wunderwahr_abzeichen", {}), by = Object.keys(got).filter(function (k) { return (got[k] || "").slice(0, 4) === String(y); }).length;
+    return { n: ids.length, fav: fav, favN: fav ? kc[fav] : 0, rare: ids.filter(function (id) { return SELTEN[id]; }).length, best: (load("wunderwahr_serie", {}).best) || 0, quiz: ok, quizAll: qy.length, badges: by, merk: sammlung().length };
+  }
+  function renderYearCard() {
+    var y = new Date().getFullYear(), d = yearData(y);
+    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Dein Wunderjahr ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt' + (d.fav ? ' · am liebsten ' + esc(d.fav) : '') + '</span></div><button type="button" class="wd-mini" id="fbYearBtn">Ansehen</button>';
+    $("fbYearBtn").onclick = function () { openYear(y); };
+  }
+  function openYear(y) {
+    var d = yearData(y);
+    sheet('<h2>Dein Wunderjahr ' + y + '</h2><p class="muted" style="margin:0">Alles, was du in diesem Jahr in WunderWahr erlebt hast.</p>' +
+      '<div class="wd-ystats"><div><b>' + fmt(d.n) + '</b><span>Wunder entdeckt</span></div><div><b>' + fmt(d.best) + '</b><span>Tage längste Serie</span></div>' +
+      '<div><b>' + fmt(d.quiz) + '<small style="font-size:14px;color:var(--sub-onbg)"> / ' + fmt(d.quizAll) + '</small></b><span>Quizfragen richtig</span></div><div><b>' + fmt(d.rare) + '</b><span>Sternstunden gefunden</span></div>' +
+      '<div><b>' + fmt(d.merk) + '</b><span>Karten gemerkt</span></div><div><b>' + fmt(d.badges) + '</b><span>Abzeichen verdient</span></div></div>' +
+      (d.fav ? '<p class="small">Dein Lieblingsthema: <b>' + esc(d.fav) + '</b> mit ' + fmt(d.favN) + ' Wundern.</p>' : '') +
+      '<button type="button" class="cta primary" id="yShare">' + icon("share") + 'Als Bild teilen</button>', function (root) {
+        root.querySelector("#yShare").onclick = function () {
+          var txt = fmt(d.n) + " Wunder entdeckt, " + fmt(d.best) + " Tage längste Serie, " + fmt(d.quiz) + " Quizfragen richtig" + (d.rare ? ", " + fmt(d.rare) + " Sternstunden gefunden" : "") + ".";
+          WDShare.wonderCard({ over: "Mein Wunderjahr", title: "Mein Wunderjahr " + y, text: txt, more: d.fav ? "Am meisten gestaunt habe ich über das Thema „" + d.fav + "“." : "", gold: true, foot: "Jeden Tag ein Grund zu staunen" })
+            .then(function (b) { return WDShare.share(b, "Wunderjahr-" + y + ".png", "Mein Wunderjahr " + y); }).then(function (ok) { if (ok) bump("shared"); });
+        };
+      });
+  }
+
+  /* ---------- Große Schrift ---------- */
+  function applyGross(on) { document.documentElement.classList.toggle("wd-gross", on); $("fbGross").setAttribute("aria-checked", on ? "true" : "false"); }
+  applyGross(load("wunderwahr_gross", false) === true);
+  $("fbGross").onclick = function () { var on = !document.documentElement.classList.contains("wd-gross"); save("wunderwahr_gross", on); applyGross(on); };
 
   /* =========================================================
      2. KilometerWahr – Meilensteine & Lebensuhr
@@ -173,8 +531,9 @@
       return '<div class="sn-row' + (m.big ? ' on' : '') + '"><span class="dot" style="background:' + (m.big ? 'var(--wd-gold)' : 'var(--accent)') + '"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div><div class="r">' + (d2 < 60 ? fmt(d2) + " Tg." : fmt(d2 / 30.44, 0) + " Mon.") + '</div></div>';
     }).join("");
     var lp = past[past.length - 1];
-    $("llPast").innerHTML = (lp ? 'Zuletzt erreicht: <b>' + esc(lp.title) + '</b> am ' + dShort(new Date(lp.t)) + ' · ' : '') +
+    $("llPast").innerHTML = (lp ? 'Zuletzt erreicht: <b>' + esc(lp.title) + '</b> am ' + dShort(new Date(lp.t)) + ' · <button type="button" class="wd-link" id="llCert">Urkunde</button> · ' : '') +
       '<button type="button" class="wd-link" id="llDel">' + esc(p.name || "Ich") + ' entfernen</button>';
+    if (lp) $("llCert").onclick = function () { certMilestone(p, lp); };
     $("llDel").onclick = function () {
       var q = window.wzConfirm ? wzConfirm((p.name || "Ich") + " mit Geburtsdatum aus KilometerWahr entfernen?", { okLabel: "Entfernen" }) : Promise.resolve(true);
       q.then(function (ok) { if (!ok) return; save("wunderwahr_personen", persons().filter(function (x) { return x.id !== p.id; })); activeP = null; save("wunderwahr_person", null); renderKilometer(); renderZeit(); });
@@ -187,6 +546,7 @@
       $("llFam").hidden = !all.length;
       $("llFamList").innerHTML = all.slice(0, 5).map(function (m) { return '<div class="sn-row"><span class="dot" style="background:var(--wd-gold)"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div></div>'; }).join("");
     } else $("llFam").hidden = true;
+    renderCal();
     startLive(p);
   }
   function startLive(p) {
@@ -218,12 +578,12 @@
     var ps = persons(); var id = "p" + Date.now().toString(36);
     ps.push({ id: id, name: name || (ps.length ? "Person " + (ps.length + 1) : "Ich"), date: v });
     save("wunderwahr_personen", ps); activeP = id; save("wunderwahr_person", id);
-    $("llForm").hidden = true; $("llName").value = ""; renderKilometer();
+    $("llForm").hidden = true; $("llName").value = ""; renderKilometer(); checkBadges();
   };
   $("llStart").onclick = function () {
     var v = $("llDate0").value;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { toast("Bitte dein Geburtsdatum wählen."); return; }
-    save("wunderwahr_personen", [{ id: "ich", name: "Ich", date: v }]); activeP = "ich"; renderKilometer(); renderZeit();
+    save("wunderwahr_personen", [{ id: "ich", name: "Ich", date: v }]); activeP = "ich"; renderKilometer(); renderZeit(); checkBadges();
   };
   $("llCancel").onclick = function () { $("llForm").hidden = true; };
 
@@ -467,35 +827,80 @@
   setInterval(function () { if (document.querySelector("#screen-weitblick.active")) { drawGlobe(); renderTerminator(); } }, 60000);
 
   /* =========================================================
-     4. ZeitWahr – Erdgeschichte zu Fuß
+     4. ZeitWahr – drei Zeitreisen zu Fuß
      ========================================================= */
-  var AE = load("wunderwahr_zeitreise", { m: 0, scale: 46 });
-  function aeKm() { return AE.m / 1000; }
-  function posKm(ma) { return (4600 - ma) / 4600 * AE.scale; }
+  var R_ORDER = ["erde", "universum", "mensch"], R_ICON = { erde: "globe", universum: "universe", mensch: "people" };
+  var SCALE_TXT = { "46": "46 km · über Wochen", "4.6": "4,6 km · an einem Nachmittag", "13.8": "13,8 km · über ein paar Tage", "1.38": "1,38 km · ein Spaziergang", "3": "3 km · ein Spaziergang", "30": "30 km · über Wochen" };
+  function migrateReisen() {
+    var old = load("wunderwahr_zeitreise", null), r = { aktiv: "erde", fertig: {} };
+    R_ORDER.forEach(function (k) { r[k] = { m: 0, scale: D.REISEN[k].scales[0] }; });
+    if (old) { r.erde.m = old.m || 0; r.erde.scale = old.scale || 46; }
+    save("wunderwahr_reisen", r); return r;
+  }
+  var RS = reisen();
+  function stations(id) {
+    var R = D.REISEN[id];
+    if (R.st) return R.st;
+    var y = new Date().getFullYear();
+    return R.jahre.map(function (j) { return [y - j[0] - (j[0] < 0 ? 1 : 0), j[1], j[2], j[0]]; });
+  }
+  function total(id) { var st = stations(id); return st[0][0]; }
+  function cur() { return RS[RS.aktiv]; }
+  function posKm(id, ago) { var T = total(id); return (T - ago) / T * RS[id].scale; }
+  function agoTxt(y, id) {
+    if (y >= 1e9) return "vor " + fmt(y / 1e9, 2) + " Milliarden Jahren";
+    if (y >= 1e6) return "vor " + fmt(y / 1e6, y < 1e7 ? 1 : 0) + " Millionen Jahren";
+    if (id === "mensch" && y < 6000) { var yr = new Date().getFullYear() - Math.round(y); return yr > 0 ? "im Jahr " + yr : "im Jahr " + (1 - yr) + " v. Chr."; }
+    if (y >= 1) return "vor " + fmt(y) + " Jahren";
+    return "in der Gegenwart";
+  }
   function renderZeit() {
-    var km = aeKm(), tot = AE.scale, pct = Math.min(100, km / tot * 100);
-    var reached = D.ZEITALTER.filter(function (z) { return posKm(z[0]) <= km + 1e-9; });
-    var cur = reached[reached.length - 1], nxt = D.ZEITALTER[reached.length];
-    var maNow = 4600 - km / tot * 4600;
-    $("aeHero").innerHTML = '<div class="wd-over">Du stehst bei</div><h2 class="wd-card-t">vor ' + (maNow >= 1000 ? fmt(maNow / 1000, 2) + " Milliarden" : fmt(maNow, maNow < 10 ? 1 : 0) + " Millionen") + ' Jahren</h2>' +
-      '<p class="wd-card-x"><b>' + esc(cur[1]) + '.</b> ' + esc(cur[2]) + '</p>' +
-      '<div class="wd-prog"><i style="width:' + pct + '%"></i>' + D.ZEITALTER.map(function (z) { return '<span style="left:' + (posKm(z[0]) / tot * 100) + '%"></span>'; }).join("") + '</div>' +
-      '<div class="wd-prog-t"><span>' + fmt(km, 2) + ' km gelaufen</span><span>' + fmt(tot) + ' km</span></div>' +
-      (nxt ? '<p class="wd-next">Nächstes Zeitalter: <b>' + esc(nxt[1]) + '</b> in ' + fmt(Math.max(0, posKm(nxt[0]) - km), 2) + ' km</p>' : '<p class="wd-next"><b>Du bist in der Gegenwart angekommen!</b></p>');
-    $("aeList").innerHTML = D.ZEITALTER.map(function (z) {
-      var p = posKm(z[0]), on = p <= km + 1e-9;
-      return '<div class="sn-row' + (on ? ' on' : '') + '"><span class="dot" style="background:' + (on ? 'var(--wd-gold)' : 'var(--border)') + '"></span><div class="main"><b>' + esc(z[1]) + '</b><span>vor ' + (z[0] >= 1 ? fmt(z[0], z[0] < 10 ? 1 : 0) + " Mio." : fmt(z[0] * 1000) + " Tsd.") + ' Jahren</span></div><div class="r">' + (p >= 1 ? fmt(p, p > AE.scale * 0.97 ? 3 : 1) + " km" : fmt(p * 1000) + " m") + '</div></div>';
+    var id = RS.aktiv, R = D.REISEN[id], c = cur(), st = stations(id), T = total(id);
+    var km = c.m / 1000, tot = c.scale, pct = Math.min(100, km / tot * 100), done = km >= tot;
+    var reached = st.filter(function (z) { return posKm(id, z[0]) <= km + 1e-9; });
+    var now = reached[reached.length - 1] || st[0], nxt = st[reached.length];
+    var agoNow = Math.max(0, T - km / tot * T);
+    if (done && !(RS.fertig || {})[id]) { RS.fertig = RS.fertig || {}; RS.fertig[id] = ymd(new Date()); save("wunderwahr_reisen", RS); toast("Angekommen in der Gegenwart! Deine Urkunde ist bereit.", 2400); buzz([30, 50, 30]); setTimeout(checkBadges, 2700); }
+    $("aeTrips").innerHTML = R_ORDER.map(function (k) {
+      var r = RS[k], p = Math.min(100, r.m / 1000 / r.scale * 100), f = (RS.fertig || {})[k];
+      return '<button type="button" class="wd-trip' + (k === id ? ' on' : '') + (f ? ' done' : '') + '" data-trip="' + k + '" aria-pressed="' + (k === id) + '">' + icon(R_ICON[k]) + esc(D.REISEN[k].kurz) + '<small>' + (f ? "geschafft" : fmt(p) + " %") + '</small></button>';
+    }).join("");
+    $("aeScales").innerHTML = R.scales.map(function (s) { return '<button type="button" class="chip' + (s === c.scale ? ' active' : '') + '" data-scale="' + s + '">' + SCALE_TXT[String(s)] + '</button>'; }).join("");
+    $("aeHero").innerHTML = '<div class="wd-over">' + esc(R.name) + ' · du stehst</div><h2 class="wd-card-t">' + (done ? "in der Gegenwart" : agoTxt(agoNow, id)) + '</h2>' +
+      '<p class="wd-card-x"><b>' + esc(now[1]) + '.</b> ' + esc(now[2]) + '</p>' +
+      '<div class="wd-prog"><i style="width:' + pct + '%"></i>' + st.map(function (z) { return '<span style="left:' + (posKm(id, z[0]) / tot * 100) + '%"></span>'; }).join("") + '</div>' +
+      '<div class="wd-prog-t"><span>' + fmt(km, 2) + ' km gelaufen</span><span>' + fmt(tot, tot < 10 ? 2 : 1) + ' km</span></div>' +
+      (nxt && !done ? '<p class="wd-next">Nächste Station: <b>' + esc(nxt[1]) + '</b> in ' + dist(Math.max(posKm(id, nxt[0]) - km, 0.000005)) + '</p>' : '') +
+      (done ? '<p class="wd-next"><b>Geschafft – du bist in der Gegenwart angekommen!</b></p><button type="button" class="wd-glass" id="aeCert">' + icon("medal") + 'Urkunde ansehen und teilen</button>' : '');
+    if ($("aeCert")) $("aeCert").onclick = function () {
+      var f = RS.fertig[id];
+      WDShare.certificate({ kind: "ZeitWahr", title: R.name, verb: "", text: "Zu Fuß gelaufen: " + fmt(tot, tot < 10 ? 2 : 1) + " km – " + (T >= 1e9 ? fmt(T / 1e9, 1) + " Milliarden" : fmt(T)) + " Jahre Geschichte, Schritt für Schritt.", date: "Geschafft am " + dShort(new Date(f)) })
+        .then(function (b) { return WDShare.share(b, "Urkunde-" + id + ".png", R.name); }).then(function (ok) { if (ok) bump("shared"); });
+    };
+    $("aeListH").textContent = "Stationen: " + R.name;
+    $("aeList").innerHTML = st.map(function (z) {
+      var p = posKm(id, z[0]), on = p <= km + 1e-9;
+      var when = id === "mensch" && z[3] != null ? (z[3] < 0 ? fmt(-z[3]) + " v. Chr." : "Jahr " + z[3]) : agoTxt(z[0], id);
+      return '<div class="sn-row' + (on ? ' on' : '') + '"><span class="dot" style="background:' + (on ? 'var(--wd-gold)' : 'var(--border)') + '"></span><div class="main"><b>' + esc(z[1]) + '</b><span>' + when + '</span></div><div class="r">' + (p >= 1 ? fmt(p, p > tot * 0.97 ? 3 : 1) + " km" : p <= 0 ? "Start" : dist(p)) + '</div></div>';
     }).join("");
     // Maßstab der letzten Meter
-    var mPerYear = tot * 1000 / 4.6e9;
-    function len(y) { var m = y * mPerYear; return m >= 1 ? fmt(m, 1) + " m" : m >= 0.01 ? fmt(m * 100, 1) + " cm" : fmt(m * 1000, 1) + " mm"; }
-    var ps = persons(), age = ps.length ? (Date.now() - birth(ps[0]).getTime()) / (365.25 * DAY) : null;
-    $("aeScale").innerHTML = [["Seit dem Ende der Dinosaurier", len(66e6)], ["Seit es den Homo sapiens gibt", len(3e5)], ["Seit dem Bau der Pyramiden", len(4600)], ["Seit Christi Geburt", len(2026)], [age ? "Dein bisheriges Leben" : "Ein Menschenleben (80 Jahre)", len(age || 80)]]
-      .map(function (r) { return '<div class="sn-row"><div class="main"><b>' + r[0] + '</b></div><div class="r">' + r[1] + '</div></div>'; }).join("");
-    document.querySelectorAll("[data-scale]").forEach(function (b) { b.classList.toggle("active", +b.getAttribute("data-scale") === AE.scale); });
+    var mPerYear = tot * 1000 / T;
+    function len(y) { var m = y * mPerYear; return m >= 1000 ? fmt(m / 1000, 2) + " km" : m >= 1 ? fmt(m, 1) + " m" : m >= 0.01 ? fmt(m * 100, 1) + " cm" : m >= 0.0001 ? fmt(m * 1000, 2) + " mm" : "weniger als ein Haar"; }
+    var ps = persons(), age = ps.length ? (Date.now() - birth(ps[0]).getTime()) / (365.25 * DAY) : null, Y = new Date().getFullYear();
+    var rows = id === "mensch"
+      ? [["Seit dem Bau der Pyramiden", len(Y + 2560)], ["Seit Christi Geburt", len(Y)], ["Seit Gutenbergs Buchdruck", len(Y - 1450)], ["Seit der Mondlandung", len(Y - 1969)], [age ? "Dein bisheriges Leben" : "Ein Menschenleben (80 Jahre)", len(age || 80)]]
+      : [["Seit dem Ende der Dinosaurier", len(66e6)], ["Seit es den Homo sapiens gibt", len(3e5)], ["Seit dem Bau der Pyramiden", len(Y + 2560)], ["Seit Christi Geburt", len(Y)], [age ? "Dein bisheriges Leben" : "Ein Menschenleben (80 Jahre)", len(age || 80)]];
+    $("aeScale").innerHTML = rows.map(function (r) { return '<div class="sn-row"><div class="main"><b>' + r[0] + '</b></div><div class="r">' + r[1] + '</div></div>'; }).join("");
+    document.querySelectorAll("[data-trip]").forEach(function (b) { b.onclick = function () { if (watch != null) { toast("Bitte erst die laufende Etappe beenden."); return; } RS.aktiv = b.getAttribute("data-trip"); save("wunderwahr_reisen", RS); renderZeit(); }; });
+    document.querySelectorAll("[data-scale]").forEach(function (b) {
+      b.onclick = function () {
+        var s = +b.getAttribute("data-scale"); if (s === cur().scale) return;
+        var ch = function () { var c2 = cur(), frac = c2.m / 1000 / c2.scale; c2.scale = s; c2.m = Math.min(frac, 1) * s * 1000; if (RS.fertig && frac < 1) delete RS.fertig[RS.aktiv]; save("wunderwahr_reisen", RS); renderZeit(); };
+        if (cur().m > 0 && window.wzConfirm) wzConfirm("Strecke ändern? Dein Fortschritt wird auf die neue Länge umgerechnet.", { okLabel: "Ändern" }).then(function (ok) { if (ok) ch(); }); else ch();
+      };
+    });
     renderZeitmitte();
   }
-  document.querySelectorAll("[data-scale]").forEach(function (b) { b.onclick = function () { AE.scale = +b.getAttribute("data-scale"); save("wunderwahr_zeitreise", AE); renderZeit(); }; });
   /* Laufen: GPS zählt nur echte Schritte (genaue Positionen, Gehtempo) */
   var watch = null, lastFix = null;
   $("aeGo").onclick = function () {
@@ -509,13 +914,13 @@
         var d = hav(lastFix.lat, lastFix.lon, c.latitude, c.longitude) * 1000, dt = (p.timestamp - lastFix.t) / 1000;
         if (d < 8) return;
         if (dt > 0 && d / dt > 4.5) { lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp }; return; } // zu schnell: Fahrzeug
-        AE.m += d; save("wunderwahr_zeitreise", AE); renderZeit();
+        cur().m += d; save("wunderwahr_reisen", RS); renderZeit(); if (Math.floor(cur().m / 1000) !== Math.floor((cur().m - d) / 1000)) checkBadges();
       }
       lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp };
     }, function () { toast("Standort nicht verfügbar."); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
   };
   $("aeReset").onclick = function () {
-    (window.wzConfirm ? wzConfirm("Die Zeitreise wirklich von vorn beginnen?", { okLabel: "Neu beginnen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { AE.m = 0; save("wunderwahr_zeitreise", AE); renderZeit(); } });
+    (window.wzConfirm ? wzConfirm("Die Zeitreise „" + D.REISEN[RS.aktiv].name + "“ wirklich von vorn beginnen?", { okLabel: "Neu beginnen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { cur().m = 0; save("wunderwahr_reisen", RS); renderZeit(); } });
   };
   /* Deine Zeitmitte & überraschend gleichzeitig */
   function renderZeitmitte() {
@@ -537,17 +942,55 @@
     }).join("");
   }
 
+  /* ---------------- KilometerWahr: Jubiläumskalender & Urkunden ---------------- */
+  function calList(from, to) {
+    var all = [];
+    persons().forEach(function (pp) {
+      all = all.concat(milestones(pp, from, to));
+    });
+    return all.sort(function (a, b) { return a.t - b.t; });
+  }
+  function renderCal() {
+    var el = $("llCal"), now = midnight(new Date()).getTime(), list = calList(now, now + 365 * DAY);
+    if (!list.length) { el.hidden = true; return; }
+    el.hidden = false;
+    var html = '<h2 class="wd-head">Jubiläumskalender <small>nächste 12 Monate</small></h2>', lastM = -1, shown = 0;
+    list.slice(0, 24).forEach(function (m) {
+      var d = new Date(m.t), mk = d.getFullYear() * 12 + d.getMonth();
+      if (mk !== lastM) { html += '<div class="wd-month">' + MO[d.getMonth()] + ' ' + d.getFullYear() + '</div>'; lastM = mk; }
+      html += '<div class="sn-row' + (m.big ? ' on' : '') + '"><span class="dot" style="background:' + (m.big ? 'var(--wd-gold)' : 'var(--accent)') + '"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + WD[d.getDay()] + ', ' + d.getDate() + '. ' + MO[d.getMonth()] + '</span></div></div>';
+      shown++;
+    });
+    html += '<button type="button" class="cta primary" id="llIcs" style="margin-top:12px">' + icon("calendar") + 'In meinen Kalender übernehmen</button><p class="muted small" style="margin:8px 0 0">Erstellt eine Kalenderdatei mit den Meilensteinen der nächsten drei Jahre. Dein Kalender fragt, ob er sie übernehmen soll.</p>';
+    el.innerHTML = html;
+    $("llIcs").onclick = function () {
+      var ev = calList(now, now + 3 * 365 * DAY).map(function (m, i) { return { date: m.t, title: m.title, text: m.sub + " – berechnet mit WunderWahr", uid: "wd-" + m.p.id + "-" + m.t + "-" + i }; });
+      WDShare.ics(ev, "Meilensteine.ics");
+    };
+  }
+  function certMilestone(p, m) {
+    var nm = p.name && p.name !== "Ich" ? p.name : "";
+    WDShare.certificate({ kind: "KilometerWahr", name: nm, verb: nm ? "hat erreicht:" : "", title: m.title, text: String(m.sub || "").replace(" ist dann ", " ist ").replace(" bist dann ", " bist ").replace("sind dann", "sind"), date: "Erreicht am " + dShort(new Date(m.t)) })
+      .then(function (b) { return WDShare.share(b, "Urkunde-Meilenstein.png", m.title); }).then(function (ok) { if (ok) bump("shared"); });
+  }
+
+  /* ---------------- WeitblickWahr: Kamera-Modus ---------------- */
+  $("dkCam").onclick = function () {
+    if (!window.WDCam) return;
+    WDCam.start({ loc: LOC, ziele: D.ZIELE, onOpen: function () { bump("cam"); } });
+  };
+
   /* ---------------- Start ---------------- */
-  renderTages();
   var onb = window.wzOnboarding ? wzOnboarding({
     key: "wunderwahr_onboarded",
     slides: [
       { icon: "tages", title: "Willkommen bei WunderWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
-      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – ein ganzes Jahr ohne Wiederholung. Was dir gefällt, hebst du in deiner Sammlung auf." },
-      { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt: dein 10.000. Lebenstag, deine erste Milliarde Sekunden, dein nächster Mars-Geburtstag – auch für deine Familie." },
-      { icon: "weitblick", title: "WeitblickWahr", text: "Zeig mit dem Smartphone in eine Richtung und folge der Linie einmal um die ganze Erde. Dazu Tag und Nacht live auf dem Globus." },
-      { icon: "zeit", title: "ZeitWahr", text: "Erlaufe die Erdgeschichte Schritt für Schritt – 4,6 Milliarden Jahre auf deinen Spaziergängen. Dazu überraschende Gleichzeitigkeiten der Geschichte." },
-      { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten, Sammlung und Fortschritt bleiben nur auf diesem Gerät; es wird nichts gesendet." }
+      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Am nächsten Tag wartet ein Quiz, und jede Karte landet in deinem Wunderalbum." },
+      { icon: "medal", title: "Sammeln und Abzeichen", text: "Fülle die Themen deines Albums, finde seltene Sternstunden, halte deine Serie und verdiene eigene Abzeichen. Jedes Wunder lässt sich als schöne Bildkarte teilen." },
+      { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – mit Jubiläumskalender für die ganze Familie und Urkunden zum Teilen." },
+      { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
+      { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },
+      { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten, Album und Fortschritt bleiben nur auf diesem Gerät; die Kamera wird nur angezeigt, nie aufgenommen. Es wird nichts gesendet." }
     ]
   }) : null;
   if ($("showOnboardingBtn")) $("showOnboardingBtn").addEventListener("click", function () { if (onb) onb.show(); });
@@ -555,7 +998,16 @@
   var h0 = (location.hash || "").slice(1);
   var startTab = TABS.indexOf(h0) >= 0 ? h0 : load("wunderwahr_tab", "tages");
   showTab(TABS.indexOf(startTab) >= 0 ? startTab : "tages");
-  // Datum direkt vorbelegen (Platzhalter), Heute-Hinweis bei Tageswechsel
+  if (startTab !== "tages") renderTages();
+  checkBadges();
+  // Startbildschirm ausblenden
+  (function () {
+    var sp = $("wdSplash"); if (!sp) return;
+    var shown = false; try { shown = sessionStorage.getItem("wunderwahr_splash") === "1"; sessionStorage.setItem("wunderwahr_splash", "1"); } catch (e) { }
+    if (shown) { sp.parentNode.removeChild(sp); return; }
+    setTimeout(function () { sp.classList.add("go"); setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 500); }, 750);
+  })();
+  // Tageswechsel: neue Karte, wenn die App über Mitternacht offen ist
   var lastDay = new Date().getDate();
   setInterval(function () { var d = new Date().getDate(); if (d !== lastDay) { lastDay = d; offset = 0; renderTages(); } }, 60000);
 })();

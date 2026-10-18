@@ -311,8 +311,8 @@
 <link rel="stylesheet" href="./wz-unify.css">
 <link rel="stylesheet" href="./wz-design.css">
 <style>
-  :root{ --wd-gold:#C98A1F; --wd-sea:#7C8FD9; }
-  html.theme-dark{ --wd-gold:#F0C583; --wd-sea:#8FA2E8; }
+  :root{ --wd-gold:#C98A1F; --wd-gold-t:#8A5A06; --wd-sea:#7C8FD9; }
+  html.theme-dark{ --wd-gold:#F0C583; --wd-gold-t:#F0C583; --wd-sea:#8FA2E8; }
   .wd-hero{position:relative;overflow:hidden;border-radius:22px;padding:20px 18px 18px;margin:0 0 14px;color:#fff;
     background:radial-gradient(120% 90% at 85% 0%, rgba(124,92,255,.45) 0%, transparent 55%), linear-gradient(160deg,#2A1C5E 0%,#15102A 100%);
     box-shadow:0 14px 34px rgba(var(--wzq-241748, 36, 23, 72),.28)}
@@ -401,6 +401,122 @@
   html[data-wz-app="wd"] body .wzd-bar > button{font-size:9.6px!important;letter-spacing:-.015em!important}
   .wd-link{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   .wd-note{font-size:12px;color:var(--sub-onbg);margin:10px 2px 0;line-height:1.45}
+  /* ---------- FINAL-95: Ausbau ---------- */
+  .wd-dayrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 2px 10px}
+  .wd-dayrow .wd-date{margin:0}
+  .wd-streak{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--border);font:700 12.5px -apple-system,sans-serif;color:var(--accent);white-space:nowrap}
+  .wd-streak .wzi{width:15px;height:15px;color:var(--wd-gold)}
+  .wd-swipe{position:relative;touch-action:pan-y}
+  .wd-swipe .wd-hero{transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .28s ease;will-change:transform}
+  .wd-swipe .wd-hero.out-l{transform:translateX(-30%);opacity:0}
+  .wd-swipe .wd-hero.out-r{transform:translateX(30%);opacity:0}
+  .wd-swipe .wd-hero.drag{transition:none}
+  .wd-hero.gold{box-shadow:0 0 0 2px #FFD27A inset,0 14px 34px rgba(201,138,31,.32)}
+  .wd-rare{display:inline-flex;align-items:center;gap:5px;margin:0 0 8px;padding:3px 9px;border-radius:999px;background:rgba(255,210,122,.16);border:1px solid rgba(255,210,122,.55);color:#FFD27A;font:800 10.5px -apple-system,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+  .wd-rare .wzi{width:12px;height:12px}
+  .wd-card-acts .wd-icon{flex:0 0 44px;padding:0}
+  .wd-hero.wd-calc{background:radial-gradient(110% 90% at 0% 0%, rgba(255,210,122,.22) 0%, transparent 55%), linear-gradient(160deg,#33246E 0%,#1A1338 100%)}
+  .wd-calc .wd-over{color:#FFD27A}
+  .wd-calc-n{display:block;font:800 30px/1.1 ui-rounded,-apple-system,sans-serif;color:#FFD27A;letter-spacing:-.02em;margin:2px 0 6px}
+  .wd-quiz-q{font-size:15px;line-height:1.5;margin:0 0 12px}
+  .wd-quiz-q mark{background:var(--soft);color:var(--accent);border-radius:6px;padding:0 6px;font-weight:700}
+  .wd-quiz-o{display:grid;gap:8px}
+  .wd-quiz-o button{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font:600 15px -apple-system,sans-serif;text-align:left;cursor:pointer}
+  .wd-quiz-o button[disabled]{cursor:default}
+  .wd-quiz-o button.ok{border-color:var(--accent);background:var(--soft)}
+  .wd-quiz-o button.no{opacity:.55;text-decoration:line-through}
+  .wd-quiz-r{margin:10px 2px 0;font-size:13.5px;font-weight:600}
+  .wd-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .wd-head small{font-size:13px;font-weight:500;color:var(--sub-onbg)}
+  .wd-bigbar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin:4px 0 12px}
+  .wd-bigbar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--wd-gold))}
+  .wd-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;margin:0 0 6px}
+  .wd-cat{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:4px 0;color:var(--text);cursor:pointer;font:inherit}
+  .wd-ring{--p:0;position:relative;width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%), var(--soft) 0);display:grid;place-items:center}
+  .wd-ring::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}
+  .wd-ring b{position:relative;font:750 13px ui-rounded,-apple-system,sans-serif}
+  .wd-cat.on .wd-ring{box-shadow:0 0 0 2px var(--wd-gold)}
+  .wd-cat span{font-size:10.8px;font-weight:600;line-height:1.15;text-align:center;color:var(--sub-onbg)}
+  .wd-cat.on span{color:var(--text)}
+  .wd-filter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+  .wd-albumlist{margin-top:4px}
+  .wd-sam.gold summary b::after{content:" ★";color:var(--wd-gold)}
+  .wd-sam .wd-sam-a{display:flex;gap:8px;margin:8px 0 2px 16px}
+  .wd-mini{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:var(--soft);color:var(--accent);font:650 13px -apple-system,sans-serif;cursor:pointer}
+  .wd-mini .wzi{width:15px;height:15px}
+  .wd-badges{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 6px}
+  .wd-badge{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;font:inherit;color:var(--text);cursor:pointer}
+  .wd-medal{position:relative;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--soft);border:2px dashed var(--border);color:var(--sub-onbg)}
+  .wd-medal .wzi{width:24px;height:24px}
+  .wd-badge.got .wd-medal{border:0;color:#3A2400;background:radial-gradient(circle at 35% 30%,#FFE8B5 0%,#F0C062 45%,#C98A1F 100%);box-shadow:0 4px 12px rgba(201,138,31,.35)}
+  .wd-badge span{font-size:10.8px;font-weight:600;line-height:1.15;text-align:center;color:var(--sub-onbg)}
+  .wd-badge.got span{color:var(--text)}
+  .wd-yearcard{display:flex;align-items:center;gap:14px}
+  .wd-yearcard .wd-medal{flex:0 0 54px;border:0;background:linear-gradient(160deg,#2A1C5E,#15102A);color:#FFD27A}
+  .wd-yearcard b{display:block;font-size:15.5px}
+  .wd-yearcard span{font-size:13px;color:var(--sub-onbg)}
+  .wd-yearcard .wd-mini{margin-left:auto}
+  .wd-setrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 2px 0}
+  .wd-setrow label{font-size:13px;font-weight:600}
+  .wd-switch{position:relative;width:50px;height:30px;flex:0 0 50px;border-radius:15px;border:0;background:var(--border);cursor:pointer;padding:0}
+  .wd-switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+  .wd-switch[aria-checked="true"]{background:var(--accent)}
+  .wd-switch[aria-checked="true"]::after{transform:translateX(20px)}
+  html.wd-gross .wd-card-t{font-size:27px}
+  html.wd-gross .wd-card-x{font-size:18px}
+  html.wd-gross .wd-more p,html.wd-gross .wd-quiz-q,html.wd-gross .wd-sam p,html.wd-gross .sn-fact span{font-size:16.5px}
+  html.wd-gross .wd-sam summary b{font-size:16px}
+  /* Bogen (eigenes Blatt für Rückblick, Abzeichen, Kalender) */
+  .wd-sheet-bg{position:fixed;inset:0;z-index:2000;background:rgba(10,6,24,.55);display:flex;align-items:flex-end;justify-content:center;animation:wdFade .2s ease}
+  .wd-sheet{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--card);color:var(--text);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:wdUp .28s cubic-bezier(.2,.8,.2,1)}
+  .wd-sheet h2{margin:0 0 6px;font-size:20px}
+  .wd-sheet .wd-x{float:right;width:36px;height:36px;border-radius:50%;border:0;background:var(--soft);color:var(--text);cursor:pointer;display:grid;place-items:center}
+  .wd-sheet .wd-x .wzi{width:16px;height:16px}
+  .wd-ystats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+  .wd-ystats div{background:var(--soft);border-radius:14px;padding:12px}
+  .wd-ystats b{display:block;font:800 24px ui-rounded,-apple-system,sans-serif;color:var(--accent)}
+  .wd-ystats span{font-size:12.5px;color:var(--sub-onbg)}
+  .wd-month{font:800 11.5px -apple-system,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--sub-onbg);margin:14px 0 2px}
+  .wd-month:first-child{margin-top:4px}
+  @keyframes wdFade{from{opacity:0}to{opacity:1}}
+  @keyframes wdUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  @keyframes wdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .screen.active{animation:wdIn .28s ease}
+  /* Kamera-Modus */
+  .wd-cam{position:fixed;inset:0;z-index:3000;background:#0B0820;color:#fff;overflow:hidden}
+  .wd-cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .wd-cam.nocam video{display:none}
+  .wd-cam canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .wd-cam-top{position:absolute;left:0;right:0;top:0;padding:calc(14px + env(safe-area-inset-top)) 16px 26px;background:linear-gradient(rgba(11,8,32,.75),transparent);text-align:center}
+  .wd-cam-top b{display:block;font:800 22px ui-rounded,-apple-system,sans-serif}
+  .wd-cam-top span{font-size:13px;opacity:.85}
+  .wd-cam-bar{position:absolute;left:12px;right:12px;bottom:calc(46px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px}
+  .wd-cam-seg{flex:1;display:flex;background:rgba(20,14,44,.72);border-radius:14px;padding:4px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .wd-cam-seg button{flex:1;min-height:40px;border:0;border-radius:10px;background:none;color:#fff;font:650 14px -apple-system,sans-serif;cursor:pointer}
+  .wd-cam-seg button.on{background:#FFD27A;color:#241748}
+  .wd-cam-x{width:48px;height:48px;border-radius:50%;border:0;background:rgba(20,14,44,.72);color:#fff;display:grid;place-items:center;cursor:pointer}
+  .wd-cam-note{position:absolute;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom));margin:0;text-align:center;font-size:11.5px;opacity:.8}
+  html.wd-cam-open, html.wd-cam-open body{overflow:hidden}
+  /* Zeitreisen */
+  .wd-trips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
+  .wd-trip{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font:650 12.5px -apple-system,sans-serif;cursor:pointer}
+  .wd-trip .wzi{width:22px;height:22px;color:var(--accent)}
+  .wd-trip small{font-size:10.5px;font-weight:500;color:var(--sub-onbg)}
+  .wd-trip.on{border-color:var(--accent);background:var(--soft)}
+  .wd-trip.done small{color:var(--wd-gold-t);font-weight:700}
+  /* Startbildschirm */
+  #wdSplash{position:fixed;inset:0;z-index:4000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;
+    background:radial-gradient(100% 70% at 80% 0%, rgba(124,92,255,.45) 0%, transparent 60%), linear-gradient(160deg,#2A1C5E 0%,#110C26 100%);transition:opacity .45s ease}
+  #wdSplash img{width:96px;height:96px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:wdPop .6s cubic-bezier(.2,.9,.3,1.3)}
+  #wdSplash b{font:800 28px ui-rounded,-apple-system,sans-serif;letter-spacing:-.02em}
+  #wdSplash span{font-size:14px;opacity:.8}
+  #wdSplash.go{opacity:0;pointer-events:none}
+  @keyframes wdPop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+  @media (prefers-reduced-motion: reduce){
+    .screen.active,.wd-sheet,.wd-sheet-bg,#wdSplash img{animation:none}
+    .wd-swipe .wd-hero{transition:none}
+  }
+  .wd-hero :focus-visible,.card :focus-visible,.wd-sheet :focus-visible{outline:3px solid var(--wd-gold);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -438,8 +554,19 @@
 <symbol id="wzi-left" viewBox="0 0 24 24"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="wzi-right" viewBox="0 0 24 24"><path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="wzi-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M15.4 8.6l-2 4.8-4.8 2 2-4.8z" fill="currentColor" fill-opacity=".25"/></g></symbol>
+<symbol id="wzi-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.2h3l1.6-2.4h6.8L17 8.2h3v10.4H4z"/><circle cx="12" cy="13.2" r="3.4"/></g></symbol>
+<symbol id="wzi-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v11"/><path d="M8 7.4l4-3.8 4 3.8"/><path d="M6.5 11H5v9h14v-9h-1.5"/></g></symbol>
+<symbol id="wzi-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.6-5.3 3.6-8.3.4 1.6 1.4 2.6 2.4 3.1C12 6.8 13.4 4.4 15.6 3c-.3 2.9 2.9 5.2 2.9 10 0 4.3-2.6 8-6.5 8zm0-2.4c1.7 0 2.8-1.2 2.8-2.9 0-1.9-1.6-2.8-2.1-4.4-.9 1.6-3.5 2.4-3.5 4.6 0 1.6 1.1 2.7 2.8 2.7z" fill="currentColor"/></symbol>
+<symbol id="wzi-medal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8l2.6 6M16 2.8l-2.6 6"/><circle cx="12" cy="15" r="6"/><path d="M12 12.2l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.8" y="5.2" width="16.4" height="15" rx="2.2"/><path d="M3.8 9.8h16.4M8.2 3.2v4M15.8 3.2v4"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-quiz" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.9-1.1 1.6v.5"/><circle cx="12" cy="16.9" r=".9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-universe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.8" fill="currentColor"/><path d="M12 5.2c4.6 0 8.4 3 8.4 6.8S16.6 18.8 12 18.8" /><path d="M12 18.8c-4.6 0-8.4-3-8.4-6.8S7.4 5.2 12 5.2" opacity=".55"/><circle cx="19" cy="5" r=".8" fill="currentColor" stroke="none"/><circle cx="4.6" cy="19.2" r=".8" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7.6" r="2.8"/><path d="M3.8 19.6c.4-3.4 2.4-5.4 5.2-5.4s4.8 2 5.2 5.4"/><circle cx="16.6" cy="8.8" r="2.2"/><path d="M15.4 14.4c2.6-.4 4.4 1.4 4.8 4.4"/></g></symbol>
+<symbol id="wzi-check" viewBox="0 0 24 24"><path d="M5 12.5l4.4 4.4L19 7.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z"/><circle cx="12" cy="12" r="2.8"/></g></symbol>
 </defs>
 </svg>
+<div id="wdSplash" aria-hidden="true"><img src="./wd-icon-192.png" alt="" width="96" height="96"><b>WunderWahr</b><span id="wdSplashD"></span></div>
 <a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
 <button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
 
@@ -458,15 +585,17 @@
   </nav>
 
   <!-- ===================== TAGES ===================== -->
-  <section class="screen active" id="screen-tages">
-    <p class="wd-date" id="fbDate"></p>
-    <div class="wd-hero" id="fbCard"></div>
+  <section class="screen active" id="screen-tages" role="tabpanel" aria-label="TagesWahr">
+    <div class="wd-dayrow"><p class="wd-date" id="fbDate"></p><span class="wd-streak" id="fbStreak" hidden></span></div>
+    <div class="wd-swipe" id="fbSwipe"><div class="wd-hero" id="fbCard" aria-live="polite"></div></div>
+    <div class="wd-hero wd-calc" id="fbCalc" aria-live="polite"></div>
+    <div class="card" id="fbQuiz" hidden></div>
     <div class="card" id="fbHeute" hidden></div>
-    <div class="card">
-      <h2 style="display:flex;justify-content:space-between;align-items:baseline">Deine Sammlung <small class="muted" style="font-size:13px;font-weight:500" id="fbSamCount"></small></h2>
-      <div id="fbSam"></div>
-    </div>
-    <p class="wd-note">Jeden Morgen erwartet dich ein neues Tageswunder – ein ganzes Jahr ohne Wiederholung. Zurückblättern kannst du eine Woche; was dir gefällt, hebst du in deiner Sammlung auf.</p>
+    <div class="card" id="fbAlbum"></div>
+    <div class="card" id="fbBadges"></div>
+    <div class="card wd-yearcard" id="fbYear"></div>
+    <div class="wd-setrow"><label for="fbGross" id="fbGrossL">Große Schrift</label><button type="button" class="wd-switch" id="fbGross" role="switch" aria-checked="false" aria-labelledby="fbGrossL"></button></div>
+    <p class="wd-note">Jeden Morgen erwartet dich ein neues Tageswunder – zwei Jahre lang ohne Wiederholung, und Karten, die du schon kennst, werden übersprungen. Wische über die Karte, um eine Woche zurückzublättern. Dazu jeden Tag ein frisch berechnetes Rechenwunder.</p>
   </section>
 
   <!-- ===================== KILOMETER ===================== -->
@@ -488,6 +617,7 @@
       <p class="wd-past" id="llPast"></p>
       <div class="card"><h2>Als Nächstes</h2><div id="llList"></div></div>
       <div class="card" id="llFam" hidden><h2>Anlässe in deiner Familie</h2><div id="llFamList"></div></div>
+      <div class="card" id="llCal"></div>
       <div class="card"><h2>Deine Lebensuhr</h2><div id="llLive"></div></div>
       <div class="card"><h2>Gerade jetzt auf der Welt</h2><p class="muted small" style="margin:-4px 0 4px">seit heute Mitternacht</p><div id="llWorld"></div></div>
       <p class="wd-note">Herzschläge, Atemzüge und weltweite Zahlen sind Schätzungen aus Durchschnittswerten; Vollmonde und Planetenjahre sind astronomisch berechnet.</p>
@@ -506,6 +636,7 @@
       <input type="range" min="0" max="359" step="1" id="dkSlider" aria-label="Richtung in Grad">
       <div class="chip-row" style="margin-top:10px"><button type="button" class="chip" data-dir="0">Norden</button><button type="button" class="chip" data-dir="90">Osten</button><button type="button" class="chip" data-dir="180">Süden</button><button type="button" class="chip" data-dir="270">Westen</button></div>
       <button type="button" class="cta primary" id="dkAim"><svg class="wzi"><use href="#wzi-compass"></use></svg><span>Mit dem Handy zielen</span></button>
+      <button type="button" class="cta" id="dkCam" style="margin-top:8px"><svg class="wzi"><use href="#wzi-camera"></use></svg><span>Kamera-Modus: Was liegt in dieser Richtung?</span></button>
     </div>
     <div class="wd-stats" id="dkSum"></div>
     <div class="card"><h2>Was genau vor dir liegt</h2><div id="dkList"></div></div>
@@ -519,12 +650,13 @@
   <section class="screen" id="screen-zeit">
     <div class="wd-hero" id="aeHero"></div>
     <div class="card">
-      <h2>Deine Strecke</h2>
-      <div class="chip-row"><button type="button" class="chip" data-scale="46">46 km · über Wochen</button><button type="button" class="chip" data-scale="4.6">4,6 km · an einem Nachmittag</button></div>
+      <h2>Deine Zeitreise</h2>
+      <div class="wd-trips" id="aeTrips" role="group" aria-label="Zeitreise wählen"></div>
+      <div class="chip-row" id="aeScales"></div>
       <button type="button" class="cta primary" id="aeGo"><svg class="wzi"><use href="#wzi-walk"></use></svg><span>Etappe starten</span></button>
-      <p class="muted small" id="aeState" style="margin:8px 0 0">Jeder Spaziergang bringt dich weiter durch die Erdgeschichte. Gezählt werden nur Schritte zu Fuß, solange die App geöffnet ist.</p>
+      <p class="muted small" id="aeState" style="margin:8px 0 0">Jeder Spaziergang bringt dich weiter durch die Zeit. Gezählt werden nur Schritte zu Fuß, solange die App geöffnet ist.</p>
     </div>
-    <div class="card"><h2>Stationen der Erdgeschichte</h2><div id="aeList"></div><button type="button" class="cta slim" id="aeReset" style="margin-top:10px"><svg class="wzi"><use href="#wzi-reset"></use></svg>Von vorn beginnen</button></div>
+    <div class="card"><h2 id="aeListH">Stationen der Erdgeschichte</h2><div id="aeList"></div><button type="button" class="cta slim" id="aeReset" style="margin-top:10px"><svg class="wzi"><use href="#wzi-reset"></use></svg>Von vorn beginnen</button></div>
     <div class="card"><h2>Die letzten Meter</h2><p class="muted small" style="margin:-4px 0 4px">so kurz ist die Menschheit auf deiner Strecke</p><div id="aeScale"></div></div>
     <div class="card" id="aeMitte"></div>
     <div class="card"><h2>Überraschend gleichzeitig</h2><div id="aeGleich"></div></div>
@@ -539,6 +671,8 @@
 <script src="./wz-onboarding.js"></script>
 <script src="./sternewahr-astro.js"></script>
 <script src="./wd-data.js"></script>
+<script src="./wd-share.js"></script>
+<script src="./wd-cam.js"></script>
 <script src="./wd-app.js"></script>
 </body>
 </html>

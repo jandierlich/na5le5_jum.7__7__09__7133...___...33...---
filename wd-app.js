@@ -35,7 +35,8 @@
   function dShort(d) { return d.getDate() + ". " + MO[d.getMonth()] + " " + d.getFullYear(); }
   function midnight(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
   function daysBetween(a, b) { return Math.round((midnight(b) - midnight(a)) / DAY); }
-  function toast(t, ms) { if (window.wzToast) wzToast(t, ms); }
+  var splashUntil = 0; // Hinweise erst nach dem Startbildschirm zeigen
+  function toast(t, ms) { var w = splashUntil - Date.now(); if (!window.wzToast) return; if (w > 0) setTimeout(function () { wzToast(t, ms); }, w); else wzToast(t, ms); }
   function wrap360(a) { return ((a % 360) + 360) % 360; }
   function wrap180(a) { return ((a + 540) % 360) - 180; }
   function ymd(d) { return D.ymd(d); }
@@ -75,7 +76,18 @@
     if (id === "zeit") renderZeit();
     if (id === "tages") renderTages();
   }
-  if ($("wdSplashD")) $("wdSplashD").textContent = dLong(new Date());
+  if ($("wdSplashD")) {
+    try { if (sessionStorage.getItem("wunderwahr_splash") !== "1") splashUntil = Date.now() + 1700; } catch (e) { }
+    $("wdSplashD").textContent = dLong(new Date());
+    try { // kleine Vorschau: Thema des heutigen Wunders, Serie, Sternstunde – ohne den Inhalt zu verraten
+      var spW = D.wonderFor(new Date()), spE = load("wunderwahr_entdeckt", {}), spS = load("wunderwahr_serie", {}), spT = [];
+      spT.push('<i>' + icon("tages") + 'Heute: ' + esc(spW.k) + '</i>');
+      var spN = spS.last === ymd(new Date()) ? spS.n : spS.last === ymd(addDays(new Date(), -1)) ? (spS.n || 0) + 1 : 1;
+      if (spN >= 2) spT.push('<i>' + icon("flame") + spN + ' Tage in Folge</i>');
+      if ((D.SELTEN || []).indexOf(spW.id) >= 0 && !spE[spW.id]) spT.push('<i class="gold">' + icon("starfill") + 'Heute wartet etwas Seltenes</i>');
+      $("wdSplashT").innerHTML = spT.join("");
+    } catch (e) { }
+  }
   tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
 
   /* =========================================================
@@ -1005,7 +1017,10 @@
     var sp = $("wdSplash"); if (!sp) return;
     var shown = false; try { shown = sessionStorage.getItem("wunderwahr_splash") === "1"; sessionStorage.setItem("wunderwahr_splash", "1"); } catch (e) { }
     if (shown) { sp.parentNode.removeChild(sp); return; }
-    setTimeout(function () { sp.classList.add("go"); setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 500); }, 750);
+    var gone = false;
+    function hide() { if (gone) return; gone = true; sp.classList.add("go"); setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 500); }
+    sp.addEventListener("pointerdown", hide);
+    setTimeout(hide, 1100);
   })();
   // Tageswechsel: neue Karte, wenn die App über Mitternacht offen ist
   var lastDay = new Date().getDate();

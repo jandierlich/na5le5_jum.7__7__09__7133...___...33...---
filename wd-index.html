@@ -356,7 +356,12 @@
   .wd-live-row:last-child{border-bottom:none}
   .wd-live-row span{font-size:14px;font-weight:600}
   .wd-live-row small{display:block;font-size:12px;font-weight:400;color:var(--sub-onbg)}
-  .wd-live-row b{font:650 15px var(--mono);font-variant-numeric:tabular-nums;color:var(--accent);text-align:right;white-space:nowrap}
+  .wd-live-row{align-items:center}
+  .wd-live-row > span{flex:1;min-width:0}
+  .wd-live-row b{display:flex;flex-direction:column;align-items:flex-end;text-align:right;flex:0 0 auto;max-width:58%}
+  .wd-live-row b em{font:750 17px/1.2 ui-rounded,-apple-system,sans-serif;font-style:normal;color:var(--accent);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+  .wd-live-row b em i{font-style:normal;font-weight:600;font-size:13px;color:var(--sub-onbg)}
+  .wd-live-row b small{display:block;margin-top:2px;font:500 11.5px var(--mono);font-variant-numeric:tabular-nums;color:var(--sub-onbg);letter-spacing:.01em}
   .wd-people{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
   .wd-globe-wrap{position:relative;border-radius:22px;overflow:hidden;padding:14px;margin:0 0 14px;background:radial-gradient(90% 70% at 50% 40%, #241B4E 0%, #0E0B20 100%)}
   .wd-globe-wrap canvas{display:block;width:100%;aspect-ratio:1/1;touch-action:none}
@@ -466,7 +471,7 @@
   html.wd-gross .wd-card-x{font-size:18px}
   html.wd-gross .wd-more p,html.wd-gross .wd-quiz-q,html.wd-gross .wd-sam p,html.wd-gross .sn-fact span{font-size:16.5px}
   html.wd-gross .wd-sam summary b{font-size:16px}
-  /* Bogen (eigenes Blatt für Rückblick, Abzeichen, Kalender) */
+  /* Bogen (eigenes Blatt für Statistik, Details, Zeitkapsel) */
   .wd-sheet-bg{position:fixed;inset:0;z-index:2000;background:rgba(10,6,24,.55);display:flex;align-items:flex-end;justify-content:center;animation:wdFade .2s ease}
   .wd-sheet{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--card);color:var(--text);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:wdUp .28s cubic-bezier(.2,.8,.2,1)}
   .wd-sheet h2{margin:0 0 6px;font-size:20px}
@@ -535,6 +540,56 @@
     #wdSplash .wd-sp-shoot{display:none}
     .wd-swipe .wd-hero{transition:none}
   }
+  /* ---------- FINAL-97: Erweiterungen ---------- */
+  .wd-sub{font-size:13px;font-weight:750;letter-spacing:.02em;margin:16px 0 4px;color:var(--text)}
+  .wd-kv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .wd-kv div{background:var(--soft);border-radius:12px;padding:9px 10px;min-width:0}
+  .wd-kv span{display:block;font-size:11.5px;color:var(--sub-onbg);line-height:1.25}
+  .wd-kv b{display:block;font:700 15px/1.3 ui-rounded,-apple-system,sans-serif;font-variant-numeric:tabular-nums;color:var(--text);word-break:break-word}
+  .wd-est{margin:6px 0 12px}
+  .wd-est output{display:block;text-align:center;font:800 30px ui-rounded,-apple-system,sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;margin-bottom:6px}
+  .wd-est input{width:100%}
+  .wd-est-t{display:flex;justify-content:space-between;font-size:11px;color:var(--sub-onbg);margin-top:4px}
+  .wd-hbar{display:grid;grid-template-columns:118px 1fr 28px;align-items:center;gap:8px;font-size:12.5px;margin:5px 0}
+  .wd-hbar i{display:block;height:8px;border-radius:4px;background:var(--soft);overflow:hidden}
+  .wd-hbar i b{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .wd-hbar em{font-style:normal;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .wd-weeks{display:block;width:100%;margin-top:12px;cursor:pointer}
+  .wd-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--sub-onbg);margin-top:8px}
+  .wd-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .wd-legend .a{background:var(--accent)} .wd-legend .g{background:var(--wd-gold)} .wd-legend .m{background:var(--wd-gold);opacity:.55} .wd-legend .f{background:var(--border);opacity:.7}
+  .wd-merc{display:block;width:100%;margin:10px 0;border-radius:12px;touch-action:none;cursor:crosshair}
+  .wd-kapsel-b{display:flex;align-items:center;gap:12px}
+  .wd-kapsel-b > .wzi{width:26px;height:26px;color:var(--wd-gold);flex:0 0 26px}
+  .wd-kapsel-b b{display:block;font-size:15px}
+  .wd-kapsel-b span{font-size:12.5px;color:var(--sub-onbg)}
+  .wd-kapsel-b .wd-mini{margin-left:auto}
+  .wd-letter{white-space:normal;font-size:15.5px;line-height:1.6;padding:14px 16px;border-radius:14px;background:var(--soft);border-left:3px solid var(--wd-gold)}
+  .wd-seal{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;margin:0 0 10px;background:radial-gradient(circle at 35% 30%,#FFE8B5,#C98A1F);color:#3A2400}
+  .wd-seal .wzi{width:24px;height:24px}
+  .wd-kapsel-open.anim .wd-seal{animation:wdSeal .9s ease both}
+  .wd-kapsel-open.anim h2,.wd-kapsel-open.anim p,.wd-kapsel-open.anim .wd-letter{animation:wdRise .6s .5s both}
+  @keyframes wdSeal{0%{transform:scale(1.4) rotate(-20deg);opacity:0}60%{transform:scale(1) rotate(8deg);opacity:1}100%{transform:none}}
+  .sn-row .r .wd-mini{min-height:30px;padding:0 9px;margin-left:4px}
+  .wd-kino{position:fixed;inset:0;z-index:3000;color:#fff;overflow:hidden;background:radial-gradient(90% 60% at 80% 0%,rgba(124,92,255,.35),transparent 60%),linear-gradient(160deg,#1E1442,#0B0820)}
+  .wd-kino-stars{position:absolute;inset:-20%;background:radial-gradient(1.3px 1.3px at 12% 18%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 28% 72%,#fff 50%,transparent 52%),radial-gradient(1.2px 1.2px at 46% 10%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 64% 84%,#fff 50%,transparent 52%),radial-gradient(1.5px 1.5px at 82% 26%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 90% 62%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 8% 52%,#fff 50%,transparent 52%),radial-gradient(1.3px 1.3px at 56% 40%,#fff 50%,transparent 52%);opacity:.6;animation:wdDrift 60s linear infinite}
+  @keyframes wdDrift{from{transform:translate(0,0)}to{transform:translate(-8%,6%)}}
+  .wd-kino-card{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%);max-width:640px;margin:0 auto}
+  .wd-kino-card.in{animation:wdKin .9s ease both}
+  @keyframes wdKin{from{opacity:0;transform:translateY(calc(-50% + 14px))}to{opacity:1;transform:translateY(-50%)}}
+  .wd-kino-card h2{font:800 30px/1.15 ui-rounded,-apple-system,sans-serif;letter-spacing:-.02em;margin:0 0 14px}
+  .wd-kino-card .x{font-size:19px;line-height:1.5;margin:0 0 14px;color:rgba(255,255,255,.95)}
+  .wd-kino-card .w{font-size:15px;line-height:1.6;color:rgba(255,255,255,.72);margin:0}
+  .wd-kino-bar{position:absolute;left:24px;right:24px;top:calc(18px + env(safe-area-inset-top));height:3px;border-radius:2px;background:rgba(255,255,255,.18)}
+  .wd-kino-bar i{display:block;height:100%;width:0;border-radius:2px;background:#FFD27A}
+  .wd-kino-ctl{position:absolute;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:12px}
+  .wd-kino-ctl button{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font:700 15px -apple-system,sans-serif;display:grid;place-items:center;cursor:pointer}
+  .wd-zoom canvas{position:absolute;inset:0;width:100%;height:100%}
+  .wd-zoom-t{position:absolute;left:24px;right:24px;bottom:calc(96px + env(safe-area-inset-bottom));max-width:600px;margin:0 auto}
+  .wd-zoom-t h2{font:800 26px ui-rounded,-apple-system,sans-serif;margin:0 0 6px}
+  .wd-zoom-t p{margin:0 0 6px;font-size:15px;line-height:1.5;color:rgba(255,255,255,.92)}
+  .wd-zoom-t p.w{font-size:13.5px;color:rgba(255,255,255,.7)}
+  @media (prefers-reduced-motion: reduce){.wd-kino-stars,.wd-kino-card.in,.wd-kapsel-open.anim *{animation:none!important}}
   .wd-hero :focus-visible,.card :focus-visible,.wd-sheet :focus-visible{outline:3px solid var(--wd-gold);outline-offset:2px}
 </style>
 </head>
@@ -605,13 +660,14 @@
 
   <!-- ===================== TAGES ===================== -->
   <section class="screen active" id="screen-tages" role="tabpanel" aria-label="TagesWahr">
-    <div class="wd-dayrow"><p class="wd-date" id="fbDate"></p><span class="wd-streak" id="fbStreak" hidden></span></div>
+    <div class="wd-dayrow"><p class="wd-date" id="fbDate"></p></div>
+    <div class="card" id="fbKapsel" hidden></div>
     <div class="wd-swipe" id="fbSwipe"><div class="wd-hero" id="fbCard" aria-live="polite"></div></div>
     <div class="wd-hero wd-calc" id="fbCalc" aria-live="polite"></div>
     <div class="card" id="fbQuiz" hidden></div>
+    <div class="card" id="fbSchaetz" hidden></div>
     <div class="card" id="fbHeute" hidden></div>
     <div class="card" id="fbAlbum"></div>
-    <div class="card" id="fbBadges"></div>
     <div class="card wd-yearcard" id="fbYear"></div>
     <div class="wd-setrow"><label for="fbGross" id="fbGrossL">Große Schrift</label><button type="button" class="wd-switch" id="fbGross" role="switch" aria-checked="false" aria-labelledby="fbGrossL"></button></div>
     <p class="wd-note">Jeden Morgen erwartet dich ein neues Tageswunder – zwei Jahre lang ohne Wiederholung, und Karten, die du schon kennst, werden übersprungen. Wische über die Karte, um eine Woche zurückzublättern. Dazu jeden Tag ein frisch berechnetes Rechenwunder.</p>
@@ -637,10 +693,13 @@
       <div class="card"><h2>Als Nächstes</h2><div id="llList"></div></div>
       <div class="card" id="llFam" hidden><h2>Anlässe in deiner Familie</h2><div id="llFamList"></div></div>
       <div class="card" id="llCal"></div>
+      <div class="card" id="llWochen" hidden></div>
+      <div class="card" id="llGeburt" hidden></div>
       <div class="card"><h2>Deine Lebensuhr</h2><div id="llLive"></div></div>
       <div class="card"><h2>Gerade jetzt auf der Welt</h2><p class="muted small" style="margin:-4px 0 4px">seit heute Mitternacht</p><div id="llWorld"></div></div>
       <p class="wd-note">Herzschläge, Atemzüge und weltweite Zahlen sind Schätzungen aus Durchschnittswerten; Vollmonde und Planetenjahre sind astronomisch berechnet.</p>
     </div>
+    <div class="card" id="llKapsel"></div>
   </section>
 
   <!-- ===================== WEITBLICK ===================== -->
@@ -661,6 +720,8 @@
     <div class="card"><h2>Was genau vor dir liegt</h2><div id="dkList"></div></div>
     <div class="card"><h2>Wie lange einmal herum?</h2><div id="dkTimes"></div></div>
     <div class="wd-hero" id="dkSun"></div>
+    <div class="card" id="dkGroesse"></div>
+    <div class="card" id="dkAdresse"></div>
     <div class="card"><h2>Hier geht gerade die Sonne auf</h2><div id="dkRise"></div><h2 style="margin-top:14px">… und hier unter</h2><div id="dkSet"></div></div>
     <p class="wd-note">Die Linie folgt einem Großkreis – der kürzesten Linie auf der Kugel. Ländergrenzen: Natural Earth (gemeinfrei); Meeresnamen grob zugeordnet.</p>
   </section>

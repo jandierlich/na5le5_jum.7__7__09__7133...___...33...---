@@ -44,6 +44,10 @@
   function open(opts) {
     if (st) return;
     var loc = opts.loc, targets = (opts.ziele || []).map(function (z) { return { n: z[0], az: bearing(loc.lat, loc.lon, z[1], z[2]), km: dist(loc.lat, loc.lon, z[1], z[2]) }; }).filter(function (t) { return t.km > 30; });
+    (function levels() { // feste Zeilen: Beschriftungen springen nicht mehr, wenn sich das Handy bewegt
+      var sorted = targets.slice().sort(function (a, b) { return a.az - b.az; }), gap = 17, rows = [];
+      sorted.forEach(function (t) { var lv = 0; while (rows[lv] != null && wrap180(t.az - rows[lv]) < gap) lv++; rows[lv] = t.az; t.lv = Math.min(lv, 5); });
+    })();
     var ov = document.createElement("div"); ov.className = "wd-cam"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Kamera-Modus");
     ov.innerHTML = '<video playsinline muted autoplay></video><canvas aria-hidden="true"></canvas>' +
       '<div class="wd-cam-top"><b id="wdCamHead">–</b><span id="wdCamHint">Halte das Handy aufrecht vor dich.</span></div>' +
@@ -61,8 +65,19 @@
       var h = null;
       if (e.webkitCompassHeading != null && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading;
       else if (e.alpha != null && (e.absolute || e.type === "deviceorientationabsolute")) h = rearHeading(e.alpha, e.beta || 0, e.gamma || 0);
-      if (h != null) st.heading = st.heading == null ? h : wrap360(st.heading + wrap180(h - st.heading) * 0.25);
-      if (e.beta != null) st.pitch = st.pitch + ((e.beta - 90) - st.pitch) * 0.25;
+      if (h != null) st.raw = h;
+      if (e.beta != null) st.rawPitch = Math.max(-80, Math.min(80, e.beta - 90));
+    }
+    /* Glättung pro Bild: ruhig bei kleinen Wacklern, schnell bei echten Drehungen; einzelne Ausreißer werden verworfen */
+    function smooth(dt) {
+      if (st.raw != null) {
+        if (st.heading == null) st.heading = st.raw;
+        var d = wrap180(st.raw - st.heading);
+        if (Math.abs(d) > 100) { st.spike = (st.spike || 0) + 1; if (st.spike < 8) d = 0; } else st.spike = 0;
+        var k = 1 - Math.exp(-dt / (Math.abs(d) > 20 ? 0.08 : 0.28));
+        st.heading = wrap360(st.heading + d * k);
+      }
+      if (st.rawPitch != null) { var kp = 1 - Math.exp(-dt / 0.22); st.pitch += (st.rawPitch - st.pitch) * kp; }
     }
     st.onOri = onOri;
     window.addEventListener("deviceorientationabsolute", onOri); window.addEventListener("deviceorientation", onOri);
@@ -72,8 +87,10 @@
         st.stream = s; video.srcObject = s; var p = video.play(); if (p && p.catch) p.catch(function () { });
       }).catch(function () { ov.classList.add("nocam"); ov.querySelector("#wdCamHint").textContent = "Ohne Kamera: Die Richtungen werden auf dunklem Grund gezeigt."; });
     } else ov.classList.add("nocam");
-    function draw() {
+    var lastT = performance.now();
+    function draw(now) {
       if (!st) return;
+      now = now || performance.now(); smooth(Math.min(0.1, (now - lastT) / 1000)); lastT = now;
       var w = ov.clientWidth, h = ov.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
       if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
@@ -94,18 +111,15 @@
         c.fillStyle = r[0] === "N" ? "#FFB4A8" : "rgba(255,255,255,.9)"; c.fillText(r[0], p.x, hy + 20);
       });
       var items = [];
-      if (st.filter !== "himmel") targets.forEach(function (t) { items.push({ n: t.n, sub: fmt(t.km) + " km", az: t.az, alt: 0, kind: "ort" }); });
+      if (st.filter !== "himmel") targets.forEach(function (t) { items.push({ n: t.n, sub: fmt(t.km) + " km", az: t.az, alt: 0, kind: "ort", lv: t.lv }); });
       if (st.filter !== "orte") st.sky.forEach(function (s) { items.push({ n: s.n, sub: s.alt < -1 ? "unter dem Horizont" : fmt(s.alt) + "° hoch", az: s.az, alt: s.alt, kind: s.sky }); });
       // Orte am Horizont übereinanderstapeln, damit nichts überlappt
-      var placed = [];
       items.sort(function (a, b) { return (a.kind === "ort" ? 1 : 0) - (b.kind === "ort" ? 1 : 0) || a.az - b.az; });
       var off = [];
       items.forEach(function (it) {
         var p = px(it.az, it.alt);
         if (Math.abs(p.d) > hfov / 2 + 2) { if (it.kind !== "ort") off.push({ it: it, d: p.d }); return; }
-        var y = it.kind === "ort" ? hy - 34 : p.y;
-        if (it.kind === "ort") { for (var k = 0; k < placed.length; k++) { var q = placed[k]; if (Math.abs(q.x - p.x) < 112 && Math.abs(q.y - y) < 40) { y = q.y - 42; k = -1; } } }
-        placed.push({ x: p.x, y: y });
+        var y = it.kind === "ort" ? hy - 34 - (it.lv || 0) * 42 : p.y;
         var col = it.kind === "sun" ? "#FFD27A" : it.kind === "moon" ? "#E8E2FF" : it.kind === "planet" ? "#FFC6A0" : "#C9B8FF";
         if (it.kind === "ort") { c.strokeStyle = "rgba(255,255,255,.55)"; c.lineWidth = 1; c.beginPath(); c.moveTo(p.x, y + 14); c.lineTo(p.x, hy); c.stroke(); }
         c.fillStyle = col; c.beginPath(); c.arc(p.x, it.kind === "ort" ? hy : y, it.kind === "sun" ? 9 : 5, 0, 7); c.fill();

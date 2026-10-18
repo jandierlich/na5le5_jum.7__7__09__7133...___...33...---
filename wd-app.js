@@ -77,14 +77,11 @@
     if (id === "tages") renderTages();
   }
   if ($("wdSplashD")) {
-    try { if (sessionStorage.getItem("wunderwahr_splash") !== "1") splashUntil = Date.now() + 1700; } catch (e) { }
+    try { if (sessionStorage.getItem("wunderwahr_splash") !== "1") splashUntil = Date.now() + 3600; } catch (e) { }
     $("wdSplashD").textContent = dLong(new Date());
-    try { // kleine Vorschau: Thema des heutigen Wunders, Serie, Sternstunde – ohne den Inhalt zu verraten
+    try { // Vorschau: Thema des heutigen Wunders, ohne den Inhalt zu verraten
       var spW = D.wonderFor(new Date()), spE = load("wunderwahr_entdeckt", {}), spS = load("wunderwahr_serie", {}), spT = [];
       spT.push('<i>' + icon("tages") + 'Heute: ' + esc(spW.k) + '</i>');
-      var spN = spS.last === ymd(new Date()) ? spS.n : spS.last === ymd(addDays(new Date(), -1)) ? (spS.n || 0) + 1 : 1;
-      if (spN >= 2) spT.push('<i>' + icon("flame") + spN + ' Tage in Folge</i>');
-      if ((D.SELTEN || []).indexOf(spW.id) >= 0 && !spE[spW.id]) spT.push('<i class="gold">' + icon("starfill") + 'Heute wartet etwas Seltenes</i>');
       $("wdSplashT").innerHTML = spT.join("");
     } catch (e) { }
   }
@@ -110,25 +107,14 @@
     if (ch) save("wunderwahr_entdeckt", e);
   })();
 
-  /* Serie: an wie vielen Tagen hintereinander TagesWahr geöffnet wurde */
-  function serie() {
-    var s = load("wunderwahr_serie", { last: null, n: 0, best: 0 }), today = ymd(new Date());
-    if (s.last !== today) {
-      s.n = s.last === ymd(addDays(new Date(), -1)) ? s.n + 1 : 1;
-      s.last = today; s.best = Math.max(s.best || 0, s.n); save("wunderwahr_serie", s);
-    }
-    return s;
-  }
-
   function renderCard(day) {
     var w = wonderFor(day), saved = sammlung().indexOf(w.id) >= 0, rare = !!SELTEN[w.id];
     var neu = discover(w.id, day);
-    if (neu && rare && offset === 0) setTimeout(function () { toast("Eine Sternstunde! Diese Karte ist besonders selten."); buzz(30); }, 600);
     var card = $("fbCard");
     card.classList.toggle("gold", rare);
     card.setAttribute("aria-label", "Tageswunder: " + w.t);
     card.innerHTML =
-      (rare ? '<div class="wd-rare">' + icon("starfill") + 'Sternstunde</div>' : '') +
+      (rare ? '<div class="wd-rare">' + icon("starfill") + 'Seltene Karte</div>' : '') +
       '<div class="wd-over">' + esc(w.k) + '</div>' +
       '<h2 class="wd-card-t">' + esc(w.t) + '</h2>' +
       '<p class="wd-card-x">' + esc(w.x) + '</p>' +
@@ -190,11 +176,7 @@
 
   function renderTages() {
     var day = new Date(Date.now() + offset * DAY);
-    var s = serie();
     $("fbDate").textContent = offset === 0 ? "Heute · " + dLong(day) : dLong(day);
-    $("fbStreak").hidden = s.n < 2;
-    $("fbStreak").innerHTML = icon("flame") + s.n + " Tage in Folge";
-    $("fbStreak").setAttribute("aria-label", "Serie: " + s.n + " Tage in Folge");
     renderCard(day);
     renderCalc(day);
     // Heute vor … Jahren
@@ -208,8 +190,9 @@
       }).join("");
     }
     renderQuiz();
+    renderSchaetz();
+    renderKapselBanner();
     renderAlbum();
-    renderBadges();
     renderYearCard();
   }
 
@@ -339,123 +322,41 @@
         qa[ymd(today)] = { a: a, ok: ok }; var ks = Object.keys(qa).sort(); if (ks.length > 800) delete qa[ks[0]];
         save("wunderwahr_quiz", qa);
         var s = stats(); s.quizAll = (s.quizAll || 0) + 1; if (ok) s.quizOk = (s.quizOk || 0) + 1; save("wunderwahr_stats", s);
-        buzz(ok ? 15 : [10, 60, 10]); renderQuiz(); checkBadges(); renderBadges();
+        buzz(ok ? 15 : [10, 60, 10]); renderQuiz();
       };
     });
   }
 
-  /* ---------- Sammelalbum ---------- */
-  var albumKat = null, albumFilter = "alle", albumMax = 20;
+  /* ---------- Wunderalbum (schlicht: Liste aller entdeckten Karten) ---------- */
+  var albumFilter = "alle", albumMax = 15;
   function renderAlbum() {
     var e = entdeckt(), sam = sammlung(), ids = Object.keys(e), total = D.WUNDER.length;
-    var rareN = ids.filter(function (id) { return SELTEN[id]; }).length;
-    var html = '<h2 class="wd-head">Dein Wunderalbum <small>' + fmt(ids.length) + ' von ' + fmt(total) + '</small></h2>' +
-      '<div class="wd-bigbar" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + ids.length + '" aria-label="Entdeckte Wunder"><i style="width:' + (ids.length / total * 100).toFixed(1) + '%"></i></div>' +
-      '<div class="wd-cats">' + KATS.map(function (k) {
-        var all = D.WUNDER.filter(function (w) { return w.k === k; }), got = all.filter(function (w) { return e[w.id]; }).length;
-        return '<button type="button" class="wd-cat' + (albumKat === k ? ' on' : '') + '" data-k="' + esc(k) + '" aria-pressed="' + (albumKat === k) + '" aria-label="' + esc(k) + ': ' + got + ' von ' + all.length + '"><span class="wd-ring" style="--p:' + Math.round(got / all.length * 100) + '"><b>' + got + '</b></span><span>' + esc(k) + '</span></button>';
-      }).join("") + '</div>' +
-      '<div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"], ["selten", "Sternstunden (" + rareN + "/" + (D.SELTEN || []).length + ")"]].map(function (f) {
+    var html = '<h2 class="wd-head">Wunderalbum <small>' + fmt(ids.length) + ' von ' + fmt(total) + ' entdeckt</small></h2>' +
+      '<div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"]].map(function (f) {
         return '<button type="button" class="chip' + (albumFilter === f[0] ? ' active' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>';
       }).join("") + '</div>';
     var list = ids.map(function (id) { return D.byId(id); }).filter(Boolean)
-      .filter(function (w) { return (!albumKat || w.k === albumKat) && (albumFilter !== "merk" || sam.indexOf(w.id) >= 0) && (albumFilter !== "selten" || SELTEN[w.id]); })
+      .filter(function (w) { return albumFilter !== "merk" || sam.indexOf(w.id) >= 0; })
       .sort(function (a, b) { return (e[b.id] || "").localeCompare(e[a.id] || ""); });
     html += '<div class="wd-albumlist">' + (list.length ? list.slice(0, albumMax).map(function (x) {
-      return '<details class="wd-sam' + (SELTEN[x.id] ? ' gold' : '') + '"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
+      return '<details class="wd-sam"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
         '<div class="wd-sam-a"><button type="button" class="wd-mini" data-share="' + x.id + '">' + icon("share") + 'Teilen</button><button type="button" class="wd-mini" data-keep="' + x.id + '">' + icon(sam.indexOf(x.id) >= 0 ? "starfill" : "star") + (sam.indexOf(x.id) >= 0 ? "Gemerkt" : "Merken") + '</button></div></details>';
-    }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere ' + fmt(Math.min(20, list.length - albumMax)) + ' zeigen</button>' : '')
-      : '<p class="muted small" style="margin:6px 0 0">' + (albumFilter === "merk" ? "Noch nichts gemerkt. Tippe bei einer Karte auf „Merken“." : albumFilter === "selten" ? "Noch keine Sternstunde – sie tauchen zufällig zwischen den anderen Karten auf." : "Hier sammeln sich alle Wunder, die du entdeckst.") + '</p>') + '</div>';
+    }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere anzeigen</button>' : '')
+      : '<p class="muted small" style="margin:6px 0 0">' + (albumFilter === "merk" ? "Noch keine Karte gemerkt." : "Hier erscheinen alle Wunder, die du entdeckt hast.") + '</p>') + '</div>' +
+      (ids.length >= 3 ? '<button type="button" class="cta slim" id="fbKino" style="margin-top:12px">' + icon("eye") + 'Vollbild-Präsentation</button>' : '');
     var el = $("fbAlbum"); el.innerHTML = html;
-    el.querySelectorAll("[data-k]").forEach(function (b) { b.onclick = function () { var k = b.getAttribute("data-k"); albumKat = albumKat === k ? null : k; albumMax = 20; renderAlbum(); }; });
-    el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 20; renderAlbum(); }; });
+    el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 15; renderAlbum(); }; });
     el.querySelectorAll("[data-share]").forEach(function (b) { b.onclick = function () { shareWonder(D.byId(b.getAttribute("data-share")), null); }; });
     el.querySelectorAll("[data-keep]").forEach(function (b) {
       b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("wunderwahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
     });
-    if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 20; renderAlbum(); };
+    if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 15; renderAlbum(); };
+    if ($("fbKino")) $("fbKino").onclick = function () { openKino(list.length >= 3 ? list : ids.map(function (id) { return D.byId(id); }).filter(Boolean)); };
   }
 
   /* ---------- Abzeichen ---------- */
   function reisen() { return load("wunderwahr_reisen", null) || migrateReisen(); }
-  function badgeState() {
-    var e = entdeckt(), ids = Object.keys(e), s = stats(), se = load("wunderwahr_serie", { best: 0 }), R = reisen();
-    var kats = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kats[w.k] = 1; });
-    var walked = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
-    var fertig = Object.keys(R.fertig || {}).length;
-    return { n: ids.length, best: se.best || 0, quiz: s.quizOk || 0, rare: ids.filter(function (id) { return SELTEN[id]; }).length, kats: Object.keys(kats).length, shared: s.shared || 0, persons: persons().length, cam: s.cam || 0, fertig: fertig, km: walked };
-  }
-  var BADGES = [
-    ["neugier", "Neugierig", "10 Wunder entdecken", "tages", function (b) { return [b.n, 10]; }],
-    ["staunend", "Staunend", "50 Wunder entdecken", "tages", function (b) { return [b.n, 50]; }],
-    ["kenner", "Wunderkenner", "100 Wunder entdecken", "tages", function (b) { return [b.n, 100]; }],
-    ["wunderjahr", "Ein Wunderjahr", "365 Wunder entdecken", "medal", function (b) { return [b.n, 365]; }],
-    ["allesgesehen", "Alles gesehen", "Alle 730 Wunder entdecken", "eye", function (b) { return [b.n, 730]; }],
-    ["woche", "Eine Woche dabei", "7 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 7]; }],
-    ["monat", "Ein Monat Staunen", "30 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 30]; }],
-    ["hundert", "Hundert Tage", "100 Tage in Folge vorbeischauen", "flame", function (b) { return [b.best, 100]; }],
-    ["gedaechtnis", "Gutes Gedächtnis", "10 Quizfragen richtig beantworten", "quiz", function (b) { return [b.quiz, 10]; }],
-    ["wundergedaechtnis", "Wundergedächtnis", "50 Quizfragen richtig beantworten", "quiz", function (b) { return [b.quiz, 50]; }],
-    ["sternstunde", "Sternstunde", "Eine seltene Sternstunden-Karte finden", "starfill", function (b) { return [b.rare, 1]; }],
-    ["sternensammler", "Sternensammler", "10 Sternstunden-Karten finden", "starfill", function (b) { return [b.rare, 10]; }],
-    ["allrounder", "Allrounder", "In allen " + KATS.length + " Themen mindestens ein Wunder entdecken", "globe", function (b) { return [b.kats, KATS.length]; }],
-    ["erzaehlt", "Weitererzählt", "Ein Wunder oder eine Urkunde teilen", "share", function (b) { return [b.shared, 1]; }],
-    ["vermesser", "Lebensvermesser", "In KilometerWahr ein Geburtsdatum eintragen", "kilometer", function (b) { return [b.persons, 1]; }],
-    ["weitblick", "Weitblick", "Den Kamera-Modus in WeitblickWahr ausprobieren", "camera", function (b) { return [b.cam, 1]; }],
-    ["zehnkm", "Zeitwanderer", "10 km auf Zeitreisen laufen", "walk", function (b) { return [b.km, 10]; }],
-    ["zeitreisend", "Zeitreisend", "Eine Zeitreise bis in die Gegenwart laufen", "zeit", function (b) { return [b.fertig, 1]; }],
-    ["allezeiten", "Durch alle Zeiten", "Alle drei Zeitreisen abschließen", "universe", function (b) { return [b.fertig, 3]; }]
-  ];
-  function checkBadges() {
-    var got = load("wunderwahr_abzeichen", {}), b = badgeState(), neu = [];
-    BADGES.forEach(function (x) { var p = x[4](b); if (p[0] >= p[1] && !got[x[0]]) { got[x[0]] = ymd(new Date()); neu.push(x[1]); } });
-    if (neu.length) { save("wunderwahr_abzeichen", got); setTimeout(function () { toast("Neues Abzeichen: " + neu.join(", "), 2600); buzz([20, 40, 20]); }, 300); if ($("fbBadges")) renderBadges(); }
-  }
-  function renderBadges() {
-    var got = load("wunderwahr_abzeichen", {}), n = Object.keys(got).length;
-    $("fbBadges").innerHTML = '<h2 class="wd-head">Abzeichen <small>' + n + ' von ' + BADGES.length + '</small></h2><div class="wd-badges">' + BADGES.map(function (x) {
-      var on = !!got[x[0]];
-      return '<button type="button" class="wd-badge' + (on ? ' got' : '') + '" data-b="' + x[0] + '" aria-label="' + esc(x[1]) + (on ? ' – erreicht' : ' – noch offen') + '"><span class="wd-medal">' + icon(x[3]) + '</span><span>' + esc(x[1]) + '</span></button>';
-    }).join("") + '</div>';
-    $("fbBadges").querySelectorAll("[data-b]").forEach(function (el) {
-      el.onclick = function () {
-        var x = BADGES.filter(function (y) { return y[0] === el.getAttribute("data-b"); })[0], p = x[4](badgeState()), on = got[x[0]];
-        sheet('<h2>' + esc(x[1]) + '</h2><p class="muted" style="margin:0 0 12px">' + esc(x[2]) + '</p>' +
-          (on ? '<p><b>Erreicht am ' + dShort(new Date(on)) + '.</b></p>' : '<div class="wd-bigbar"><i style="width:' + Math.min(100, p[0] / p[1] * 100).toFixed(1) + '%"></i></div><p class="small">' + fmt(Math.min(p[0], p[1]), p[0] % 1 ? 1 : 0) + ' von ' + fmt(p[1]) + '</p>'));
-      };
-    });
-  }
-
-  /* ---------- Dein Wunderjahr ---------- */
-  function yearData(y) {
-    var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
-    var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
-    var fav = Object.keys(kc).sort(function (a, b) { return kc[b] - kc[a]; })[0];
-    var qa = load("wunderwahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
-    var ok = qy.filter(function (k) { return qa[k].ok; }).length;
-    var got = load("wunderwahr_abzeichen", {}), by = Object.keys(got).filter(function (k) { return (got[k] || "").slice(0, 4) === String(y); }).length;
-    return { n: ids.length, fav: fav, favN: fav ? kc[fav] : 0, rare: ids.filter(function (id) { return SELTEN[id]; }).length, best: (load("wunderwahr_serie", {}).best) || 0, quiz: ok, quizAll: qy.length, badges: by, merk: sammlung().length };
-  }
-  function renderYearCard() {
-    var y = new Date().getFullYear(), d = yearData(y);
-    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Dein Wunderjahr ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt' + (d.fav ? ' · am liebsten ' + esc(d.fav) : '') + '</span></div><button type="button" class="wd-mini" id="fbYearBtn">Ansehen</button>';
-    $("fbYearBtn").onclick = function () { openYear(y); };
-  }
-  function openYear(y) {
-    var d = yearData(y);
-    sheet('<h2>Dein Wunderjahr ' + y + '</h2><p class="muted" style="margin:0">Alles, was du in diesem Jahr in WunderWahr erlebt hast.</p>' +
-      '<div class="wd-ystats"><div><b>' + fmt(d.n) + '</b><span>Wunder entdeckt</span></div><div><b>' + fmt(d.best) + '</b><span>Tage längste Serie</span></div>' +
-      '<div><b>' + fmt(d.quiz) + '<small style="font-size:14px;color:var(--sub-onbg)"> / ' + fmt(d.quizAll) + '</small></b><span>Quizfragen richtig</span></div><div><b>' + fmt(d.rare) + '</b><span>Sternstunden gefunden</span></div>' +
-      '<div><b>' + fmt(d.merk) + '</b><span>Karten gemerkt</span></div><div><b>' + fmt(d.badges) + '</b><span>Abzeichen verdient</span></div></div>' +
-      (d.fav ? '<p class="small">Dein Lieblingsthema: <b>' + esc(d.fav) + '</b> mit ' + fmt(d.favN) + ' Wundern.</p>' : '') +
-      '<button type="button" class="cta primary" id="yShare">' + icon("share") + 'Als Bild teilen</button>', function (root) {
-        root.querySelector("#yShare").onclick = function () {
-          var txt = fmt(d.n) + " Wunder entdeckt, " + fmt(d.best) + " Tage längste Serie, " + fmt(d.quiz) + " Quizfragen richtig" + (d.rare ? ", " + fmt(d.rare) + " Sternstunden gefunden" : "") + ".";
-          WDShare.wonderCard({ over: "Mein Wunderjahr", title: "Mein Wunderjahr " + y, text: txt, more: d.fav ? "Am meisten gestaunt habe ich über das Thema „" + d.fav + "“." : "", gold: true, foot: "Jeden Tag ein Grund zu staunen" })
-            .then(function (b) { return WDShare.share(b, "Wunderjahr-" + y + ".png", "Mein Wunderjahr " + y); }).then(function (ok) { if (ok) bump("shared"); });
-        };
-      });
-  }
+  function checkBadges() { }
 
   /* ---------- Große Schrift ---------- */
   function applyGross(on) { document.documentElement.classList.toggle("wd-gross", on); $("fbGross").setAttribute("aria-checked", on ? "true" : "false"); }
@@ -516,6 +417,7 @@
   function nextFor(list, from, days) { return list.filter(function (m) { return m.t >= from; }); }
   var liveTimer = null;
   function renderKilometer() {
+    renderKapsel();
     var ps = persons();
     var setup = $("llSetup"), main = $("llMain");
     if (!ps.length) { setup.hidden = false; main.hidden = true; return; }
@@ -559,6 +461,8 @@
       $("llFamList").innerHTML = all.slice(0, 5).map(function (m) { return '<div class="sn-row"><span class="dot" style="background:var(--wd-gold)"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div></div>'; }).join("");
     } else $("llFam").hidden = true;
     renderCal();
+    renderWochen();
+    renderGeburt();
     startLive(p);
   }
   function startLive(p) {
@@ -567,20 +471,23 @@
     function tick() {
       var now = Date.now(), sec = (now - b) / 1000, today = (now - b0) / 1000;
       var fm = Math.floor((now - firstFullMoonAfter(new Date(b)).getTime()) / (SYN * DAY)) + 1;
-      $("llLive").innerHTML = [
-        ["Sekunden gelebt", fmt(Math.floor(sec)), ""],
-        ["Herzschläge (geschätzt)", fmt(Math.floor(sec * HR)), "Ø 75 pro Minute"],
-        ["Km mit der Erde um die Sonne", fmt(Math.floor(sec * ORBIT_KM_S)), "29,78 km in jeder Sekunde"],
-        ["Km mit der Sonne durch die Milchstraße", fmt(Math.floor(sec * GAL_KM_S)), "rund 230 km pro Sekunde"],
-        ["Erdumdrehungen erlebt", fmt(Math.floor(sec / SID)), ""],
-        ["Vollmonde erlebt", fmt(fm), ""]
-      ].map(function (r) { return '<div class="wd-live-row"><span>' + r[0] + (r[2] ? '<small>' + r[2] + '</small>' : '') + '</span><b>' + r[1] + '</b></div>'; }).join("");
-      $("llWorld").innerHTML = [
-        ["Geburten weltweit", fmt(Math.floor(today * 4.25)), "≈ 4,3 pro Sekunde"],
-        ["Blitzeinschläge", fmt(Math.floor(today * 44)), "≈ 44 pro Sekunde"],
-        ["Herzschläge aller Menschen", big(today * 8.1e9 * HR), "Schätzung"],
-        ["Km der Erde auf ihrer Bahn", fmt(Math.floor(today * ORBIT_KM_S)), "seit Mitternacht"]
-      ].map(function (r) { return '<div class="wd-live-row"><span>' + r[0] + '<small>' + r[2] + '</small></span><b>' + r[1] + '</b></div>'; }).join("");
+      function words(n) { var a = Math.abs(n); return a >= 1e12 ? fmt(n / 1e12, 3) + " Billionen" : a >= 1e9 ? fmt(n / 1e9, 3) + " Milliarden" : a >= 1e6 ? fmt(n / 1e6, 2) + " Millionen" : fmt(n); }
+      function row(label, n, unit, sub) {
+        n = Math.floor(n); var w = words(n), exact = n >= 1e6;
+        return '<div class="wd-live-row"><span>' + label + (sub ? '<small>' + sub + '</small>' : '') + '</span><b><em>' + w + (unit ? ' <i>' + unit + '</i>' : '') + '</em>' + (exact ? '<small>' + fmt(n) + '</small>' : '') + '</b></div>';
+      }
+      $("llLive").innerHTML =
+        row("Sekunden gelebt", sec, "", "live gezählt") +
+        row("Herzschläge", sec * HR, "", "geschätzt, Ø 75 pro Minute") +
+        row("Mit der Erde um die Sonne", sec * ORBIT_KM_S, "km", "29,78 km in jeder Sekunde") +
+        row("Mit der Sonne durch die Milchstraße", sec * GAL_KM_S, "km", "rund 230 km pro Sekunde") +
+        row("Erdumdrehungen erlebt", sec / SID, "", "") +
+        row("Vollmonde erlebt", fm, "", "");
+      $("llWorld").innerHTML =
+        row("Geburten weltweit", today * 4.25, "", "≈ 4,3 pro Sekunde") +
+        row("Blitzeinschläge", today * 44, "", "≈ 44 pro Sekunde") +
+        row("Herzschläge aller Menschen", today * 8.1e9 * HR, "", "Schätzung") +
+        row("Strecke der Erde auf ihrer Bahn", today * ORBIT_KM_S, "km", "seit Mitternacht");
     }
     tick(); liveTimer = setInterval(function () { if (document.querySelector("#screen-kilometer.active")) tick(); }, 250);
   }
@@ -807,7 +714,7 @@
   function renderWeitblick() {
     loadGeo().then(function () {
       if (!weitblickReady) { weitblickReady = true; $("dkSlider").value = Math.round(heading); }
-      updatePath(); renderSunrise(); renderTerminator();
+      updatePath(); renderSunrise(); renderTerminator(); renderGroesse(); renderAdresse();
     });
   }
   $("dkSlider").addEventListener("input", function () { heading = +this.value; $("dkHead").textContent = fmt(heading) + "° · " + dirName(heading); $("dkDial").style.setProperty("--a", heading + "deg"); });
@@ -954,6 +861,395 @@
     }).join("");
   }
 
+  /* =========================================================
+     Erweiterungen (FINAL-97): Schätzfrage, Vollbild-Präsentation, Jahresstatistik,
+     Lebenszeit in Wochen, Geburtsmoment, Zeitkapsel, Wahre Größe, Kosmische Adresse
+     ========================================================= */
+
+  /* ---------- Größenordnung schätzen ---------- */
+  function numToken(w) {
+    var m = w.x.match(/(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?)/);
+    if (!m) return null;
+    var tok = m[1], v = parseFloat(tok.replace(/\./g, "").replace(",", "."));
+    if (!(v >= 2) || (/^\d{4}$/.test(tok) && v >= 1000 && v <= 2100)) return null;
+    return { tok: tok, v: v, i: m.index, dec: (tok.split(",")[1] || "").length };
+  }
+  var SCH_POOL = null;
+  function schPool() { if (!SCH_POOL) SCH_POOL = D.WUNDER.filter(function (w) { return !!numToken(w); }); return SCH_POOL; }
+  function sig(x) { if (!isFinite(x) || x <= 0) return "–"; var p = Math.pow(10, Math.floor(Math.log10(x)) - 1), r = Math.round(x / p) * p; return r < 10 ? fmt(r, r < 1 ? 2 : 1) : fmt(r); }
+  function renderSchaetz() {
+    var el = $("fbSchaetz"); if (!el) return;
+    if (offset !== 0) { el.hidden = true; return; }
+    var today = new Date(), key = ymd(today), store = load("wunderwahr_schaetz", {}), done = store[key];
+    var pool = schPool(), n = daysBetween(new Date(2026, 0, 1), today), r = seeded(n * 13 + 5);
+    var w = done ? D.byId(done.id) : null;
+    if (!w) { var todayCard = wonderFor(today).id; for (var k = 0; k < 20; k++) { var c = pool[Math.floor(r() * pool.length)]; if (c.id !== todayCard) { w = c; break; } } }
+    var t = numToken(w), v = t.v;
+    var off = 0.6 + r() * 1.8, lo = v / Math.pow(10, off), hi = v * Math.pow(10, 4 - off);
+    var q = esc(w.x.slice(0, t.i)) + '<mark>?</mark>' + esc(w.x.slice(t.i + t.tok.length));
+    el.hidden = false;
+    if (!done) {
+      el.innerHTML = '<h2 class="wd-head">Größenordnung schätzen <small>' + esc(w.k) + '</small></h2><p class="wd-quiz-q">' + q + '</p>' +
+        '<div class="wd-est"><output id="fbSchO" aria-live="polite">–</output><input type="range" min="0" max="1000" value="500" id="fbSchR" aria-label="Schätzwert (logarithmische Skala)"><div class="wd-est-t"><span>' + sig(lo) + '</span><span>logarithmische Skala</span><span>' + sig(hi) + '</span></div></div>' +
+        '<button type="button" class="cta primary" id="fbSchGo">Schätzung abgeben</button>';
+      var rg = $("fbSchR");
+      function val() { return Math.pow(10, Math.log10(lo) + (+rg.value / 1000) * (Math.log10(hi) - Math.log10(lo))); }
+      function upd() { $("fbSchO").textContent = sig(val()); }
+      rg.oninput = upd; upd();
+      $("fbSchGo").onclick = function () {
+        var g = val(), f = Math.max(g / v, v / g);
+        store[key] = { id: w.id, g: g, v: v, f: f }; var ks = Object.keys(store).sort(); if (ks.length > 800) delete store[ks[0]];
+        save("wunderwahr_schaetz", store); buzz(); renderSchaetz();
+      };
+      return;
+    }
+    var hist = Object.keys(store).sort().slice(-30).map(function (k) { return store[k].f; }).sort(function (a, b) { return a - b; });
+    var med = hist[Math.floor(hist.length / 2)], in2 = hist.filter(function (f) { return f <= 2; }).length;
+    var lg = Math.log10(done.f);
+    el.innerHTML = '<h2 class="wd-head">Größenordnung schätzen <small>' + esc(w.k) + '</small></h2><p class="wd-quiz-q">' + esc(w.x) + '</p>' +
+      '<div class="wd-kv"><div><span>Deine Schätzung</span><b>' + sig(done.g) + '</b></div><div><span>Tatsächlicher Wert</span><b>' + esc(t.tok) + '</b></div>' +
+      '<div><span>Abweichung</span><b>Faktor ' + fmt(done.f, done.f < 10 ? 2 : 0) + '</b></div><div><span>in Größenordnungen</span><b>' + fmt(lg, 2) + '</b></div></div>' +
+      '<p class="small" style="margin:10px 0 0">' + esc(w.w) + '</p>' +
+      '<p class="muted small" style="margin:8px 0 0">Letzte ' + hist.length + ' Schätzungen: Median-Abweichung Faktor ' + fmt(med, 2) + ' · ' + in2 + ' innerhalb Faktor 2. Morgen folgt die nächste Frage.</p>';
+  }
+
+  /* ---------- Vollbild-Präsentation ---------- */
+  function openKino(list) {
+    if (!list || !list.length) return;
+    var order = list.slice(), r = seeded(Date.now() % 100000); for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var tt = order[i]; order[i] = order[j]; order[j] = tt; }
+    var ov = document.createElement("div"); ov.className = "wd-kino"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Vollbild-Präsentation");
+    ov.innerHTML = '<div class="wd-kino-stars"></div><div class="wd-kino-card" aria-live="polite"></div><div class="wd-kino-bar"><i></i></div>' +
+      '<div class="wd-kino-ctl"><button type="button" data-k="prev" aria-label="Zurück">' + icon("left") + '</button><button type="button" data-k="pause" aria-label="Pause">II</button><button type="button" data-k="next" aria-label="Weiter">' + icon("right") + '</button><button type="button" data-k="x" aria-label="Schließen">' + icon("close") + '</button></div>';
+    document.body.appendChild(ov); document.documentElement.classList.add("wd-cam-open");
+    var idx = 0, paused = false, t0 = Date.now(), DUR = 12000, raf = 0, lock = null;
+    try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { lock = l; }).catch(function () { }); } catch (e) { }
+    function show() {
+      var w = order[idx % order.length], c = ov.querySelector(".wd-kino-card");
+      c.classList.remove("in"); void c.offsetWidth;
+      c.innerHTML = '<div class="wd-over">' + esc(w.k) + ' · ' + (idx % order.length + 1) + ' / ' + order.length + '</div><h2>' + esc(w.t) + '</h2><p class="x">' + esc(w.x) + '</p><p class="w">' + esc(w.w) + '</p>';
+      c.classList.add("in"); t0 = Date.now();
+    }
+    function loop() { if (!ov.parentNode) return; var p = paused ? null : (Date.now() - t0) / DUR; if (p != null) { ov.querySelector(".wd-kino-bar i").style.width = Math.min(100, p * 100) + "%"; if (p >= 1) { idx++; show(); } } raf = requestAnimationFrame(loop); }
+    function close() { cancelAnimationFrame(raf); if (lock) try { lock.release(); } catch (e) { } if (ov.parentNode) ov.parentNode.removeChild(ov); document.documentElement.classList.remove("wd-cam-open"); document.removeEventListener("keydown", key); }
+    function key(e) { if (e.key === "Escape") close(); if (e.key === "ArrowRight") { idx++; show(); } if (e.key === "ArrowLeft") { idx = (idx - 1 + order.length) % order.length; show(); } if (e.key === " ") { paused = !paused; } }
+    document.addEventListener("keydown", key);
+    ov.querySelectorAll("[data-k]").forEach(function (b) {
+      b.onclick = function (e) {
+        e.stopPropagation(); var k = b.getAttribute("data-k");
+        if (k === "x") close(); else if (k === "next") { idx++; show(); } else if (k === "prev") { idx = (idx - 1 + order.length) % order.length; show(); }
+        else { paused = !paused; b.textContent = paused ? "▶" : "II"; if (!paused) t0 = Date.now(); }
+      };
+    });
+    show(); raf = requestAnimationFrame(loop);
+  }
+
+  /* ---------- Jahresstatistik ---------- */
+  function yearData(y) {
+    var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
+    var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
+    var qa = load("wunderwahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
+    var sc = load("wunderwahr_schaetz", {}), sy = Object.keys(sc).filter(function (k) { return k.slice(0, 4) === String(y); }).map(function (k) { return sc[k].f; }).sort(function (a, b) { return a - b; });
+    var R = reisen(), km = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
+    return { n: ids.length, kc: kc, quiz: qy.filter(function (k) { return qa[k].ok; }).length, quizAll: qy.length, sch: sy.length, schMed: sy.length ? sy[Math.floor(sy.length / 2)] : null, merk: sammlung().length, km: km };
+  }
+  function renderYearCard() {
+    var y = new Date().getFullYear(), d = yearData(y);
+    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Jahresstatistik ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt · ' + (d.quizAll ? fmt(d.quiz / d.quizAll * 100) + ' % Quiz-Trefferquote' : 'noch kein Quiz') + '</span></div><button type="button" class="wd-mini" id="fbYearBtn">Details</button>';
+    $("fbYearBtn").onclick = function () { openYear(y); };
+  }
+  function openYear(y) {
+    var d = yearData(y), maxK = Math.max.apply(null, KATS.map(function (k) { return d.kc[k] || 0; }).concat([1]));
+    sheet('<h2>Jahresstatistik ' + y + '</h2><p class="muted small" style="margin:0">Alle Werte werden lokal aus deinen Einträgen berechnet.</p>' +
+      '<div class="wd-ystats"><div><b>' + fmt(d.n) + '</b><span>Wunder entdeckt</span></div><div><b>' + fmt(d.merk) + '</b><span>Karten gemerkt</span></div>' +
+      '<div><b>' + (d.quizAll ? fmt(d.quiz / d.quizAll * 100) + ' %' : '–') + '</b><span>Quiz-Trefferquote (' + d.quiz + '/' + d.quizAll + ')</span></div>' +
+      '<div><b>' + (d.schMed ? '× ' + fmt(d.schMed, 2) : '–') + '</b><span>Median-Abweichung Schätzungen (' + d.sch + ')</span></div>' +
+      '<div><b>' + fmt(d.km, 2) + ' km</b><span>auf Zeitreisen gelaufen</span></div><div><b>' + fmt(Object.keys(d.kc).length) + ' / ' + KATS.length + '</b><span>Themen abgedeckt</span></div></div>' +
+      '<h3 class="wd-sub">Verteilung nach Themen</h3>' + KATS.map(function (k) { var v = d.kc[k] || 0; return '<div class="wd-hbar"><span>' + esc(k) + '</span><i><b style="width:' + (v / maxK * 100).toFixed(1) + '%"></b></i><em>' + v + '</em></div>'; }).join(""));
+  }
+
+  /* ---------- Lebenszeit in Wochen ---------- */
+  var WEEKS_ROWS = 90;
+  function renderWochen() {
+    var el = $("llWochen"), ps = persons(); if (!el || !ps.length) { if (el) el.hidden = true; return; }
+    var p = ps.filter(function (x) { return x.id === activeP; })[0] || ps[0], b = birth(p), now = new Date();
+    var lived = Math.floor((now - b) / (7 * DAY)), yrs = (now - b) / (365.2425 * DAY);
+    el.hidden = false;
+    el.innerHTML = '<h2 class="wd-head">Lebenszeit in Wochen <small>' + esc(p.name || "Ich") + '</small></h2>' +
+      '<p class="muted small" style="margin:0 0 10px">Raster über 90 Jahre: eine Zeile pro Lebensjahr, 52 Kästchen pro Zeile (die 1–2 Resttage je Jahr sind der Lesbarkeit halber ausgelassen). Tippe auf ein Kästchen für Details.</p>' +
+      '<div class="wd-kv"><div><span>Gelebte Wochen</span><b>' + fmt(lived) + '</b></div><div><span>Aktuelle Lebenswoche</span><b>' + fmt(lived + 1) + '</b></div><div><span>Alter</span><b>' + fmt(yrs, 2) + ' J.</b></div><div><span>Kästchen gesamt</span><b>' + fmt(52 * WEEKS_ROWS) + '</b></div></div>' +
+      '<canvas id="llWCv" class="wd-weeks" role="img" aria-label="Raster der Lebenswochen; ' + fmt(lived) + ' Wochen gelebt"></canvas>' +
+      '<div class="wd-legend"><span><i class="a"></i>gelebt</span><span><i class="g"></i>aktuelle Woche</span><span><i class="m"></i>Meilenstein</span><span><i class="f"></i>kommend</span></div>';
+    var cv = $("llWCv"), css = cv.clientWidth || 340, dpr = Math.min(2, window.devicePixelRatio || 1);
+    var padL = 24, cell = (css - padL) / 52, H = WEEKS_ROWS * cell + 4;
+    cv.style.height = H + "px"; cv.width = Math.round(css * dpr); cv.height = Math.round(H * dpr);
+    var g = cv.getContext("2d"); g.scale(dpr, dpr);
+    var cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue("--accent").trim() || "#5A2FBE", bor = cs.getPropertyValue("--border").trim() || "#ccc", sub = cs.getPropertyValue("--sub-onbg").trim() || "#777";
+    var gold = cs.getPropertyValue("--wd-gold").trim() || "#C98A1F";
+    var ms = {}; milestones(p, b.getTime(), b.getTime() + WEEKS_ROWS * 365.25 * DAY).forEach(function (m) { if (m.big) ms[Math.floor((m.t - b) / (7 * DAY))] = 1; });
+    g.font = "600 8px -apple-system, system-ui, sans-serif"; g.fillStyle = sub; g.textAlign = "right"; g.textBaseline = "middle";
+    for (var y = 0; y < WEEKS_ROWS; y++) {
+      if (y % 10 === 0) g.fillText(String(y), padL - 5, y * cell + cell / 2);
+      for (var w = 0; w < 52; w++) {
+        var i = y * 52 + w, x = padL + w * cell, yy = y * cell, s = Math.max(1, cell - 1.4);
+        var wk = Math.floor(((new Date(b.getFullYear() + y, b.getMonth(), b.getDate())) - b) / (7 * DAY)) + w;
+        if (wk === lived) g.fillStyle = gold; else if (ms[wk] && wk < lived) g.fillStyle = gold; else if (wk < lived) g.fillStyle = acc; else if (ms[wk]) g.fillStyle = gold; else g.fillStyle = bor;
+        g.globalAlpha = wk < lived || wk === lived ? 1 : ms[wk] ? .55 : .55;
+        g.fillRect(x, yy, s, s);
+      }
+    }
+    g.globalAlpha = 1;
+    cv.onclick = function (e) {
+      var rc = cv.getBoundingClientRect(), x = e.clientX - rc.left - padL, y2 = e.clientY - rc.top;
+      if (x < 0) return; var row = Math.floor(y2 / cell), col = Math.min(51, Math.floor(x / cell));
+      if (row < 0 || row >= WEEKS_ROWS) return;
+      var ys = new Date(b.getFullYear() + row, b.getMonth(), b.getDate()), start = addDays(ys, col * 7), end = addDays(start, 6);
+      var wk = Math.floor((start - b) / (7 * DAY)) + 1, past = start <= now;
+      var evs = D.EREIGNISSE.filter(function (ev) { return ev[0] === start.getFullYear() || ev[0] === end.getFullYear(); });
+      var hv = []; for (var d = 0; d < 7; d++) { var dd = addDays(start, d), key = String(dd.getMonth() + 1).padStart(2, "0") + "-" + String(dd.getDate()).padStart(2, "0"); (D.HEUTE[key] || []).forEach(function (h) { if (h[0] <= start.getFullYear()) hv.push([dd, h]); }); }
+      var mws = milestones(p, start.getTime(), end.getTime() + DAY);
+      sheet('<h2>Lebenswoche ' + fmt(wk) + '</h2><p class="muted" style="margin:0">' + dShort(start) + ' – ' + dShort(end) + ' · Alter ' + row + ' Jahre, Woche ' + (col + 1) + ' des Lebensjahres' + (past ? '' : ' · liegt in der Zukunft') + '</p>' +
+        (mws.length ? '<h3 class="wd-sub">Meilensteine in dieser Woche</h3>' + mws.map(function (m) { return '<div class="sn-row on"><span class="dot" style="background:var(--wd-gold)"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div></div>'; }).join("") : '') +
+        (evs.length ? '<h3 class="wd-sub">In diesem Jahr in der Welt</h3>' + evs.map(function (ev) { return '<div class="sn-fact"><div class="ic wd-yr">' + ev[0] + '</div><div><b>' + esc(ev[1]) + '</b></div></div>'; }).join("") : '') +
+        (hv.length ? '<h3 class="wd-sub">Jahrestage in dieser Woche</h3>' + hv.slice(0, 6).map(function (x) { return '<div class="sn-fact"><div class="ic wd-yr">' + x[1][0] + '</div><div><b>' + x[0].getDate() + '. ' + MO[x[0].getMonth()] + '</b><span>' + esc(x[1][1]) + '</span></div></div>'; }).join("") : ''));
+    };
+  }
+
+  /* ---------- Geburtsmoment: Himmel und Erde am Tag der Geburt ---------- */
+  function renderGeburt() {
+    var el = $("llGeburt"), ps = persons(); if (!el || !ps.length || !A) { if (el) el.hidden = true; return; }
+    var p = ps.filter(function (x) { return x.id === activeP; })[0] || ps[0], b = birth(p), jd = A.toJD(b), now = new Date(), jdn = A.toJD(now);
+    try {
+      var s = A.sun(jd), m = A.moon(jd), cosE = s.v[0] * m.v[0] + s.v[1] * m.v[1] + s.v[2] * m.v[2], illum = (1 - cosE) / 2 * 100;
+      var nm = A.moonPhaseTime(jd, 0, -1), age = nm ? jd - nm : null, waxing = age != null && age < 14.77;
+      var phase = illum < 3 ? "Neumond" : illum > 97 ? "Vollmond" : (waxing ? "zunehmend" : "abnehmend") + (illum < 45 ? "e Sichel" : illum > 55 ? "er Mond (Dreiviertel)" : "er Halbmond");
+      var key = String(b.getMonth() + 1).padStart(2, "0") + "-" + String(b.getDate()).padStart(2, "0"), hv = (D.HEUTE[key] || []).filter(function (h) { return h[0] <= b.getFullYear() + 80; });
+      var sec = (now - b) / 1000, ly = sec * GAL_KM_S / 9.4607e12;
+      var pl = [["mars", "Mars"], ["venus", "Venus"], ["jupiter", "Jupiter"], ["saturn", "Saturn"]].map(function (x) { return [x[1], A.planet(x[0], jd).dist * 149597870.7, A.planet(x[0], jdn).dist * 149597870.7]; });
+      var tt = new Date(b), wd = WD[tt.getDay()];
+      var kw = (function (d) { var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); var dn = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - dn); var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0) / DAY + 1) / 7); })(tt);
+      el.hidden = false;
+      el.innerHTML = '<h2 class="wd-head">Geburtsmoment <small>' + esc(p.name || "Ich") + ' · ' + dShort(b) + '</small></h2>' +
+        '<p class="muted small" style="margin:0 0 10px">Berechnet für 12:00 Uhr Ortszeit (die Uhrzeit ist nicht hinterlegt). Positionen nach Meeus, geozentrisch.</p>' +
+        '<div class="wd-kv"><div><span>Wochentag</span><b>' + wd + '</b></div><div><span>Kalenderwoche</span><b>' + kw + '</b></div>' +
+        '<div><span>Julianisches Datum</span><b>' + fmt(jd, 3) + '</b></div><div><span>Tage seither</span><b>' + fmt(Math.floor((now - b) / DAY)) + '</b></div>' +
+        '<div><span>Mond</span><b>' + phase + '</b></div><div><span>Beleuchtung · Mondalter</span><b>' + fmt(illum) + ' % · ' + (age != null ? fmt(age, 1) + ' d' : '–') + '</b></div>' +
+        '<div><span>Abstand Mond</span><b>' + fmt(Math.round(m.dist / 100) * 100) + ' km</b></div><div><span>Abstand Sonne</span><b>' + fmt(s.dist * 149.5978707, 2) + ' Mio. km</b></div>' +
+        '<div><span>Sonne (ekl. Länge)</span><b>' + fmt(s.lon, 1) + '°</b></div><div><span>Strecke der Sonne seither</span><b>' + fmt(ly, 4) + ' Lj</b></div></div>' +
+        '<h3 class="wd-sub">Planetenabstände: Geburt → heute</h3>' + pl.map(function (x) { return '<div class="sn-row"><div class="main"><b>' + x[0] + '</b><span>' + fmt(x[1] / 1e6) + ' → ' + fmt(x[2] / 1e6) + ' Mio. km</span></div><div class="r">' + (x[2] < x[1] ? "−" : "+") + fmt(Math.abs(x[2] - x[1]) / 1e6) + '</div></div>'; }).join("") +
+        (hv.length ? '<h3 class="wd-sub">Derselbe Kalendertag in der Geschichte</h3>' + hv.map(function (h) { return '<div class="sn-fact"><div class="ic wd-yr">' + h[0] + '</div><div><b>' + (h[0] < b.getFullYear() ? fmt(b.getFullYear() - h[0]) + ' Jahre vor der Geburt' : h[0] === b.getFullYear() ? 'im Geburtsjahr' : fmt(h[0] - b.getFullYear()) + ' Jahre nach der Geburt') + '</b><span>' + esc(h[1]) + '</span></div></div>'; }).join("") : '');
+    } catch (e) { el.hidden = true; }
+  }
+
+  /* ---------- Zeitkapsel ---------- */
+  function kapseln() { return load("wunderwahr_kapseln", []); }
+  function kapselReady(k) { return !k.opened && midnight(new Date()) >= midnight(new Date(k.open)); }
+  function renderKapselBanner() {
+    var el = $("fbKapsel"); if (!el) return;
+    var r = kapseln().filter(kapselReady);
+    el.hidden = !r.length || offset !== 0;
+    if (!r.length) return;
+    el.innerHTML = '<div class="wd-kapsel-b">' + icon("lock") + '<div><b>Zeitkapsel bereit</b><span>' + (r.length === 1 ? 'Geschrieben am ' + dShort(new Date(r[0].created)) : r.length + ' Zeitkapseln können geöffnet werden') + '</span></div><button type="button" class="wd-mini" id="fbKapselGo">Öffnen</button></div>';
+    $("fbKapselGo").onclick = function () { openKapsel(r[0].id); };
+  }
+  function renderKapsel() {
+    var el = $("llKapsel"); if (!el) return;
+    var ks = kapseln().sort(function (a, b) { return a.open < b.open ? -1 : 1; }), now = new Date();
+    el.innerHTML = '<h2 class="wd-head">Zeitkapsel <small>' + ks.length + ' gespeichert</small></h2>' +
+      '<p class="muted small" style="margin:0 0 10px">Eine Nachricht an dein zukünftiges Ich – versiegelt bis zum gewählten Datum. Gespeichert nur auf diesem Gerät, unverschlüsselt im App-Speicher; mit der Datensicherung der WahrZentrale wird sie mitgesichert.</p>' +
+      (ks.length ? ks.map(function (k) {
+        var d = daysBetween(now, new Date(k.open)), ready = kapselReady(k);
+        return '<div class="sn-row"><span class="dot" style="background:' + (k.opened ? 'var(--border)' : ready ? 'var(--wd-gold)' : 'var(--accent)') + '"></span><div class="main"><b>' + esc(k.t || "Zeitkapsel") + '</b><span>' + (k.opened ? 'geöffnet am ' + dShort(new Date(k.opened)) : ready ? 'bereit zum Öffnen' : 'versiegelt bis ' + dShort(new Date(k.open)) + ' · noch ' + fmt(d) + (d === 1 ? ' Tag' : ' Tage')) + ' · geschrieben ' + dShort(new Date(k.created)) + '</span></div>' +
+          '<div class="r">' + (k.opened || ready ? '<button type="button" class="wd-mini" data-ko="' + k.id + '">' + (k.opened ? 'Lesen' : 'Öffnen') + '</button>' : '') + '<button type="button" class="wd-mini" data-kd="' + k.id + '" aria-label="Löschen">' + icon("trash") + '</button></div></div>';
+      }).join("") : '') +
+      '<button type="button" class="cta primary" id="llKNew" style="margin-top:10px">' + icon("lock") + 'Neue Zeitkapsel</button>';
+    el.querySelectorAll("[data-ko]").forEach(function (b) { b.onclick = function () { openKapsel(b.getAttribute("data-ko")); }; });
+    el.querySelectorAll("[data-kd]").forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute("data-kd");
+        (window.wzConfirm ? wzConfirm("Diese Zeitkapsel endgültig löschen? Der Inhalt kann nicht wiederhergestellt werden.", { okLabel: "Löschen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { save("wunderwahr_kapseln", kapseln().filter(function (k) { return k.id !== id; })); renderKapsel(); renderKapselBanner(); } });
+      };
+    });
+    $("llKNew").onclick = newKapsel;
+  }
+  function newKapsel() {
+    var ps = persons(), nb = null;
+    if (ps.length) { var b = birth(ps[0]), n = new Date(); nb = new Date(n.getFullYear(), b.getMonth(), b.getDate()); if (nb <= n) nb = new Date(n.getFullYear() + 1, b.getMonth(), b.getDate()); }
+    var opts = [["m1", "in 1 Monat", addDays(new Date(), 30)], ["y1", "in 1 Jahr", new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate())], ["y5", "in 5 Jahren", new Date(new Date().getFullYear() + 5, new Date().getMonth(), new Date().getDate())]];
+    if (nb) opts.splice(2, 0, ["gb", "zum Geburtstag", nb]);
+    sheet('<h2>Neue Zeitkapsel</h2><div class="wd-form"><label for="kT">Betreff (optional)</label><input class="text-input" id="kT" maxlength="60" placeholder="z. B. Gedanken im Herbst">' +
+      '<label for="kX">Nachricht</label><textarea class="text-input" id="kX" rows="6" maxlength="4000" placeholder="Was möchtest du dir selbst sagen? Was beschäftigt dich, was erhoffst du dir?"></textarea>' +
+      '<label>Öffnen frühestens</label><div class="chip-row" id="kO">' + opts.map(function (o, i) { return '<button type="button" class="chip' + (i === 1 ? ' active' : '') + '" data-d="' + ymd(o[2]) + '">' + o[1] + '</button>'; }).join("") + '</div>' +
+      '<input class="text-input sn-date" type="date" id="kD" value="' + ymd(opts[1][2]) + '" min="' + ymd(addDays(new Date(), 1)) + '" aria-label="Öffnungsdatum"></div>' +
+      '<button type="button" class="cta primary" id="kSave" style="margin-top:12px">' + icon("lock") + 'Versiegeln</button>', function (root, close) {
+        root.querySelectorAll("#kO [data-d]").forEach(function (c) { c.onclick = function () { root.querySelectorAll("#kO .chip").forEach(function (x) { x.classList.toggle("active", x === c); }); root.querySelector("#kD").value = c.getAttribute("data-d"); }; });
+        root.querySelector("#kSave").onclick = function () {
+          var txt = root.querySelector("#kX").value.trim(), d = root.querySelector("#kD").value;
+          if (!txt) { toast("Bitte eine Nachricht schreiben."); return; }
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d <= ymd(new Date())) { toast("Bitte ein Datum in der Zukunft wählen."); return; }
+          var w = wonderFor(new Date()), ks = kapseln();
+          ks.push({ id: "k" + Date.now().toString(36), t: root.querySelector("#kT").value.trim(), txt: txt, created: new Date().toISOString(), open: d, ctx: { ort: LOC.name || "", wunder: w.t } });
+          save("wunderwahr_kapseln", ks); close(); toast("Zeitkapsel versiegelt bis " + dShort(new Date(d)) + "."); renderKapsel();
+        };
+      });
+  }
+  function openKapsel(id) {
+    var ks = kapseln(), k = ks.filter(function (x) { return x.id === id; })[0]; if (!k) return;
+    if (!k.opened && !kapselReady(k)) return;
+    var first = !k.opened;
+    if (first) { k.opened = new Date().toISOString(); save("wunderwahr_kapseln", ks); }
+    var d = daysBetween(new Date(k.created), new Date());
+    sheet('<div class="wd-kapsel-open' + (first ? ' anim' : '') + '"><div class="wd-seal">' + icon("lock") + '</div>' +
+      '<h2>' + esc(k.t || "Zeitkapsel") + '</h2><p class="muted small" style="margin:0 0 12px">Geschrieben am ' + dLong(new Date(k.created)) + (k.ctx && k.ctx.ort ? ' in ' + esc(k.ctx.ort) : '') + ' – vor ' + fmt(d) + (d === 1 ? ' Tag' : ' Tagen') + '.</p>' +
+      '<div class="wd-letter">' + esc(k.txt).replace(/\n/g, "<br>") + '</div>' +
+      (k.ctx && k.ctx.wunder ? '<p class="muted small" style="margin:12px 0 0">Tageswunder an jenem Tag: „' + esc(k.ctx.wunder) + '“</p>' : '') + '</div>');
+    renderKapsel(); renderKapselBanner();
+  }
+
+  /* ---------- Wahre Größe: Länder auf der Mercator-Karte verschieben ---------- */
+  var TG = { sel: null, to: null, ready: false };
+  function vec(lat, lon) { var p = lat * D2R, l = lon * D2R; return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)]; }
+  function unvec(v) { return [Math.asin(Math.max(-1, Math.min(1, v[2]))) * R2D, Math.atan2(v[1], v[0]) * R2D]; }
+  function rotFn(a, b) {
+    var k = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], s = Math.hypot(k[0], k[1], k[2]), c = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    if (s < 1e-9) return function (v) { return v; };
+    k = [k[0] / s, k[1] / s, k[2] / s];
+    return function (v) { var kv = [k[1] * v[2] - k[2] * v[1], k[2] * v[0] - k[0] * v[2], k[0] * v[1] - k[1] * v[0]], kd = k[0] * v[0] + k[1] * v[1] + k[2] * v[2]; return [v[0] * c + kv[0] * s + k[0] * kd * (1 - c), v[1] * c + kv[1] * s + k[1] * kd * (1 - c), v[2] * c + kv[2] * s + k[2] * kd * (1 - c)]; };
+  }
+  var MLAT = 82;
+  function mercY(lat) { var p = Math.max(-MLAT, Math.min(MLAT, lat)) * D2R; return Math.log(Math.tan(Math.PI / 4 + p / 2)); }
+  var MY = mercY(MLAT);
+  function renderGroesse() {
+    var el = $("dkGroesse"); if (!el || !GEO.world) return;
+    var list = GEO.world.filter(function (c) { return c.area && c.bb && c.bb[1] > -60; }).sort(function (a, b) { return a.de.localeCompare(b.de, "de"); });
+    if (!TG.sel) { TG.sel = list.filter(function (c) { return c.de === "Grönland"; })[0] || list[0]; TG.to = [8, 20]; }
+    var quick = ["Grönland", "Russland", "Kanada", "Australien", "Deutschland", "Indien", "Brasilien", "Alaska"].map(function (n) { return list.filter(function (c) { return c.de === n; })[0]; }).filter(Boolean);
+    el.innerHTML = '<h2 class="wd-head">Wahre Größe <small>Mercator-Projektion</small></h2>' +
+      '<p class="muted small" style="margin:0 0 10px">Die übliche Weltkarte (Mercator) ist winkeltreu, aber nicht flächentreu: Ein Gebiet in der Breite φ wird linear um 1/cos φ und in der Fläche um 1/cos² φ vergrößert. Wähle ein Land und tippe oder ziehe auf der Karte – es wird auf der Kugel verschoben und dann neu projiziert.</p>' +
+      '<div class="chip-row" style="margin-bottom:8px">' + quick.map(function (c) { return '<button type="button" class="chip' + (c === TG.sel ? ' active' : '') + '" data-tg="' + esc(c.id) + '">' + esc(c.de) + '</button>'; }).join("") + '</div>' +
+      '<select class="text-input" id="tgSel" aria-label="Land wählen">' + list.map(function (c) { return '<option value="' + esc(c.id) + '"' + (c === TG.sel ? ' selected' : '') + '>' + esc(c.de) + '</option>'; }).join("") + '</select>' +
+      '<canvas id="tgCv" class="wd-merc" aria-label="Weltkarte in Mercator-Projektion mit verschobenem Land"></canvas><div id="tgInfo"></div>';
+    el.querySelectorAll("[data-tg]").forEach(function (b) { b.onclick = function () { TG.sel = list.filter(function (c) { return c.id === b.getAttribute("data-tg"); })[0]; renderGroesse(); }; });
+    $("tgSel").onchange = function () { TG.sel = list.filter(function (c) { return c.id === $("tgSel").value; })[0]; renderGroesse(); };
+    var cv = $("tgCv"), st = null;
+    function pick(e) { var rc = cv.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height; var lon = x * 360 - 180, my = MY - y * 2 * MY, lat = (2 * Math.atan(Math.exp(my)) - Math.PI / 2) * R2D; TG.to = [Math.max(-75, Math.min(78, lat)), lon]; drawGroesse(); }
+    cv.addEventListener("pointerdown", function (e) { st = true; try { cv.setPointerCapture(e.pointerId); } catch (x) { } pick(e); });
+    cv.addEventListener("pointermove", function (e) { if (st) pick(e); });
+    cv.addEventListener("pointerup", function () { st = null; });
+    drawGroesse();
+  }
+  function drawGroesse() {
+    var cv = $("tgCv"); if (!cv) return;
+    var css = cv.clientWidth || 340, dpr = Math.min(2, window.devicePixelRatio || 1), Hh = css * (2 * MY) / (2 * Math.PI);
+    cv.style.height = Hh + "px"; cv.width = Math.round(css * dpr); cv.height = Math.round(Hh * dpr);
+    var g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue("--accent").trim() || "#5A2FBE", bor = cs.getPropertyValue("--border").trim() || "#ccc";
+    var dark = document.documentElement.classList.contains("theme-dark");
+    g.fillStyle = dark ? "#15102A" : "#EEE9FA"; g.fillRect(0, 0, css, Hh);
+    function X(lon) { return (lon + 180) / 360 * css; }
+    function Y(lat) { return (MY - mercY(lat)) / (2 * MY) * Hh; }
+    // Breitenkreise mit Flächenfaktor
+    g.strokeStyle = dark ? "rgba(255,255,255,.08)" : "rgba(40,20,90,.08)"; g.lineWidth = 1; g.fillStyle = dark ? "rgba(255,255,255,.45)" : "rgba(40,20,90,.45)"; g.font = "600 8.5px -apple-system, system-ui, sans-serif";
+    [-60, -30, 0, 30, 60, 75].forEach(function (la) { g.beginPath(); g.moveTo(0, Y(la)); g.lineTo(css, Y(la)); g.stroke(); g.fillText((la === 0 ? "0°" : la + "°") + " ×" + fmt(1 / Math.pow(Math.cos(la * D2R), 2), 1), 3, Y(la) - 2); });
+    // Länder
+    g.fillStyle = dark ? "#3A2E5E" : "#D5CAEE";
+    GEO.world.forEach(function (c) { c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.fill("evenodd"); }); });
+    var c = TG.sel, ref = [c.ly, c.lx];
+    // Original hervorheben
+    g.strokeStyle = acc; g.lineWidth = 1.2; g.setLineDash([3, 2]);
+    c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.stroke(); });
+    g.setLineDash([]);
+    // verschobene Kopie
+    var rot = rotFn(vec(ref[0], ref[1]), vec(TG.to[0], TG.to[1]));
+    g.fillStyle = dark ? "rgba(255,210,122,.55)" : "rgba(201,138,31,.5)"; g.strokeStyle = dark ? "#FFD27A" : "#8A5A06"; g.lineWidth = 1.2;
+    [-360, 0, 360].forEach(function (sh) {
+      c.polys.forEach(function (rings) {
+        g.beginPath();
+        rings.forEach(function (r) {
+          var prev = null;
+          for (var i = 0; i < r.length; i += 2) {
+            var q = unvec(rot(vec(r[i + 1], r[i]))), lon = q[1];
+            if (prev != null) { while (lon - prev > 180) lon -= 360; while (lon - prev < -180) lon += 360; } else { while (lon - TG.to[1] > 180) lon -= 360; while (lon - TG.to[1] < -180) lon += 360; }
+            prev = lon; var x = X(lon + sh), y = Y(q[0]); if (i) g.lineTo(x, y); else g.moveTo(x, y);
+          }
+          g.closePath();
+        });
+        g.fill("evenodd"); g.stroke();
+      });
+    });
+    var de = GEO.world.filter(function (x) { return x.de === "Deutschland"; })[0];
+    var f0 = 1 / Math.pow(Math.cos(ref[0] * D2R), 2), f1 = 1 / Math.pow(Math.cos(TG.to[0] * D2R), 2);
+    $("tgInfo").innerHTML = '<div class="wd-kv"><div><span>Fläche (aus Umriss berechnet)</span><b>' + fmt(c.area) + ' km²</b></div><div><span>Vergleich Deutschland</span><b>× ' + fmt(c.area / (de ? de.area : 357000), 1) + '</b></div>' +
+      '<div><span>Bezugspunkt original</span><b>' + fmt(ref[0], 1) + '° · ×' + fmt(f0, 2) + '</b></div><div><span>Bezugspunkt verschoben</span><b>' + fmt(TG.to[0], 1) + '° · ×' + fmt(f1, 2) + '</b></div></div>' +
+      '<p class="muted small" style="margin:8px 0 0">×-Werte = Flächenvergrößerung der Mercator-Karte am Bezugspunkt (1/cos² φ). Am Original erscheint ' + esc(c.de) + ' damit etwa ' + fmt(f0 / f1, 1) + '-mal so groß wie an der neuen Position. Polnahe Gebiete jenseits ±82° sind abgeschnitten.</p>';
+  }
+
+  /* ---------- Kosmische Adresse ---------- */
+  function adresse() {
+    var LJ = 9.4607e12;
+    return [
+      { n: LOC.name || "Dein Standort", d: "Breite " + fmt(LOC.lat, 3) + "°, Länge " + fmt(LOC.lon, 3) + "°", km: 1, t: "Ausgangspunkt" },
+      { n: "Deutschland", d: "Fläche rund 357.600 km², Nord–Süd rund 880 km", km: 880, t: "Licht durchquert das Land in rund 3 Millisekunden." },
+      { n: "Europa", d: "Fläche rund 10 Mio. km²", km: 4000, t: "Ein Funksignal braucht quer über Europa gut 13 Millisekunden." },
+      { n: "Erde", d: "Durchmesser 12.742 km, Umfang 40.075 km", km: 12742, t: "Licht umrundet die Erde rund 7,5-mal pro Sekunde." },
+      { n: "Erde-Mond-System", d: "mittlerer Mondabstand 384.400 km", km: 768800, t: "Licht braucht 1,28 Sekunden zum Mond." },
+      { n: "Innere Planeten", d: "Erdbahn: Radius 1 AE = 149,6 Mio. km", km: 2 * 1.496e8, t: "Sonnenlicht ist 8 Minuten 19 Sekunden bis zur Erde unterwegs." },
+      { n: "Planetensystem", d: "bis zur Neptunbahn: Radius rund 30 AE = 4,5 Mrd. km", km: 2 * 4.5e9, t: "Licht braucht gut 4 Stunden bis zum Neptun." },
+      { n: "Sonnenumgebung", d: "nächster Stern Proxima Centauri: 4,24 Lichtjahre", km: 2 * 4.24 * LJ, t: "Die Raumsonde Voyager 1 bräuchte dorthin über 70.000 Jahre." },
+      { n: "Milchstraße", d: "Durchmesser rund 100.000 Lj, 100–400 Mrd. Sterne; Sonne rund 26.000 Lj vom Zentrum im Orion-Arm", km: 1e5 * LJ, t: "Ein Umlauf der Sonne um das Zentrum dauert rund 230 Mio. Jahre." },
+      { n: "Lokale Gruppe", d: "über 80 Galaxien, Ausdehnung rund 10 Mio. Lj; Andromeda in 2,5 Mio. Lj", km: 1e7 * LJ, t: "Andromeda nähert sich mit rund 110 km/s." },
+      { n: "Virgo-Superhaufen", d: "Ausdehnung rund 110 Mio. Lj, über 100 Galaxiengruppen", km: 1.1e8 * LJ, t: "Sein Zentrum, der Virgo-Haufen, liegt rund 54 Mio. Lj entfernt." },
+      { n: "Laniakea-Superhaufen", d: "Ausdehnung rund 520 Mio. Lj, etwa 100.000 Galaxien", km: 5.2e8 * LJ, t: "Definiert 2014 über die Bewegungsrichtungen der Galaxien." },
+      { n: "Beobachtbares Universum", d: "Durchmesser rund 93 Mrd. Lj", km: 9.3e10 * LJ, t: "Das älteste sichtbare Licht ist rund 13,8 Mrd. Jahre unterwegs." }
+    ];
+  }
+  function renderAdresse() {
+    var el = $("dkAdresse"); if (!el) return;
+    var L = adresse();
+    el.innerHTML = '<h2 class="wd-head">Kosmische Adresse <small>' + L.length + ' Ebenen</small></h2>' +
+      '<p class="muted small" style="margin:0 0 8px">Von deinem Standort bis an den Rand des beobachtbaren Universums – jede Ebene mit Ausdehnung und Größensprung zur vorherigen.</p>' +
+      L.map(function (l, i) { var f = i ? l.km / L[i - 1].km : null; return '<div class="sn-row"><span class="dot" style="background:' + (i ? 'var(--accent)' : 'var(--wd-gold)') + '"></span><div class="main"><b>' + esc(l.n) + '</b><span>' + esc(l.d) + '</span></div><div class="r">' + (f ? "×" + (f >= 1e4 ? fmt(f / 1000) + " Tsd." : fmt(f, f < 10 ? 1 : 0)) : "") + '</div></div>'; }).join("") +
+      '<div class="btn-row" style="margin-top:10px"><button type="button" class="cta primary slim" id="kaZoom">' + icon("universe") + 'Hinauszoomen</button><button type="button" class="cta slim" id="kaShare">' + icon("share") + 'Teilen</button></div>' +
+      '<p class="muted small" style="margin:8px 0 0">„×“ = Faktor der Ausdehnung gegenüber der Ebene darüber. Werte gerundet; Grenzen von Superhaufen sind Definitionssache.</p>';
+    $("kaZoom").onclick = function () { zoomAdresse(L); };
+    $("kaShare").onclick = function () {
+      WDShare.wonderCard({ over: "Kosmische Adresse", title: L[0].n + " → Universum", text: L.slice(0, 1).concat(L.slice(3)).map(function (l) { return l.n; }).join(" › "), more: "Vom eigenen Standort bis zum Rand des beobachtbaren Universums: rund 93 Milliarden Lichtjahre Durchmesser.", foot: "WeitblickWahr" })
+        .then(function (b) { return WDShare.share(b, "Kosmische-Adresse.png", "Kosmische Adresse"); });
+    };
+  }
+  function zoomAdresse(L) {
+    var ov = document.createElement("div"); ov.className = "wd-kino wd-zoom"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Kosmische Adresse");
+    ov.innerHTML = '<canvas></canvas><div class="wd-zoom-t" aria-live="polite"></div><div class="wd-kino-ctl"><button type="button" data-k="prev" aria-label="Zurück">' + icon("left") + '</button><button type="button" data-k="next" aria-label="Weiter">' + icon("right") + '</button><button type="button" data-k="x" aria-label="Schließen">' + icon("close") + '</button></div>';
+    document.body.appendChild(ov); document.documentElement.classList.add("wd-cam-open");
+    var cv = ov.querySelector("canvas"), g = cv.getContext("2d"), lvl = 0, shown = 0, raf = 0;
+    function txt() {
+      var l = L[lvl], f = lvl ? L[lvl].km / L[lvl - 1].km : null;
+      ov.querySelector(".wd-zoom-t").innerHTML = '<div class="wd-over">Ebene ' + (lvl + 1) + ' von ' + L.length + '</div><h2>' + esc(l.n) + '</h2><p>' + esc(l.d) + '</p><p class="w">' + esc(l.t) + (f ? ' Größensprung: ×' + (f >= 1e4 ? fmt(f / 1000) + ' Tsd.' : fmt(f, f < 10 ? 1 : 0)) + '.' : '') + '</p>';
+    }
+    function draw() {
+      if (!ov.parentNode) return;
+      shown += (lvl - shown) * 0.12; if (Math.abs(lvl - shown) < 0.001) shown = lvl;
+      var w = ov.clientWidth, h = ov.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+      var cx = w / 2, cy = h * 0.36, R = Math.min(w, h) * 0.3, base = Math.log10(L[Math.max(0, Math.min(L.length - 1, Math.round(shown)))].km);
+      var lf = Math.floor(shown), fr = shown - lf, cur = Math.log10(L[lf].km) + (lf + 1 < L.length ? (Math.log10(L[lf + 1].km) - Math.log10(L[lf].km)) * fr : 0);
+      for (var i = 0; i < L.length; i++) {
+        var r = R * Math.pow(10, (Math.log10(L[i].km) - cur) * 0.32);
+        if (r < 1.5 || r > Math.max(w, h) * 2) continue;
+        var on = i === lvl;
+        g.beginPath(); g.arc(cx, cy, r, 0, 7); g.strokeStyle = on ? "#FFD27A" : "rgba(201,184,255," + (i < lvl ? .55 : .25) + ")"; g.lineWidth = on ? 2.2 : 1; g.stroke();
+        if (r > 22 && r < Math.max(w, h)) { g.fillStyle = on ? "#FFD27A" : "rgba(255,255,255,.6)"; g.font = (on ? "700 " : "500 ") + "11px -apple-system, system-ui, sans-serif"; g.textAlign = "center"; g.fillText(L[i].n, cx, cy - r - 5); }
+      }
+      g.fillStyle = "#FFD27A"; g.beginPath(); g.arc(cx, cy, 3, 0, 7); g.fill();
+      raf = requestAnimationFrame(draw);
+    }
+    function close() { cancelAnimationFrame(raf); if (ov.parentNode) ov.parentNode.removeChild(ov); document.documentElement.classList.remove("wd-cam-open"); document.removeEventListener("keydown", key); }
+    function key(e) { if (e.key === "Escape") close(); if (e.key === "ArrowRight") { lvl = Math.min(L.length - 1, lvl + 1); txt(); } if (e.key === "ArrowLeft") { lvl = Math.max(0, lvl - 1); txt(); } }
+    document.addEventListener("keydown", key);
+    ov.querySelectorAll("[data-k]").forEach(function (b) { b.onclick = function () { var k = b.getAttribute("data-k"); if (k === "x") close(); else { lvl = Math.max(0, Math.min(L.length - 1, lvl + (k === "next" ? 1 : -1))); txt(); } }; });
+    txt(); raf = requestAnimationFrame(draw);
+  }
+
   /* ---------------- KilometerWahr: Jubiläumskalender & Urkunden ---------------- */
   function calList(from, to) {
     var all = [];
@@ -998,9 +1294,9 @@
     slides: [
       { icon: "tages", title: "Willkommen bei WunderWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
       { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Am nächsten Tag wartet ein Quiz, und jede Karte landet in deinem Wunderalbum." },
-      { icon: "medal", title: "Sammeln und Abzeichen", text: "Fülle die Themen deines Albums, finde seltene Sternstunden, halte deine Serie und verdiene eigene Abzeichen. Jedes Wunder lässt sich als schöne Bildkarte teilen." },
-      { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – mit Jubiläumskalender für die ganze Familie und Urkunden zum Teilen." },
-      { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
+      { icon: "quiz", title: "Prüfen und schätzen", text: "Jeden Tag eine Quizfrage zum Wunder von gestern und eine Schätzfrage zur Größenordnung – mit Abweichungsfaktor statt Punkten. Alle Karten landen im Wunderalbum und lassen sich als Bildkarte teilen." },
+      { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
+      { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live, prüfe die wahre Größe von Ländern, zoome von deinem Standort bis an den Rand des Universums – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
       { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },
       { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten, Album und Fortschritt bleiben nur auf diesem Gerät; die Kamera wird nur angezeigt, nie aufgenommen. Es wird nichts gesendet." }
     ]
@@ -1020,7 +1316,7 @@
     var gone = false;
     function hide() { if (gone) return; gone = true; sp.classList.add("go"); setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 500); }
     sp.addEventListener("pointerdown", hide);
-    setTimeout(hide, 1100);
+    setTimeout(hide, 3000);
   })();
   // Tageswechsel: neue Karte, wenn die App über Mitternacht offen ist
   var lastDay = new Date().getDate();

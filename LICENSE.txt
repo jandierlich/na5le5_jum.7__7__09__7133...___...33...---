@@ -8,7 +8,7 @@ KompassWahr, NaviWahr, Keysglade, WowarWahr, BelegParkWahr, AlltagWahr,
 ProduktWahr, VorratsWahr, QRWahr, LautstärkeWahr, LosDenkWahr, MessWahr,
 LabWahr, AufwindWahr, ZahlenturmWahr, Korvanthiel, HerzKaroDrei,
 PartikelWahr, StrömungsWahr, BeatWahr, HorizontWahr, KlangWahr,
-StaunWahr, WunderWahr).
+StaunWahr, ThaumoraWahr).
 
 Der Quellcode sowie alle Texte, Grafiken, Symbole und Klänge sind
 urheberrechtlich geschützt. Eine Nutzung, Vervielfältigung,

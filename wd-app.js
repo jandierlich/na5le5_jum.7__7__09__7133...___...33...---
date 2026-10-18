@@ -1,11 +1,11 @@
 /* ============================================================
-   WunderWahr – jeden Tag ein Grund zu staunen
+   ThaumoraWahr – jeden Tag ein Grund zu staunen
    Bereiche: TagesWahr (Tageswunder, Rechenwunder, Quiz, Sammelalbum, Abzeichen, Wunderjahr),
    KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
    WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
    ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
    Alles wird auf dem Gerät berechnet; es wird nichts gesendet.
-   Speicher (Präfix wunderwahr_): Personen/Geburtsdaten, entdeckte und gemerkte Karten, Tageskarten,
+   Speicher (Präfix thaumorawahr_): Personen/Geburtsdaten, entdeckte und gemerkte Karten, Tageskarten,
    Serie, Quiz-Antworten, Abzeichen, Fortschritt der Zeitreisen, Einstellungen.
    © 2026 Jan Dierlich – Alle Rechte vorbehalten.
    ============================================================ */
@@ -46,8 +46,8 @@
   function dist(km) { return km >= 1 ? fmt(km, 2) + " km" : km >= 0.001 ? fmt(km * 1000) + " m" : km > 0 ? fmt(km * 1e5, 0) + " cm" : "am Start"; }
   function icon(id) { return '<svg class="wzi" aria-hidden="true"><use href="#wzi-' + id + '"></use></svg>'; }
   function seeded(n) { var s = (n * 2654435761) % 4294967296; return function () { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
-  function stats() { return load("wunderwahr_stats", { quizOk: 0, quizAll: 0, shared: 0, cam: 0 }); }
-  function bump(k, n) { var s = stats(); s[k] = (s[k] || 0) + (n || 1); save("wunderwahr_stats", s); checkBadges(); }
+  function stats() { return load("thaumorawahr_stats", { quizOk: 0, quizAll: 0, shared: 0, cam: 0 }); }
+  function bump(k, n) { var s = stats(); s[k] = (s[k] || 0) + (n || 1); save("thaumorawahr_stats", s); checkBadges(); }
 
   /* Eigenes Blatt (Bottom Sheet) */
   function sheet(html, onReady) {
@@ -70,17 +70,17 @@
   function showTab(id) {
     tabs.forEach(function (t) { var on = t.getAttribute("data-tab") === id; t.classList.toggle("active", on); t.setAttribute("aria-selected", on ? "true" : "false"); });
     document.querySelectorAll(".screen").forEach(function (s) { s.classList.toggle("active", s.id === "screen-" + id); });
-    save("wunderwahr_tab", id);
+    save("thaumorawahr_tab", id);
     if (id === "weitblick") renderWeitblick();
     if (id === "kilometer") renderKilometer();
     if (id === "zeit") renderZeit();
     if (id === "tages") renderTages();
   }
   if ($("wdSplashD")) {
-    try { if (sessionStorage.getItem("wunderwahr_splash") !== "1") splashUntil = Date.now() + 3600; } catch (e) { }
+    try { if (sessionStorage.getItem("thaumorawahr_splash") !== "1") splashUntil = Date.now() + 3600; } catch (e) { }
     $("wdSplashD").textContent = dLong(new Date());
     try { // Vorschau: Thema des heutigen Wunders, ohne den Inhalt zu verraten
-      var spW = D.wonderFor(new Date()), spE = load("wunderwahr_entdeckt", {}), spS = load("wunderwahr_serie", {}), spT = [];
+      var spW = D.wonderFor(new Date()), spE = load("thaumorawahr_entdeckt", {}), spS = load("thaumorawahr_serie", {}), spT = [];
       spT.push('<i>' + icon("tages") + 'Heute: ' + esc(spW.k) + '</i>');
       $("wdSplashT").innerHTML = spT.join("");
     } catch (e) { }
@@ -94,17 +94,17 @@
   var SELTEN = {}; (D.SELTEN || []).forEach(function (id) { SELTEN[id] = 1; });
   var KATS = []; D.WUNDER.forEach(function (w) { if (KATS.indexOf(w.k) < 0) KATS.push(w.k); });
   function wonderFor(date) { return D.wonderFor(date); }
-  function sammlung() { return load("wunderwahr_sammlung", []); }
-  function entdeckt() { return load("wunderwahr_entdeckt", {}); }
+  function sammlung() { return load("thaumorawahr_sammlung", []); }
+  function entdeckt() { return load("thaumorawahr_entdeckt", {}); }
   function discover(id, date) {
     var e = entdeckt(); if (e[id]) return false;
-    e[id] = ymd(date || new Date()); save("wunderwahr_entdeckt", e); return true;
+    e[id] = ymd(date || new Date()); save("thaumorawahr_entdeckt", e); return true;
   }
   (function migrate() { // bereits gemerkte Karten zählen als entdeckt
     var e = entdeckt(), ch = false;
     sammlung().forEach(function (id) { if (!e[id]) { e[id] = ymd(new Date()); ch = true; } });
-    var t = load("wunderwahr_tage", {}); Object.keys(t).forEach(function (k) { if (!e[t[k]]) { e[t[k]] = k; ch = true; } });
-    if (ch) save("wunderwahr_entdeckt", e);
+    var t = load("thaumorawahr_tage", {}); Object.keys(t).forEach(function (k) { if (!e[t[k]]) { e[t[k]] = k; ch = true; } });
+    if (ch) save("thaumorawahr_entdeckt", e);
   })();
 
   function renderCard(day) {
@@ -130,7 +130,7 @@
     $("fbKeep").onclick = function () {
       var s = sammlung(), i = s.indexOf(w.id);
       if (i >= 0) s.splice(i, 1); else { s.unshift(w.id); buzz(); }
-      save("wunderwahr_sammlung", s); renderCard(day); renderAlbum(); checkBadges();
+      save("thaumorawahr_sammlung", s); renderCard(day); renderAlbum(); checkBadges();
     };
     $("fbShare").onclick = function () { shareWonder(w, day); };
     return w;
@@ -269,10 +269,17 @@
   ];
   function renderCalc(day) {
     var el = $("fbCalc"), n = daysBetween(new Date(2026, 0, 1), day), out = null;
-    for (var k = 0; k < CALC.length && !out; k++) { try { out = CALC[((n + k) % CALC.length + CALC.length) % CALC.length](day); } catch (e) { out = null; } }
+    var fnUsed = null;
+    for (var k = 0; k < CALC.length && !out; k++) { try { fnUsed = CALC[((n + k) % CALC.length + CALC.length) % CALC.length]; out = fnUsed(day); } catch (e) { out = null; } }
+    var METH = { mond: "Geozentrische Mondentfernung nach Meeus (Mittag); nächster Erdnähe-Tag durch Tagesraster über 30 Tage.", sonne: "Sonnenabstand in AE nach Meeus × 149.597.870,7 km; Lichtlaufzeit mit c = 299.792,458 km/s.",
+      tag: "Auf- und Untergang bei −0,8333° (Refraktion + Sonnenradius) für deinen Standort, Vergleich mit dem Wert vor 7 Tagen.", schatten: "Maximale Sonnenhöhe im 5-Minuten-Raster 10–15 Uhr; Schattenlänge = 1,80 m / tan h.",
+      bahn: "Strecke = vergangene Sekunden × 29,78 km/s (mittlere Bahngeschwindigkeit).", mondphase: "Beleuchteter Anteil = (1 − cos Elongation)/2; Phasenzeitpunkte über die Differenz der ekliptikalen Längen.",
+      planet: "Planetenort aus Keplerelementen (JPL-Näherung), geozentrische Entfernung; Lichtlaufzeit mit c.", drehung: "v = 1.674,4 km/h · cos φ (Äquatorgeschwindigkeit × Kosinus der Breite).",
+      jahr: "Anteil der verstrichenen Zeit am Kalenderjahr; Bahnstrecke ≈ 940 Mio. km pro Umlauf.", leben: "Tageszählung ab Geburtstag; Herzschläge mit Ø 75 pro Minute geschätzt." };
     if (!out) { el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = '<div class="wd-over">' + esc(out.over) + '</div><span class="wd-calc-n">' + esc(out.n) + '</span><h2 class="wd-card-t" style="font-size:19px">' + esc(out.t) + '</h2><p class="wd-card-x" style="font-size:14.5px">' + esc(out.x) + '</p>' +
+      '<p class="wd-meth">Methode: ' + esc(METH[fnUsed && fnUsed.name] || "eigene Berechnung auf dem Gerät.") + '</p>' +
       '<div class="wd-card-acts"><button type="button" class="wd-glass" id="fbCalcShare">' + icon("share") + 'Teilen</button></div>';
     $("fbCalcShare").onclick = function () {
       WDShare.wonderCard({ over: out.over, title: out.n + " – " + out.t, text: out.x, foot: "Berechnet am " + dShort(day) })
@@ -306,10 +313,10 @@
     return { q: "Welches dieser Wunder hast du gestern entdeckt?", opts: shuffle(o), ok: w.t, typ: "titel" };
   }
   function renderQuiz() {
-    var el = $("fbQuiz"), today = new Date(), yd = addDays(today, -1), tage = load("wunderwahr_tage", {}), e = entdeckt();
+    var el = $("fbQuiz"), today = new Date(), yd = addDays(today, -1), tage = load("thaumorawahr_tage", {}), e = entdeckt();
     var id = tage[ymd(yd)], w = id && D.byId(id);
     if (!w || !e[w.id] || offset !== 0) { el.hidden = true; return; }
-    var qa = load("wunderwahr_quiz", {}), done = qa[ymd(today)];
+    var qa = load("thaumorawahr_quiz", {}), done = qa[ymd(today)];
     var q = quizFor(w, daysBetween(new Date(2026, 0, 1), today) * 7 + 3);
     el.hidden = false;
     el.innerHTML = '<h2 class="wd-head">Quiz zu gestern <small>' + icon("quiz") + '</small></h2><p class="wd-quiz-q">' + q.q + '</p><div class="wd-quiz-o" role="group" aria-label="Antworten">' +
@@ -320,8 +327,8 @@
       b.onclick = function () {
         var a = b.getAttribute("data-o"), ok = a === q.ok;
         qa[ymd(today)] = { a: a, ok: ok }; var ks = Object.keys(qa).sort(); if (ks.length > 800) delete qa[ks[0]];
-        save("wunderwahr_quiz", qa);
-        var s = stats(); s.quizAll = (s.quizAll || 0) + 1; if (ok) s.quizOk = (s.quizOk || 0) + 1; save("wunderwahr_stats", s);
+        save("thaumorawahr_quiz", qa);
+        var s = stats(); s.quizAll = (s.quizAll || 0) + 1; if (ok) s.quizOk = (s.quizOk || 0) + 1; save("thaumorawahr_stats", s);
         buzz(ok ? 15 : [10, 60, 10]); renderQuiz();
       };
     });
@@ -348,28 +355,28 @@
     el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 15; renderAlbum(); }; });
     el.querySelectorAll("[data-share]").forEach(function (b) { b.onclick = function () { shareWonder(D.byId(b.getAttribute("data-share")), null); }; });
     el.querySelectorAll("[data-keep]").forEach(function (b) {
-      b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("wunderwahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
+      b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("thaumorawahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
     });
     if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 15; renderAlbum(); };
     if ($("fbKino")) $("fbKino").onclick = function () { openKino(list.length >= 3 ? list : ids.map(function (id) { return D.byId(id); }).filter(Boolean)); };
   }
 
   /* ---------- Abzeichen ---------- */
-  function reisen() { return load("wunderwahr_reisen", null) || migrateReisen(); }
+  function reisen() { return load("thaumorawahr_reisen", null) || migrateReisen(); }
   function checkBadges() { }
 
   /* ---------- Große Schrift ---------- */
   function applyGross(on) { document.documentElement.classList.toggle("wd-gross", on); $("fbGross").setAttribute("aria-checked", on ? "true" : "false"); }
-  applyGross(load("wunderwahr_gross", false) === true);
-  $("fbGross").onclick = function () { var on = !document.documentElement.classList.contains("wd-gross"); save("wunderwahr_gross", on); applyGross(on); };
+  applyGross(load("thaumorawahr_gross", false) === true);
+  $("fbGross").onclick = function () { var on = !document.documentElement.classList.contains("wd-gross"); save("thaumorawahr_gross", on); applyGross(on); };
 
   /* =========================================================
      2. KilometerWahr – Meilensteine & Lebensuhr
      ========================================================= */
   var SYN = 29.530588853, ORBIT_KM_S = 29.78, GAL_KM_S = 230, SID = 86164.0905;
   var HR = 75 / 60, BR = 16 / 60; // Schätzwerte je Sekunde (Ø Herzschlag 75/min, Ø Atem 16/min)
-  function persons() { return load("wunderwahr_personen", []); }
-  var activeP = load("wunderwahr_person", null);
+  function persons() { return load("thaumorawahr_personen", []); }
+  var activeP = load("thaumorawahr_person", null);
   function birth(p) { var a = p.date.split("-"); return new Date(+a[0], +a[1] - 1, +a[2], 12, 0, 0); }
   function firstFullMoonAfter(t) {
     if (A && A.moonPhaseTime) { var jd = A.moonPhaseTime(A.toJD(t), 180, 1); if (jd) return A.fromJD(jd); }
@@ -427,7 +434,7 @@
     $("llPeople").innerHTML = ps.map(function (p) {
       return '<button type="button" class="chip' + (p.id === activeP ? ' active' : '') + '" data-id="' + p.id + '">' + esc(p.name || "Ich") + '</button>';
     }).join("") + '<button type="button" class="chip" id="llAdd"><svg class="wzi"><use href="#wzi-plus"></use></svg>Person</button>';
-    $("llPeople").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { activeP = b.getAttribute("data-id"); save("wunderwahr_person", activeP); renderKilometer(); }; });
+    $("llPeople").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { activeP = b.getAttribute("data-id"); save("thaumorawahr_person", activeP); renderKilometer(); }; });
     $("llAdd").onclick = function () { $("llForm").hidden = false; $("llName").focus(); };
     var p = ps.filter(function (x) { return x.id === activeP; })[0];
     var now = Date.now(), list = milestones(p, now - 400 * DAY, now + 12 * 365 * DAY);
@@ -450,7 +457,7 @@
     if (lp) $("llCert").onclick = function () { certMilestone(p, lp); };
     $("llDel").onclick = function () {
       var q = window.wzConfirm ? wzConfirm((p.name || "Ich") + " mit Geburtsdatum aus KilometerWahr entfernen?", { okLabel: "Entfernen" }) : Promise.resolve(true);
-      q.then(function (ok) { if (!ok) return; save("wunderwahr_personen", persons().filter(function (x) { return x.id !== p.id; })); activeP = null; save("wunderwahr_person", null); renderKilometer(); renderZeit(); });
+      q.then(function (ok) { if (!ok) return; save("thaumorawahr_personen", persons().filter(function (x) { return x.id !== p.id; })); activeP = null; save("thaumorawahr_person", null); renderKilometer(); renderZeit(); });
     };
     // Familie: nächste Anlässe aller Personen
     if (ps.length > 1) {
@@ -462,6 +469,7 @@
     } else $("llFam").hidden = true;
     renderCal();
     renderWochen();
+    renderZeitmasse();
     renderGeburt();
     startLive(p);
   }
@@ -496,13 +504,13 @@
     if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { toast("Bitte ein Geburtsdatum wählen."); return; }
     var ps = persons(); var id = "p" + Date.now().toString(36);
     ps.push({ id: id, name: name || (ps.length ? "Person " + (ps.length + 1) : "Ich"), date: v });
-    save("wunderwahr_personen", ps); activeP = id; save("wunderwahr_person", id);
+    save("thaumorawahr_personen", ps); activeP = id; save("thaumorawahr_person", id);
     $("llForm").hidden = true; $("llName").value = ""; renderKilometer(); checkBadges();
   };
   $("llStart").onclick = function () {
     var v = $("llDate0").value;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { toast("Bitte dein Geburtsdatum wählen."); return; }
-    save("wunderwahr_personen", [{ id: "ich", name: "Ich", date: v }]); activeP = "ich"; renderKilometer(); renderZeit(); checkBadges();
+    save("thaumorawahr_personen", [{ id: "ich", name: "Ich", date: v }]); activeP = "ich"; renderKilometer(); renderZeit(); checkBadges();
   };
   $("llCancel").onclick = function () { $("llForm").hidden = true; };
 
@@ -611,7 +619,7 @@
     GEO.world.forEach(function (c) { c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = (r[i] + 180) / 360 * W, y = (90 - r[i + 1]) / 180 * H; if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.fill("evenodd"); }); });
     GEO.mask = g.getImageData(0, 0, W, H).data; GEO.mw = W; GEO.mh = H;
   }
-  var view = { lat: LOC.lat, lon: LOC.lon }, heading = load("wunderwahr_richtung", 90), lastPath = null;
+  var view = { lat: LOC.lat, lon: LOC.lon }, heading = load("thaumorawahr_richtung", 90), lastPath = null;
   function drawGlobe() {
     var cv = $("dkGlobe"); if (!cv || !GEO.mask) return;
     var css = cv.clientWidth || 320, dpr = Math.min(2, window.devicePixelRatio || 1), N = Math.round(css * dpr);
@@ -682,7 +690,7 @@
     $("dkTimes").innerHTML = [["Zu Fuß", "8 Std. am Tag, 5 km/h", fmt(total / 40) + " Tage"], ["Mit dem Auto", "Ø 100 km/h", fmt(total / 100) + " Std."], ["Im Flugzeug", "Ø 900 km/h", fmt(total / 900, 0) + " Std."], ["Mit Schallgeschwindigkeit", "1.235 km/h", fmt(total / 1235, 1) + " Std."], ["Mit Lichtgeschwindigkeit", "", fmt(total / 299792.458, 2) + " Sek."]]
       .map(function (r) { return '<div class="sn-row"><div class="main"><b>' + r[0] + '</b><span>' + r[1] + '</span></div><div class="r">' + r[2] + '</div></div>'; }).join("");
     if (firstAbroad) $("dkFirst").textContent = "Erstes Ziel: " + firstAbroad.name + " nach " + fmt(firstAbroad.a) + " km";
-    drawGlobe();
+    drawGlobe(); renderGK();
   }
   function renderSunrise() {
     var now = new Date(), y = now.getFullYear();
@@ -709,12 +717,12 @@
     function fmtL(l, word) { l.sort(function (a, b) { return b.pop - a.pop; }); return l.slice(0, 4).map(function (x) { return '<div class="sn-row"><span class="dot" style="background:' + (word === "auf" ? '#FFD27A' : '#B9A6F5') + '"></span><div class="main"><b>' + esc(x.n) + '</b><span>Sonne geht gerade ' + word + '</span></div></div>'; }).join("") || '<p class="muted small" style="margin:6px 0">Gerade keine Großstadt genau auf der Linie.</p>'; }
     $("dkRise").innerHTML = fmtL(rise, "auf"); $("dkSet").innerHTML = fmtL(set, "unter");
   }
-  function setHeading(a) { heading = wrap360(a); save("wunderwahr_richtung", Math.round(heading)); $("dkSlider").value = Math.round(heading); updatePath(); }
+  function setHeading(a) { heading = wrap360(a); save("thaumorawahr_richtung", Math.round(heading)); $("dkSlider").value = Math.round(heading); updatePath(); }
   var weitblickReady = false;
   function renderWeitblick() {
     loadGeo().then(function () {
       if (!weitblickReady) { weitblickReady = true; $("dkSlider").value = Math.round(heading); }
-      updatePath(); renderSunrise(); renderTerminator(); renderGroesse(); renderAdresse();
+      updatePath(); renderSunrise(); renderTerminator(); renderEphem(); renderGroesse(); renderAdresse();
     });
   }
   $("dkSlider").addEventListener("input", function () { heading = +this.value; $("dkHead").textContent = fmt(heading) + "° · " + dirName(heading); $("dkDial").style.setProperty("--a", heading + "deg"); });
@@ -729,7 +737,7 @@
     if (Date.now() - lastAim > 900) { lastAim = Date.now(); $("dkSlider").value = Math.round(heading); updatePath(); }
   }
   $("dkAim").onclick = function () {
-    if (aiming) { aiming = false; window.removeEventListener("deviceorientation", onOri); window.removeEventListener("deviceorientationabsolute", onOri); this.classList.remove("on"); this.lastChild.textContent = "Mit dem Handy zielen"; save("wunderwahr_richtung", Math.round(heading)); return; }
+    if (aiming) { aiming = false; window.removeEventListener("deviceorientation", onOri); window.removeEventListener("deviceorientationabsolute", onOri); this.classList.remove("on"); this.lastChild.textContent = "Mit dem Handy zielen"; save("thaumorawahr_richtung", Math.round(heading)); return; }
     var btn = this;
     function go() { aiming = true; btn.classList.add("on"); btn.lastChild.textContent = "Richtung festhalten"; window.addEventListener("deviceorientationabsolute", onOri); window.addEventListener("deviceorientation", onOri); }
     if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") DeviceOrientationEvent.requestPermission().then(function (s) { if (s === "granted") go(); else toast("Ohne Zugriff auf den Kompass bitte die Richtung unten einstellen."); }).catch(function () { toast("Kompass nicht verfügbar."); });
@@ -751,10 +759,10 @@
   var R_ORDER = ["erde", "universum", "mensch"], R_ICON = { erde: "globe", universum: "universe", mensch: "people" };
   var SCALE_TXT = { "46": "46 km · über Wochen", "4.6": "4,6 km · an einem Nachmittag", "13.8": "13,8 km · über ein paar Tage", "1.38": "1,38 km · ein Spaziergang", "3": "3 km · ein Spaziergang", "30": "30 km · über Wochen" };
   function migrateReisen() {
-    var old = load("wunderwahr_zeitreise", null), r = { aktiv: "erde", fertig: {} };
+    var old = load("thaumorawahr_zeitreise", null), r = { aktiv: "erde", fertig: {} };
     R_ORDER.forEach(function (k) { r[k] = { m: 0, scale: D.REISEN[k].scales[0] }; });
     if (old) { r.erde.m = old.m || 0; r.erde.scale = old.scale || 46; }
-    save("wunderwahr_reisen", r); return r;
+    save("thaumorawahr_reisen", r); return r;
   }
   var RS = reisen();
   function stations(id) {
@@ -779,7 +787,7 @@
     var reached = st.filter(function (z) { return posKm(id, z[0]) <= km + 1e-9; });
     var now = reached[reached.length - 1] || st[0], nxt = st[reached.length];
     var agoNow = Math.max(0, T - km / tot * T);
-    if (done && !(RS.fertig || {})[id]) { RS.fertig = RS.fertig || {}; RS.fertig[id] = ymd(new Date()); save("wunderwahr_reisen", RS); toast("Angekommen in der Gegenwart! Deine Urkunde ist bereit.", 2400); buzz([30, 50, 30]); setTimeout(checkBadges, 2700); }
+    if (done && !(RS.fertig || {})[id]) { RS.fertig = RS.fertig || {}; RS.fertig[id] = ymd(new Date()); save("thaumorawahr_reisen", RS); toast("Angekommen in der Gegenwart! Deine Urkunde ist bereit.", 2400); buzz([30, 50, 30]); setTimeout(checkBadges, 2700); }
     $("aeTrips").innerHTML = R_ORDER.map(function (k) {
       var r = RS[k], p = Math.min(100, r.m / 1000 / r.scale * 100), f = (RS.fertig || {})[k];
       return '<button type="button" class="wd-trip' + (k === id ? ' on' : '') + (f ? ' done' : '') + '" data-trip="' + k + '" aria-pressed="' + (k === id) + '">' + icon(R_ICON[k]) + esc(D.REISEN[k].kurz) + '<small>' + (f ? "geschafft" : fmt(p) + " %") + '</small></button>';
@@ -810,36 +818,64 @@
       ? [["Seit dem Bau der Pyramiden", len(Y + 2560)], ["Seit Christi Geburt", len(Y)], ["Seit Gutenbergs Buchdruck", len(Y - 1450)], ["Seit der Mondlandung", len(Y - 1969)], [age ? "Dein bisheriges Leben" : "Ein Menschenleben (80 Jahre)", len(age || 80)]]
       : [["Seit dem Ende der Dinosaurier", len(66e6)], ["Seit es den Homo sapiens gibt", len(3e5)], ["Seit dem Bau der Pyramiden", len(Y + 2560)], ["Seit Christi Geburt", len(Y)], [age ? "Dein bisheriges Leben" : "Ein Menschenleben (80 Jahre)", len(age || 80)]];
     $("aeScale").innerHTML = rows.map(function (r) { return '<div class="sn-row"><div class="main"><b>' + r[0] + '</b></div><div class="r">' + r[1] + '</div></div>'; }).join("");
-    document.querySelectorAll("[data-trip]").forEach(function (b) { b.onclick = function () { if (watch != null) { toast("Bitte erst die laufende Etappe beenden."); return; } RS.aktiv = b.getAttribute("data-trip"); save("wunderwahr_reisen", RS); renderZeit(); }; });
+    document.querySelectorAll("[data-trip]").forEach(function (b) { b.onclick = function () { if (watch != null) { toast("Bitte erst die laufende Etappe beenden."); return; } RS.aktiv = b.getAttribute("data-trip"); save("thaumorawahr_reisen", RS); renderZeit(); }; });
     document.querySelectorAll("[data-scale]").forEach(function (b) {
       b.onclick = function () {
         var s = +b.getAttribute("data-scale"); if (s === cur().scale) return;
-        var ch = function () { var c2 = cur(), frac = c2.m / 1000 / c2.scale; c2.scale = s; c2.m = Math.min(frac, 1) * s * 1000; if (RS.fertig && frac < 1) delete RS.fertig[RS.aktiv]; save("wunderwahr_reisen", RS); renderZeit(); };
+        var ch = function () { var c2 = cur(), frac = c2.m / 1000 / c2.scale; c2.scale = s; c2.m = Math.min(frac, 1) * s * 1000; if (RS.fertig && frac < 1) delete RS.fertig[RS.aktiv]; save("thaumorawahr_reisen", RS); renderZeit(); };
         if (cur().m > 0 && window.wzConfirm) wzConfirm("Strecke ändern? Dein Fortschritt wird auf die neue Länge umgerechnet.", { okLabel: "Ändern" }).then(function (ok) { if (ok) ch(); }); else ch();
       };
     });
     renderZeitmitte();
+    renderEtappen();
   }
-  /* Laufen: GPS zählt nur echte Schritte (genaue Positionen, Gehtempo) */
-  var watch = null, lastFix = null;
+  /* Laufen: GPS zählt nur echte Schritte (genaue Positionen, Gehtempo) – mit Live-Diagnose und Etappenprotokoll */
+  var watch = null, lastFix = null, stage = null;
+  function etappen() { return load("thaumorawahr_etappen", []); }
+  function renderGps() {
+    var el = $("aeGps"); if (!el) return;
+    if (!stage) { el.hidden = true; return; }
+    var dur = (Date.now() - stage.t0) / 1000, km = stage.m / 1000, pace = km > 0.01 ? dur / 60 / km : null;
+    el.hidden = false;
+    el.innerHTML = '<div class="wd-kv"><div><span>Etappe</span><b>' + fmt(stage.m) + ' m</b></div><div><span>Dauer</span><b>' + Math.floor(dur / 60) + ':' + String(Math.floor(dur % 60)).padStart(2, "0") + ' min</b></div>' +
+      '<div><span>GPS-Genauigkeit</span><b>' + (stage.acc != null ? '± ' + fmt(stage.acc) + ' m' : 'wird gesucht …') + '</b></div><div><span>Tempo</span><b>' + (stage.v != null ? fmt(stage.v * 3.6, 1) + ' km/h' : '–') + (pace ? ' · ' + fmt(pace, 1) + ' min/km' : '') + '</b></div>' +
+      '<div><span>Fixes gezählt / verworfen</span><b>' + stage.ok + ' / ' + stage.no + '</b></div><div><span>Zeitreise ' + esc(D.REISEN[RS.aktiv].kurz) + '</span><b>' + agoTxt(Math.max(0, total(RS.aktiv) - cur().m / 1000 / cur().scale * total(RS.aktiv)), RS.aktiv) + '</b></div></div>';
+  }
+  function renderEtappen() {
+    var el = $("aeEtappen"); if (!el) return;
+    var E = etappen().slice().reverse(), sum = E.reduce(function (a, e) { return a + e.m; }, 0), dur = E.reduce(function (a, e) { return a + e.s; }, 0);
+    el.innerHTML = '<h2 class="wd-head">Etappenprotokoll <small>' + E.length + ' Etappen</small></h2>' +
+      (E.length ? '<div class="wd-kv" style="margin-bottom:6px"><div><span>Strecke gesamt</span><b>' + fmt(sum / 1000, 2) + ' km</b></div><div><span>Gehzeit gesamt</span><b>' + hm(dur / 60) + '</b></div><div><span>Ø Tempo</span><b>' + (dur ? fmt(sum / dur * 3.6, 2) + ' km/h' : '–') + '</b></div><div><span>Längste Etappe</span><b>' + fmt(Math.max.apply(null, E.map(function (e) { return e.m; })) / 1000, 2) + ' km</b></div></div>' +
+        E.slice(0, 12).map(function (e) { return '<div class="sn-row"><div class="main"><b>' + dShort(new Date(e.d)) + ' · ' + esc((D.REISEN[e.j] || {}).kurz || "") + '</b><span>' + hm(e.s / 60) + ' · Ø ' + (e.s ? fmt(e.m / e.s * 3.6, 1) : '–') + ' km/h · ' + e.ok + ' Fixes, ' + e.no + ' verworfen</span></div><div class="r wd-num">' + fmt(e.m / 1000, 2) + ' km</div></div>'; }).join("")
+        : '<p class="muted small" style="margin:0">Noch keine Etappe. Gespeichert werden je Etappe nur Datum, Dauer, Strecke und die Zahl der GPS-Punkte – keine Route.</p>');
+  }
+  function endStage() {
+    if (!stage) return;
+    if (stage.m >= 1) { var E = etappen(); E.push({ d: ymd(new Date(stage.t0)), j: RS.aktiv, m: Math.round(stage.m), s: Math.round((Date.now() - stage.t0) / 1000), ok: stage.ok, no: stage.no }); if (E.length > 300) E.splice(0, E.length - 300); save("thaumorawahr_etappen", E); }
+    stage = null; renderGps(); renderEtappen();
+  }
   $("aeGo").onclick = function () {
     var btn = this;
-    if (watch != null) { navigator.geolocation.clearWatch(watch); watch = null; btn.classList.remove("on"); btn.lastChild.textContent = "Etappe starten"; $("aeState").textContent = "Pausiert – dein Fortschritt ist gespeichert."; return; }
+    if (watch != null) { navigator.geolocation.clearWatch(watch); watch = null; endStage(); btn.classList.remove("on"); btn.lastChild.textContent = "Etappe starten"; $("aeState").textContent = "Pausiert – dein Fortschritt ist gespeichert."; return; }
     if (!navigator.geolocation) { toast("Standort nicht verfügbar."); return; }
-    lastFix = null; btn.classList.add("on"); btn.lastChild.textContent = "Etappe beenden"; $("aeState").textContent = "Läuft – die App muss dabei geöffnet bleiben.";
+    lastFix = null; stage = { t0: Date.now(), m: 0, ok: 0, no: 0, acc: null, v: null };
+    btn.classList.add("on"); btn.lastChild.textContent = "Etappe beenden"; $("aeState").textContent = "Läuft – die App muss dabei geöffnet bleiben."; renderGps();
     watch = navigator.geolocation.watchPosition(function (p) {
-      var c = p.coords; if (c.accuracy > 35) return;
+      var c = p.coords; stage.acc = c.accuracy;
+      if (c.accuracy > 35) { stage.no++; renderGps(); return; }
       if (lastFix) {
         var d = hav(lastFix.lat, lastFix.lon, c.latitude, c.longitude) * 1000, dt = (p.timestamp - lastFix.t) / 1000;
-        if (d < 8) return;
-        if (dt > 0 && d / dt > 4.5) { lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp }; return; } // zu schnell: Fahrzeug
-        cur().m += d; save("wunderwahr_reisen", RS); renderZeit(); if (Math.floor(cur().m / 1000) !== Math.floor((cur().m - d) / 1000)) checkBadges();
+        if (d < 8) { renderGps(); return; }
+        stage.v = dt > 0 ? d / dt : null;
+        if (dt > 0 && d / dt > 4.5) { stage.no++; lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp }; renderGps(); return; } // zu schnell: Fahrzeug
+        cur().m += d; stage.m += d; stage.ok++; save("thaumorawahr_reisen", RS); renderZeit();
       }
-      lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp };
+      lastFix = { lat: c.latitude, lon: c.longitude, t: p.timestamp }; renderGps();
     }, function () { toast("Standort nicht verfügbar."); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
   };
+  setInterval(function () { if (stage && document.querySelector("#screen-zeit.active")) renderGps(); }, 1000);
   $("aeReset").onclick = function () {
-    (window.wzConfirm ? wzConfirm("Die Zeitreise „" + D.REISEN[RS.aktiv].name + "“ wirklich von vorn beginnen?", { okLabel: "Neu beginnen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { cur().m = 0; save("wunderwahr_reisen", RS); renderZeit(); } });
+    (window.wzConfirm ? wzConfirm("Die Zeitreise „" + D.REISEN[RS.aktiv].name + "“ wirklich von vorn beginnen?", { okLabel: "Neu beginnen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { cur().m = 0; save("thaumorawahr_reisen", RS); renderZeit(); } });
   };
   /* Deine Zeitmitte & überraschend gleichzeitig */
   function renderZeitmitte() {
@@ -880,7 +916,7 @@
   function renderSchaetz() {
     var el = $("fbSchaetz"); if (!el) return;
     if (offset !== 0) { el.hidden = true; return; }
-    var today = new Date(), key = ymd(today), store = load("wunderwahr_schaetz", {}), done = store[key];
+    var today = new Date(), key = ymd(today), store = load("thaumorawahr_schaetz", {}), done = store[key];
     var pool = schPool(), n = daysBetween(new Date(2026, 0, 1), today), r = seeded(n * 13 + 5);
     var w = done ? D.byId(done.id) : null;
     if (!w) { var todayCard = wonderFor(today).id; for (var k = 0; k < 20; k++) { var c = pool[Math.floor(r() * pool.length)]; if (c.id !== todayCard) { w = c; break; } } }
@@ -899,7 +935,7 @@
       $("fbSchGo").onclick = function () {
         var g = val(), f = Math.max(g / v, v / g);
         store[key] = { id: w.id, g: g, v: v, f: f }; var ks = Object.keys(store).sort(); if (ks.length > 800) delete store[ks[0]];
-        save("wunderwahr_schaetz", store); buzz(); renderSchaetz();
+        save("thaumorawahr_schaetz", store); buzz(); renderSchaetz();
       };
       return;
     }
@@ -947,8 +983,8 @@
   function yearData(y) {
     var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
     var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
-    var qa = load("wunderwahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
-    var sc = load("wunderwahr_schaetz", {}), sy = Object.keys(sc).filter(function (k) { return k.slice(0, 4) === String(y); }).map(function (k) { return sc[k].f; }).sort(function (a, b) { return a - b; });
+    var qa = load("thaumorawahr_quiz", {}), qy = Object.keys(qa).filter(function (k) { return k.slice(0, 4) === String(y); });
+    var sc = load("thaumorawahr_schaetz", {}), sy = Object.keys(sc).filter(function (k) { return k.slice(0, 4) === String(y); }).map(function (k) { return sc[k].f; }).sort(function (a, b) { return a - b; });
     var R = reisen(), km = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
     return { n: ids.length, kc: kc, quiz: qy.filter(function (k) { return qa[k].ok; }).length, quizAll: qy.length, sch: sy.length, schMed: sy.length ? sy[Math.floor(sy.length / 2)] : null, merk: sammlung().length, km: km };
   }
@@ -969,49 +1005,76 @@
 
   /* ---------- Lebenszeit in Wochen ---------- */
   var WEEKS_ROWS = 90;
+  function weekStart(b, row, col) { return addDays(new Date(b.getFullYear() + row, b.getMonth(), b.getDate()), col * 7); }
+  function weekState(p, b, row, col, ms, now) {
+    var st = weekStart(b, row, col), en = addDays(st, 7);
+    if (now >= st && now < en) return "now";
+    var big = ms.some(function (m) { return m.t >= st.getTime() && m.t < en.getTime(); });
+    if (st < now) return big ? "msp" : "past";
+    return big ? "msf" : "fut";
+  }
   function renderWochen() {
     var el = $("llWochen"), ps = persons(); if (!el || !ps.length) { if (el) el.hidden = true; return; }
     var p = ps.filter(function (x) { return x.id === activeP; })[0] || ps[0], b = birth(p), now = new Date();
-    var lived = Math.floor((now - b) / (7 * DAY)), yrs = (now - b) / (365.2425 * DAY);
+    var lived = Math.floor((now - b) / (7 * DAY)), yrs = (now - b) / (365.2425 * DAY), rowNow = Math.floor(yrs);
     el.hidden = false;
     el.innerHTML = '<h2 class="wd-head">Lebenszeit in Wochen <small>' + esc(p.name || "Ich") + '</small></h2>' +
-      '<p class="muted small" style="margin:0 0 10px">Raster über 90 Jahre: eine Zeile pro Lebensjahr, 52 Kästchen pro Zeile (die 1–2 Resttage je Jahr sind der Lesbarkeit halber ausgelassen). Tippe auf ein Kästchen für Details.</p>' +
-      '<div class="wd-kv"><div><span>Gelebte Wochen</span><b>' + fmt(lived) + '</b></div><div><span>Aktuelle Lebenswoche</span><b>' + fmt(lived + 1) + '</b></div><div><span>Alter</span><b>' + fmt(yrs, 2) + ' J.</b></div><div><span>Kästchen gesamt</span><b>' + fmt(52 * WEEKS_ROWS) + '</b></div></div>' +
+      '<p class="muted small" style="margin:0 0 10px">Raster über 90 Jahre: eine Zeile pro Lebensjahr (ab Geburtstag), 52 Kästchen pro Zeile; die 1–2 Resttage je Jahr sind ausgelassen. Tippe auf eine Zeile, um das Lebensjahr vergrößert zu öffnen.</p>' +
+      '<div class="wd-kv"><div><span>Gelebte Wochen</span><b>' + fmt(lived) + '</b></div><div><span>Aktuelle Lebenswoche</span><b>' + fmt(lived + 1) + '</b></div><div><span>Alter</span><b>' + fmt(yrs, 3) + ' Jahre</b></div><div><span>Anteil am Raster</span><b>' + fmt(Math.min(100, yrs / WEEKS_ROWS * 100), 1) + ' %</b></div></div>' +
       '<canvas id="llWCv" class="wd-weeks" role="img" aria-label="Raster der Lebenswochen; ' + fmt(lived) + ' Wochen gelebt"></canvas>' +
-      '<div class="wd-legend"><span><i class="a"></i>gelebt</span><span><i class="g"></i>aktuelle Woche</span><span><i class="m"></i>Meilenstein</span><span><i class="f"></i>kommend</span></div>';
+      '<div class="wd-legend"><span><i class="a"></i>gelebt</span><span><i class="g"></i>aktuelle Woche</span><span><i class="m"></i>Meilenstein</span><span><i class="f"></i>kommend</span></div>' +
+      '<button type="button" class="cta slim" id="llWNow" style="margin-top:10px">' + icon("calendar") + 'Aktuelles Lebensjahr öffnen</button>';
     var cv = $("llWCv"), css = cv.clientWidth || 340, dpr = Math.min(2, window.devicePixelRatio || 1);
     var padL = 24, cell = (css - padL) / 52, H = WEEKS_ROWS * cell + 4;
     cv.style.height = H + "px"; cv.width = Math.round(css * dpr); cv.height = Math.round(H * dpr);
     var g = cv.getContext("2d"); g.scale(dpr, dpr);
-    var cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue("--accent").trim() || "#5A2FBE", bor = cs.getPropertyValue("--border").trim() || "#ccc", sub = cs.getPropertyValue("--sub-onbg").trim() || "#777";
-    var gold = cs.getPropertyValue("--wd-gold").trim() || "#C98A1F";
-    var ms = {}; milestones(p, b.getTime(), b.getTime() + WEEKS_ROWS * 365.25 * DAY).forEach(function (m) { if (m.big) ms[Math.floor((m.t - b) / (7 * DAY))] = 1; });
-    g.font = "600 8px -apple-system, system-ui, sans-serif"; g.fillStyle = sub; g.textAlign = "right"; g.textBaseline = "middle";
+    var cs = getComputedStyle(document.documentElement), col = { past: cs.getPropertyValue("--accent").trim() || "#5A2FBE", fut: cs.getPropertyValue("--border").trim() || "#ccc", gold: cs.getPropertyValue("--wd-gold").trim() || "#C98A1F", sub: cs.getPropertyValue("--sub-onbg").trim() || "#777" };
+    var ms = milestones(p, b.getTime(), b.getTime() + WEEKS_ROWS * 365.25 * DAY).filter(function (m) { return m.big; });
+    g.font = "600 8px -apple-system, system-ui, sans-serif"; g.fillStyle = col.sub; g.textAlign = "right"; g.textBaseline = "middle";
     for (var y = 0; y < WEEKS_ROWS; y++) {
-      if (y % 10 === 0) g.fillText(String(y), padL - 5, y * cell + cell / 2);
+      if (y % 10 === 0) { g.fillStyle = col.sub; g.fillText(String(y), padL - 5, y * cell + cell / 2); }
       for (var w = 0; w < 52; w++) {
-        var i = y * 52 + w, x = padL + w * cell, yy = y * cell, s = Math.max(1, cell - 1.4);
-        var wk = Math.floor(((new Date(b.getFullYear() + y, b.getMonth(), b.getDate())) - b) / (7 * DAY)) + w;
-        if (wk === lived) g.fillStyle = gold; else if (ms[wk] && wk < lived) g.fillStyle = gold; else if (wk < lived) g.fillStyle = acc; else if (ms[wk]) g.fillStyle = gold; else g.fillStyle = bor;
-        g.globalAlpha = wk < lived || wk === lived ? 1 : ms[wk] ? .55 : .55;
-        g.fillRect(x, yy, s, s);
+        var stt = weekState(p, b, y, w, ms, now), x = padL + w * cell, s = Math.max(1, cell - 1.3);
+        g.globalAlpha = stt === "fut" ? .55 : stt === "msf" ? .6 : 1;
+        g.fillStyle = stt === "past" ? col.past : stt === "fut" ? col.fut : col.gold;
+        g.fillRect(x, y * cell, s, s);
       }
     }
     g.globalAlpha = 1;
-    cv.onclick = function (e) {
-      var rc = cv.getBoundingClientRect(), x = e.clientX - rc.left - padL, y2 = e.clientY - rc.top;
-      if (x < 0) return; var row = Math.floor(y2 / cell), col = Math.min(51, Math.floor(x / cell));
-      if (row < 0 || row >= WEEKS_ROWS) return;
-      var ys = new Date(b.getFullYear() + row, b.getMonth(), b.getDate()), start = addDays(ys, col * 7), end = addDays(start, 6);
-      var wk = Math.floor((start - b) / (7 * DAY)) + 1, past = start <= now;
-      var evs = D.EREIGNISSE.filter(function (ev) { return ev[0] === start.getFullYear() || ev[0] === end.getFullYear(); });
-      var hv = []; for (var d = 0; d < 7; d++) { var dd = addDays(start, d), key = String(dd.getMonth() + 1).padStart(2, "0") + "-" + String(dd.getDate()).padStart(2, "0"); (D.HEUTE[key] || []).forEach(function (h) { if (h[0] <= start.getFullYear()) hv.push([dd, h]); }); }
-      var mws = milestones(p, start.getTime(), end.getTime() + DAY);
-      sheet('<h2>Lebenswoche ' + fmt(wk) + '</h2><p class="muted" style="margin:0">' + dShort(start) + ' – ' + dShort(end) + ' · Alter ' + row + ' Jahre, Woche ' + (col + 1) + ' des Lebensjahres' + (past ? '' : ' · liegt in der Zukunft') + '</p>' +
-        (mws.length ? '<h3 class="wd-sub">Meilensteine in dieser Woche</h3>' + mws.map(function (m) { return '<div class="sn-row on"><span class="dot" style="background:var(--wd-gold)"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div></div>'; }).join("") : '') +
-        (evs.length ? '<h3 class="wd-sub">In diesem Jahr in der Welt</h3>' + evs.map(function (ev) { return '<div class="sn-fact"><div class="ic wd-yr">' + ev[0] + '</div><div><b>' + esc(ev[1]) + '</b></div></div>'; }).join("") : '') +
-        (hv.length ? '<h3 class="wd-sub">Jahrestage in dieser Woche</h3>' + hv.slice(0, 6).map(function (x) { return '<div class="sn-fact"><div class="ic wd-yr">' + x[1][0] + '</div><div><b>' + x[0].getDate() + '. ' + MO[x[0].getMonth()] + '</b><span>' + esc(x[1][1]) + '</span></div></div>'; }).join("") : ''));
-    };
+    g.strokeStyle = col.gold; g.lineWidth = 1.2; g.strokeRect(padL - 1, rowNow * cell - 1, 52 * cell + 1, cell + 1);
+    cv.onclick = function (e) { var rc = cv.getBoundingClientRect(), row = Math.floor((e.clientY - rc.top) / cell); if (row >= 0 && row < WEEKS_ROWS) openJahr(p, row); };
+    $("llWNow").onclick = function () { openJahr(p, rowNow); };
+  }
+  /* Ein Lebensjahr vergrößert: 52 gut antippbare Wochen */
+  function openJahr(p, row) {
+    var b = birth(p), now = new Date(), ms = milestones(p, b.getTime(), b.getTime() + WEEKS_ROWS * 365.25 * DAY).filter(function (m) { return m.big; });
+    var y0 = new Date(b.getFullYear() + row, b.getMonth(), b.getDate()), y1 = addDays(new Date(b.getFullYear() + row + 1, b.getMonth(), b.getDate()), -1);
+    var cells = ""; for (var w = 0; w < 52; w++) { var st = weekState(p, b, row, w, ms, now); cells += '<button type="button" class="wd-wk ' + st + '" data-w="' + w + '" aria-label="Woche ' + (w + 1) + ', ab ' + dShort(weekStart(b, row, w)) + '">' + (w + 1) + '</button>'; }
+    sheet('<h2>Lebensjahr ' + (row + 1) + ' <small class="muted" style="font-size:14px;font-weight:500">Alter ' + row + '</small></h2>' +
+      '<p class="muted small" style="margin:0 0 10px">' + dShort(y0) + ' – ' + dShort(y1) + ' · Kalenderjahre ' + y0.getFullYear() + (y1.getFullYear() !== y0.getFullYear() ? '/' + y1.getFullYear() : '') + '</p>' +
+      '<div class="wd-wkgrid">' + cells + '</div>' +
+      '<div class="btn-row" style="margin-top:12px"><button type="button" class="cta slim" id="jPrev"' + (row <= 0 ? ' disabled' : '') + '>' + icon("left") + 'Jahr ' + row + '</button><button type="button" class="cta slim" id="jNext"' + (row >= WEEKS_ROWS - 1 ? ' disabled' : '') + '>Jahr ' + (row + 2) + icon("right") + '</button></div>', function (root, close) {
+        root.querySelectorAll("[data-w]").forEach(function (c) { c.onclick = function () { close(); weekDetail(p, row, +c.getAttribute("data-w")); }; });
+        root.querySelector("#jPrev").onclick = function () { close(); openJahr(p, row - 1); };
+        root.querySelector("#jNext").onclick = function () { close(); openJahr(p, row + 1); };
+      });
+  }
+  function weekDetail(p, row, col) {
+    var b = birth(p), now = new Date(), start = weekStart(b, row, col), end = addDays(start, 6);
+    var wk = Math.floor((start - b) / (7 * DAY)) + 1, past = start <= now;
+    var evs = D.EREIGNISSE.filter(function (ev) { return ev[0] === start.getFullYear() || ev[0] === end.getFullYear(); });
+    var hv = []; for (var d = 0; d < 7; d++) { var dd = addDays(start, d), key = String(dd.getMonth() + 1).padStart(2, "0") + "-" + String(dd.getDate()).padStart(2, "0"); (D.HEUTE[key] || []).forEach(function (h) { if (h[0] <= start.getFullYear()) hv.push([dd, h]); }); }
+    var mws = milestones(p, start.getTime(), end.getTime() + DAY);
+    var ageD = Math.floor((start - b) / DAY);
+    sheet('<h2>Lebenswoche ' + fmt(wk) + '</h2><p class="muted" style="margin:0">' + dShort(start) + ' – ' + dShort(end) + (past ? '' : ' · liegt in der Zukunft') + '</p>' +
+      '<div class="wd-kv" style="margin-top:10px"><div><span>Alter zu Wochenbeginn</span><b>' + row + ' J. · ' + fmt(ageD) + ' Tage</b></div><div><span>Woche im Lebensjahr</span><b>' + (col + 1) + ' von 52</b></div>' +
+      '<div><span>' + (past ? 'Vor' : 'In') + '</span><b>' + fmt(Math.abs(daysBetween(now, start))) + ' Tagen</b></div><div><span>Erdbahn bis dahin</span><b>' + fmt(ageD * 86400 * ORBIT_KM_S / 1e9, 2) + ' Mrd. km</b></div></div>' +
+      (mws.length ? '<h3 class="wd-sub">Meilensteine in dieser Woche</h3>' + mws.map(function (m) { return '<div class="sn-row on"><span class="dot" style="background:var(--wd-gold)"></span><div class="main"><b>' + esc(m.title) + '</b><span>' + dShort(new Date(m.t)) + '</span></div></div>'; }).join("") : '') +
+      (evs.length ? '<h3 class="wd-sub">In diesem Jahr in der Welt</h3>' + evs.map(function (ev) { return '<div class="sn-fact"><div class="ic wd-yr">' + ev[0] + '</div><div><b>' + esc(ev[1]) + '</b></div></div>'; }).join("") : '') +
+      (hv.length ? '<h3 class="wd-sub">Jahrestage in dieser Woche</h3>' + hv.slice(0, 7).map(function (x) { return '<div class="sn-fact"><div class="ic wd-yr">' + x[1][0] + '</div><div><b>' + x[0].getDate() + '. ' + MO[x[0].getMonth()] + '</b><span>' + esc(x[1][1]) + '</span></div></div>'; }).join("") : '') +
+      '<button type="button" class="cta slim" id="wBack" style="margin-top:12px">' + icon("left") + 'Zurück zum Lebensjahr ' + (row + 1) + '</button>', function (root, close) {
+        root.querySelector("#wBack").onclick = function () { close(); openJahr(p, row); };
+      });
   }
 
   /* ---------- Geburtsmoment: Himmel und Erde am Tag der Geburt ---------- */
@@ -1041,7 +1104,7 @@
   }
 
   /* ---------- Zeitkapsel ---------- */
-  function kapseln() { return load("wunderwahr_kapseln", []); }
+  function kapseln() { return load("thaumorawahr_kapseln", []); }
   function kapselReady(k) { return !k.opened && midnight(new Date()) >= midnight(new Date(k.open)); }
   function renderKapselBanner() {
     var el = $("fbKapsel"); if (!el) return;
@@ -1066,7 +1129,7 @@
     el.querySelectorAll("[data-kd]").forEach(function (b) {
       b.onclick = function () {
         var id = b.getAttribute("data-kd");
-        (window.wzConfirm ? wzConfirm("Diese Zeitkapsel endgültig löschen? Der Inhalt kann nicht wiederhergestellt werden.", { okLabel: "Löschen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { save("wunderwahr_kapseln", kapseln().filter(function (k) { return k.id !== id; })); renderKapsel(); renderKapselBanner(); } });
+        (window.wzConfirm ? wzConfirm("Diese Zeitkapsel endgültig löschen? Der Inhalt kann nicht wiederhergestellt werden.", { okLabel: "Löschen" }) : Promise.resolve(true)).then(function (ok) { if (ok) { save("thaumorawahr_kapseln", kapseln().filter(function (k) { return k.id !== id; })); renderKapsel(); renderKapselBanner(); } });
       };
     });
     $("llKNew").onclick = newKapsel;
@@ -1088,7 +1151,7 @@
           if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d <= ymd(new Date())) { toast("Bitte ein Datum in der Zukunft wählen."); return; }
           var w = wonderFor(new Date()), ks = kapseln();
           ks.push({ id: "k" + Date.now().toString(36), t: root.querySelector("#kT").value.trim(), txt: txt, created: new Date().toISOString(), open: d, ctx: { ort: LOC.name || "", wunder: w.t } });
-          save("wunderwahr_kapseln", ks); close(); toast("Zeitkapsel versiegelt bis " + dShort(new Date(d)) + "."); renderKapsel();
+          save("thaumorawahr_kapseln", ks); close(); toast("Zeitkapsel versiegelt bis " + dShort(new Date(d)) + "."); renderKapsel();
         };
       });
   }
@@ -1096,7 +1159,7 @@
     var ks = kapseln(), k = ks.filter(function (x) { return x.id === id; })[0]; if (!k) return;
     if (!k.opened && !kapselReady(k)) return;
     var first = !k.opened;
-    if (first) { k.opened = new Date().toISOString(); save("wunderwahr_kapseln", ks); }
+    if (first) { k.opened = new Date().toISOString(); save("thaumorawahr_kapseln", ks); }
     var d = daysBetween(new Date(k.created), new Date());
     sheet('<div class="wd-kapsel-open' + (first ? ' anim' : '') + '"><div class="wd-seal">' + icon("lock") + '</div>' +
       '<h2>' + esc(k.t || "Zeitkapsel") + '</h2><p class="muted small" style="margin:0 0 12px">Geschrieben am ' + dLong(new Date(k.created)) + (k.ctx && k.ctx.ort ? ' in ' + esc(k.ctx.ort) : '') + ' – vor ' + fmt(d) + (d === 1 ? ' Tag' : ' Tagen') + '.</p>' +
@@ -1111,17 +1174,24 @@
   function unvec(v) { return [Math.asin(Math.max(-1, Math.min(1, v[2]))) * R2D, Math.atan2(v[1], v[0]) * R2D]; }
   function rotFn(a, b) {
     var k = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], s = Math.hypot(k[0], k[1], k[2]), c = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-    if (s < 1e-9) return function (v) { return v; };
+    if (s < 1e-12) return function (v) { return v; };
     k = [k[0] / s, k[1] / s, k[2] / s];
     return function (v) { var kv = [k[1] * v[2] - k[2] * v[1], k[2] * v[0] - k[0] * v[2], k[0] * v[1] - k[1] * v[0]], kd = k[0] * v[0] + k[1] * v[1] + k[2] * v[2]; return [v[0] * c + kv[0] * s + k[0] * kd * (1 - c), v[1] * c + kv[1] * s + k[1] * kd * (1 - c), v[2] * c + kv[2] * s + k[2] * kd * (1 - c)]; };
   }
-  var MLAT = 82;
-  function mercY(lat) { var p = Math.max(-MLAT, Math.min(MLAT, lat)) * D2R; return Math.log(Math.tan(Math.PI / 4 + p / 2)); }
+  /* Verschiebung ohne Verdrehen: 1) Drehung um die Erdachse (Längenänderung), 2) Drehung entlang des Ziel-Meridians (Breitenänderung) */
+  function moveFn(from, to) {
+    var dl = (to[1] - from[1]) * D2R, cz = Math.cos(dl), sz = Math.sin(dl);
+    var r2 = rotFn(vec(from[0], to[1]), vec(to[0], to[1]));
+    return function (v) { return r2([v[0] * cz - v[1] * sz, v[0] * sz + v[1] * cz, v[2]]); };
+  }
+  var MLAT = 82, DLAT = 89.5;
+  function mercY(lat, lim) { var L = lim || MLAT, p = Math.max(-L, Math.min(L, lat)) * D2R; return Math.log(Math.tan(Math.PI / 4 + p / 2)); }
   var MY = mercY(MLAT);
   function renderGroesse() {
     var el = $("dkGroesse"); if (!el || !GEO.world) return;
     var list = GEO.world.filter(function (c) { return c.area && c.bb && c.bb[1] > -60; }).sort(function (a, b) { return a.de.localeCompare(b.de, "de"); });
-    if (!TG.sel) { TG.sel = list.filter(function (c) { return c.de === "Grönland"; })[0] || list[0]; TG.to = [8, 20]; }
+    if (!TG.sel) { TG.sel = list.filter(function (c) { return c.de === "Grönland"; })[0] || list[0]; }
+    if (!TG.to || TG.forId !== TG.sel.id) { TG.to = [Math.abs(TG.sel.ly) > 25 ? 0 : (TG.sel.ly >= 0 ? 55 : -55), TG.sel.lx]; TG.forId = TG.sel.id; }
     var quick = ["Grönland", "Russland", "Kanada", "Australien", "Deutschland", "Indien", "Brasilien", "Alaska"].map(function (n) { return list.filter(function (c) { return c.de === n; })[0]; }).filter(Boolean);
     el.innerHTML = '<h2 class="wd-head">Wahre Größe <small>Mercator-Projektion</small></h2>' +
       '<p class="muted small" style="margin:0 0 10px">Die übliche Weltkarte (Mercator) ist winkeltreu, aber nicht flächentreu: Ein Gebiet in der Breite φ wird linear um 1/cos φ und in der Fläche um 1/cos² φ vergrößert. Wähle ein Land und tippe oder ziehe auf der Karte – es wird auf der Kugel verschoben und dann neu projiziert.</p>' +
@@ -1131,10 +1201,12 @@
     el.querySelectorAll("[data-tg]").forEach(function (b) { b.onclick = function () { TG.sel = list.filter(function (c) { return c.id === b.getAttribute("data-tg"); })[0]; renderGroesse(); }; });
     $("tgSel").onchange = function () { TG.sel = list.filter(function (c) { return c.id === $("tgSel").value; })[0]; renderGroesse(); };
     var cv = $("tgCv"), st = null;
-    function pick(e) { var rc = cv.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height; var lon = x * 360 - 180, my = MY - y * 2 * MY, lat = (2 * Math.atan(Math.exp(my)) - Math.PI / 2) * R2D; TG.to = [Math.max(-75, Math.min(78, lat)), lon]; drawGroesse(); }
-    cv.addEventListener("pointerdown", function (e) { st = true; try { cv.setPointerCapture(e.pointerId); } catch (x) { } pick(e); });
-    cv.addEventListener("pointermove", function (e) { if (st) pick(e); });
-    cv.addEventListener("pointerup", function () { st = null; });
+    function ll(e) { var rc = cv.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height; var my = MY - y * 2 * MY; return [(2 * Math.atan(Math.exp(my)) - Math.PI / 2) * R2D, x * 360 - 180]; }
+    function setTo(lat, lon) { TG.to = [Math.max(-72, Math.min(72, lat)), wrap180(lon)]; drawGroesse(); }
+    // Ziehen: Land wird mitgeführt (relativ zum Startpunkt); kurzer Tipp: Bezugspunkt springt dorthin
+    cv.addEventListener("pointerdown", function (e) { var p0 = ll(e); st = { p0: p0, to0: TG.to.slice(), moved: false, x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (x) { } });
+    cv.addEventListener("pointermove", function (e) { if (!st) return; if (Math.hypot(e.clientX - st.x, e.clientY - st.y) > 6) st.moved = true; if (st.moved) { var p1 = ll(e); setTo(st.to0[0] + (p1[0] - st.p0[0]), st.to0[1] + (p1[1] - st.p0[1])); } });
+    cv.addEventListener("pointerup", function (e) { if (st && !st.moved) { var p = ll(e); setTo(p[0], p[1]); } st = null; });
     drawGroesse();
   }
   function drawGroesse() {
@@ -1147,6 +1219,7 @@
     g.fillStyle = dark ? "#15102A" : "#EEE9FA"; g.fillRect(0, 0, css, Hh);
     function X(lon) { return (lon + 180) / 360 * css; }
     function Y(lat) { return (MY - mercY(lat)) / (2 * MY) * Hh; }
+    function YD(lat) { return (MY - mercY(lat, DLAT)) / (2 * MY) * Hh; }
     // Breitenkreise mit Flächenfaktor
     g.strokeStyle = dark ? "rgba(255,255,255,.08)" : "rgba(40,20,90,.08)"; g.lineWidth = 1; g.fillStyle = dark ? "rgba(255,255,255,.45)" : "rgba(40,20,90,.45)"; g.font = "600 8.5px -apple-system, system-ui, sans-serif";
     [-60, -30, 0, 30, 60, 75].forEach(function (la) { g.beginPath(); g.moveTo(0, Y(la)); g.lineTo(css, Y(la)); g.stroke(); g.fillText((la === 0 ? "0°" : la + "°") + " ×" + fmt(1 / Math.pow(Math.cos(la * D2R), 2), 1), 3, Y(la) - 2); });
@@ -1159,7 +1232,7 @@
     c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.stroke(); });
     g.setLineDash([]);
     // verschobene Kopie
-    var rot = rotFn(vec(ref[0], ref[1]), vec(TG.to[0], TG.to[1]));
+    var rot = moveFn(ref, TG.to);
     g.fillStyle = dark ? "rgba(255,210,122,.55)" : "rgba(201,138,31,.5)"; g.strokeStyle = dark ? "#FFD27A" : "#8A5A06"; g.lineWidth = 1.2;
     [-360, 0, 360].forEach(function (sh) {
       c.polys.forEach(function (rings) {
@@ -1169,7 +1242,7 @@
           for (var i = 0; i < r.length; i += 2) {
             var q = unvec(rot(vec(r[i + 1], r[i]))), lon = q[1];
             if (prev != null) { while (lon - prev > 180) lon -= 360; while (lon - prev < -180) lon += 360; } else { while (lon - TG.to[1] > 180) lon -= 360; while (lon - TG.to[1] < -180) lon += 360; }
-            prev = lon; var x = X(lon + sh), y = Y(q[0]); if (i) g.lineTo(x, y); else g.moveTo(x, y);
+            prev = lon; var x = X(lon + sh), y = YD(q[0]); if (i) g.lineTo(x, y); else g.moveTo(x, y);
           }
           g.closePath();
         });
@@ -1180,7 +1253,7 @@
     var f0 = 1 / Math.pow(Math.cos(ref[0] * D2R), 2), f1 = 1 / Math.pow(Math.cos(TG.to[0] * D2R), 2);
     $("tgInfo").innerHTML = '<div class="wd-kv"><div><span>Fläche (aus Umriss berechnet)</span><b>' + fmt(c.area) + ' km²</b></div><div><span>Vergleich Deutschland</span><b>× ' + fmt(c.area / (de ? de.area : 357000), 1) + '</b></div>' +
       '<div><span>Bezugspunkt original</span><b>' + fmt(ref[0], 1) + '° · ×' + fmt(f0, 2) + '</b></div><div><span>Bezugspunkt verschoben</span><b>' + fmt(TG.to[0], 1) + '° · ×' + fmt(f1, 2) + '</b></div></div>' +
-      '<p class="muted small" style="margin:8px 0 0">×-Werte = Flächenvergrößerung der Mercator-Karte am Bezugspunkt (1/cos² φ). Am Original erscheint ' + esc(c.de) + ' damit etwa ' + fmt(f0 / f1, 1) + '-mal so groß wie an der neuen Position. Polnahe Gebiete jenseits ±82° sind abgeschnitten.</p>';
+      '<p class="muted small" style="margin:8px 0 0">×-Werte = Flächenvergrößerung der Mercator-Karte am Bezugspunkt (1/cos² φ). Am Original erscheint ' + esc(c.de) + ' damit etwa ' + fmt(f0 / f1, 1) + '-mal so groß wie an der neuen Position. Das Land wird auf der Kugel starr verschoben (Norden bleibt oben); sehr ausgedehnte Länder wie Russland krümmen sich dabei sichtbar, weil ihre Ränder auf der Kugel andere Wege nehmen. Kartenrand bei ±82°.</p>';
   }
 
   /* ---------- Kosmische Adresse ---------- */
@@ -1250,6 +1323,120 @@
     txt(); raf = requestAnimationFrame(draw);
   }
 
+  /* =========================================================
+     Technik (FINAL-98): Ephemeriden, Großkreis-Parameter, Zeitmaße & Zeitdilatation,
+     Methoden-Übersicht
+     ========================================================= */
+  function hhmm(d) { return d ? d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) : "–"; }
+  function hhmmss(d) { return d ? d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "–"; }
+  function degTxt(a, d) { return fmt(a, d == null ? 1 : d) + "°"; }
+  function raTxt(ra) { var h = wrap360(ra) / 15, H = Math.floor(h), m = (h - H) * 60, M = Math.floor(m), S = Math.round((m - M) * 60); if (S === 60) { S = 0; M++; } if (M === 60) { M = 0; H = (H + 1) % 24; } return H + "h " + String(M).padStart(2, "0") + "m " + String(S).padStart(2, "0") + "s"; }
+  function sunAA(t) { var jd = A.toJD(t), s = A.sun(jd), aa = A.enuToAltAz(A.eqToEnu(s.v, A.lst(jd, LOC.lon), LOC.lat)); return { alt: aa.alt, az: aa.az, s: s }; }
+  /* Zeitpunkt, an dem die Sonnenhöhe einen Wert kreuzt (Suche in 5-Minuten-Schritten, dann Bisektion) */
+  function sunCross(day, h, rising) {
+    var t0 = midnight(day).getTime(), step = 5 * 60000, prev = sunAA(new Date(t0)).alt - h;
+    for (var t = t0 + step; t <= t0 + DAY; t += step) {
+      var cur = sunAA(new Date(t)).alt - h;
+      if (rising ? (prev < 0 && cur >= 0) : (prev >= 0 && cur < 0)) {
+        var a = t - step, b = t; for (var i = 0; i < 20; i++) { var m = (a + b) / 2, v = sunAA(new Date(m)).alt - h; if (rising ? v < 0 : v >= 0) a = m; else b = m; }
+        return new Date((a + b) / 2);
+      }
+      prev = cur;
+    }
+    return null;
+  }
+  function eqTime(t) { // Zeitgleichung in Minuten (wahre minus mittlere Sonnenzeit)
+    var jd = A.toJD(t), T = (jd - 2451545) / 36525, L0 = wrap360(280.46646 + 36000.76983 * T + 0.0003032 * T * T), s = A.sun(jd);
+    return 4 * wrap180(L0 - 0.0057183 - s.ra);
+  }
+  function renderEphem() {
+    var el = $("dkEphem"); if (!el || !A) return;
+    try {
+      var now = new Date(), jd = A.toJD(now), sa = sunAA(now), s = sa.s, refr = A.refraction ? A.refraction(sa.alt) : 0;
+      var cul = A.culmination ? A.culmination("sun", A.toJD(midnight(now)), LOC.lat, LOC.lon) : null, culD = cul ? A.fromJD(cul.jd) : null;
+      var rise = sunCross(now, -0.8333, true), set = sunCross(now, -0.8333, false);
+      var tw = [[-6, "Bürgerliche Dämmerung"], [-12, "Nautische Dämmerung"], [-18, "Astronomische Dämmerung"]].map(function (x) { return [x[1], sunCross(now, x[0], true), sunCross(now, x[0], false)]; });
+      var m = A.moon(jd), tc = A.topocentric(m.ra, m.dec, m.dist, A.lst(jd, LOC.lon), LOC.lat, 0), maa = A.enuToAltAz(A.eqToEnu(A.vec(tc.ra, tc.dec), A.lst(jd, LOC.lon), LOC.lat));
+      var cosE = s.v[0] * m.v[0] + s.v[1] * m.v[1] + s.v[2] * m.v[2], illum = (1 - cosE) / 2 * 100;
+      var mr = A.riseSet("moon", A.toJD(midnight(now)), LOC.lat, LOC.lon, "rise", 1), mset = A.riseSet("moon", A.toJD(midnight(now)), LOC.lat, LOC.lon, "set", 1);
+      var lstH = wrap360(A.lst(jd, LOC.lon)), eot = eqTime(now), len = rise && set ? (set - rise) / 60000 : null;
+      var mDiam = 2 * Math.asin(1737.4 / m.dist) * R2D * 60, sDiam = 2 * s.radius * 60;
+      function r(k, v) { return '<div><span>' + k + '</span><b>' + v + '</b></div>'; }
+      el.innerHTML = '<h2 class="wd-head">Ephemeriden <small>' + esc(LOC.name || "Standort") + ' · ' + hhmmss(now) + '</small></h2>' +
+        '<p class="muted small" style="margin:0 0 10px">Live berechnet für ' + fmt(LOC.lat, 4) + '° N, ' + fmt(LOC.lon, 4) + '° O. Azimut ab Norden über Osten; Höhen geometrisch, Refraktion separat ausgewiesen.</p>' +
+        '<h3 class="wd-sub">Sonne</h3><div class="wd-kv">' +
+        r("Azimut", degTxt(sa.az)) + r("Höhe (+ Refraktion)", degTxt(sa.alt, 2) + (refr ? " (+" + fmt(refr * 60, 1) + "′)" : "")) +
+        r("Rektaszension", raTxt(s.ra)) + r("Deklination", degTxt(s.dec, 2)) +
+        r("Aufgang / Untergang", hhmm(rise) + " / " + hhmm(set)) + r("Tageslänge", len ? hm(len) : "–") +
+        r("Wahrer Mittag (Höhe)", culD ? hhmm(culD) + " (" + degTxt(cul.alt, 1) + ")" : "–") + r("Zeitgleichung", (eot >= 0 ? "+" : "−") + fmt(Math.abs(eot), 2) + " min") +
+        r("Abstand", fmt(s.dist, 6) + " AE") + r("Scheinbarer Durchmesser", fmt(sDiam, 2) + "′") + '</div>' +
+        '<h3 class="wd-sub">Dämmerung (Beginn morgens / Ende abends)</h3><div class="wd-kv">' + tw.map(function (x) { return r(x[0] + " (" + (x[0][0] === "B" ? "−6°" : x[0][0] === "N" ? "−12°" : "−18°") + ")", hhmm(x[1]) + " / " + hhmm(x[2])); }).join("") + r("Lokale Sternzeit", raTxt(lstH)) + '</div>' +
+        '<h3 class="wd-sub">Mond</h3><div class="wd-kv">' +
+        r("Azimut", degTxt(maa.az)) + r("Höhe (topozentrisch)", degTxt(maa.alt, 2)) +
+        r("Entfernung (Erdmitte)", fmt(m.dist) + " km") + r("Scheinbarer Durchmesser", fmt(mDiam, 2) + "′") +
+        r("Beleuchtung", fmt(illum, 1) + " %") + r("Aufgang / Untergang", hhmm(mr ? A.fromJD(mr) : null) + " / " + hhmm(mset ? A.fromJD(mset) : null)) +
+        r("Ekliptikale Breite", degTxt(m.lat, 2)) + r("Julianisches Datum", fmt(jd, 5)) + '</div>';
+    } catch (e) { el.innerHTML = '<h2>Ephemeriden</h2><p class="muted small">Für diesen Ort nicht berechenbar.</p>'; }
+  }
+  setInterval(function () { if (document.querySelector("#screen-weitblick.active") && !document.hidden) renderEphem(); }, 10000);
+
+  /* Großkreis-Parameter der gewählten Richtung */
+  function renderGK() {
+    var el = $("dkGK"); if (!el) return;
+    var a = heading * D2R, p = LOC.lat * D2R;
+    var vmax = Math.acos(Math.min(1, Math.abs(Math.sin(a) * Math.cos(p)))) * R2D; // Scheitelbreite (Clairaut)
+    var sv = 0; if (lastPath) { var mx = -99; lastPath.pts.forEach(function (q0, i) { if (q0[0] > mx) { mx = q0[0]; sv = i * 10; } }); } // Entfernung bis zum nördlichsten Punkt (entlang der Linie)
+    var ant = [-LOC.lat, wrap180(LOC.lon + 180)], q = dest(LOC.lat, LOC.lon, heading, CIRC / 4), q2 = dest(LOC.lat, LOC.lon, heading, CIRC * 3 / 4);
+    var inc = vmax; // Bahnneigung gegen den Äquator = Scheitelbreite
+    el.innerHTML = '<h3 class="wd-sub">Großkreis-Parameter</h3><div class="wd-kv">' +
+      '<div><span>Anfangskurs</span><b>' + degTxt(wrap360(heading), 1) + '</b></div><div><span>Neigung gegen Äquator</span><b>' + degTxt(inc, 2) + '</b></div>' +
+      '<div><span>Nördlichster Punkt</span><b>' + degTxt(vmax, 2) + ' N</b></div><div><span>Abstand zum Scheitel</span><b>' + fmt(sv) + ' km</b></div>' +
+      '<div><span>Nach 10.008 km (¼)</span><b>' + fmt(q[0], 2) + '°, ' + fmt(q[1], 2) + '°</b></div><div><span>Nach ' + fmt(CIRC * 3 / 4) + ' km (¾)</span><b>' + fmt(q2[0], 2) + '°, ' + fmt(q2[1], 2) + '°</b></div>' +
+      '<div><span>Erdumfang (Kugel R = ' + fmt(RE, 1) + ' km)</span><b>' + fmt(CIRC, 1) + ' km</b></div><div><span>Gegenpunkt deines Orts</span><b>' + fmt(ant[0], 2) + '°, ' + fmt(ant[1], 2) + '°</b></div></div>' +
+      '<p class="muted small" style="margin:8px 0 0">Kugelmodell (mittlerer Erdradius). Scheitelbreite nach Clairaut: cos φ<sub>max</sub> = |sin α · cos φ<sub>0</sub>|. Ein Großkreis schneidet den Äquator zweimal und erreicht genau eine nördlichste und eine südlichste Breite.</p>';
+  }
+
+  /* Zeitmaße & relativistische Zeitdilatation */
+  function renderZeitmasse() {
+    var el = $("llMasse"), ps = persons(); if (!el || !ps.length) { if (el) el.hidden = true; return; }
+    var p = ps.filter(function (x) { return x.id === activeP; })[0] || ps[0], sec = (Date.now() - birth(p).getTime()) / 1000, d = sec / 86400;
+    var rows = [
+      ["Sekunden", sec, 0], ["Minuten", sec / 60, 0], ["Stunden", sec / 3600, 0], ["Tage (24 h)", d, 2], ["Wochen", d / 7, 2],
+      ["Sterntage (23 h 56 min 4 s)", sec / SID, 1], ["Synodische Monate (29,53 d)", d / SYN, 2], ["Siderische Monate (27,32 d)", d / 27.321661, 2],
+      ["Tropische Jahre (365,2422 d)", d / 365.24219, 4], ["Julianische Jahre (365,25 d)", d / 365.25, 4],
+      ["Merkurjahre", d / 87.969, 2], ["Venusjahre", d / 224.701, 2], ["Marsjahre", d / 686.98, 3], ["Jupiterjahre", d / 4332.59, 3],
+      ["Saturnjahre", d / 10759.22, 4], ["Uranusjahre", d / 30688.5, 4], ["Neptunjahre", d / 60182, 5], ["Galaktische Jahre (≈ 230 Mio. J.)", d / 365.25 / 2.3e8, 9]
+    ];
+    var c = 299792.458, vo = ORBIT_KM_S, vg = GAL_KM_S;
+    var dvo = sec * vo * vo / (2 * c * c), dvg = sec * vg * vg / (2 * c * c), dgr = sec * 6.96e-10; // GM/(R c²) für die Erdoberfläche
+    function fs(x) { return x >= 1 ? fmt(x, 2) + " s" : x >= 1e-3 ? fmt(x * 1000, 2) + " ms" : fmt(x * 1e6, 2) + " µs"; }
+    el.hidden = false;
+    el.innerHTML = '<h2 class="wd-head">Alter in Zeitmaßen <small>' + esc(p.name || "Ich") + '</small></h2>' +
+      rows.map(function (r) { return '<div class="sn-row"><div class="main"><b>' + r[0] + '</b></div><div class="r wd-num">' + fmt(r[1], r[2]) + '</div></div>'; }).join("") +
+      '<h3 class="wd-sub">Relativistische Zeitdilatation (Abschätzung)</h3><div class="wd-kv">' +
+      '<div><span>Bahnbewegung der Erde (29,78 km/s)</span><b>− ' + fs(dvo) + '</b></div><div><span>Bewegung um das galaktische Zentrum (230 km/s)</span><b>− ' + fs(dvg) + '</b></div>' +
+      '<div><span>Schwerefeld der Erde (Oberfläche)</span><b>− ' + fs(dgr) + '</b></div><div><span>Faktor v²/2c² (Erdbahn)</span><b>' + (vo * vo / (2 * c * c)).toExponential(2).replace(".", ",") + '</b></div></div>' +
+      '<p class="muted small" style="margin:8px 0 0">So viel weniger Zeit ist für dich vergangen als für eine gedachte Uhr, die relativ zur Sonne bzw. zum galaktischen Zentrum ruht oder sich weit weg von der Erde befindet. Näherung erster Ordnung (Δt ≈ t·v²/2c² bzw. t·GM/Rc²); Effekte überlagern sich nicht einfach additiv, die Größenordnung stimmt.</p>';
+  }
+
+  /* Methoden & Genauigkeit */
+  function openMethoden() {
+    var M = [
+      ["Tageswunder", "730 eigene Karten, Reihenfolge ab 01.01.2026; persönlich festgelegte Tageskarte, bekannte Karten werden übersprungen (Speicher: thaumorawahr_tage, thaumorawahr_entdeckt)."],
+      ["Sonne, Mond, Planeten", "Algorithmen nach J. Meeus (Astronomical Algorithms): Sonnenposition mit Genauigkeit ~0,01°, Mond nach verkürzter ELP-Reihe (~0,1°, Entfernung ~10 km), Planeten über Keplerbahnen (JPL-Näherungselemente, Bogenminuten). Auf- und Untergänge: Suche in 10-Minuten-Schritten mit Bisektion, Standardrefraktion −0,8333° (Sonne)."],
+      ["Dämmerung", "Sonnenhöhe −6°, −12°, −18°; Suche in 5-Minuten-Schritten, Bisektion auf Sekunden. Polarnacht/-tag: kein Wert."],
+      ["Zeitgleichung", "E = 4 min · (L₀ − 0,0057183° − α), L₀ mittlere Länge der Sonne, α Rektaszension. Genauigkeit ~±10 s."],
+      ["Meilensteine", "Exakt aus dem Geburtsdatum (12:00 Uhr Ortszeit angenommen); Vollmonde über Phasensuche der Mondlänge; Herzschläge/Atemzüge mit Mittelwerten 75/min bzw. 16/min."],
+      ["Großkreis", "Kugelmodell R = 6.371,0088 km; Zielpunkte nach der direkten geodätischen Formel auf der Kugel in 10-km-Schritten; Länderzuordnung per Punkt-in-Polygon (Natural Earth, vereinfacht). Abweichung zum Ellipsoid bis ~0,5 %."],
+      ["Kamera-Modus", "Peilung über Großkreis-Anfangskurs; Blickrichtung aus Geräteausrichtung (Kompasskurs bzw. α/β/γ nach dem Beispiel der W3C-Spezifikation), zeitbasiert geglättet, Ausreißer über 100° verworfen. Bildwinkel als 58° horizontal angenommen – typische Abweichung einige Grad."],
+      ["Wahre Größe", "Verschiebung auf der Kugel in zwei Drehungen (um die Erdachse, dann entlang des Meridians), anschließend Mercator-Projektion y = ln tan(π/4 + φ/2). Fläche aus den Natural-Earth-Umrissen. Flächenverzerrung 1/cos² φ."],
+      ["Zeitreisen / GPS", "Gezählt werden nur Fixes mit Genauigkeit ≤ 35 m, Mindestabstand 8 m und Geschwindigkeit ≤ 4,5 m/s (≈ 16 km/h); Abstand nach Haversine. Es wird keine Route gespeichert, nur Summen je Etappe."],
+      ["Zeitdilatation", "Näherung erster Ordnung: Δt ≈ t·v²/(2c²) (Bewegung) bzw. t·GM/(R c²) (Gravitation, Erdoberfläche 6,96·10⁻¹⁰)."],
+      ["Daten", "Alles wird auf dem Gerät berechnet; keine Verbindung zu fremden Servern (strenge Sicherheitsrichtlinie: nur eigene Dateien)."]
+    ];
+    sheet('<h2>Methoden &amp; Genauigkeit</h2><p class="muted small" style="margin:0 0 6px">Wie ThaumoraWahr rechnet und wie genau die Werte sind.</p>' + M.map(function (x) { return '<h3 class="wd-sub">' + x[0] + '</h3><p class="small" style="margin:0;line-height:1.55">' + x[1] + '</p>'; }).join(""));
+  }
+
   /* ---------------- KilometerWahr: Jubiläumskalender & Urkunden ---------------- */
   function calList(from, to) {
     var all = [];
@@ -1272,7 +1459,7 @@
     html += '<button type="button" class="cta primary" id="llIcs" style="margin-top:12px">' + icon("calendar") + 'In meinen Kalender übernehmen</button><p class="muted small" style="margin:8px 0 0">Erstellt eine Kalenderdatei mit den Meilensteinen der nächsten drei Jahre. Dein Kalender fragt, ob er sie übernehmen soll.</p>';
     el.innerHTML = html;
     $("llIcs").onclick = function () {
-      var ev = calList(now, now + 3 * 365 * DAY).map(function (m, i) { return { date: m.t, title: m.title, text: m.sub + " – berechnet mit WunderWahr", uid: "wd-" + m.p.id + "-" + m.t + "-" + i }; });
+      var ev = calList(now, now + 3 * 365 * DAY).map(function (m, i) { return { date: m.t, title: m.title, text: m.sub + " – berechnet mit ThaumoraWahr", uid: "wd-" + m.p.id + "-" + m.t + "-" + i }; });
       WDShare.ics(ev, "Meilensteine.ics");
     };
   }
@@ -1290,9 +1477,9 @@
 
   /* ---------------- Start ---------------- */
   var onb = window.wzOnboarding ? wzOnboarding({
-    key: "wunderwahr_onboarded",
+    key: "thaumorawahr_onboarded",
     slides: [
-      { icon: "tages", title: "Willkommen bei WunderWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
+      { icon: "tages", title: "Willkommen bei ThaumoraWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
       { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Am nächsten Tag wartet ein Quiz, und jede Karte landet in deinem Wunderalbum." },
       { icon: "quiz", title: "Prüfen und schätzen", text: "Jeden Tag eine Quizfrage zum Wunder von gestern und eine Schätzfrage zur Größenordnung – mit Abweichungsfaktor statt Punkten. Alle Karten landen im Wunderalbum und lassen sich als Bildkarte teilen." },
       { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
@@ -1302,16 +1489,17 @@
     ]
   }) : null;
   if ($("showOnboardingBtn")) $("showOnboardingBtn").addEventListener("click", function () { if (onb) onb.show(); });
+  if ($("showMethodBtn")) $("showMethodBtn").addEventListener("click", openMethoden);
   var TABS = ["tages", "kilometer", "weitblick", "zeit"];
   var h0 = (location.hash || "").slice(1);
-  var startTab = TABS.indexOf(h0) >= 0 ? h0 : load("wunderwahr_tab", "tages");
+  var startTab = TABS.indexOf(h0) >= 0 ? h0 : load("thaumorawahr_tab", "tages");
   showTab(TABS.indexOf(startTab) >= 0 ? startTab : "tages");
   if (startTab !== "tages") renderTages();
   checkBadges();
   // Startbildschirm ausblenden
   (function () {
     var sp = $("wdSplash"); if (!sp) return;
-    var shown = false; try { shown = sessionStorage.getItem("wunderwahr_splash") === "1"; sessionStorage.setItem("wunderwahr_splash", "1"); } catch (e) { }
+    var shown = false; try { shown = sessionStorage.getItem("thaumorawahr_splash") === "1"; sessionStorage.setItem("thaumorawahr_splash", "1"); } catch (e) { }
     if (shown) { sp.parentNode.removeChild(sp); return; }
     var gone = false;
     function hide() { if (gone) return; gone = true; sp.classList.add("go"); setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 500); }

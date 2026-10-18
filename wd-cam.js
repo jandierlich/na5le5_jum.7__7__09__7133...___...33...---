@@ -1,5 +1,5 @@
 /* ============================================================
-   WunderWahr – Kamera-Modus für WeitblickWahr
+   ThaumoraWahr – Kamera-Modus für WeitblickWahr
    Zeigt im Live-Kamerabild, in welcher Richtung Städte, Pole, Sonne, Mond
    und helle Planeten liegen. Das Kamerabild wird nur angezeigt – nichts wird
    aufgenommen, gespeichert oder gesendet.
@@ -66,6 +66,7 @@
       if (e.webkitCompassHeading != null && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading;
       else if (e.alpha != null && (e.absolute || e.type === "deviceorientationabsolute")) h = rearHeading(e.alpha, e.beta || 0, e.gamma || 0);
       if (h != null) st.raw = h;
+      if (e.webkitCompassAccuracy != null && e.webkitCompassAccuracy >= 0) st.accu = e.webkitCompassAccuracy;
       if (e.beta != null) st.rawPitch = Math.max(-80, Math.min(80, e.beta - 90));
     }
     /* Glättung pro Bild: ruhig bei kleinen Wacklern, schnell bei echten Drehungen; einzelne Ausreißer werden verworfen */
@@ -101,6 +102,7 @@
       function px(az, alt) { return { x: cx + wrap180(az - head) / hfov * w, y: cy - (alt - pitch) / vfov * h, d: wrap180(az - head) }; }
       $t("wdCamHead", head == null ? "Kompass wird gesucht …" : fmt(wrap360(head)) + "° · " + dirName(head));
       if (head == null) { st.raf = requestAnimationFrame(draw); return; }
+      $t("wdCamHint", "Kurs " + wrap360(head).toFixed(1).replace(".", ",") + "° · Neigung " + (pitch >= 0 ? "+" : "−") + Math.abs(pitch).toFixed(1).replace(".", ",") + "°" + (st.accu != null ? " · Kompass ±" + Math.round(st.accu) + "°" : "") + " · Bildwinkel " + hfov + "°");
       // Horizontlinie
       var hy = cy + pitch / vfov * h;
       c.strokeStyle = "rgba(255,255,255,.45)"; c.lineWidth = 1.5; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(0, hy); c.lineTo(w, hy); c.stroke(); c.setLineDash([]);

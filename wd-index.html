@@ -10,14 +10,14 @@
 <script src="./wz-design.js" defer></script>
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-180.png">
-<title>WunderWahr</title>
-<meta name="description" content="WunderWahr – jeden Tag ein Grund zu staunen: Tageswunder, Lebens-Meilensteine, geradeaus um die Welt und die Erdgeschichte zu Fuß.">
+<title>ThaumoraWahr</title>
+<meta name="description" content="ThaumoraWahr – jeden Tag ein Grund zu staunen: Tageswunder, Lebens-Meilensteine, geradeaus um die Welt und die Erdgeschichte zu Fuß.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WahrZentrale">
 <meta name="theme-color" content="#5A2FBE">
 <link rel="icon" href="./wd-icon-192.png">
-<!-- WunderWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<!-- ThaumoraWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
 <style>@view-transition{navigation:auto}.wzi{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.22em;fill:currentColor;flex-shrink:0}
   [hidden]{display:none!important}
   :root{
@@ -540,6 +540,16 @@
     #wdSplash .wd-sp-shoot{display:none}
     .wd-swipe .wd-hero{transition:none}
   }
+  /* ---------- FINAL-98: Technik ---------- */
+  .wd-meth{margin:10px 0 0;font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.62)}
+  .wd-num{font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}
+  .wd-wkgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+  .wd-wk{min-height:40px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--sub-onbg);font:650 12.5px -apple-system,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer;padding:0}
+  .wd-wk.past{background:var(--wz-primary-bg,#5A2FBE);border-color:transparent;color:#fff}
+  .wd-wk.now{background:var(--wd-gold);border-color:var(--wd-gold);color:#241748;box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--wd-gold)}
+  .wd-wk.msp{background:var(--wd-gold);border-color:var(--wd-gold);color:#241748}
+  .wd-wk.msf{border:2px solid var(--wd-gold);color:var(--text)}
+  .wd-gps{margin-top:10px}
   /* ---------- FINAL-97: Erweiterungen ---------- */
   .wd-sub{font-size:13px;font-weight:750;letter-spacing:.02em;margin:16px 0 4px;color:var(--text)}
   .wd-kv{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -640,14 +650,14 @@
 <symbol id="wzi-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z"/><circle cx="12" cy="12" r="2.8"/></g></symbol>
 </defs>
 </svg>
-<div id="wdSplash" aria-hidden="true" title="Tippen zum Überspringen"><div class="wd-sp-stars"></div><div class="wd-sp-stars2"></div><div class="wd-sp-shoot"></div><div class="wd-sp-logo"><img src="./wd-icon-192.png" alt="" width="96" height="96"></div><b>WunderWahr</b><span id="wdSplashD"></span><div class="wd-sp-tease" id="wdSplashT"></div></div>
+<div id="wdSplash" aria-hidden="true" title="Tippen zum Überspringen"><div class="wd-sp-stars"></div><div class="wd-sp-stars2"></div><div class="wd-sp-shoot"></div><div class="wd-sp-logo"><img src="./wd-icon-192.png" alt="" width="96" height="96"></div><b>ThaumoraWahr</b><span id="wdSplashD"></span><div class="wd-sp-tease" id="wdSplashT"></div></div>
 <a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
 <button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
 
 <div class="app safe-top safe-bottom">
   <header class="wz-hero">
-    <div class="logo-badge"><img class="wz-logo-light" src="./wd-icon-192.png" alt="WunderWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
-    <h1>WunderWahr</h1>
+    <div class="logo-badge"><img class="wz-logo-light" src="./wd-icon-192.png" alt="ThaumoraWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>ThaumoraWahr</h1>
     <p>Jeden Tag ein Grund zu staunen – dein Leben, deine Zeit und dein Platz auf der Welt in unglaublichen Maßstäben.</p>
   </header>
 
@@ -696,6 +706,7 @@
       <div class="card" id="llWochen" hidden></div>
       <div class="card" id="llGeburt" hidden></div>
       <div class="card"><h2>Deine Lebensuhr</h2><div id="llLive"></div></div>
+      <div class="card" id="llMasse" hidden></div>
       <div class="card"><h2>Gerade jetzt auf der Welt</h2><p class="muted small" style="margin:-4px 0 4px">seit heute Mitternacht</p><div id="llWorld"></div></div>
       <p class="wd-note">Herzschläge, Atemzüge und weltweite Zahlen sind Schätzungen aus Durchschnittswerten; Vollmonde und Planetenjahre sind astronomisch berechnet.</p>
     </div>
@@ -715,11 +726,13 @@
       <div class="chip-row" style="margin-top:10px"><button type="button" class="chip" data-dir="0">Norden</button><button type="button" class="chip" data-dir="90">Osten</button><button type="button" class="chip" data-dir="180">Süden</button><button type="button" class="chip" data-dir="270">Westen</button></div>
       <button type="button" class="cta primary" id="dkAim"><svg class="wzi"><use href="#wzi-compass"></use></svg><span>Mit dem Handy zielen</span></button>
       <button type="button" class="cta" id="dkCam" style="margin-top:8px"><svg class="wzi"><use href="#wzi-camera"></use></svg><span>Kamera-Modus: Was liegt in dieser Richtung?</span></button>
+      <div id="dkGK"></div>
     </div>
     <div class="wd-stats" id="dkSum"></div>
     <div class="card"><h2>Was genau vor dir liegt</h2><div id="dkList"></div></div>
     <div class="card"><h2>Wie lange einmal herum?</h2><div id="dkTimes"></div></div>
     <div class="wd-hero" id="dkSun"></div>
+    <div class="card" id="dkEphem"></div>
     <div class="card" id="dkGroesse"></div>
     <div class="card" id="dkAdresse"></div>
     <div class="card"><h2>Hier geht gerade die Sonne auf</h2><div id="dkRise"></div><h2 style="margin-top:14px">… und hier unter</h2><div id="dkSet"></div></div>
@@ -734,8 +747,10 @@
       <div class="wd-trips" id="aeTrips" role="group" aria-label="Zeitreise wählen"></div>
       <div class="chip-row" id="aeScales"></div>
       <button type="button" class="cta primary" id="aeGo"><svg class="wzi"><use href="#wzi-walk"></use></svg><span>Etappe starten</span></button>
+      <div id="aeGps" class="wd-gps" hidden></div>
       <p class="muted small" id="aeState" style="margin:8px 0 0">Jeder Spaziergang bringt dich weiter durch die Zeit. Gezählt werden nur Schritte zu Fuß, solange die App geöffnet ist.</p>
     </div>
+    <div class="card" id="aeEtappen"></div>
     <div class="card"><h2 id="aeListH">Stationen der Erdgeschichte</h2><div id="aeList"></div><button type="button" class="cta slim" id="aeReset" style="margin-top:10px"><svg class="wzi"><use href="#wzi-reset"></use></svg>Von vorn beginnen</button></div>
     <div class="card"><h2>Die letzten Meter</h2><p class="muted small" style="margin:-4px 0 4px">so kurz ist die Menschheit auf deiner Strecke</p><div id="aeScale"></div></div>
     <div class="card" id="aeMitte"></div>
@@ -743,7 +758,7 @@
   </section>
 
   <footer class="wz-footer">
-    <button type="button" id="showOnboardingBtn">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#wd">Datenschutz</a>
+    <button type="button" id="showOnboardingBtn">Einführung</button><span class="sep" aria-hidden="true">·</span><button type="button" id="showMethodBtn">Methoden</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#wd">Datenschutz</a>
   </footer>
 </div>
 

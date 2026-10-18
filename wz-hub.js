@@ -173,7 +173,7 @@
     { app: "zw", text: "Ein Turm in ZahlenturmWahr", metric: "zwGames", kind: "more" },
     { app: "bw", text: "Ein Beat in BeatWahr", kind: "visit" },
     { app: "af", text: "Eine Partie AufwindWahr", metric: "afGames", kind: "more" },
-    { app: "wd", text: "Das Tageswunder in WunderWahr lesen", kind: "visit" }
+    { app: "wd", text: "Das Tageswunder in ThaumoraWahr lesen", kind: "visit" }
   ];
   function dailyTask() {
     var d = ymd(new Date()), seed = 0;
@@ -241,7 +241,7 @@
     { id: "fahrt", name: "Letzte Fahrt", desc: "aus NaviWahr", def: true, cond: true, ic: "car" },
     { id: "vorrat", name: "Vorräte", desc: "was in den nächsten 7 Tagen abläuft (VorratsWahr)", def: false, cond: true, ic: "vw" },
     { id: "zuletzt", name: "Zuletzt geöffnet", desc: "deine drei zuletzt genutzten Apps", def: false, cond: true, ic: "clock" },
-    { id: "wunder", name: "Tageswunder", desc: "jeden Tag eine neue Karte aus WunderWahr", def: true, ic: "wd" },
+    { id: "wunder", name: "Tageswunder", desc: "jeden Tag eine neue Karte aus ThaumoraWahr", def: true, ic: "wd" },
     { id: "aufgabe", name: "Tagesaufgabe", desc: "eine kleine Aufgabe für heute", def: true, ic: "trophy" },
     { id: "sicherung", name: "Sicherungs-Erinnerung", desc: "wenn länger als 30 Tage nicht gesichert", def: true, cond: true, ic: "backup" }
   ];
@@ -330,7 +330,7 @@
           apps.map(function (a) { return '<a href="./' + a.href + '" class="recent-app"><span class="recent-ic">' + icon(a.id) + "</span>" + esc(a.name) + "</a>"; }).join("") + "</span></span></div>";
       },
       wunder: function () {
-        // Tageswunder aus WunderWahr: die Inhalte werden erst nach dem Aufbau der Startseite nachgeladen (offline aus dem Zwischenspeicher)
+        // Tageswunder aus ThaumoraWahr: die Inhalte werden erst nach dem Aufbau der Startseite nachgeladen (offline aus dem Zwischenspeicher)
         setTimeout(loadWonder, 0);
         return '<a class="row" href="./wd-index.html" id="wdRow" hidden><span class="r-ic">' + icon("wd") + '</span><span class="r-txt"><span class="r-l">Tageswunder</span><span class="r-v" style="display:block"></span></span>' + CHEV + "</a>";
       },
@@ -462,7 +462,7 @@
         case "sn": { var sm = json("staunwahr_momente", []); return Array.isArray(sm) && sm.length ? sm.length + (sm.length === 1 ? " Lichtecho-Moment" : " Lichtecho-Momente") : ""; }
         case "mw": { var ml = json("messwahr_messungen", []); return Array.isArray(ml) && ml.length ? ml.length + (ml.length === 1 ? " Messung" : " Messungen") : ""; }
         case "lb": { var lp = json("labwahr_protokolle", []), lx = {}; (Array.isArray(lp) ? lp : []).forEach(function (q) { if (q && q.exp && q.exp !== "frei" && !q.example) lx[q.exp] = 1; }); var ln = Object.keys(lx).length; return ln ? ln + " von 18 Versuchen" : ""; }
-        case "wd": { var we = json("wunderwahr_entdeckt", {}), wn = we && typeof we === "object" ? Object.keys(we).length : 0; if (!wn) { var ws = json("wunderwahr_sammlung", []); wn = Array.isArray(ws) ? ws.length : 0; } return wn ? wn + (wn === 1 ? " Wunder entdeckt" : " Wunder entdeckt") : ""; }
+        case "wd": { var we = json("thaumorawahr_entdeckt", {}), wn = we && typeof we === "object" ? Object.keys(we).length : 0; if (!wn) { var ws = json("thaumorawahr_sammlung", []); wn = Array.isArray(ws) ? ws.length : 0; } return wn ? wn + (wn === 1 ? " Wunder entdeckt" : " Wunder entdeckt") : ""; }
         case "kl": { var kmo = json("klangwahr_momente", []); return Array.isArray(kmo) && kmo.length ? kmo.length + (kmo.length === 1 ? " Moment" : " Momente") : ""; }
       }
     } catch (e) { }

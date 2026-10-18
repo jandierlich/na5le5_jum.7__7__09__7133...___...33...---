@@ -1,10 +1,19 @@
 /* ============================================================
-   WunderWahr – Inhalte (eigene Texte, © 2026 Jan Dierlich – Alle Rechte vorbehalten)
+   ThaumoraWahr – Inhalte (eigene Texte, © 2026 Jan Dierlich – Alle Rechte vorbehalten)
    Alle Zahlen sind allgemein bekannte Fakten bzw. veröffentlichte Schätzwerte;
    Quellenangaben stehen in lizenzen.html. Schätzungen sind im Text als solche erkennbar.
    ============================================================ */
 (function (g) {
   "use strict";
+  /* Einmalige Übernahme gespeicherter Daten aus der Vorversion (frühere Schlüssel-Präfixe).
+     Kopiert alte Einträge auf das Präfix „thaumorawahr_“ und entfernt die alten. */
+  (function () {
+    try {
+      var OLD = "wunder" + "wahr_", NEW = "thaumorawahr_", ks = [];
+      for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(OLD) === 0) ks.push(k); }
+      ks.forEach(function (k) { var n = NEW + k.slice(OLD.length); if (localStorage.getItem(n) == null) localStorage.setItem(n, localStorage.getItem(k)); localStorage.removeItem(k); });
+    } catch (e) { }
+  })();
 
   /* Tageswunder (730 – zwei Jahre ohne Wiederholung): k = Kategorie, t = Titel, x = Kernaussage, w = Hintergrund */
   var WUNDER = [
@@ -25,7 +34,7 @@
     {"id":"honigewig","k":"Alltag","t":"Fast unbegrenzt haltbar","x":"Honig hält bei richtiger Lagerung praktisch unbegrenzt.","w":"Er enthält wenig Wasser und viel Zucker – Bakterien können darin kaum wachsen. Wird er fest, ist er nicht verdorben: Er kristallisiert nur."},
     {"id":"wikingerhelm","k":"Irrtum","t":"Keine Hörner","x":"Wikinger trugen keine Helme mit Hörnern.","w":"Das Bild stammt aus dem 19. Jahrhundert, unter anderem aus Kostümen für Opern. Gefundene Wikingerhelme sind schlichte Kappen aus Eisen."},
     {"id":"email","k":"Technik","t":"Wie das @ in die Mail kam","x":"Die erste E-Mail zwischen zwei Computern wurde 1971 verschickt – und mit ihr kam das @-Zeichen in Adressen.","w":"Der Programmierer Ray Tomlinson wählte das Zeichen, weil es in Namen nie vorkam. An den Inhalt seiner ersten Nachricht erinnerte er sich selbst nicht mehr."},
-    {"id":"atacama","k":"Erde","t":"Jahrzehnte ohne Regen","x":"In Teilen der Atacama-Wüste in Chile hat es seit Beginn der Messungen kaum je geregnet.","w":"Sie gilt als trockenste nichtpolare Wüste der Erde. Die NASA testet dort Geräte für die Suche nach Leben auf dem Mars."},
+    {"id":"atacama","k":"Erde","t":"Jahrzehnte ohne Regen","x":"In Teilen der Atacama-Wüste in Chile hat es seit Beginn der Messungen kaum je geregnet.","w":"Sie gilt als trockenste nichtpolare Wüste der Erde. Raumfahrtbehörden testen dort Geräte für die Suche nach Leben auf dem Mars."},
     {"id":"vollmondzeit","k":"Weltall","t":"Ein Vollmond ist kurz","x":"Genau genommen ist der Mond nur für einen Augenblick „voll“.","w":"Der exakte Zeitpunkt wird auf die Minute berechnet. Für unser Auge wirkt er aber auch am Abend davor und danach rund."},
     {"id":"zeitzone","k":"Zeitgenossen","t":"Als jede Stadt ihre Zeit hatte","x":"Bis 1893 hatte im Deutschen Reich praktisch jede Stadt ihre eigene Uhrzeit.","w":"Erst dann wurde die Mitteleuropäische Zeit eingeführt. Den Anstoß gab vor allem die Eisenbahn, die verlässliche Fahrpläne brauchte."},
     {"id":"wuerfel","k":"Zahl zum Fühlen","t":"Immer sieben","x":"Auf einem normalen Spielwürfel ergeben gegenüberliegende Seiten zusammen immer 7.","w":"1 liegt gegenüber der 6, 2 gegenüber der 5 und 3 gegenüber der 4. Das ist schon bei Würfeln aus der Antike oft so."},
@@ -570,7 +579,7 @@
     {"id": "newtonapfel", "k": "Irrtum", "t": "Der Apfel traf ihn nicht", "x": "Isaac Newton bekam vermutlich keinen Apfel auf den Kopf.", "w": "Nach eigener Erzählung sah er einen Apfel fallen und fragte sich, warum er senkrecht zu Boden fällt. Daraus entwickelte er seine Idee der Schwerkraft. Der Baum steht angeblich noch heute."},
     {"id": "berthabenz", "k": "Technik", "t": "Die erste Fernfahrt", "x": "1888 fuhr Bertha Benz mit ihren Söhnen im Auto ihres Mannes von Mannheim nach Pforzheim – über 100 Kilometer.", "w": "Es war die erste längere Autofahrt der Geschichte. Benzin kaufte sie in einer Apotheke in Wiesloch – sie gilt heute als erste Tankstelle der Welt."},
     {"id": "computerbug", "k": "Technik", "t": "Ein echter Käfer", "x": "1947 fanden Techniker in einem Großrechner eine echte Motte, die einen Fehler verursacht hatte.", "w": "Sie klebten das Insekt ins Logbuch und notierten, man habe den ersten echten „Bug“ gefunden. Das Wort für Technikfehler war allerdings schon älter."},
-    {"id": "erstewebsite", "k": "Technik", "t": "Die erste Webseite", "x": "Die erste Webseite der Welt ging 1991 online – und ist heute wieder abrufbar.", "w": "Sie erklärte, was das World Wide Web ist. Das Forschungszentrum CERN in Genf, wo es erfunden wurde, hat sie wiederhergestellt."},
+    {"id": "erstewebsite", "k": "Technik", "t": "Die erste Webseite", "x": "Die erste Webseite der Welt ging 1991 online – und ist heute wieder abrufbar.", "w": "Sie erklärte, was das World Wide Web ist. Das europäische Forschungszentrum für Teilchenphysik in Genf, wo es erfunden wurde, hat sie wiederhergestellt."},
     {"id": "heron", "k": "Technik", "t": "Eine Dampfmaschine aus der Antike", "x": "Schon vor rund 2.000 Jahren beschrieb Heron von Alexandria eine Kugel, die sich durch Dampf dreht.", "w": "Wasser wurde erhitzt, der Dampf entwich aus zwei gebogenen Röhrchen und brachte die Kugel zum Rotieren. Genutzt wurde die Erfindung aber nur als Kuriosität."},
     {"id": "antikythera", "k": "Technik", "t": "Ein Computer aus der Antike", "x": "In einem Schiffswrack vor Griechenland wurde ein über 2.000 Jahre altes Zahnradgetriebe gefunden.", "w": "Der Mechanismus von Antikythera berechnete die Stellung von Sonne und Mond und sagte Finsternisse voraus. Etwas Vergleichbares tauchte erst über tausend Jahre später wieder auf."},
     {"id": "roemerbeton", "k": "Technik", "t": "Beton, der sich selbst heilt", "x": "Römischer Beton hält in Hafenanlagen seit 2.000 Jahren dem Meerwasser stand.", "w": "Kleine Kalkbrocken im Beton reagieren mit eindringendem Wasser und verschließen feine Risse von selbst. Forschende versuchen heute, das nachzumachen."},
@@ -641,7 +650,7 @@
     {"id": "wassererde", "k": "Zahl zum Fühlen", "t": "Ein Planet aus Wasser – fast", "x": "Wasser bedeckt rund 71 Prozent der Erdoberfläche – macht aber nur etwa 0,02 Prozent der Erdmasse aus.", "w": "Von diesem Wasser sind nur gut zwei Prozent Süßwasser, und das meiste davon ist im Eis gebunden."},
     {"id": "grashalm", "k": "Zahl zum Fühlen", "t": "Billionen Bäume", "x": "Auf der Erde stehen rund drei Billionen Bäume – etwa 400 für jeden Menschen.", "w": "Seit Beginn der Landwirtschaft hat sich ihre Zahl ungefähr halbiert. Jedes Jahr kommen durch Aufforstung neue hinzu, aber noch mehr werden gefällt."},
     {"id": "haarwachstum", "k": "Zahl zum Fühlen", "t": "35 Meter Haar am Tag", "x": "Alle Haare auf deinem Kopf zusammen wachsen jeden Tag um rund 35 Meter.", "w": "Ein einzelnes Haar wächst nur etwa einen Drittelmillimeter am Tag – aber du hast rund 100.000 davon."},
-    {"id": "atmenleben", "k": "Zahl zum Fühlen", "t": "Die Luft eines Lebens", "x": "Ein Mensch atmet in seinem Leben rund 300 Millionen Liter Luft ein und aus.", "w": "Damit könnte man über 100 olympische Schwimmbecken füllen."},
+    {"id": "atmenleben", "k": "Zahl zum Fühlen", "t": "Die Luft eines Lebens", "x": "Ein Mensch atmet in seinem Leben rund 300 Millionen Liter Luft ein und aus.", "w": "Damit könnte man über 100 Wettkampfbecken mit 50 Metern Länge füllen."},
     {"id": "fusswege", "k": "Zahl zum Fühlen", "t": "Ein Planet voller Schritte", "x": "Alle Menschen der Welt zusammen gehen an einem einzigen Tag rund 40 Milliarden Kilometer.", "w": "Wenn jeder nur 5 Kilometer geht, entspricht das rund 130 Hin- und Rückwegen zur Sonne. Bis zum nächsten Stern wäre es trotzdem noch etwa tausendmal weiter."},
     {"id": "plutolicht", "k": "Weltall", "t": "Fünfeinhalb Stunden Licht", "x": "Das Sonnenlicht braucht bis zum Zwergplaneten Pluto im Durchschnitt rund fünfeinhalb Stunden.", "w": "Dort ist die Sonne nur noch ein sehr heller Stern. Trotzdem ist es am Mittag auf Pluto noch viel heller als bei Vollmond auf der Erde."},
     {"id": "luftdruck", "k": "Zahl zum Fühlen", "t": "Wie schwer ist die Luft?", "x": "Die Luft über deinem Kopf drückt mit etwa einem Kilogramm auf jeden Quadratzentimeter.", "w": "Auf deinem ganzen Körper lasten so viele Tonnen Luft. Du spürst sie nicht, weil dein Körper von innen genauso stark dagegen drückt."},
@@ -705,7 +714,7 @@
     {"id": "maus", "k": "Technik", "t": "Die erste Maus war aus Holz", "x": "Die erste Computermaus wurde 1964 gebaut – mit einem Gehäuse aus Holz.", "w": "Sie hatte zwei Räder statt einer Kugel und nur einen Knopf. Ihr Kabel sah aus wie ein Schwanz – daher der Name."},
     {"id": "schutzkontakt", "k": "Technik", "t": "Der Stecker aus Bayern", "x": "Der Schutzkontaktstecker, den wir in Deutschland benutzen, wurde in den 1920er-Jahren in Bayern erfunden.", "w": "Die zusätzlichen Metallbügel sorgen dafür, dass bei einem Fehler der Strom in die Erde abfließt statt durch den Menschen. Viele Länder in Europa nutzen ihn heute."},
     {"id": "gotthard", "k": "Technik", "t": "Der längste Eisenbahntunnel", "x": "Der Gotthard-Basistunnel in der Schweiz ist mit 57 Kilometern der längste Eisenbahntunnel der Welt.", "w": "Über ihm liegen bis zu 2.300 Meter Fels. Im Inneren wäre es ohne Kühlung über 40 Grad heiß."},
-    {"id": "burjkhalifa", "k": "Technik", "t": "828 Meter in die Höhe", "x": "Das höchste Gebäude der Welt, der Burj Khalifa in Dubai, ist 828 Meter hoch.", "w": "Von der Spitze sieht man den Sonnenuntergang einige Minuten später als vom Boden. Manche Menschen haben deshalb den Sonnenuntergang an einem Abend zweimal gesehen."},
+    {"id": "burjkhalifa", "k": "Technik", "t": "828 Meter in die Höhe", "x": "Das höchste Gebäude der Welt, ein Wolkenkratzer in Dubai, ist 828 Meter hoch.", "w": "Von der Spitze sieht man den Sonnenuntergang einige Minuten später als vom Boden. Manche Menschen haben deshalb den Sonnenuntergang an einem Abend zweimal gesehen."},
     {"id": "ulmermuenster", "k": "Kultur", "t": "Der höchste Kirchturm", "x": "Der höchste Kirchturm der Welt steht in Ulm: 161,5 Meter.", "w": "Mit dem Bau wurde 1377 begonnen, fertig wurde der Turm erst 1890. Wer hinaufwill, muss 768 Stufen steigen."},
     {"id": "speicherstadt", "k": "Kultur", "t": "Auf Holzpfählen gebaut", "x": "Die Hamburger Speicherstadt steht auf unzähligen Eichenpfählen im Boden.", "w": "Sie ist der größte zusammenhängende Lagerhauskomplex der Welt und gehört seit 2015 zum Welterbe. Die Pfähle müssen dauerhaft nass bleiben, sonst würden sie verrotten."},
     {"id": "tuffi", "k": "Kultur", "t": "Ein Elefant im Fluss", "x": "1950 sprang ein junger Zirkuselefant namens Tuffi aus der Wuppertaler Schwebebahn in die Wupper.", "w": "Er blieb fast unverletzt. Die Schwebebahn fährt seit 1901 und hängt kopfüber an einem Stahlgerüst über dem Fluss."},
@@ -745,9 +754,9 @@
   var HEUTE = {
     "01-01": [[2002, "Der Euro wird in zwölf Ländern Bargeld – auch in Deutschland ersetzt er die D-Mark."]],
     "01-02": [[1959, "Die sowjetische Sonde Luna 1 startet – als erstes Raumfahrzeug verlässt sie den Einflussbereich der Erde und fliegt am Mond vorbei."]],
-    "01-03": [[1892, "J. R. R. Tolkien wird geboren, der Autor von „Der Herr der Ringe“."]],
+    "01-03": [[1892, "J. R. R. Tolkien wird geboren – Sprachwissenschaftler und Autor der wohl einflussreichsten Fantasy-Romane."]],
     "01-04": [[1809, "Louis Braille wird geboren. Er erfindet als Jugendlicher die Punktschrift für blinde Menschen."]],
-    "01-05": [[1933, "In San Francisco beginnt der Bau der Golden Gate Bridge."]],
+    "01-05": [[1933, "In San Francisco beginnt der Bau der großen Hängebrücke über die Meerenge am Goldenen Tor."]],
     "01-06": [[1838, "Samuel Morse und Alfred Vail führen ihren elektrischen Telegrafen vor."]],
     "01-07": [[1610, "Galileo Galilei sieht mit seinem Fernrohr zum ersten Mal Monde, die um den Jupiter kreisen."]],
     "01-08": [[1942, "Stephen Hawking wird geboren – genau 300 Jahre nach dem Tod Galileis."]],
@@ -755,15 +764,15 @@
     "01-10": [[1863, "In London fährt die erste U-Bahn der Welt – noch mit Dampflokomotiven."]],
     "01-11": [[1922, "Zum ersten Mal wird ein zuckerkranker Patient mit Insulin behandelt – ein 14-jähriger Junge in Toronto."]],
     "01-12": [[1628, "Charles Perrault wird geboren. Er schreibt Märchen wie „Aschenputtel“ und „Der gestiefelte Kater“ auf."]],
-    "01-13": [[1910, "Zum ersten Mal wird eine Oper live im Radio übertragen – aus der Metropolitan Opera in New York."]],
+    "01-13": [[1910, "Zum ersten Mal wird eine Oper live im Radio übertragen – aus dem großen Opernhaus von New York."]],
     "01-14": [[1875, "Albert Schweitzer wird geboren – Arzt, Musiker, Theologe und Friedensnobelpreisträger."]],
-    "01-15": [[2001, "Die freie Online-Enzyklopädie Wikipedia geht online."]],
+    "01-15": [[2001, "Eine freie, von Freiwilligen geschriebene Online-Enzyklopädie geht online – heute eines der meistbesuchten Angebote im Netz."]],
     "01-16": [[1909, "Eine Expedition erreicht zum ersten Mal den magnetischen Südpol."]],
     "01-17": [[1773, "James Cook überquert als erster Seefahrer den südlichen Polarkreis."]],
     "01-18": [[1871, "Im Spiegelsaal von Versailles wird das Deutsche Kaiserreich ausgerufen."]],
     "01-19": [[1736, "James Watt wird geboren. Seine verbesserte Dampfmaschine treibt die Industrialisierung an – nach ihm ist die Einheit Watt benannt."]],
     "01-20": [[1265, "In England tritt ein Parlament zusammen, zu dem erstmals auch Vertreter der Städte geladen sind."]],
-    "01-21": [[1976, "Das Überschallflugzeug Concorde nimmt den regulären Linienflug auf."]],
+    "01-21": [[1976, "Ein britisch-französisches Überschall-Passagierflugzeug nimmt den regulären Linienflug auf."]],
     "01-22": [[1901, "Königin Victoria stirbt nach über 63 Jahren auf dem britischen Thron."]],
     "01-23": [[1960, "Zwei Männer tauchen im Tauchboot „Trieste“ bis auf den Grund des Marianengrabens – fast 11 Kilometer tief."]],
     "01-24": [[1848, "In Kalifornien wird Gold gefunden – der Goldrausch beginnt."]],
@@ -774,7 +783,7 @@
     "01-29": [[1886, "Carl Benz meldet seinen „Fahrzeug mit Gasmotorenbetrieb“ zum Patent an – die Geburtsurkunde des Automobils."]],
     "01-30": [[1847, "Die kleine Siedlung Yerba Buena wird in San Francisco umbenannt."]],
     "01-31": [[1797, "Franz Schubert wird in Wien geboren."]],
-    "02-01": [[1884, "Der erste Teil des großen Oxford-Wörterbuchs der englischen Sprache erscheint – fertig wird es erst 44 Jahre später."]],
+    "02-01": [[1884, "Der erste Teil des großen historischen Wörterbuchs der englischen Sprache erscheint – fertig wird es erst 44 Jahre später."]],
     "02-02": [[1887, "In Punxsutawney in den USA wird zum ersten Mal ein Murmeltier nach dem Ende des Winters „gefragt“."]],
     "02-03": [[1468, "Johannes Gutenberg stirbt in Mainz."]],
     "02-04": [[1902, "Charles Lindbergh wird geboren, der später als Erster allein über den Atlantik fliegt."]],
@@ -782,7 +791,7 @@
     "02-06": [[1952, "Elisabeth II. wird Königin von Großbritannien – sie regiert über 70 Jahre."]],
     "02-07": [[1812, "Charles Dickens wird geboren."]],
     "02-08": [[1828, "Jules Verne wird geboren. Er beschreibt Reisen zum Mond und in die Tiefsee, lange bevor sie möglich werden."]],
-    "02-09": [[1969, "Der erste Jumbojet hebt zu seinem Erstflug ab."]],
+    "02-09": [[1969, "Das erste Großraum-Passagierflugzeug mit zwei Gängen hebt zu seinem Erstflug ab."]],
     "02-10": [[1996, "Zum ersten Mal gewinnt ein Schachcomputer eine Partie gegen den amtierenden Schachweltmeister."]],
     "02-11": [[1847, "Thomas Alva Edison wird geboren."]],
     "02-12": [[1809, "Charles Darwin und Abraham Lincoln werden am selben Tag geboren."]],
@@ -804,7 +813,7 @@
     "02-28": [[1953, "Francis Crick verkündet in einem Pub in Cambridge, er und James Watson hätten „das Geheimnis des Lebens“ gefunden – die Doppelhelix der DNA."]],
     "02-29": [[1504, "Kolumbus sagt auf Jamaika eine Mondfinsternis voraus und bringt so die Einheimischen dazu, seine Mannschaft weiter zu versorgen."]],
     "03-01": [[1872, "Yellowstone wird zum ersten Nationalpark der Welt erklärt."]],
-    "03-02": [[1969, "Das Überschallflugzeug Concorde absolviert seinen Erstflug."]],
+    "03-02": [[1969, "Das erste britisch-französische Überschall-Passagierflugzeug absolviert seinen Erstflug."]],
     "03-03": [[1847, "Alexander Graham Bell wird in Edinburgh geboren."]],
     "03-04": [[1152, "Friedrich I., genannt Barbarossa, wird zum König gewählt."]],
     "03-05": [[1512, "Gerhard Mercator wird geboren. Seine Kartenprojektion prägt bis heute unser Bild der Welt."]],
@@ -840,7 +849,7 @@
     "04-04": [[1581, "Francis Drake wird nach seiner Weltumsegelung an Bord seines Schiffes zum Ritter geschlagen."]],
     "04-05": [[1722, "Ein niederländischer Seefahrer erreicht am Ostersonntag eine Insel im Pazifik – er nennt sie Osterinsel."]],
     "04-06": [[1896, "In Athen beginnen die ersten Olympischen Spiele der Neuzeit."]],
-    "04-07": [[1948, "Die Weltgesundheitsorganisation WHO wird gegründet."]],
+    "04-07": [[1948, "Die Weltgesundheitsorganisation der Vereinten Nationen wird gegründet."]],
     "04-08": [[1820, "Auf der griechischen Insel Milos findet ein Bauer die Statue der Venus von Milo."]],
     "04-09": [[1959, "Die ersten sieben Astronauten der USA werden der Öffentlichkeit vorgestellt."]],
     "04-10": [[1912, "Die Titanic legt in Southampton zu ihrer einzigen Fahrt ab."]],
@@ -857,7 +866,7 @@
     "04-21": [[1926, "Elisabeth II. wird in London geboren."]],
     "04-22": [[1724, "Immanuel Kant wird in Königsberg geboren."]],
     "04-23": [[1616, "Der Todestag von William Shakespeare – deshalb ist heute der Welttag des Buches."]],
-    "04-24": [[1990, "Das Weltraumteleskop Hubble wird ins All gebracht."]],
+    "04-24": [[1990, "Ein großes Weltraumteleskop wird ins All gebracht – benannt nach dem Astronomen Edwin Hubble."]],
     "04-25": [[1859, "Am Mittelmeer beginnt der Bau des Suezkanals."]],
     "04-26": [[1564, "William Shakespeare wird in Stratford-upon-Avon getauft."]],
     "04-27": [[1791, "Samuel Morse wird geboren, der Erfinder des Morsealphabets."]],
@@ -869,7 +878,7 @@
     "05-03": [[1469, "Niccolò Machiavelli wird in Florenz geboren."]],
     "05-04": [[1904, "Die USA beginnen mit dem Bau des Panamakanals."]],
     "05-05": [[1961, "Alan Shepard fliegt als erster US-Amerikaner ins All – der Flug dauert 15 Minuten."]],
-    "05-06": [[1840, "Die erste Briefmarke der Welt wird gültig – die „Penny Black“ in Großbritannien."]],
+    "05-06": [[1840, "Die erste Briefmarke der Welt wird in Großbritannien gültig – schwarz, mit dem Profil der Königin."]],
     "05-07": [[1189, "Hamburg feiert diesen Tag als Geburtstag seines Hafens."]],
     "05-08": [[1945, "Der Zweite Weltkrieg endet in Europa."]],
     "05-09": [[1950, "Mit der Schuman-Erklärung beginnt die europäische Einigung – heute ist Europatag."]],
@@ -890,7 +899,7 @@
     "05-24": [[1844, "Samuel Morse sendet die erste Telegrafennachricht über eine Fernleitung von Washington nach Baltimore."]],
     "05-25": [[1961, "John F. Kennedy kündigt an, noch im selben Jahrzehnt Menschen zum Mond zu schicken."]],
     "05-26": [[1897, "Bram Stokers Roman „Dracula“ erscheint."]],
-    "05-27": [[1937, "Die Golden Gate Bridge in San Francisco wird eröffnet."]],
+    "05-27": [[1937, "Die große Hängebrücke über die Meerenge am Goldenen Tor in San Francisco wird eröffnet."]],
     "05-28": [[1987, "Ein 19-jähriger Pilot aus Wedel landet mit einem Sportflugzeug mitten in Moskau am Roten Platz."]],
     "05-29": [[1953, "Edmund Hillary und Tenzing Norgay stehen als erste Menschen auf dem Gipfel des Mount Everest."]],
     "05-30": [[1498, "Kolumbus bricht zu seiner dritten Reise nach Amerika auf."]],
@@ -923,21 +932,21 @@
     "06-26": [[1945, "In San Francisco wird die Charta der Vereinten Nationen unterzeichnet."]],
     "06-27": [[1880, "Helen Keller wird geboren. Taub und blind, wird sie Schriftstellerin und Rednerin."]],
     "06-28": [[1712, "Jean-Jacques Rousseau wird in Genf geboren."]],
-    "06-29": [[1900, "Antoine de Saint-Exupéry wird geboren, der Autor des „Kleinen Prinzen“."]],
+    "06-29": [[1900, "Antoine de Saint-Exupéry wird geboren – Pilot und Autor einer weltberühmten Erzählung über Freundschaft."]],
     "06-30": [[1908, "Über Sibirien explodiert ein Himmelskörper – das Tunguska-Ereignis knickt Millionen Bäume um."]],
     "07-01": [[1646, "Gottfried Wilhelm Leibniz wird in Leipzig geboren."], [1650, "In Leipzig erscheint die erste Tageszeitung der Welt."]],
-    "07-02": [[1900, "Über dem Bodensee steigt das erste Zeppelin-Luftschiff auf."]],
+    "07-02": [[1900, "Über dem Bodensee steigt das erste starre Luftschiff des Grafen Ferdinand von Zeppelin auf."]],
     "07-03": [[1886, "Carl Benz fährt mit seinem Motorwagen zum ersten Mal öffentlich durch Mannheim."]],
     "07-04": [[1776, "Die Unabhängigkeitserklärung der Vereinigten Staaten wird verabschiedet."]],
     "07-05": [[1996, "Das Schaf Dolly kommt zur Welt – das erste geklonte Säugetier aus einer erwachsenen Körperzelle."]],
     "07-06": [[1885, "Louis Pasteur rettet einen von einem tollwütigen Hund gebissenen Jungen mit seiner neuen Impfung."]],
     "07-07": [[1860, "Gustav Mahler wird geboren."]],
     "07-08": [[1497, "Vasco da Gama bricht von Lissabon zu seiner Reise nach Indien auf."]],
-    "07-09": [[1877, "In Wimbledon beginnt das erste Tennisturnier der Welt."]],
+    "07-09": [[1877, "In einem Vorort von London beginnt das erste Tennisturnier der Welt – es wird bis heute ausgetragen."]],
     "07-10": [[1856, "Nikola Tesla wird geboren."]],
     "07-11": [[1979, "Die US-Raumstation Skylab stürzt ab – Trümmer landen in Westaustralien."]],
     "07-12": [[1817, "Henry David Thoreau wird geboren, der zwei Jahre in einer Hütte am Waldsee lebt."]],
-    "07-13": [[1985, "Beim Benefizkonzert Live Aid in London und Philadelphia sehen weltweit über eine Milliarde Menschen zu."]],
+    "07-13": [[1985, "Bei einem großen Benefizkonzert in London und Philadelphia sehen weltweit über eine Milliarde Menschen zu."]],
     "07-14": [[1789, "Sturm auf die Bastille – der Beginn der Französischen Revolution."]],
     "07-15": [[1799, "Französische Soldaten finden in Ägypten den Stein von Rosette – der Schlüssel zu den Hieroglyphen."]],
     "07-16": [[1969, "Apollo 11 startet zum Mond."]],
@@ -953,7 +962,7 @@
     "07-26": [[1856, "George Bernard Shaw wird geboren."]],
     "07-27": [[1921, "In Toronto gelingt es zum ersten Mal, Insulin zu gewinnen."]],
     "07-28": [[1750, "Johann Sebastian Bach stirbt in Leipzig."]],
-    "07-29": [[1958, "Die US-Raumfahrtbehörde NASA wird gegründet."]],
+    "07-29": [[1958, "Die zivile Raumfahrtbehörde der USA wird gegründet."]],
     "07-30": [[1898, "Otto von Bismarck stirbt."]],
     "07-31": [[1498, "Kolumbus entdeckt auf seiner dritten Reise die Insel Trinidad."]],
     "08-01": [[1774, "Joseph Priestley entdeckt den Sauerstoff."]],
@@ -962,7 +971,7 @@
     "08-04": [[1901, "Louis Armstrong wird in New Orleans geboren."]],
     "08-05": [[1858, "Das erste Telegrafenkabel durch den Atlantik ist verlegt – es hält nur wenige Wochen."]],
     "08-06": [[1926, "Gertrude Ederle durchschwimmt als erste Frau den Ärmelkanal – schneller als alle Männer vor ihr."]],
-    "08-07": [[1974, "Philippe Petit balanciert auf einem Seil zwischen den beiden Türmen des World Trade Centers."]],
+    "08-07": [[1974, "Philippe Petit balanciert auf einem Seil zwischen den beiden Zwillingstürmen in New York."]],
     "08-08": [[1786, "Zwei Männer aus Chamonix stehen als Erste auf dem Gipfel des Mont Blanc."]],
     "08-09": [[1173, "In Pisa beginnt der Bau des Glockenturms, der später schief wird."]],
     "08-10": [[1675, "In Greenwich wird der Grundstein der Königlichen Sternwarte gelegt."]],
@@ -1007,7 +1016,7 @@
     "09-18": [[1977, "Voyager 1 fotografiert Erde und Mond zum ersten Mal gemeinsam auf einem Bild."]],
     "09-19": [[1991, "Wanderer finden in den Ötztaler Alpen „Ötzi“ – eine rund 5.300 Jahre alte Gletschermumie."]],
     "09-20": [[1519, "Magellan bricht mit fünf Schiffen zur ersten Weltumsegelung auf."]],
-    "09-21": [[1937, "Tolkiens „Der Hobbit“ erscheint."]],
+    "09-21": [[1937, "Tolkiens erster Fantasy-Roman erscheint – der Auftakt einer Welt, die Millionen Leser begeistert."]],
     "09-22": [[1791, "Michael Faraday wird geboren. Mit seinen Entdeckungen werden Elektromotor und Generator möglich."]],
     "09-23": [[1846, "Johann Gottfried Galle entdeckt an der Berliner Sternwarte den Planeten Neptun."]],
     "09-24": [[1852, "Henri Giffard fliegt mit dem ersten lenkbaren Luftschiff mit Dampfantrieb."]],
@@ -1015,14 +1024,14 @@
     "09-26": [[1580, "Francis Drake kehrt nach seiner Weltumsegelung nach England zurück."]],
     "09-27": [[1825, "In England fährt die erste öffentliche Eisenbahn mit Dampflokomotive."]],
     "09-28": [[1928, "Alexander Fleming bemerkt einen Schimmelpilz, der Bakterien abtötet – die Entdeckung des Penicillins."]],
-    "09-29": [[1954, "Das Forschungszentrum CERN in Genf wird gegründet."]],
+    "09-29": [[1954, "In Genf wird das europäische Forschungszentrum für Teilchenphysik gegründet."]],
     "09-30": [[1791, "Mozarts „Zauberflöte“ wird in Wien uraufgeführt."]],
     "10-01": [[1890, "Yosemite in Kalifornien wird Nationalpark."]],
     "10-02": [[1869, "Mahatma Gandhi wird geboren."]],
     "10-03": [[1990, "Tag der Deutschen Einheit."]],
     "10-04": [[1957, "Sputnik 1, der erste künstliche Satellit, umkreist die Erde."]],
     "10-05": [[1582, "Diesen Tag gab es in Italien und Spanien nicht: Bei der Kalenderreform folgte auf den 4. direkt der 15. Oktober."]],
-    "10-06": [[1927, "Der erste Spielfilm mit Ton kommt in die Kinos – „Der Jazzsänger“."]],
+    "10-06": [[1927, "Der erste abendfüllende Spielfilm mit synchronem Gesang und Dialog kommt in die Kinos."]],
     "10-07": [[1959, "Die Sonde Luna 3 fotografiert zum ersten Mal die Rückseite des Mondes."]],
     "10-08": [[1871, "In Chicago bricht ein Großbrand aus, der weite Teile der Stadt zerstört."]],
     "10-09": [[1989, "In Leipzig demonstrieren rund 70.000 Menschen friedlich – ein Wendepunkt der friedlichen Revolution."]],
@@ -1030,7 +1039,7 @@
     "10-11": [[1968, "Apollo 7 startet – zum ersten Mal wird live aus einem bemannten Raumschiff im Fernsehen gesendet."]],
     "10-12": [[1492, "Kolumbus landet auf einer Insel der Bahamas."]],
     "10-13": [[1884, "Greenwich wird auf einer Konferenz in Washington zum weltweiten Nullmeridian bestimmt – seitdem zählt die Welt ihre Längengrade von London aus."]],
-    "10-14": [[1947, "Zum ersten Mal fliegt ein Mensch schneller als der Schall: Chuck Yeager durchbricht mit der Bell X-1 die Schallmauer."], [1066, "Schlacht bei Hastings – der Beginn der normannischen Herrschaft über England."]],
+    "10-14": [[1947, "Zum ersten Mal fliegt ein Mensch schneller als der Schall: Chuck Yeager durchbricht mit einem Raketenflugzeug die Schallmauer."], [1066, "Schlacht bei Hastings – der Beginn der normannischen Herrschaft über England."]],
     "10-15": [[1997, "Die Raumsonde Cassini startet zum Saturn. Sie wird 13 Jahre lang Ringe und Monde erforschen."]],
     "10-16": [[1846, "In Boston wird zum ersten Mal öffentlich eine Operation unter Äther-Narkose gezeigt – der Beginn schmerzfreier Chirurgie."]],
     "10-17": [[1604, "Johannes Kepler beginnt seine Beobachtungen einer Supernova – des letzten Sterns in unserer Milchstraße, der mit bloßem Auge explodierend gesehen wurde."]],
@@ -1210,7 +1219,7 @@
     ["Anchorage",61.218,-149.9],["Los Angeles",34.052,-118.244],["Mexiko-Stadt",19.433,-99.133],["New York",40.713,-74.006],["Toronto",43.653,-79.383],
     ["Rio de Janeiro",-22.907,-43.173],["Buenos Aires",-34.604,-58.382],["Lima",-12.046,-77.043]];
 
-  /* Karte eines Tages – gleiche Auswahl in WunderWahr und auf der Startseite der WahrZentrale.
+  /* Karte eines Tages – gleiche Auswahl in ThaumoraWahr und auf der Startseite der WahrZentrale.
      Grundreihenfolge: ab 1. Januar 2026 Tag für Tag durch alle Karten (730 Tage ohne Wiederholung).
      Persönlich: Die Karte von heute wird einmal festgelegt und gemerkt. Kennst du sie schon,
      kommt stattdessen die nächste noch unbekannte Karte. Alles bleibt nur auf diesem Gerät. */
@@ -1224,14 +1233,14 @@
     return ((n % L) + L) % L;
   }
   function known() {
-    var s = {}, e = rd("wunderwahr_entdeckt", {}), t = rd("wunderwahr_tage", {});
+    var s = {}, e = rd("thaumorawahr_entdeckt", {}), t = rd("thaumorawahr_tage", {});
     Object.keys(e).forEach(function (id) { s[id] = 1; });
     Object.keys(t).forEach(function (k) { s[t[k]] = 1; });
-    rd("wunderwahr_sammlung", []).forEach(function (id) { s[id] = 1; });
+    rd("thaumorawahr_sammlung", []).forEach(function (id) { s[id] = 1; });
     return s;
   }
   function wonderFor(date) {
-    var key = ymd(date), tage = rd("wunderwahr_tage", {});
+    var key = ymd(date), tage = rd("thaumorawahr_tage", {});
     if (tage[key] && BYID[tage[key]] != null) return WUNDER[BYID[tage[key]]];
     var i0 = baseIndex(date), today = ymd(new Date());
     if (key !== today) return WUNDER[i0];
@@ -1239,7 +1248,7 @@
     for (var k = 0; k < L; k++) { var j = (i0 + k) % L; if (!s[WUNDER[j].id]) { pick = j; break; } }
     tage[key] = WUNDER[pick].id;
     var ks = Object.keys(tage).sort(); if (ks.length > 1200) ks.slice(0, ks.length - 1200).forEach(function (x) { delete tage[x]; });
-    wr("wunderwahr_tage", tage);
+    wr("thaumorawahr_tage", tage);
     return WUNDER[pick];
   }
   function byId(id) { return BYID[id] != null ? WUNDER[BYID[id]] : null; }

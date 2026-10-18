@@ -1,5 +1,5 @@
 /* ============================================================
-   WunderWahr – Bildkarten, Urkunden und Kalenderdatei
+   ThaumoraWahr – Bildkarten, Urkunden und Kalenderdatei
    Alles entsteht auf dem Gerät (Canvas bzw. Text). Geteilt wird nur,
    wenn du selbst im Teilen-Menü ein Ziel auswählst.
    © 2026 Jan Dierlich – Alle Rechte vorbehalten.
@@ -77,7 +77,7 @@
         y += gap2; c.fillStyle = "rgba(255,255,255,.74)"; c.font = "400 " + m.size + "px " + FONT;
         m.lines.forEach(function (l, i) { c.fillText(l, x, y + m.lh * (i + 1) - m.lh * .22); });
       }
-      footer(c, logo, "WunderWahr", o.foot || "Jeden Tag ein Grund zu staunen");
+      footer(c, logo, "ThaumoraWahr", o.foot || "Jeden Tag ein Grund zu staunen");
       return toBlob(cv);
     });
   }
@@ -112,7 +112,7 @@
       y += t.lines.length * t.lh + 46;
       if (bb) { c.fillStyle = "rgba(255,255,255,.88)"; c.font = "500 " + bb.size + "px " + FONT; bb.lines.forEach(function (l, i) { c.fillText(l, W / 2, y + bb.lh * (i + 1) - bb.lh * .22); }); }
       c.textAlign = "left";
-      footer(c, logo, "WunderWahr", o.date || "", -34);
+      footer(c, logo, "ThaumoraWahr", o.date || "", -34);
       return toBlob(cv);
     });
   }
@@ -125,7 +125,7 @@
     var file = null;
     try { file = new File([blob], filename, { type: blob.type || "image/png" }); } catch (e) { }
     if (file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-      return navigator.share({ files: [file], title: title || "WunderWahr" }).then(function () { return true; }, function (e) { return e && e.name === "AbortError" ? false : download(blob, filename); });
+      return navigator.share({ files: [file], title: title || "ThaumoraWahr" }).then(function () { return true; }, function (e) { return e && e.name === "AbortError" ? false : download(blob, filename); });
     }
     return Promise.resolve(download(blob, filename));
   }
@@ -145,10 +145,10 @@
     function d8(d) { return d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0"); }
     function fold(line) { var out = [], s = line; while (s.length > 60) { out.push(s.slice(0, 60)); s = " " + s.slice(60); } out.push(s); return out.join("\r\n"); }
     var now = new Date(), st = now.toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
-    var L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//WunderWahr//Meilensteine//DE", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:WunderWahr – Meilensteine"];
+    var L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ThaumoraWahr//Meilensteine//DE", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:ThaumoraWahr – Meilensteine"];
     events.forEach(function (e) {
       var d = new Date(e.date), n = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
-      L.push("BEGIN:VEVENT", "UID:" + esc(e.uid) + "@wunderwahr", "DTSTAMP:" + st, "DTSTART;VALUE=DATE:" + d8(d), "DTEND;VALUE=DATE:" + d8(n),
+      L.push("BEGIN:VEVENT", "UID:" + esc(e.uid) + "@thaumorawahr", "DTSTAMP:" + st, "DTSTART;VALUE=DATE:" + d8(d), "DTEND;VALUE=DATE:" + d8(n),
         fold("SUMMARY:" + esc(e.title)), fold("DESCRIPTION:" + esc(e.text)), "TRANSP:TRANSPARENT", "END:VEVENT");
     });
     L.push("END:VCALENDAR");

@@ -147,20 +147,27 @@ function openCropTool(sourceCanvas) {
     function finish(useFull) {
       window.removeEventListener('pointerup', onUp);
       document.body.removeChild(overlay);
-      const outCanvas = document.createElement('canvas');
-      if (useFull) {
-        outCanvas.width = sourceCanvas.width;
-        outCanvas.height = sourceCanvas.height;
-        outCanvas.getContext('2d').drawImage(sourceCanvas, 0, 0);
-      } else {
-        const sx = (rect.x / dispW) * sourceCanvas.width;
-        const sy = (rect.y / dispH) * sourceCanvas.height;
-        const sw = (rect.w / dispW) * sourceCanvas.width;
-        const sh = (rect.h / dispH) * sourceCanvas.height;
-        outCanvas.width = sw;
-        outCanvas.height = sh;
-        outCanvas.getContext('2d').drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+      // Ausschnitt bestimmen (ganzes Foto oder Zuschnitt) – in voller Auflösung
+      let sx = 0, sy = 0, sw = sourceCanvas.width, sh = sourceCanvas.height;
+      if (!useFull) {
+        sx = (rect.x / dispW) * sourceCanvas.width;
+        sy = (rect.y / dispH) * sourceCanvas.height;
+        sw = (rect.w / dispW) * sourceCanvas.width;
+        sh = (rect.h / dispH) * sourceCanvas.height;
       }
+      // Speicher schonen: längste Seite höchstens MAX_SIDE Pixel.
+      // Belege bleiben damit gestochen scharf lesbar, brauchen aber nur ca. ein Zehntel des Platzes.
+      const MAX_SIDE = 2000;
+      const scale = Math.min(1, MAX_SIDE / Math.max(sw, sh));
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = Math.max(1, Math.round(sw * scale));
+      outCanvas.height = Math.max(1, Math.round(sh * scale));
+      const ctx = outCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, outCanvas.width, outCanvas.height);
+      // Große Zwischen-Canvas sofort freigeben (entlastet den Arbeitsspeicher auf dem iPhone)
+      sourceCanvas.width = sourceCanvas.height = 0;
       resolve(outCanvas.toDataURL('image/jpeg', 0.85));
     }
     btnFull.addEventListener('click', () => finish(true));

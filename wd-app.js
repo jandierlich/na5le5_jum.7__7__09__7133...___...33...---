@@ -1,6 +1,6 @@
 /* ============================================================
    ThaumoraWahr – jeden Tag ein Grund zu staunen
-   Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“, Wunderalbum, Jahresstatistik),
+   Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“, Wunderalbum),
    KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
    WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
    ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
@@ -92,7 +92,6 @@
      ========================================================= */
   var offset = 0; // 0 = heute, -1 = gestern …
   var SELTEN = {}; (D.SELTEN || []).forEach(function (id) { SELTEN[id] = 1; });
-  var KATS = []; D.WUNDER.forEach(function (w) { if (KATS.indexOf(w.k) < 0) KATS.push(w.k); });
   function wonderFor(date) { return D.wonderFor(date); }
   function sammlung() { return load("thaumorawahr_sammlung", []); }
   function entdeckt() { return load("thaumorawahr_entdeckt", {}); }
@@ -192,7 +191,6 @@
     }
     renderKapselBanner();
     renderAlbum();
-    renderYearCard();
   }
 
   /* ---------- Rechenwunder: jeden Tag frisch berechnet ---------- */
@@ -286,41 +284,43 @@
     };
   }
 
-  /* ---------- Wunderalbum (schlicht: Liste aller entdeckten Karten) ---------- */
-  var albumFilter = "alle", albumMax = 15;
+  /* ---------- Wunderalbum (schlicht: nur Anzahl, Liste erst auf Antippen) ---------- */
+  var albumFilter = "alle", albumMax = 15, albumOpen = false;
   function renderAlbum() {
-    var e = entdeckt(), sam = sammlung(), ids = Object.keys(e), total = D.WUNDER.length;
-    var html = '<h2 class="wd-head">Wunderalbum <small>' + fmt(ids.length) + ' von ' + fmt(total) + ' entdeckt</small></h2>' +
-      '<div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"]].map(function (f) {
-        return '<button type="button" class="chip' + (albumFilter === f[0] ? ' active' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>';
-      }).join("") + '</div>';
-    var list = ids.map(function (id) { return D.byId(id); }).filter(Boolean)
-      .filter(function (w) { return albumFilter !== "merk" || sam.indexOf(w.id) >= 0; })
-      .sort(function (a, b) { return (e[b.id] || "").localeCompare(e[a.id] || ""); });
-    html += '<div class="wd-albumlist">' + (list.length ? list.slice(0, albumMax).map(function (x) {
-      return '<details class="wd-sam"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
-        '<div class="wd-sam-a"><button type="button" class="wd-mini" data-share="' + x.id + '">' + icon("share") + 'Teilen</button><button type="button" class="wd-mini" data-keep="' + x.id + '">' + icon(sam.indexOf(x.id) >= 0 ? "starfill" : "star") + (sam.indexOf(x.id) >= 0 ? "Gemerkt" : "Merken") + '</button></div></details>';
-    }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere anzeigen</button>' : '')
-      : '<p class="muted small" style="margin:6px 0 0">' + (albumFilter === "merk" ? "Noch keine Karte gemerkt." : "Hier erscheinen alle Wunder, die du entdeckt hast.") + '</p>') + '</div>' +
-      (ids.length >= 3 ? '<button type="button" class="cta slim" id="fbKino" style="margin-top:12px">' + icon("eye") + 'Vollbild-Präsentation</button>' : '');
-    var el = $("fbAlbum"); el.innerHTML = html;
+    var e = entdeckt(), sam = sammlung(), ids = Object.keys(e).filter(function (id) { return !!D.byId(id); });
+    var n = ids.length, el = $("fbAlbum");
+    var html = '<button type="button" class="wd-albhead" id="fbAlbHead" aria-expanded="' + (albumOpen ? 'true' : 'false') + '" aria-controls="fbAlbBody"' + (n ? '' : ' disabled') + '>' +
+      '<span class="wd-albt">Wunderalbum</span><span class="wd-albn"><b>' + fmt(n) + '</b> gesammelt</span>' + (n ? icon("right") : '') + '</button>';
+    if (!n) html += '<p class="muted small" style="margin:6px 0 0">Jedes Tageswunder, das du aufdeckst, wird hier gezählt.</p>';
+    if (albumOpen && n) {
+      var list = ids.map(function (id) { return D.byId(id); })
+        .filter(function (w) { return albumFilter !== "merk" || sam.indexOf(w.id) >= 0; })
+        .sort(function (a, b) { return (e[b.id] || "").localeCompare(e[a.id] || ""); });
+      html += '<div id="fbAlbBody"><div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"]].map(function (f) {
+          return '<button type="button" class="chip' + (albumFilter === f[0] ? ' active' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>';
+        }).join("") + '</div>' +
+        '<div class="wd-albumlist">' + (list.length ? list.slice(0, albumMax).map(function (x) {
+        return '<details class="wd-sam"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
+          '<div class="wd-sam-a"><button type="button" class="wd-mini" data-share="' + x.id + '">' + icon("share") + 'Teilen</button><button type="button" class="wd-mini" data-keep="' + x.id + '">' + icon(sam.indexOf(x.id) >= 0 ? "starfill" : "star") + (sam.indexOf(x.id) >= 0 ? "Gemerkt" : "Merken") + '</button></div></details>';
+      }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere anzeigen</button>' : '')
+        : '<p class="muted small" style="margin:6px 0 0">Noch keine Karte gemerkt.</p>') + '</div>' +
+        (n >= 3 ? '<button type="button" class="cta slim" id="fbKino" style="margin-top:12px">' + icon("eye") + 'Vollbild-Präsentation</button>' : '') + '</div>';
+    }
+    el.innerHTML = html;
+    $("fbAlbHead").onclick = function () { albumOpen = !albumOpen; if (!albumOpen) { albumFilter = "alle"; albumMax = 15; } renderAlbum(); };
+    if (!albumOpen || !n) return;
     el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 15; renderAlbum(); }; });
     el.querySelectorAll("[data-share]").forEach(function (b) { b.onclick = function () { shareWonder(D.byId(b.getAttribute("data-share")), null); }; });
     el.querySelectorAll("[data-keep]").forEach(function (b) {
       b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("thaumorawahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
     });
     if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 15; renderAlbum(); };
-    if ($("fbKino")) $("fbKino").onclick = function () { openKino(list.length >= 3 ? list : ids.map(function (id) { return D.byId(id); }).filter(Boolean)); };
+    if ($("fbKino")) $("fbKino").onclick = function () { openKino(list.length >= 3 ? list : ids.map(function (id) { return D.byId(id); })); };
   }
 
   /* ---------- Abzeichen ---------- */
   function reisen() { return load("thaumorawahr_reisen", null) || migrateReisen(); }
   function checkBadges() { }
-
-  /* ---------- Große Schrift ---------- */
-  function applyGross(on) { document.documentElement.classList.toggle("wd-gross", on); $("fbGross").setAttribute("aria-checked", on ? "true" : "false"); }
-  applyGross(load("thaumorawahr_gross", false) === true);
-  $("fbGross").onclick = function () { var on = !document.documentElement.classList.contains("wd-gross"); save("thaumorawahr_gross", on); applyGross(on); };
 
   /* =========================================================
      2. KilometerWahr – Meilensteine & Lebensuhr
@@ -837,7 +837,8 @@
       var by = +ps[0].date.slice(0, 4), now = new Date().getFullYear(), age = now - by, mid = by - age;
       var near = D.EREIGNISSE.filter(function (e) { return Math.abs(e[0] - mid) <= 6; }).slice(0, 4);
       $("aeMitte").innerHTML = '<h2>Deine Zeitmitte</h2><p class="small" style="margin:0 0 8px">Du bist <b>' + age + '</b> Jahre alt. Genauso lange vor deiner Geburt war das Jahr <b>' + mid + '</b>.</p>' +
-        '<div class="wd-axis"><span style="left:0">' + mid + '</span><span style="left:50%">' + by + '<small>Geburt</small></span><span style="left:100%">' + now + '</span><i></i></div>' +
+        '<div class="wd-gl wd-gl-solo"><div class="wd-gl-line"><i style="left:0"></i><i class="mid" style="left:50%"></i><i style="left:100%"></i></div>' +
+        '<div class="wd-gl-t"><span>Zeitmitte<small>' + mid + '</small></span><span style="text-align:center">Geburt<small>' + by + '</small></span><span style="text-align:right">Heute<small>' + now + '</small></span></div></div>' +
         (near.length ? '<p class="muted small" style="margin:0 0 2px">Um diese Zeit geschah:</p>' + near.map(function (e) { return '<div class="sn-fact"><div class="ic wd-yr">' + e[0] + '</div><div><b>' + esc(e[1]) + '</b></div></div>'; }).join("") : '');
     }
     $("aeGleich").innerHTML = D.GLEICHZEITIG.map(function (g) {
@@ -850,7 +851,7 @@
   }
 
   /* =========================================================
-     Erweiterungen (FINAL-97): Vollbild-Präsentation, Jahresstatistik,
+     Erweiterungen (FINAL-97): Vollbild-Präsentation,
      Lebenszeit in Wochen, Geburtsmoment, Zeitkapsel, Wahre Größe, Kosmische Adresse
      ========================================================= */
 
@@ -882,26 +883,6 @@
       };
     });
     show(); raf = requestAnimationFrame(loop);
-  }
-
-  /* ---------- Jahresstatistik ---------- */
-  function yearData(y) {
-    var e = entdeckt(), ids = Object.keys(e).filter(function (id) { return (e[id] || "").slice(0, 4) === String(y); });
-    var kc = {}; ids.forEach(function (id) { var w = D.byId(id); if (w) kc[w.k] = (kc[w.k] || 0) + 1; });
-    var R = reisen(), km = ["erde", "universum", "mensch"].reduce(function (a, k) { return a + ((R[k] && R[k].m) || 0); }, 0) / 1000;
-    return { n: ids.length, kc: kc, merk: sammlung().length, km: km };
-  }
-  function renderYearCard() {
-    var y = new Date().getFullYear(), d = yearData(y);
-    $("fbYear").innerHTML = '<span class="wd-medal">' + icon("calendar") + '</span><div><b>Jahresstatistik ' + y + '</b><span>' + fmt(d.n) + ' Wunder entdeckt · ' + fmt(Object.keys(d.kc).length) + ' von ' + KATS.length + ' Themen</span></div><button type="button" class="wd-mini" id="fbYearBtn">Details</button>';
-    $("fbYearBtn").onclick = function () { openYear(y); };
-  }
-  function openYear(y) {
-    var d = yearData(y), maxK = Math.max.apply(null, KATS.map(function (k) { return d.kc[k] || 0; }).concat([1]));
-    sheet('<h2>Jahresstatistik ' + y + '</h2><p class="muted small" style="margin:0">Alle Werte werden lokal aus deinen Einträgen berechnet.</p>' +
-      '<div class="wd-ystats"><div><b>' + fmt(d.n) + '</b><span>Wunder entdeckt</span></div><div><b>' + fmt(d.merk) + '</b><span>Karten gemerkt</span></div>' +
-      '<div><b>' + fmt(d.km, 2) + ' km</b><span>auf Zeitreisen gelaufen</span></div><div><b>' + fmt(Object.keys(d.kc).length) + ' / ' + KATS.length + '</b><span>Themen abgedeckt</span></div></div>' +
-      '<h3 class="wd-sub">Verteilung nach Themen</h3>' + KATS.map(function (k) { var v = d.kc[k] || 0; return '<div class="wd-hbar"><span>' + esc(k) + '</span><i><b style="width:' + (v / maxK * 100).toFixed(1) + '%"></b></i><em>' + v + '</em></div>'; }).join(""));
   }
 
   /* ---------- Lebenszeit in Wochen ---------- */
@@ -1088,73 +1069,173 @@
   var MLAT = 82, DLAT = 89.5;
   function mercY(lat, lim) { var L = lim || MLAT, p = Math.max(-L, Math.min(L, lat)) * D2R; return Math.log(Math.tan(Math.PI / 4 + p / 2)); }
   var MY = mercY(MLAT);
+  var RAT = (2 * MY) / (2 * Math.PI); // Höhe/Breite der Mercator-Karte bis ±82°
+  function tgOk(c) { return !!(c && c.area && c.bb && c.bb[1] > -60 && c.de); }
+  function tgSelect(c) { TG.sel = c; TG.to = [Math.abs(c.ly) > 25 ? 0 : (c.ly >= 0 ? 55 : -55), c.lx]; TG.forId = c.id; }
+  var TGV = { inline: null, big: null };
   function renderGroesse() {
     var el = $("dkGroesse"); if (!el || !GEO.world) return;
-    var list = GEO.world.filter(function (c) { return c.area && c.bb && c.bb[1] > -60; }).sort(function (a, b) { return a.de.localeCompare(b.de, "de"); });
-    if (!TG.sel) { TG.sel = list.filter(function (c) { return c.de === "Grönland"; })[0] || list[0]; }
-    if (!TG.to || TG.forId !== TG.sel.id) { TG.to = [Math.abs(TG.sel.ly) > 25 ? 0 : (TG.sel.ly >= 0 ? 55 : -55), TG.sel.lx]; TG.forId = TG.sel.id; }
-    var quick = ["Grönland", "Russland", "Kanada", "Australien", "Deutschland", "Indien", "Brasilien", "Alaska"].map(function (n) { return list.filter(function (c) { return c.de === n; })[0]; }).filter(Boolean);
+    if (!TG.sel || !tgOk(TG.sel)) tgSelect(GEO.world.filter(function (c) { return c.de === "Grönland" && tgOk(c); })[0] || GEO.world.filter(tgOk)[0]);
     el.innerHTML = '<h2 class="wd-head">Wahre Größe <small>Mercator-Projektion</small></h2>' +
-      '<p class="muted small" style="margin:0 0 10px">Die übliche Weltkarte (Mercator) ist winkeltreu, aber nicht flächentreu: Ein Gebiet in der Breite φ wird linear um 1/cos φ und in der Fläche um 1/cos² φ vergrößert. Wähle ein Land und tippe oder ziehe auf der Karte – es wird auf der Kugel verschoben und dann neu projiziert.</p>' +
-      '<div class="chip-row" style="margin-bottom:8px">' + quick.map(function (c) { return '<button type="button" class="chip' + (c === TG.sel ? ' active' : '') + '" data-tg="' + esc(c.id) + '">' + esc(c.de) + '</button>'; }).join("") + '</div>' +
-      '<select class="text-input" id="tgSel" aria-label="Land wählen">' + list.map(function (c) { return '<option value="' + esc(c.id) + '"' + (c === TG.sel ? ' selected' : '') + '>' + esc(c.de) + '</option>'; }).join("") + '</select>' +
-      '<canvas id="tgCv" class="wd-merc" aria-label="Weltkarte in Mercator-Projektion mit verschobenem Land"></canvas><div id="tgInfo"></div>';
-    el.querySelectorAll("[data-tg]").forEach(function (b) { b.onclick = function () { TG.sel = list.filter(function (c) { return c.id === b.getAttribute("data-tg"); })[0]; renderGroesse(); }; });
-    $("tgSel").onchange = function () { TG.sel = list.filter(function (c) { return c.id === $("tgSel").value; })[0]; renderGroesse(); };
-    var cv = $("tgCv"), st = null;
-    function ll(e) { var rc = cv.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height; var my = MY - y * 2 * MY; return [(2 * Math.atan(Math.exp(my)) - Math.PI / 2) * R2D, x * 360 - 180]; }
-    function setTo(lat, lon) { TG.to = [Math.max(-72, Math.min(72, lat)), wrap180(lon)]; drawGroesse(); }
-    // Ziehen: Land wird mitgeführt (relativ zum Startpunkt); kurzer Tipp: Bezugspunkt springt dorthin
-    cv.addEventListener("pointerdown", function (e) { var p0 = ll(e); st = { p0: p0, to0: TG.to.slice(), moved: false, x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (x) { } });
-    cv.addEventListener("pointermove", function (e) { if (!st) return; if (Math.hypot(e.clientX - st.x, e.clientY - st.y) > 6) st.moved = true; if (st.moved) { var p1 = ll(e); setTo(st.to0[0] + (p1[0] - st.p0[0]), st.to0[1] + (p1[1] - st.p0[1])); } });
-    cv.addEventListener("pointerup", function (e) { if (st && !st.moved) { var p = ll(e); setTo(p[0], p[1]); } st = null; });
+      '<p class="muted small" style="margin:0 0 10px">Die übliche Weltkarte (Mercator) ist winkeltreu, aber nicht flächentreu: Ein Gebiet in der Breite φ wird linear um 1/cos φ und in der Fläche um 1/cos² φ vergrößert. Tippe auf der Karte ein beliebiges Land an, um es auszuwählen, und ziehe dann die goldene Kopie an eine andere Stelle – oder tippe aufs Meer, um sie dorthin zu setzen. Die Kopie wird auf der Kugel verschoben und neu projiziert.</p>' +
+      '<div class="wd-merc-sel" id="tgSelL" aria-live="polite"></div>' +
+      '<div class="wd-merc-wrap"><canvas id="tgCv" class="wd-merc" role="img" aria-label="Weltkarte in Mercator-Projektion mit verschobenem Land"></canvas>' +
+      '<button type="button" class="wd-merc-zoom" id="tgBig" aria-label="Karte vergrößern">' + icon("expand") + '</button></div><div id="tgInfo"></div>';
+    TGV.inline = tgMap($("tgCv"), false);
+    $("tgBig").onclick = openGroesseBig;
     drawGroesse();
   }
-  function drawGroesse() {
-    var cv = $("tgCv"); if (!cv) return;
-    var css = cv.clientWidth || 340, dpr = Math.min(2, window.devicePixelRatio || 1), Hh = css * (2 * MY) / (2 * Math.PI);
-    cv.style.height = Hh + "px"; cv.width = Math.round(css * dpr); cv.height = Math.round(Hh * dpr);
+  /* Karten-Steuerung für eingebettete und vergrößerte Ansicht (gemeinsamer Zustand TG) */
+  function tgMap(cv, big) {
+    var V = { cv: cv, big: big, s: 1, minS: 1, cx: .5, cy: .5, tr: null, copy: [], refPt: null, init: !big };
+    var pts = {}, st = null, pinch = null, raf = 0;
+    function redraw() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; drawGroesse(); }); }
+    function local(e) { var rc = cv.getBoundingClientRect(); return [e.clientX - rc.left, e.clientY - rc.top]; }
+    function ll(px, py) { var t = V.tr, x = (px - t.ox) / t.bw, y = (py - t.oy) / t.bh, my = MY - y * 2 * MY; return [(2 * Math.atan(Math.exp(my)) - Math.PI / 2) * R2D, x * 360 - 180]; }
+    function onCopy(px, py) {
+      if (V.refPt && Math.hypot(px - V.refPt[0], py - V.refPt[1]) < 22) return true;
+      return V.copy.some(function (rings) { var ins = false; rings.forEach(function (r) { if (inRing(r, px, py)) ins = !ins; }); return ins; });
+    }
+    function setTo(lat, lon) { TG.to = [Math.max(-72, Math.min(72, lat)), wrap180(lon)]; redraw(); }
+    function zoomAt(s, mx, my) {
+      var t = V.tr, nx = (mx - t.ox) / t.bw, ny = (my - t.oy) / t.bh;
+      V.s = Math.max(V.minS, Math.min(12, s));
+      var bw = t.w * V.s, bh = bw * RAT;
+      V.cx = (t.w / 2 - (mx - nx * bw)) / bw; V.cy = (t.h / 2 - (my - ny * bh)) / bh; redraw();
+    }
+    V.zoomBy = function (f) { if (V.tr) zoomAt(V.s * f, V.tr.w / 2, V.tr.h / 2); };
+    cv.addEventListener("pointerdown", function (e) {
+      if (!V.tr) return; var p = local(e); pts[e.pointerId] = p; try { cv.setPointerCapture(e.pointerId); } catch (x) { }
+      var ids = Object.keys(pts);
+      if (big && ids.length === 2) { var a = pts[ids[0]], b = pts[ids[1]]; pinch = { d0: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, s0: V.s }; st = null; return; }
+      if (ids.length > 1) return;
+      var copy = onCopy(p[0], p[1]);
+      st = { x: p[0], y: p[1], p0: ll(p[0], p[1]), to0: TG.to.slice(), moved: false, mode: copy ? "copy" : (big && V.s > 1.01 ? "pan" : "copy"), onCopy: copy, cx0: V.cx, cy0: V.cy };
+    });
+    cv.addEventListener("pointermove", function (e) {
+      if (!(e.pointerId in pts)) return; var p = local(e); pts[e.pointerId] = p;
+      var ids = Object.keys(pts);
+      if (pinch && ids.length === 2) { var a = pts[ids[0]], b = pts[ids[1]]; zoomAt(pinch.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d0, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); pinch.s0 = V.s; pinch.d0 = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1; return; }
+      if (!st) return;
+      if (Math.hypot(p[0] - st.x, p[1] - st.y) > 6) st.moved = true;
+      if (!st.moved) return;
+      if (st.mode === "pan") { var t = V.tr; V.cx = st.cx0 - (p[0] - st.x) / t.bw; V.cy = st.cy0 - (p[1] - st.y) / t.bh; redraw(); }
+      else { var p1 = ll(p[0], p[1]); setTo(st.to0[0] + (p1[0] - st.p0[0]), st.to0[1] + (p1[1] - st.p0[1])); }
+    });
+    function up(e) {
+      if (!(e.pointerId in pts)) return; var p = pts[e.pointerId]; delete pts[e.pointerId];
+      if (pinch) { if (!Object.keys(pts).length) pinch = null; st = null; return; }
+      if (st && !st.moved && !st.onCopy && e.type === "pointerup") {
+        var q = ll(p[0], p[1]); if (q[0] < -85 || q[0] > 85 || p[0] < V.tr.ox || p[0] > V.tr.ox + V.tr.bw) { st = null; return; }
+        var c = countryAt(q[0], q[1]);
+        if (c && tgOk(c)) { if (c !== TG.sel) { tgSelect(c); buzz(); redraw(); } }
+        else if (!c) setTo(q[0], q[1]);
+      }
+      st = null;
+    }
+    cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+    return V;
+  }
+  function tgDraw(V) {
+    var cv = V.cv; if (!cv || !cv.isConnected) return;
+    var w = cv.clientWidth || 340, h, dpr = Math.min(V.big ? 3 : 2, window.devicePixelRatio || 1);
+    if (V.big) h = cv.clientHeight || w * RAT; else { h = w * RAT; cv.style.height = h + "px"; }
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    V.minS = V.big ? Math.max(1, h / (w * RAT)) : 1;
+    if (!V.init) { V.init = true; V.s = V.minS; V.cx = (wrap180(TG.to[1]) + 180) / 360; V.cy = (MY - mercY(TG.to[0])) / (2 * MY); }
+    if (V.s < V.minS) V.s = V.minS;
+    var bw = w * V.s, bh = bw * RAT;
+    V.cx = bw <= w ? .5 : Math.max(w / 2 / bw, Math.min(1 - w / 2 / bw, V.cx));
+    V.cy = bh <= h ? .5 : Math.max(h / 2 / bh, Math.min(1 - h / 2 / bh, V.cy));
+    var ox = w / 2 - V.cx * bw, oy = h / 2 - V.cy * bh; V.tr = { ox: ox, oy: oy, bw: bw, bh: bh, w: w, h: h };
     var g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue("--accent").trim() || "#5A2FBE", bor = cs.getPropertyValue("--border").trim() || "#ccc";
+    var cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue("--accent").trim() || "#5A2FBE";
     var dark = document.documentElement.classList.contains("theme-dark");
-    g.fillStyle = dark ? "#15102A" : "#EEE9FA"; g.fillRect(0, 0, css, Hh);
-    function X(lon) { return (lon + 180) / 360 * css; }
-    function Y(lat) { return (MY - mercY(lat)) / (2 * MY) * Hh; }
-    function YD(lat) { return (MY - mercY(lat, DLAT)) / (2 * MY) * Hh; }
-    // Breitenkreise mit Flächenfaktor
-    g.strokeStyle = dark ? "rgba(255,255,255,.08)" : "rgba(40,20,90,.08)"; g.lineWidth = 1; g.fillStyle = dark ? "rgba(255,255,255,.45)" : "rgba(40,20,90,.45)"; g.font = "600 8.5px -apple-system, system-ui, sans-serif";
-    [-60, -30, 0, 30, 60, 75].forEach(function (la) { g.beginPath(); g.moveTo(0, Y(la)); g.lineTo(css, Y(la)); g.stroke(); g.fillText((la === 0 ? "0°" : la + "°") + " ×" + fmt(1 / Math.pow(Math.cos(la * D2R), 2), 1), 3, Y(la) - 2); });
-    // Länder
-    g.fillStyle = dark ? "#3A2E5E" : "#D5CAEE";
-    GEO.world.forEach(function (c) { c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.fill("evenodd"); }); });
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = dark ? "#15102A" : "#EEE9FA"; g.fillRect(ox, oy, bw, bh);
+    function X(lon) { return ox + (lon + 180) / 360 * bw; }
+    function Y(lat) { return oy + (MY - mercY(lat)) / (2 * MY) * bh; }
+    function YD(lat) { return oy + (MY - mercY(lat, DLAT)) / (2 * MY) * bh; }
+    function vis(c) { var b = c.bb; return !(X(b[2]) < 0 || X(b[0]) > w || Y(b[1]) < 0 || Y(b[3]) > h); }
+    // Breitenkreise (Linien unter den Ländern, Beschriftung zuletzt obenauf)
+    var LATS = [-60, -30, 0, 30, 60, 75];
+    g.strokeStyle = dark ? "rgba(255,255,255,.08)" : "rgba(40,20,90,.08)"; g.lineWidth = 1;
+    LATS.forEach(function (la) { var y = Y(la); if (y < -2 || y > h + 2) return; g.beginPath(); g.moveTo(Math.max(0, ox), y); g.lineTo(Math.min(w, ox + bw), y); g.stroke(); });
+    function path(c) { c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.fill("evenodd"); if (V.big && V.s > 2.5) g.stroke(); }); }
+    // Länder (bei starker Vergrößerung mit Grenzen)
+    g.fillStyle = dark ? "#3A2E5E" : "#D5CAEE"; g.strokeStyle = dark ? "rgba(255,255,255,.18)" : "rgba(255,255,255,.9)"; g.lineWidth = .7;
+    GEO.world.forEach(function (c) { if (vis(c)) path(c); });
     var c = TG.sel, ref = [c.ly, c.lx];
     // Original hervorheben
-    g.strokeStyle = acc; g.lineWidth = 1.2; g.setLineDash([3, 2]);
-    c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.stroke(); });
+    g.fillStyle = dark ? "rgba(155,123,255,.28)" : "rgba(90,47,190,.16)"; g.strokeStyle = acc; g.lineWidth = 1.2; g.setLineDash([3, 2]);
+    c.polys.forEach(function (rings) { g.beginPath(); rings.forEach(function (r) { for (var i = 0; i < r.length; i += 2) { var x = X(r[i]), y = Y(r[i + 1]); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); }); g.fill("evenodd"); g.stroke(); });
     g.setLineDash([]);
     // verschobene Kopie
-    var rot = moveFn(ref, TG.to);
+    var rot = moveFn(ref, TG.to); V.copy = [];
     g.fillStyle = dark ? "rgba(255,210,122,.55)" : "rgba(201,138,31,.5)"; g.strokeStyle = dark ? "#FFD27A" : "#8A5A06"; g.lineWidth = 1.2;
     [-360, 0, 360].forEach(function (sh) {
       c.polys.forEach(function (rings) {
+        var sp = [];
         g.beginPath();
         rings.forEach(function (r) {
-          var prev = null;
+          var prev = null, out = new Float32Array(r.length);
           for (var i = 0; i < r.length; i += 2) {
             var q = unvec(rot(vec(r[i + 1], r[i]))), lon = q[1];
             if (prev != null) { while (lon - prev > 180) lon -= 360; while (lon - prev < -180) lon += 360; } else { while (lon - TG.to[1] > 180) lon -= 360; while (lon - TG.to[1] < -180) lon += 360; }
-            prev = lon; var x = X(lon + sh), y = YD(q[0]); if (i) g.lineTo(x, y); else g.moveTo(x, y);
+            prev = lon; var x = X(lon + sh), y = YD(q[0]); out[i] = x; out[i + 1] = y; if (i) g.lineTo(x, y); else g.moveTo(x, y);
           }
-          g.closePath();
+          g.closePath(); sp.push(out);
         });
-        g.fill("evenodd"); g.stroke();
+        g.fill("evenodd"); g.stroke(); V.copy.push(sp);
       });
     });
-    var de = GEO.world.filter(function (x) { return x.de === "Deutschland"; })[0];
-    var f0 = 1 / Math.pow(Math.cos(ref[0] * D2R), 2), f1 = 1 / Math.pow(Math.cos(TG.to[0] * D2R), 2);
-    $("tgInfo").innerHTML = '<div class="wd-kv"><div><span>Fläche (aus Umriss berechnet)</span><b>' + fmt(c.area) + ' km²</b></div><div><span>Vergleich Deutschland</span><b>× ' + fmt(c.area / (de ? de.area : 357000), 1) + '</b></div>' +
-      '<div><span>Bezugspunkt original</span><b>' + fmt(ref[0], 1) + '° · ×' + fmt(f0, 2) + '</b></div><div><span>Bezugspunkt verschoben</span><b>' + fmt(TG.to[0], 1) + '° · ×' + fmt(f1, 2) + '</b></div></div>' +
-      '<p class="muted small" style="margin:8px 0 0">×-Werte = Flächenvergrößerung der Mercator-Karte am Bezugspunkt (1/cos² φ). Am Original erscheint ' + esc(c.de) + ' damit etwa ' + fmt(f0 / f1, 1) + '-mal so groß wie an der neuen Position. Das Land wird auf der Kugel starr verschoben (Norden bleibt oben); sehr ausgedehnte Länder wie Russland krümmen sich dabei sichtbar, weil ihre Ränder auf der Kugel andere Wege nehmen. Kartenrand bei ±82°.</p>';
+    V.refPt = [X(TG.to[1]), YD(TG.to[0])];
+    // Griffpunkt der Kopie
+    g.beginPath(); g.arc(V.refPt[0], V.refPt[1], V.big ? 5 : 3.5, 0, 2 * Math.PI); g.fillStyle = dark ? "#FFD27A" : "#8A5A06"; g.fill();
+    g.lineWidth = 1.5; g.strokeStyle = dark ? "#15102A" : "#fff"; g.stroke();
+    g.font = "650 " + (V.big ? 10.5 : 8.5) + "px -apple-system, system-ui, sans-serif"; g.lineJoin = "round";
+    LATS.forEach(function (la) {
+      var y = Y(la); if (y < 8 || y > h + 2) return; var t = (la === 0 ? "0°" : la + "°") + " ×" + fmt(1 / Math.pow(Math.cos(la * D2R), 2), 1), x = Math.max(4, ox + 4);
+      g.lineWidth = 3; g.strokeStyle = dark ? "rgba(21,16,42,.85)" : "rgba(238,233,250,.9)"; g.strokeText(t, x, y - 3);
+      g.fillStyle = dark ? "rgba(255,255,255,.6)" : "rgba(40,20,90,.6)"; g.fillText(t, x, y - 3);
+    });
+  }
+  function tgFacts() {
+    var c = TG.sel, ref = [c.ly, c.lx], de = GEO.world.filter(function (x) { return x.de === "Deutschland"; })[0];
+    return { c: c, ref: ref, rel: function () { var r = this.f0 / this.f1; return r >= 1 ? "erscheint am Original " + fmt(r, 1) + "-mal so groß wie an der Kopie" : "erscheint an der Kopie " + fmt(1 / r, 1) + "-mal so groß wie am Original"; }, f0: 1 / Math.pow(Math.cos(ref[0] * D2R), 2), f1: 1 / Math.pow(Math.cos(TG.to[0] * D2R), 2), vde: c.area / (de ? de.area : 357000) };
+  }
+  function drawGroesse() {
+    if (TGV.inline) tgDraw(TGV.inline);
+    if (TGV.big) tgDraw(TGV.big);
+    var F = tgFacts(), c = F.c;
+    if ($("tgSelL")) $("tgSelL").innerHTML = '<b>' + esc(c.de) + '</b><span>' + fmt(c.area) + ' km² · Original ×' + fmt(F.f0, 2) + ' · Kopie ×' + fmt(F.f1, 2) + '</span>';
+    if ($("tgBigSel")) $("tgBigSel").innerHTML = '<b>' + esc(c.de) + '</b><span>' + fmt(c.area) + ' km² · ' + F.rel() + '</span>';
+    if (!$("tgInfo")) return;
+    $("tgInfo").innerHTML = '<div class="wd-kv"><div><span>Fläche (aus Umriss berechnet)</span><b>' + fmt(c.area) + ' km²</b></div><div><span>Vergleich Deutschland</span><b>× ' + fmt(F.vde, 1) + '</b></div>' +
+      '<div><span>Bezugspunkt original</span><b>' + fmt(F.ref[0], 1) + '° · ×' + fmt(F.f0, 2) + '</b></div><div><span>Bezugspunkt verschoben</span><b>' + fmt(TG.to[0], 1) + '° · ×' + fmt(F.f1, 2) + '</b></div></div>' +
+      '<p class="muted small" style="margin:8px 0 0">×-Werte = Flächenvergrößerung der Mercator-Karte am Bezugspunkt (1/cos² φ). Auf der Karte ' + F.rel().replace("erscheint", "erscheint " + esc(c.de) + " damit etwa").replace("an der Kopie", "an der neuen Position") + '. Das Land wird auf der Kugel starr verschoben (Norden bleibt oben); sehr ausgedehnte Länder wie Russland krümmen sich dabei sichtbar, weil ihre Ränder auf der Kugel andere Wege nehmen. Kartenrand bei ±82°.</p>';
+  }
+  /* Vergrößerte Karte: Vollbild mit Zoom (zwei Finger oder +/−), Schließen über X */
+  function openGroesseBig() {
+    if (TGV.big) return;
+    var ov = document.createElement("div"); ov.className = "wd-mercbig"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "Wahre Größe – vergrößerte Karte");
+    ov.innerHTML = '<div class="wd-mercbig-top"><div class="wd-merc-sel" id="tgBigSel" aria-live="polite"></div><button type="button" class="wd-mercbig-x" id="tgBigX" aria-label="Schließen">' + icon("close") + '</button></div>' +
+      '<div class="wd-mercbig-map"><canvas id="tgBigCv" role="img" aria-label="Vergrößerte Weltkarte in Mercator-Projektion"></canvas>' +
+      '<div class="wd-mercbig-zoom"><button type="button" data-z="1.6" aria-label="Hineinzoomen">' + icon("plus") + '</button><button type="button" data-z="0.625" aria-label="Herauszoomen">' + icon("minus") + '</button></div></div>' +
+      '<p class="wd-mercbig-hint">Land antippen = auswählen · Kopie ziehen = verschieben · Meer antippen = Kopie dorthin setzen · zwei Finger = zoomen, ein Finger neben der Kopie = Karte bewegen</p>';
+    document.body.appendChild(ov); document.documentElement.classList.add("wd-cam-open");
+    var last = document.activeElement;
+    TGV.big = tgMap($("tgBigCv"), true);
+    ov.querySelectorAll("[data-z]").forEach(function (b) { b.onclick = function () { TGV.big.zoomBy(+b.getAttribute("data-z")); }; });
+    function onResize() { drawGroesse(); }
+    function key(e) { if (e.key === "Escape") close(); }
+    function close() {
+      TGV.big = null; window.removeEventListener("resize", onResize); document.removeEventListener("keydown", key);
+      if (ov.parentNode) ov.parentNode.removeChild(ov); document.documentElement.classList.remove("wd-cam-open"); drawGroesse();
+      if (last && last.focus) try { last.focus(); } catch (x) { }
+    }
+    $("tgBigX").onclick = close; window.addEventListener("resize", onResize); document.addEventListener("keydown", key);
+    requestAnimationFrame(function () { drawGroesse(); try { $("tgBigX").focus(); } catch (x) { } });
   }
 
   /* ---------- Kosmische Adresse ---------- */

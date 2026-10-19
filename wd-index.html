@@ -423,14 +423,6 @@
   .wd-hero.wd-calc{background:radial-gradient(110% 90% at 0% 0%, rgba(255,210,122,.22) 0%, transparent 55%), linear-gradient(160deg,#33246E 0%,#1A1338 100%)}
   .wd-calc .wd-over{color:#FFD27A}
   .wd-calc-n{display:block;font:800 30px/1.1 ui-rounded,-apple-system,sans-serif;color:#FFD27A;letter-spacing:-.02em;margin:2px 0 6px}
-  .wd-quiz-q{font-size:15px;line-height:1.5;margin:0 0 12px}
-  .wd-quiz-q mark{background:var(--soft);color:var(--accent);border-radius:6px;padding:0 6px;font-weight:700}
-  .wd-quiz-o{display:grid;gap:8px}
-  .wd-quiz-o button{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font:600 15px -apple-system,sans-serif;text-align:left;cursor:pointer}
-  .wd-quiz-o button[disabled]{cursor:default}
-  .wd-quiz-o button.ok{border-color:var(--accent);background:var(--soft)}
-  .wd-quiz-o button.no{opacity:.55;text-decoration:line-through}
-  .wd-quiz-r{margin:10px 2px 0;font-size:13.5px;font-weight:600}
   .wd-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
   .wd-head small{font-size:13px;font-weight:500;color:var(--sub-onbg)}
   .wd-bigbar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin:4px 0 12px}
@@ -469,7 +461,7 @@
   .wd-switch[aria-checked="true"]::after{transform:translateX(20px)}
   html.wd-gross .wd-card-t{font-size:27px}
   html.wd-gross .wd-card-x{font-size:18px}
-  html.wd-gross .wd-more p,html.wd-gross .wd-quiz-q,html.wd-gross .wd-sam p,html.wd-gross .sn-fact span{font-size:16.5px}
+  html.wd-gross .wd-more p,html.wd-gross .wd-sam p,html.wd-gross .sn-fact span{font-size:16.5px}
   html.wd-gross .wd-sam summary b{font-size:16px}
   /* Bogen (eigenes Blatt für Statistik, Details, Zeitkapsel) */
   .wd-sheet-bg{position:fixed;inset:0;z-index:2000;background:rgba(10,6,24,.55);display:flex;align-items:flex-end;justify-content:center;animation:wdFade .2s ease}
@@ -556,10 +548,6 @@
   .wd-kv div{background:var(--soft);border-radius:12px;padding:9px 10px;min-width:0}
   .wd-kv span{display:block;font-size:11.5px;color:var(--sub-onbg);line-height:1.25}
   .wd-kv b{display:block;font:700 15px/1.3 ui-rounded,-apple-system,sans-serif;font-variant-numeric:tabular-nums;color:var(--text);word-break:break-word}
-  .wd-est{margin:6px 0 12px}
-  .wd-est output{display:block;text-align:center;font:800 30px ui-rounded,-apple-system,sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;margin-bottom:6px}
-  .wd-est input{width:100%}
-  .wd-est-t{display:flex;justify-content:space-between;font-size:11px;color:var(--sub-onbg);margin-top:4px}
   .wd-hbar{display:grid;grid-template-columns:118px 1fr 28px;align-items:center;gap:8px;font-size:12.5px;margin:5px 0}
   .wd-hbar i{display:block;height:8px;border-radius:4px;background:var(--soft);overflow:hidden}
   .wd-hbar i b{display:block;height:100%;background:var(--accent);border-radius:4px}
@@ -643,7 +631,6 @@
 <symbol id="wzi-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.6-5.3 3.6-8.3.4 1.6 1.4 2.6 2.4 3.1C12 6.8 13.4 4.4 15.6 3c-.3 2.9 2.9 5.2 2.9 10 0 4.3-2.6 8-6.5 8zm0-2.4c1.7 0 2.8-1.2 2.8-2.9 0-1.9-1.6-2.8-2.1-4.4-.9 1.6-3.5 2.4-3.5 4.6 0 1.6 1.1 2.7 2.8 2.7z" fill="currentColor"/></symbol>
 <symbol id="wzi-medal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8l2.6 6M16 2.8l-2.6 6"/><circle cx="12" cy="15" r="6"/><path d="M12 12.2l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="currentColor" stroke="none"/></g></symbol>
 <symbol id="wzi-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.8" y="5.2" width="16.4" height="15" rx="2.2"/><path d="M3.8 9.8h16.4M8.2 3.2v4M15.8 3.2v4"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></g></symbol>
-<symbol id="wzi-quiz" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.9-1.1 1.6v.5"/><circle cx="12" cy="16.9" r=".9" fill="currentColor" stroke="none"/></g></symbol>
 <symbol id="wzi-universe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.8" fill="currentColor"/><path d="M12 5.2c4.6 0 8.4 3 8.4 6.8S16.6 18.8 12 18.8" /><path d="M12 18.8c-4.6 0-8.4-3-8.4-6.8S7.4 5.2 12 5.2" opacity=".55"/><circle cx="19" cy="5" r=".8" fill="currentColor" stroke="none"/><circle cx="4.6" cy="19.2" r=".8" fill="currentColor" stroke="none"/></g></symbol>
 <symbol id="wzi-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7.6" r="2.8"/><path d="M3.8 19.6c.4-3.4 2.4-5.4 5.2-5.4s4.8 2 5.2 5.4"/><circle cx="16.6" cy="8.8" r="2.2"/><path d="M15.4 14.4c2.6-.4 4.4 1.4 4.8 4.4"/></g></symbol>
 <symbol id="wzi-check" viewBox="0 0 24 24"><path d="M5 12.5l4.4 4.4L19 7.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -674,8 +661,6 @@
     <div class="card" id="fbKapsel" hidden></div>
     <div class="wd-swipe" id="fbSwipe"><div class="wd-hero" id="fbCard" aria-live="polite"></div></div>
     <div class="wd-hero wd-calc" id="fbCalc" aria-live="polite"></div>
-    <div class="card" id="fbQuiz" hidden></div>
-    <div class="card" id="fbSchaetz" hidden></div>
     <div class="card" id="fbHeute" hidden></div>
     <div class="card" id="fbAlbum"></div>
     <div class="card wd-yearcard" id="fbYear"></div>

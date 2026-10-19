@@ -1,12 +1,12 @@
 /* ============================================================
    ThaumoraWahr – jeden Tag ein Grund zu staunen
-   Bereiche: TagesWahr (Tageswunder, Rechenwunder, Quiz, Sammelalbum, Abzeichen, Wunderjahr),
+   Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“, Wunderalbum, Jahresstatistik),
    KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
    WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
    ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
    Alles wird auf dem Gerät berechnet; es wird nichts gesendet.
    Speicher (Präfix thaumorawahr_): Personen/Geburtsdaten, entdeckte und gemerkte Karten, Tageskarten,
-   Serie, Quiz-Antworten, Abzeichen, Fortschritt der Zeitreisen, Einstellungen.
+   Zeitkapseln, Fortschritt der Zeitreisen, Etappenprotokoll, Einstellungen.
    © 2026 Jan Dierlich – Alle Rechte vorbehalten.
    ============================================================ */
 (function () {
@@ -88,7 +88,7 @@
   tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
 
   /* =========================================================
-     1. TagesWahr – Tageswunder, Rechenwunder, Quiz, Album, Abzeichen
+     1. TagesWahr – Tageswunder, Rechenwunder, „Heute vor …“, Album
      ========================================================= */
   var offset = 0; // 0 = heute, -1 = gestern …
   var SELTEN = {}; (D.SELTEN || []).forEach(function (id) { SELTEN[id] = 1; });
@@ -100,6 +100,7 @@
     var e = entdeckt(); if (e[id]) return false;
     e[id] = ymd(date || new Date()); save("thaumorawahr_entdeckt", e); return true;
   }
+  try { localStorage.removeItem("thaumorawahr_quiz"); localStorage.removeItem("thaumorawahr_schaetz"); } catch (e) { } // Quiz und Schätzfrage gibt es nicht mehr
   (function migrate() { // bereits gemerkte Karten zählen als entdeckt
     var e = entdeckt(), ch = false;
     sammlung().forEach(function (id) { if (!e[id]) { e[id] = ymd(new Date()); ch = true; } });
@@ -189,8 +190,6 @@
         return '<div class="sn-fact"><div class="ic wd-yr">' + fmt(y) + '</div><div><b>' + fmt(y) + ' Jahren · ' + e[0] + '</b><span>' + esc(e[1]) + '</span></div></div>';
       }).join("");
     }
-    renderQuiz();
-    renderSchaetz();
     renderKapselBanner();
     renderAlbum();
     renderYearCard();
@@ -285,52 +284,6 @@
       WDShare.wonderCard({ over: out.over, title: out.n + " – " + out.t, text: out.x, foot: "Berechnet am " + dShort(day) })
         .then(function (b) { return WDShare.share(b, "Rechenwunder.png", out.t); }).then(function (ok) { if (ok) bump("shared"); });
     };
-  }
-
-  /* ---------- Quiz zum Wunder von gestern ---------- */
-  function quizFor(w, seed) {
-    var r = seeded(seed), m = w.x.match(/(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?)/);
-    function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-    if (m) {
-      var tok = m[1], dec = (tok.split(",")[1] || "").length, v = parseFloat(tok.replace(/\./g, "").replace(",", ".")), grp = tok.indexOf(".") >= 0;
-      var year = !grp && !dec && v >= 1000 && v <= new Date().getFullYear() && /^\d{4}$/.test(tok);
-      var f = function (x) { return year ? String(Math.round(x)) : x.toLocaleString("de-DE", { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: grp || x >= 10000 }); };
-      var opts = [], cand = year ? [-120, -60, -35, 40, 75, 110] : [2, 3, 5, 10, .5, .2, .1, 1 / 3, 4, 1.5];
-      cand = shuffle(cand.slice());
-      for (var i = 0; i < cand.length && opts.length < 2; i++) {
-        var x = year ? v + cand[i] : v * cand[i];
-        if (year && x > new Date().getFullYear()) continue;
-        if (!year) { var mag = Math.pow(10, Math.max(0, Math.floor(Math.log10(Math.abs(x) || 1)) - 1)); x = dec ? Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec) : Math.round(x / mag) * mag; }
-        var s = f(x); if (x > 0 && s !== f(v) && opts.indexOf(s) < 0) opts.push(s);
-      }
-      if (opts.length === 2) {
-        var q = esc(w.x.slice(0, m.index)) + '<mark>?</mark>' + esc(w.x.slice(m.index + tok.length));
-        return { q: q, opts: shuffle([tok].concat(opts)), ok: tok, typ: "zahl" };
-      }
-    }
-    var e = entdeckt(), pool = D.WUNDER.filter(function (x) { return x.id !== w.id && !e[x.id]; });
-    var o = [w.t]; while (o.length < 3 && pool.length) { var k = Math.floor(r() * pool.length); o.push(pool.splice(k, 1)[0].t); }
-    return { q: "Welches dieser Wunder hast du gestern entdeckt?", opts: shuffle(o), ok: w.t, typ: "titel" };
-  }
-  function renderQuiz() {
-    var el = $("fbQuiz"), today = new Date(), yd = addDays(today, -1), tage = load("thaumorawahr_tage", {}), e = entdeckt();
-    var id = tage[ymd(yd)], w = id && D.byId(id);
-    if (!w || !e[w.id] || offset !== 0) { el.hidden = true; return; }
-    var qa = load("thaumorawahr_quiz", {}), done = qa[ymd(today)];
-    if (Object.keys(qa).some(function (k) { return k !== ymd(today); })) { qa = {}; if (done) qa[ymd(today)] = done; save("thaumorawahr_quiz", qa); }
-    var q = quizFor(w, daysBetween(new Date(2026, 0, 1), today) * 7 + 3);
-    el.hidden = false;
-    el.innerHTML = '<h2 class="wd-head">Quiz zu gestern <small>' + icon("quiz") + '</small></h2><p class="wd-quiz-q">' + q.q + '</p><div class="wd-quiz-o" role="group" aria-label="Antworten">' +
-      q.opts.map(function (o) { return '<button type="button" data-o="' + esc(o) + '"' + (done ? ' disabled' : '') + (done && o === q.ok ? ' class="ok"' : done && o === done.a && o !== q.ok ? ' class="no"' : '') + '>' + (done && o === q.ok ? icon("check") : '') + esc(o) + '</button>'; }).join("") +
-      '</div><p class="wd-quiz-r" id="fbQuizR" aria-live="polite">' + (done ? (done.ok ? "Richtig! Morgen gibt es die nächste Frage." : "Knapp daneben – die richtige Antwort ist markiert. Morgen gibt es die nächste Frage.") : '') + '</p>';
-    if (done) return;
-    el.querySelectorAll("[data-o]").forEach(function (b) {
-      b.onclick = function () {
-        var a = b.getAttribute("data-o"), ok = a === q.ok;
-        var only = {}; only[ymd(today)] = { a: a, ok: ok }; save("thaumorawahr_quiz", only); // nur die heutige Antwort, keine Auswertung
-        buzz(ok ? 15 : [10, 60, 10]); renderQuiz();
-      };
-    });
   }
 
   /* ---------- Wunderalbum (schlicht: Liste aller entdeckten Karten) ---------- */
@@ -897,52 +850,9 @@
   }
 
   /* =========================================================
-     Erweiterungen (FINAL-97): Schätzfrage, Vollbild-Präsentation, Jahresstatistik,
+     Erweiterungen (FINAL-97): Vollbild-Präsentation, Jahresstatistik,
      Lebenszeit in Wochen, Geburtsmoment, Zeitkapsel, Wahre Größe, Kosmische Adresse
      ========================================================= */
-
-  /* ---------- Größenordnung schätzen ---------- */
-  function numToken(w) {
-    var m = w.x.match(/(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?)/);
-    if (!m) return null;
-    var tok = m[1], v = parseFloat(tok.replace(/\./g, "").replace(",", "."));
-    if (!(v >= 2) || (/^\d{4}$/.test(tok) && v >= 1000 && v <= 2100)) return null;
-    return { tok: tok, v: v, i: m.index, dec: (tok.split(",")[1] || "").length };
-  }
-  var SCH_POOL = null;
-  function schPool() { if (!SCH_POOL) SCH_POOL = D.WUNDER.filter(function (w) { return !!numToken(w); }); return SCH_POOL; }
-  function sig(x) { if (!isFinite(x) || x <= 0) return "–"; var p = Math.pow(10, Math.floor(Math.log10(x)) - 1), r = Math.round(x / p) * p; return r < 10 ? fmt(r, r < 1 ? 2 : 1) : fmt(r); }
-  function renderSchaetz() {
-    var el = $("fbSchaetz"); if (!el) return;
-    if (offset !== 0) { el.hidden = true; return; }
-    var today = new Date(), key = ymd(today), store = load("thaumorawahr_schaetz", {}), done = store[key];
-    if (Object.keys(store).some(function (k) { return k !== key; })) { store = done ? (function () { var o = {}; o[key] = done; return o; })() : {}; save("thaumorawahr_schaetz", store); }
-    var pool = schPool(), n = daysBetween(new Date(2026, 0, 1), today), r = seeded(n * 13 + 5);
-    var w = done ? D.byId(done.id) : null;
-    if (!w) { var todayCard = wonderFor(today).id; for (var k = 0; k < 20; k++) { var c = pool[Math.floor(r() * pool.length)]; if (c.id !== todayCard) { w = c; break; } } }
-    var t = numToken(w), v = t.v;
-    var off = 0.6 + r() * 1.8, lo = v / Math.pow(10, off), hi = v * Math.pow(10, 4 - off);
-    var q = esc(w.x.slice(0, t.i)) + '<mark>?</mark>' + esc(w.x.slice(t.i + t.tok.length));
-    el.hidden = false;
-    if (!done) {
-      el.innerHTML = '<h2 class="wd-head">Größenordnung schätzen <small>' + esc(w.k) + '</small></h2><p class="wd-quiz-q">' + q + '</p>' +
-        '<div class="wd-est"><output id="fbSchO" aria-live="polite">–</output><input type="range" min="0" max="1000" value="500" id="fbSchR" aria-label="Schätzwert (logarithmische Skala)"><div class="wd-est-t"><span>' + sig(lo) + '</span><span>logarithmische Skala</span><span>' + sig(hi) + '</span></div></div>' +
-        '<button type="button" class="cta primary" id="fbSchGo">Schätzung abgeben</button>';
-      var rg = $("fbSchR");
-      function val() { return Math.pow(10, Math.log10(lo) + (+rg.value / 1000) * (Math.log10(hi) - Math.log10(lo))); }
-      function upd() { $("fbSchO").textContent = sig(val()); }
-      rg.oninput = upd; upd();
-      $("fbSchGo").onclick = function () {
-        var g = val(), f = Math.max(g / v, v / g);
-        var only = {}; only[key] = { id: w.id, g: g }; save("thaumorawahr_schaetz", only); buzz(); renderSchaetz(); // nur heute, keine Auswertung
-      };
-      return;
-    }
-    el.innerHTML = '<h2 class="wd-head">Größenordnung schätzen <small>' + esc(w.k) + '</small></h2><p class="wd-quiz-q">' + esc(w.x) + '</p>' +
-      '<div class="wd-kv"><div><span>Deine Schätzung</span><b>' + sig(done.g) + '</b></div><div><span>Tatsächlicher Wert</span><b>' + esc(t.tok) + '</b></div></div>' +
-      '<p class="small" style="margin:10px 0 0">' + esc(w.w) + '</p>' +
-      '<p class="muted small" style="margin:8px 0 0">Morgen folgt die nächste Frage.</p>';
-  }
 
   /* ---------- Vollbild-Präsentation ---------- */
   function openKino(list) {
@@ -1471,8 +1381,8 @@
     key: "thaumorawahr_onboarded",
     slides: [
       { icon: "tages", title: "Willkommen bei ThaumoraWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
-      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Am nächsten Tag wartet ein Quiz, und jede Karte landet in deinem Wunderalbum." },
-      { icon: "quiz", title: "Quiz und Schätzfrage", text: "Jeden Tag eine Quizfrage zum Wunder von gestern und eine Schätzfrage zu einer erstaunlichen Zahl – einfach zum Mitraten, ohne Punkte und ohne Wertung. Alle Karten landen im Wunderalbum und lassen sich als Bildkarte teilen." },
+      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Jede Karte landet in deinem Wunderalbum." },
+      { icon: "share", title: "Album und Teilen", text: "Alle entdeckten Wunder sammeln sich im Wunderalbum – zum Nachlesen, Merken und als Vollbild-Präsentation. Jedes Wunder lässt sich als gestaltete Bildkarte teilen." },
       { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
       { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live, prüfe die wahre Größe von Ländern, zoome von deinem Standort bis an den Rand des Universums – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
       { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },

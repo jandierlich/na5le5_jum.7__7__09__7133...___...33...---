@@ -1,6 +1,6 @@
 /* ============================================================
    ThaumoraWahr – jeden Tag ein Grund zu staunen
-   Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“, Wunderalbum),
+   Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“),
    KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
    WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
    ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
@@ -88,7 +88,7 @@
   tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
 
   /* =========================================================
-     1. TagesWahr – Tageswunder, Rechenwunder, „Heute vor …“, Album
+     1. TagesWahr – Tageswunder, Rechenwunder, „Heute vor …“
      ========================================================= */
   var offset = 0; // 0 = heute, -1 = gestern …
   var SELTEN = {}; (D.SELTEN || []).forEach(function (id) { SELTEN[id] = 1; });
@@ -108,7 +108,7 @@
   })();
 
   function renderCard(day) {
-    var w = wonderFor(day), saved = sammlung().indexOf(w.id) >= 0, rare = !!SELTEN[w.id];
+    var w = wonderFor(day), rare = !!SELTEN[w.id];
     var neu = discover(w.id, day);
     var card = $("fbCard");
     card.classList.toggle("gold", rare);
@@ -121,30 +121,24 @@
       '<details class="wd-more"><summary>Wie kann das sein?</summary><p>' + esc(w.w) + '</p></details>' +
       '<div class="wd-card-acts">' +
       '<button type="button" class="wd-glass wd-icon" id="fbPrev" aria-label="Vorheriger Tag">' + icon("left") + '</button>' +
-      '<button type="button" class="wd-glass wd-keep' + (saved ? ' on' : '') + '" id="fbKeep" aria-pressed="' + saved + '">' + icon(saved ? 'starfill' : 'star') + (saved ? 'Gemerkt' : 'Merken') + '</button>' +
-      '<button type="button" class="wd-glass wd-icon" id="fbShare" aria-label="Als Bild teilen">' + icon("share") + '</button>' +
+      '<button type="button" class="wd-glass wd-wide" id="fbShare">' + icon("share") + 'Als Bild teilen</button>' +
       '<button type="button" class="wd-glass wd-icon" id="fbNext" aria-label="Nächster Tag"' + (offset >= 0 ? ' disabled' : '') + '>' + icon("right") + '</button>' +
       '</div>';
     $("fbPrev").onclick = function () { go(-1); };
     $("fbNext").onclick = function () { go(1); };
-    $("fbKeep").onclick = function () {
-      var s = sammlung(), i = s.indexOf(w.id);
-      if (i >= 0) s.splice(i, 1); else { s.unshift(w.id); buzz(); }
-      save("thaumorawahr_sammlung", s); renderCard(day); renderAlbum(); checkBadges();
-    };
     $("fbShare").onclick = function () { shareWonder(w, day); };
     return w;
   }
   function shareWonder(w, day) {
     if (!window.WDShare) return;
-    WDShare.wonderCard({ over: w.k, title: w.t, text: w.x, more: w.w, gold: !!SELTEN[w.id], foot: day ? "Tageswunder vom " + dShort(day) : "Aus meinem Wunderalbum" })
+    WDShare.wonderCard({ over: w.k, title: w.t, text: w.x, more: w.w, gold: !!SELTEN[w.id], foot: "Tageswunder vom " + dShort(day || new Date()) })
       .then(function (b) { return WDShare.share(b, "Wunder-" + w.id + ".png", w.t); })
       .then(function (ok) { if (ok) bump("shared"); });
   }
   function go(dir) {
     var n = offset + dir;
     if (n > 0) return;
-    if (n < -6) { toast("Ältere Karten findest du in deinem Album."); return; }
+    if (n < -6) { toast("Zurückblättern geht bis zu einer Woche."); return; }
     var card = $("fbCard"), reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     offset = n;
     if (reduce) { renderTages(); return; }
@@ -190,7 +184,6 @@
       }).join("");
     }
     renderKapselBanner();
-    renderAlbum();
   }
 
   /* ---------- Rechenwunder: jeden Tag frisch berechnet ---------- */
@@ -282,40 +275,6 @@
       WDShare.wonderCard({ over: out.over, title: out.n + " – " + out.t, text: out.x, foot: "Berechnet am " + dShort(day) })
         .then(function (b) { return WDShare.share(b, "Rechenwunder.png", out.t); }).then(function (ok) { if (ok) bump("shared"); });
     };
-  }
-
-  /* ---------- Wunderalbum (schlicht: nur Anzahl, Liste erst auf Antippen) ---------- */
-  var albumFilter = "alle", albumMax = 15, albumOpen = false;
-  function renderAlbum() {
-    var e = entdeckt(), sam = sammlung(), ids = Object.keys(e).filter(function (id) { return !!D.byId(id); });
-    var n = ids.length, el = $("fbAlbum");
-    var html = '<button type="button" class="wd-albhead" id="fbAlbHead" aria-expanded="' + (albumOpen ? 'true' : 'false') + '" aria-controls="fbAlbBody"' + (n ? '' : ' disabled') + '>' +
-      '<span class="wd-albt">Wunderalbum</span><span class="wd-albn"><b>' + fmt(n) + '</b> gesammelt</span>' + (n ? icon("right") : '') + '</button>';
-    if (!n) html += '<p class="muted small" style="margin:6px 0 0">Jedes Tageswunder, das du aufdeckst, wird hier gezählt.</p>';
-    if (albumOpen && n) {
-      var list = ids.map(function (id) { return D.byId(id); })
-        .filter(function (w) { return albumFilter !== "merk" || sam.indexOf(w.id) >= 0; })
-        .sort(function (a, b) { return (e[b.id] || "").localeCompare(e[a.id] || ""); });
-      html += '<div id="fbAlbBody"><div class="wd-filter" role="group" aria-label="Filter">' + [["alle", "Alle"], ["merk", "Gemerkt (" + sam.length + ")"]].map(function (f) {
-          return '<button type="button" class="chip' + (albumFilter === f[0] ? ' active' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>';
-        }).join("") + '</div>' +
-        '<div class="wd-albumlist">' + (list.length ? list.slice(0, albumMax).map(function (x) {
-        return '<details class="wd-sam"><summary><span class="wd-dot"' + (sam.indexOf(x.id) >= 0 ? '' : ' style="background:var(--border)"') + '></span><b>' + esc(x.t) + '</b><small>' + esc(x.k) + '</small></summary><p>' + esc(x.x) + ' ' + esc(x.w) + '</p>' +
-          '<div class="wd-sam-a"><button type="button" class="wd-mini" data-share="' + x.id + '">' + icon("share") + 'Teilen</button><button type="button" class="wd-mini" data-keep="' + x.id + '">' + icon(sam.indexOf(x.id) >= 0 ? "starfill" : "star") + (sam.indexOf(x.id) >= 0 ? "Gemerkt" : "Merken") + '</button></div></details>';
-      }).join("") + (list.length > albumMax ? '<button type="button" class="cta slim" id="fbMore" style="margin-top:10px">Weitere anzeigen</button>' : '')
-        : '<p class="muted small" style="margin:6px 0 0">Noch keine Karte gemerkt.</p>') + '</div>' +
-        (n >= 3 ? '<button type="button" class="cta slim" id="fbKino" style="margin-top:12px">' + icon("eye") + 'Vollbild-Präsentation</button>' : '') + '</div>';
-    }
-    el.innerHTML = html;
-    $("fbAlbHead").onclick = function () { albumOpen = !albumOpen; if (!albumOpen) { albumFilter = "alle"; albumMax = 15; } renderAlbum(); };
-    if (!albumOpen || !n) return;
-    el.querySelectorAll("[data-f]").forEach(function (b) { b.onclick = function () { albumFilter = b.getAttribute("data-f"); albumMax = 15; renderAlbum(); }; });
-    el.querySelectorAll("[data-share]").forEach(function (b) { b.onclick = function () { shareWonder(D.byId(b.getAttribute("data-share")), null); }; });
-    el.querySelectorAll("[data-keep]").forEach(function (b) {
-      b.onclick = function () { var id = b.getAttribute("data-keep"), s = sammlung(), i = s.indexOf(id); if (i >= 0) s.splice(i, 1); else s.unshift(id); save("thaumorawahr_sammlung", s); buzz(); renderAlbum(); renderCard(new Date(Date.now() + offset * DAY)); };
-    });
-    if ($("fbMore")) $("fbMore").onclick = function () { albumMax += 15; renderAlbum(); };
-    if ($("fbKino")) $("fbKino").onclick = function () { openKino(list.length >= 3 ? list : ids.map(function (id) { return D.byId(id); })); };
   }
 
   /* ---------- Abzeichen ---------- */
@@ -851,39 +810,9 @@
   }
 
   /* =========================================================
-     Erweiterungen (FINAL-97): Vollbild-Präsentation,
+     Erweiterungen (FINAL-97):
      Lebenszeit in Wochen, Geburtsmoment, Zeitkapsel, Wahre Größe, Kosmische Adresse
      ========================================================= */
-
-  /* ---------- Vollbild-Präsentation ---------- */
-  function openKino(list) {
-    if (!list || !list.length) return;
-    var order = list.slice(), r = seeded(Date.now() % 100000); for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var tt = order[i]; order[i] = order[j]; order[j] = tt; }
-    var ov = document.createElement("div"); ov.className = "wd-kino"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Vollbild-Präsentation");
-    ov.innerHTML = '<div class="wd-kino-stars"></div><div class="wd-kino-card" aria-live="polite"></div><div class="wd-kino-bar"><i></i></div>' +
-      '<div class="wd-kino-ctl"><button type="button" data-k="prev" aria-label="Zurück">' + icon("left") + '</button><button type="button" data-k="pause" aria-label="Pause">II</button><button type="button" data-k="next" aria-label="Weiter">' + icon("right") + '</button><button type="button" data-k="x" aria-label="Schließen">' + icon("close") + '</button></div>';
-    document.body.appendChild(ov); document.documentElement.classList.add("wd-cam-open");
-    var idx = 0, paused = false, t0 = Date.now(), DUR = 12000, raf = 0, lock = null;
-    try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { lock = l; }).catch(function () { }); } catch (e) { }
-    function show() {
-      var w = order[idx % order.length], c = ov.querySelector(".wd-kino-card");
-      c.classList.remove("in"); void c.offsetWidth;
-      c.innerHTML = '<div class="wd-over">' + esc(w.k) + ' · ' + (idx % order.length + 1) + ' / ' + order.length + '</div><h2>' + esc(w.t) + '</h2><p class="x">' + esc(w.x) + '</p><p class="w">' + esc(w.w) + '</p>';
-      c.classList.add("in"); t0 = Date.now();
-    }
-    function loop() { if (!ov.parentNode) return; var p = paused ? null : (Date.now() - t0) / DUR; if (p != null) { ov.querySelector(".wd-kino-bar i").style.width = Math.min(100, p * 100) + "%"; if (p >= 1) { idx++; show(); } } raf = requestAnimationFrame(loop); }
-    function close() { cancelAnimationFrame(raf); if (lock) try { lock.release(); } catch (e) { } if (ov.parentNode) ov.parentNode.removeChild(ov); document.documentElement.classList.remove("wd-cam-open"); document.removeEventListener("keydown", key); }
-    function key(e) { if (e.key === "Escape") close(); if (e.key === "ArrowRight") { idx++; show(); } if (e.key === "ArrowLeft") { idx = (idx - 1 + order.length) % order.length; show(); } if (e.key === " ") { paused = !paused; } }
-    document.addEventListener("keydown", key);
-    ov.querySelectorAll("[data-k]").forEach(function (b) {
-      b.onclick = function (e) {
-        e.stopPropagation(); var k = b.getAttribute("data-k");
-        if (k === "x") close(); else if (k === "next") { idx++; show(); } else if (k === "prev") { idx = (idx - 1 + order.length) % order.length; show(); }
-        else { paused = !paused; b.textContent = paused ? "▶" : "II"; if (!paused) t0 = Date.now(); }
-      };
-    });
-    show(); raf = requestAnimationFrame(loop);
-  }
 
   /* ---------- Lebenszeit in Wochen ---------- */
   var WEEKS_ROWS = 90;
@@ -1462,12 +1391,12 @@
     key: "thaumorawahr_onboarded",
     slides: [
       { icon: "tages", title: "Willkommen bei ThaumoraWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
-      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Jede Karte landet in deinem Wunderalbum." },
-      { icon: "share", title: "Album und Teilen", text: "Alle entdeckten Wunder sammeln sich im Wunderalbum – zum Nachlesen, Merken und als Vollbild-Präsentation. Jedes Wunder lässt sich als gestaltete Bildkarte teilen." },
+      { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Karten, die du schon kennst, werden übersprungen." },
+      { icon: "share", title: "Teilen", text: "Jedes Tageswunder und jedes Rechenwunder lässt sich als gestaltete Bildkarte teilen. Bis zu eine Woche kannst du zurückblättern." },
       { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
       { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live, prüfe die wahre Größe von Ländern, zoome von deinem Standort bis an den Rand des Universums – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
       { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },
-      { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten, Album und Fortschritt bleiben nur auf diesem Gerät; die Kamera wird nur angezeigt, nie aufgenommen. Es wird nichts gesendet." }
+      { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten und Fortschritt bleiben nur auf diesem Gerät; die Kamera wird nur angezeigt, nie aufgenommen. Es wird nichts gesendet." }
     ]
   }) : null;
   if ($("showOnboardingBtn")) $("showOnboardingBtn").addEventListener("click", function () { if (onb) onb.show(); });

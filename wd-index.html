@@ -336,18 +336,9 @@
   .wd-glass .wzi{width:18px;height:18px}
   .wd-glass:disabled{opacity:.35}
   .wd-glass.on{background:#FFD27A;color:#241748;border-color:#FFD27A}
-  .wd-keep{flex:1}
   .wd-hero > .wd-glass{margin-top:14px;width:100%}
   .wd-date{margin:2px 2px 10px;font-size:13px;font-weight:600;color:var(--sub-onbg)}
   .wd-yr{font:700 11px var(--mono)!important;flex-basis:44px!important}
-  .wd-sam{border-bottom:1px solid var(--border);padding:10px 0}
-  .wd-sam:last-child{border-bottom:none}
-  .wd-sam summary{display:flex;align-items:baseline;gap:8px;cursor:pointer;list-style:none}
-  .wd-sam summary::-webkit-details-marker{display:none}
-  .wd-sam summary b{flex:1;font-size:14.5px}
-  .wd-sam summary small{font-size:12px;color:var(--sub-onbg)}
-  .wd-sam p{margin:6px 0 0 16px;font-size:13.5px;color:var(--sub-onbg);line-height:1.5}
-  .wd-dot{width:8px;height:8px;border-radius:50%;background:var(--wd-gold);flex:0 0 8px;transform:translateY(-1px)}
   .wd-count{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14)}
   .wd-count b{display:block;font:750 26px ui-rounded,-apple-system,sans-serif;color:#FFD27A;letter-spacing:-.01em}
   .wd-count span{font-size:13.5px;color:rgba(255,255,255,.8)}
@@ -416,6 +407,7 @@
   .wd-rare{display:inline-flex;align-items:center;gap:5px;margin:0 0 8px;padding:3px 9px;border-radius:999px;background:rgba(255,210,122,.16);border:1px solid rgba(255,210,122,.55);color:#FFD27A;font:800 10.5px -apple-system,sans-serif;letter-spacing:.12em;text-transform:uppercase}
   .wd-rare .wzi{width:12px;height:12px}
   .wd-card-acts .wd-icon{flex:0 0 44px;padding:0}
+  .wd-card-acts .wd-wide{flex:1}
   .wd-hero.wd-calc{background:radial-gradient(110% 90% at 0% 0%, rgba(255,210,122,.22) 0%, transparent 55%), linear-gradient(160deg,#33246E 0%,#1A1338 100%)}
   .wd-calc .wd-over{color:#FFD27A}
   .wd-calc-n{display:block;font:800 30px/1.1 ui-rounded,-apple-system,sans-serif;color:#FFD27A;letter-spacing:-.02em;margin:2px 0 6px}
@@ -431,18 +423,6 @@
   .wd-cat.on .wd-ring{box-shadow:0 0 0 2px var(--wd-gold)}
   .wd-cat span{font-size:10.8px;font-weight:600;line-height:1.15;text-align:center;color:var(--sub-onbg)}
   .wd-cat.on span{color:var(--text)}
-  .wd-filter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
-  .wd-albumlist{margin-top:4px}
-  .wd-albhead{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
-  .wd-albhead:disabled{cursor:default}
-  .wd-albt{flex:1;font-size:17px;font-weight:700}
-  .wd-albn{font-size:14px;color:var(--sub-onbg);font-variant-numeric:tabular-nums}
-  .wd-albn b{font-size:17px;font-weight:800;color:var(--accent)}
-  .wd-albhead .wzi{width:16px;height:16px;color:var(--sub-onbg);transition:transform .2s}
-  .wd-albhead[aria-expanded="true"] .wzi{transform:rotate(90deg)}
-  #fbAlbBody{margin-top:8px;border-top:1px solid var(--border);padding-top:6px}
-  .wd-sam.gold summary b::after{content:" ★";color:var(--wd-gold)}
-  .wd-sam .wd-sam-a{display:flex;gap:8px;margin:8px 0 2px 16px}
   .wd-mini{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:var(--soft);color:var(--accent);font:650 13px -apple-system,sans-serif;cursor:pointer}
   .wd-mini .wzi{width:15px;height:15px}
   /* Bogen (eigenes Blatt für Details, Zeitkapsel) */
@@ -562,16 +542,6 @@
   @keyframes wdSeal{0%{transform:scale(1.4) rotate(-20deg);opacity:0}60%{transform:scale(1) rotate(8deg);opacity:1}100%{transform:none}}
   .sn-row .r .wd-mini{min-height:30px;padding:0 9px;margin-left:4px}
   .wd-kino{position:fixed;inset:0;z-index:3000;color:#fff;overflow:hidden;background:radial-gradient(90% 60% at 80% 0%,rgba(124,92,255,.35),transparent 60%),linear-gradient(160deg,#1E1442,#0B0820)}
-  .wd-kino-stars{position:absolute;inset:-20%;background:radial-gradient(1.3px 1.3px at 12% 18%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 28% 72%,#fff 50%,transparent 52%),radial-gradient(1.2px 1.2px at 46% 10%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 64% 84%,#fff 50%,transparent 52%),radial-gradient(1.5px 1.5px at 82% 26%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 90% 62%,#fff 50%,transparent 52%),radial-gradient(1px 1px at 8% 52%,#fff 50%,transparent 52%),radial-gradient(1.3px 1.3px at 56% 40%,#fff 50%,transparent 52%);opacity:.6;animation:wdDrift 60s linear infinite}
-  @keyframes wdDrift{from{transform:translate(0,0)}to{transform:translate(-8%,6%)}}
-  .wd-kino-card{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%);max-width:640px;margin:0 auto}
-  .wd-kino-card.in{animation:wdKin .9s ease both}
-  @keyframes wdKin{from{opacity:0;transform:translateY(calc(-50% + 14px))}to{opacity:1;transform:translateY(-50%)}}
-  .wd-kino-card h2{font:800 30px/1.15 ui-rounded,-apple-system,sans-serif;letter-spacing:-.02em;margin:0 0 14px}
-  .wd-kino-card .x{font-size:19px;line-height:1.5;margin:0 0 14px;color:rgba(255,255,255,.95)}
-  .wd-kino-card .w{font-size:15px;line-height:1.6;color:rgba(255,255,255,.72);margin:0}
-  .wd-kino-bar{position:absolute;left:24px;right:24px;top:calc(18px + env(safe-area-inset-top));height:3px;border-radius:2px;background:rgba(255,255,255,.18)}
-  .wd-kino-bar i{display:block;height:100%;width:0;border-radius:2px;background:#FFD27A}
   .wd-kino-ctl{position:absolute;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:12px}
   .wd-kino-ctl button{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font:700 15px -apple-system,sans-serif;display:grid;place-items:center;cursor:pointer}
   .wd-zoom canvas{position:absolute;inset:0;width:100%;height:100%}
@@ -579,7 +549,7 @@
   .wd-zoom-t h2{font:800 26px ui-rounded,-apple-system,sans-serif;margin:0 0 6px}
   .wd-zoom-t p{margin:0 0 6px;font-size:15px;line-height:1.5;color:rgba(255,255,255,.92)}
   .wd-zoom-t p.w{font-size:13.5px;color:rgba(255,255,255,.7)}
-  @media (prefers-reduced-motion: reduce){.wd-kino-stars,.wd-kino-card.in,.wd-kapsel-open.anim *{animation:none!important}}
+  @media (prefers-reduced-motion: reduce){.wd-kapsel-open.anim *{animation:none!important}}
   .wd-hero :focus-visible,.card :focus-visible,.wd-sheet :focus-visible{outline:3px solid var(--wd-gold);outline-offset:2px}
 </style>
 </head>
@@ -656,7 +626,6 @@
     <div class="wd-swipe" id="fbSwipe"><div class="wd-hero" id="fbCard" aria-live="polite"></div></div>
     <div class="wd-hero wd-calc" id="fbCalc" aria-live="polite"></div>
     <div class="card" id="fbHeute" hidden></div>
-    <div class="card" id="fbAlbum"></div>
     <p class="wd-note">Jeden Morgen erwartet dich ein neues Tageswunder – zwei Jahre lang ohne Wiederholung, und Karten, die du schon kennst, werden übersprungen. Wische über die Karte, um eine Woche zurückzublättern. Dazu jeden Tag ein frisch berechnetes Rechenwunder.</p>
   </section>
 

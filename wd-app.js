@@ -1,9 +1,9 @@
 /* ============================================================
    ThaumoraWahr – jeden Tag ein Grund zu staunen
    Bereiche: TagesWahr (Tageswunder, Rechenwunder, „Heute vor …“),
-   KilometerWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
+   ZeitWahr (Meilensteine, Lebensuhr, Jubiläumskalender, Urkunden),
    WeitblickWahr (geradeaus um die Welt, Tag und Nacht, Kamera-Modus),
-   ZeitWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
+   KilometerWahr (drei Zeitreisen zu Fuß, Zeitmitte, Gleichzeitigkeiten).
    Alles wird auf dem Gerät berechnet; es wird nichts gesendet.
    Speicher (Präfix thaumorawahr_): Personen/Geburtsdaten, entdeckte und gemerkte Karten, Tageskarten,
    Zeitkapseln, Fortschritt der Zeitreisen, Etappenprotokoll, Einstellungen.
@@ -282,7 +282,7 @@
   function checkBadges() { }
 
   /* =========================================================
-     2. KilometerWahr – Meilensteine & Lebensuhr
+     2. ZeitWahr – Meilensteine & Lebensuhr
      ========================================================= */
   var SYN = 29.530588853, ORBIT_KM_S = 29.78, GAL_KM_S = 230, SID = 86164.0905;
   var HR = 75 / 60, BR = 16 / 60; // Schätzwerte je Sekunde (Ø Herzschlag 75/min, Ø Atem 16/min)
@@ -367,7 +367,7 @@
       '<button type="button" class="wd-link" id="llDel">' + esc(p.name || "Ich") + ' entfernen</button>';
     if (lp) $("llCert").onclick = function () { certMilestone(p, lp); };
     $("llDel").onclick = function () {
-      var q = window.wzConfirm ? wzConfirm((p.name || "Ich") + " mit Geburtsdatum aus KilometerWahr entfernen?", { okLabel: "Entfernen" }) : Promise.resolve(true);
+      var q = window.wzConfirm ? wzConfirm((p.name || "Ich") + " mit Geburtsdatum aus ZeitWahr entfernen?", { okLabel: "Entfernen" }) : Promise.resolve(true);
       q.then(function (ok) { if (!ok) return; save("thaumorawahr_personen", persons().filter(function (x) { return x.id !== p.id; })); activeP = null; save("thaumorawahr_person", null); renderKilometer(); renderZeit(); });
     };
     // Familie: nächste Anlässe aller Personen
@@ -665,7 +665,7 @@
   setInterval(function () { if (document.querySelector("#screen-weitblick.active")) { drawGlobe(); renderTerminator(); } }, 60000);
 
   /* =========================================================
-     4. ZeitWahr – drei Zeitreisen zu Fuß
+     4. KilometerWahr – drei Zeitreisen zu Fuß
      ========================================================= */
   var R_ORDER = ["erde", "universum", "mensch"], R_ICON = { erde: "globe", universum: "universe", mensch: "people" };
   var SCALE_TXT = { "46": "46 km · über Wochen", "4.6": "4,6 km · an einem Nachmittag", "13.8": "13,8 km · über ein paar Tage", "1.38": "1,38 km · ein Spaziergang", "3": "3 km · ein Spaziergang", "30": "30 km · über Wochen" };
@@ -712,7 +712,7 @@
       (done ? '<p class="wd-next"><b>Geschafft – du bist in der Gegenwart angekommen!</b></p><button type="button" class="wd-glass" id="aeCert">' + icon("medal") + 'Urkunde ansehen und teilen</button>' : '');
     if ($("aeCert")) $("aeCert").onclick = function () {
       var f = RS.fertig[id];
-      WDShare.certificate({ kind: "ZeitWahr", title: R.name, verb: "", text: "Zu Fuß gelaufen: " + fmt(tot, tot < 10 ? 2 : 1) + " km – " + (T >= 1e9 ? fmt(T / 1e9, 1) + " Milliarden" : fmt(T)) + " Jahre Geschichte, Schritt für Schritt.", date: "Geschafft am " + dShort(new Date(f)) })
+      WDShare.certificate({ kind: "KilometerWahr", title: R.name, verb: "", text: "Zu Fuß gelaufen: " + fmt(tot, tot < 10 ? 2 : 1) + " km – " + (T >= 1e9 ? fmt(T / 1e9, 1) + " Milliarden" : fmt(T)) + " Jahre Geschichte, Schritt für Schritt.", date: "Geschafft am " + dShort(new Date(f)) })
         .then(function (b) { return WDShare.share(b, "Urkunde-" + id + ".png", R.name); }).then(function (ok) { if (ok) bump("shared"); });
     };
     $("aeListH").textContent = "Stationen: " + R.name;
@@ -791,7 +791,7 @@
   /* Deine Zeitmitte & überraschend gleichzeitig */
   function renderZeitmitte() {
     var ps = persons();
-    if (!ps.length) { $("aeMitte").innerHTML = '<h2>Deine Zeitmitte</h2><p class="muted small" style="margin:0">Trag in KilometerWahr dein Geburtsdatum ein – dann zeigt dir ZeitWahr, was von deiner Geburt aus genauso weit zurückliegt wie dein ganzes bisheriges Leben.</p>'; }
+    if (!ps.length) { $("aeMitte").innerHTML = '<h2>Deine Zeitmitte</h2><p class="muted small" style="margin:0">Trag in ZeitWahr dein Geburtsdatum ein – dann zeigt dir KilometerWahr, was von deiner Geburt aus genauso weit zurückliegt wie dein ganzes bisheriges Leben.</p>'; }
     else {
       var by = +ps[0].date.slice(0, 4), now = new Date().getFullYear(), age = now - by, mid = by - age;
       var near = D.EREIGNISSE.filter(function (e) { return Math.abs(e[0] - mid) <= 6; }).slice(0, 4);
@@ -1348,7 +1348,7 @@
     sheet('<h2>Methoden &amp; Genauigkeit</h2><p class="muted small" style="margin:0 0 6px">Wie ThaumoraWahr rechnet und wie genau die Werte sind.</p>' + M.map(function (x) { return '<h3 class="wd-sub">' + x[0] + '</h3><p class="small" style="margin:0;line-height:1.55">' + x[1] + '</p>'; }).join(""));
   }
 
-  /* ---------------- KilometerWahr: Jubiläumskalender & Urkunden ---------------- */
+  /* ---------------- ZeitWahr: Jubiläumskalender & Urkunden ---------------- */
   function calList(from, to) {
     var all = [];
     persons().forEach(function (pp) {
@@ -1376,7 +1376,7 @@
   }
   function certMilestone(p, m) {
     var nm = p.name && p.name !== "Ich" ? p.name : "";
-    WDShare.certificate({ kind: "KilometerWahr", name: nm, verb: nm ? "hat erreicht:" : "", title: m.title, text: String(m.sub || "").replace(" ist dann ", " ist ").replace(" bist dann ", " bist ").replace("sind dann", "sind"), date: "Erreicht am " + dShort(new Date(m.t)) })
+    WDShare.certificate({ kind: "ZeitWahr", name: nm, verb: nm ? "hat erreicht:" : "", title: m.title, text: String(m.sub || "").replace(" ist dann ", " ist ").replace(" bist dann ", " bist ").replace("sind dann", "sind"), date: "Erreicht am " + dShort(new Date(m.t)) })
       .then(function (b) { return WDShare.share(b, "Urkunde-Meilenstein.png", m.title); }).then(function (ok) { if (ok) bump("shared"); });
   }
 
@@ -1393,9 +1393,9 @@
       { icon: "tages", title: "Willkommen bei ThaumoraWahr", text: "Jeden Tag ein Grund zu staunen – über dein Leben, deine Zeit und deinen Platz auf der Welt. Vier Bereiche, jeden Tag etwas Neues." },
       { icon: "tages", title: "TagesWahr", text: "Jeden Morgen eine neue Wunderkarte – zwei Jahre ohne Wiederholung – und ein frisch berechnetes Rechenwunder. Karten, die du schon kennst, werden übersprungen." },
       { icon: "share", title: "Teilen", text: "Jedes Tageswunder und jedes Rechenwunder lässt sich als gestaltete Bildkarte teilen. Bis zu eine Woche kannst du zurückblättern." },
-      { icon: "kilometer", title: "KilometerWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
+      { icon: "kilometer", title: "ZeitWahr", text: "Aus deinem Geburtsdatum werden Meilensteine, die sonst niemand bemerkt – dazu Jubiläumskalender, Lebenszeit in Wochen, der Himmel am Tag deiner Geburt und eine Zeitkapsel an dein zukünftiges Ich." },
       { icon: "weitblick", title: "WeitblickWahr", text: "Folge einer Linie geradeaus um die Erde, sieh Tag und Nacht live, prüfe die wahre Größe von Ländern, zoome von deinem Standort bis an den Rand des Universums – und halte im Kamera-Modus das Handy hoch, um zu sehen, wo New York, der Nordpol oder der Mond liegen." },
-      { icon: "zeit", title: "ZeitWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },
+      { icon: "zeit", title: "KilometerWahr", text: "Drei Zeitreisen zu Fuß: die Erdgeschichte, das Universum seit dem Urknall und die Geschichte der Menschheit – Schritt für Schritt auf deinen Spaziergängen." },
       { icon: "lock", title: "Alles bleibt bei dir", text: "Alles wird auf dem Gerät berechnet. Geburtsdaten und Fortschritt bleiben nur auf diesem Gerät; die Kamera wird nur angezeigt, nie aufgenommen. Es wird nichts gesendet." }
     ]
   }) : null;

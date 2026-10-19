@@ -126,7 +126,7 @@
     {"id":"brille","k":"Zeitgenossen","t":"Brille vor Buchdruck","x":"Die Brille ist älter als der Buchdruck.","w":"Lesebrillen gab es in Italien schon Ende des 13. Jahrhunderts. Gutenberg druckte erst um 1450 mit beweglichen Lettern."},
     {"id":"igel","k":"Tierwelt","t":"Tausende Stacheln","x":"Ein Igel trägt etwa 5.000 bis 7.000 Stacheln.","w":"Die Stacheln sind umgewandelte Haare. Igel sind übrigens Insektenfresser – Äpfel tragen sie nur in Bilderbüchern."},
     {"id":"antarktis","k":"Erde","t":"Das große Süßwasserlager","x":"Im Eis der Antarktis sind rund 70 % des Süßwassers der Erde gespeichert.","w":"Der Eispanzer ist stellenweise fast 5 Kilometer dick. Würde er ganz schmelzen, stiege der Meeresspiegel um rund 58 Meter."},
-    {"id":"herz","k":"Dein Körper","t":"100.000 Schläge am Tag","x":"Dein Herz schlägt rund 100.000-mal am Tag – ohne Pause, ein Leben lang.","w":"Über ein langes Leben kommen so etwa drei Milliarden Herzschläge zusammen. In KilometerWahr siehst du, wann du welche Schätzmarke erreichst."},
+    {"id":"herz","k":"Dein Körper","t":"100.000 Schläge am Tag","x":"Dein Herz schlägt rund 100.000-mal am Tag – ohne Pause, ein Leben lang.","w":"Über ein langes Leben kommen so etwa drei Milliarden Herzschläge zusammen. In ZeitWahr siehst du, wann du welche Schätzmarke erreichst."},
     {"id":"wald","k":"Natur","t":"Ein Drittel Wald","x":"Rund ein Drittel der Fläche Deutschlands ist von Wald bedeckt.","w":"Das sind über 11 Millionen Hektar mit geschätzt rund 90 Milliarden Bäumen."},
     {"id":"goldfisch","k":"Irrtum","t":"Mehr als drei Sekunden","x":"Goldfische haben kein Drei-Sekunden-Gedächtnis.","w":"In Versuchen merken sie sich Futterzeiten, Farben und sogar Töne über Monate. Man kann sie trainieren, auf einen Hebel zu drücken."},
     {"id":"aal","k":"Tierwelt","t":"Die rätselhafte Reise des Aals","x":"Europäische Aale wandern zum Laichen bis in die Sargassosee vor Amerika – Tausende Kilometer weit.","w":"Dort hat noch nie ein Mensch einen Aal beim Laichen beobachtet. Die winzigen Larven treiben dann mit dem Golfstrom zurück nach Europa."},
@@ -1171,7 +1171,7 @@
     "marianen","everest","doggerland","loewenmensch","fussballsonne","dunklematerie","lichtjahrlaufen","sternenochda","erdkern",
     "unterwasserfall","axolotl","pfuhlschnepfe","groenlandwal","meersauerstoff","atome","tropfenmolekuele","antikythera","ries"];
 
-  /* Zeitreisen in ZeitWahr: Stationen [vor … Jahren, Titel, Text]; Menschheit mit festen Jahreszahlen (negativ = v. Chr.) */
+  /* Zeitreisen in KilometerWahr: Stationen [vor … Jahren, Titel, Text]; Menschheit mit festen Jahreszahlen (negativ = v. Chr.) */
   var REISEN = {
     erde: { name: "Erdgeschichte", kurz: "Erde", total: 4.6e9, scales: [46, 4.6], st: ZEITALTER.map(function (z) { return [z[0] * 1e6, z[1], z[2]]; }) },
     universum: { name: "Vom Urknall bis heute", kurz: "Universum", total: 13.8e9, scales: [13.8, 1.38], st: [

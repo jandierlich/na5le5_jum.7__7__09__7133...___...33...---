@@ -138,7 +138,7 @@ function hwLoadNight(){
 
     document.getElementById('hw-nightstrip').innerHTML = n.slots.map(function(s){
       var q = s.q, h = q == null ? 3 : Math.max(3, q);
-      return '<div class="hw-night-col' + (s.moonAlt > 0 ? ' moon' : '') + '"><div class="hw-night-bar" style="height:' + h + '%;background:' + hwNightQualityColor(q) + ';opacity:' + (q == null ? 0.35 : 1) + ';" title="' +
+      return '<div class="hw-night-col' + (s.moonAlt > 0 ? ' moon' : '') + '"><div class="hw-night-bar" style="height:calc((100% - 18px) * ' + (h / 100) + ');background:' + hwNightQualityColor(q) + ';opacity:' + (q == null ? 0.35 : 1) + ';" title="' +
         hwFmtLocal(s.ms, off) + ' Uhr: ' + (q == null ? 'noch zu hell' : q + ' von 100') + ', Wolken ' + Math.round(s.cloud) + ' %"></div><b>' + hwFmtLocal(s.ms, off).slice(0, 2) + '</b></div>';
     }).join('');
     document.getElementById('hw-night-updated').innerHTML = hwIcon('refresh', 13) + ' Zuletzt aktualisiert: ' + new Date().toLocaleTimeString('de-DE');

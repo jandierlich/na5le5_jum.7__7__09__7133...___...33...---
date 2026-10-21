@@ -405,9 +405,10 @@ function hwRenderNowcast(containerId, nc){
   var maxMm = 0.5;
   info.steps.forEach(function(s){ if(s.mm > maxMm) maxMm = s.mm; });
   var bars = info.steps.map(function(s, k){
-    var h = s.mm >= 0.1 ? Math.max(14, Math.round(Math.min(1, s.mm / maxMm) * 100)) : 5;
+    /* Höhe relativ zum Zeichenfeld (Spaltenhöhe minus fester Beschriftungszeile) – so stehen alle Balken auf derselben Nulllinie */
+    var h = s.mm >= 0.1 ? Math.max(14, Math.round(Math.min(1, s.mm / maxMm) * 100)) : 4;
     var lab = k === 0 ? 'jetzt' : (k % 2 === 0 ? '+' + (k * 15) : '');
-    return '<div class="hw-nc-col"><div class="hw-nc-bar' + (s.mm >= 0.1 ? ' wet' : '') + '" style="height:' + h + '%"></div><span>' + lab + '</span></div>';
+    return '<div class="hw-nc-col"><div class="hw-nc-bar' + (s.mm >= 0.1 ? ' wet' : '') + '" style="height:calc((100% - 17px) * ' + (h / 100) + ')"></div><span>' + lab + '</span></div>';
   }).join('');
   el.innerHTML = '<p class="hw-nc-text">' + info.text + '</p><div class="hw-nc-strip' + (info.state === 'dry' ? ' dry' : '') + '" role="img" aria-label="Niederschlag in 15-Minuten-Schritten, nächste 2 Stunden">' + bars + '</div>' +
     '<p class="hw-attrib" style="margin-top:8px;">Modelldaten (kein Radar), Minuten in Fünferschritten · <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (CC BY 4.0)</p>';
@@ -744,13 +745,13 @@ function hwRenderAqiChart(containerId, data){
   var maxVal = 20;
   items.forEach(function(it){ if(it.value > maxVal) maxVal = it.value; });
   var bars = items.map(function(it, i){
-    var h = Math.max(4, Math.round((it.value / maxVal) * 100));
+    var h = Math.max(4, Math.round((it.value / maxVal) * 100)) / 100;
     var band = hwEaqiBand(it.value);
     var dotVar = band.stufe === 'gruen' ? '--green-dot' : (band.stufe === 'gelb' ? '--yellow-dot' : '--red-dot');
     var showLabel = (i % 4 === 0) || (i === items.length - 1);
     return '<div class="hw-aqi-item">' +
       '<span class="hw-aqi-val">' + it.value + '</span>' +
-      '<div class="hw-aqi-bar" style="height:' + h + '%;background:var(' + dotVar + ');"></div>' +
+      '<div class="hw-aqi-bar" style="height:calc((100% - 32px) * ' + h + ');background:var(' + dotVar + ');"></div>' +
       '<span class="hw-aqi-time">' + (showLabel ? it.label : '') + '</span>' +
     '</div>';
   }).join('');
@@ -905,10 +906,10 @@ function hwRenderPrecipChart(containerId, weatherData, hours){
   var items = hwHourlyPrecipData(weatherData, hours);
   if(!items || !items.length){ el.innerHTML = ''; return; }
   el.innerHTML = '<div class="hw-precip-chart">' + items.map(function(it){
-    var h = Math.max(4, it.pct);
+    var h = Math.max(4, it.pct) / 100;
     return '<div class="hw-precip-bar-wrap">' +
       '<span class="hw-precip-pct">' + it.pct + '%</span>' +
-      '<div class="hw-precip-bar" style="height:' + h + '%;background:' + hwPrecipColor(it.pct) + ';"></div>' +
+      '<div class="hw-precip-bar" style="height:calc((100% - 38px) * ' + h + ');background:' + hwPrecipColor(it.pct) + ';"></div>' +
       '<span class="hw-precip-label">' + it.label + '</span>' +
     '</div>';
   }).join('') + '</div>';

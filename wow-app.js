@@ -1432,7 +1432,7 @@ function renderStats() {
 
     ${perYear.length ? `<div class="card"><h4 class="card-h">Reisen pro Jahr</h4>
       <div class="bars" role="img" aria-label="Reisen pro Jahr">${perYear.map(p => `<div class="bar" tabindex="0" data-tip="${p.y}: ${p.trips} ${p.trips === 1 ? 'Reise' : 'Reisen'}, ${p.days} Tage, ${p.newCountries} neue Länder">
-        <span class="bv">${p.trips || ''}</span><i style="height:${(p.trips / maxT) * 100}%"></i><span class="bl">${p.y.slice(2) === p.y ? p.y : '’' + p.y.slice(2)}</span></div>`).join('')}</div>
+        <span class="bv">${p.trips || ''}</span><i style="height:calc((100% - 21px) * ${p.trips / maxT})"></i><span class="bl">${p.y.slice(2) === p.y ? p.y : '’' + p.y.slice(2)}</span></div>`).join('')}</div>
       <div class="bar-tip muted small" id="bar-tip">Tippe auf einen Balken für Details.</div></div>` : ''}
 
     <div class="card"><h4 class="card-h">Staaten nach Kontinent</h4>

@@ -114,7 +114,7 @@ footer a{color:var(--text);text-decoration:underline}
 .korb-produkt-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px}
 .legal-box{background:var(--card2);border-left:3px solid var(--rot);border-radius:10px;padding:10px 12px;margin:14px 0;font-size: 14px}
 .mode-switch{display:flex;gap:6px}
-.mode-btn{flex:1;padding:9px 4px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--sub);font-size: 13px;font-weight:600;cursor:pointer;text-align:center}
+.mode-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;white-space:nowrap;padding:9px 4px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--sub);font-size: 13px;font-weight:600;cursor:pointer;text-align:center}
 .mode-btn.active{background:var(--btn-warm);color:var(--text);border-color:var(--btn-warm)}
 .group-head{font-size: 14px;font-weight:700;margin:18px 4px 8px;display:flex;align-items:center;gap:6px;color:var(--text)}
 .profil-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14.5px}

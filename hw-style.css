@@ -695,3 +695,7 @@ button:active:not(:disabled), button.hw-pressed:not(:disabled), a[role="button"]
 .hw-tap{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:14px;}
 .hw-tap:active{opacity:.75;}
 .hw-tap:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+
+/* Solange noch kein Standort freigegeben ist, steht der Hinweis im Himmelsfenster – Sonne und Mond
+   würden sonst halb dahinter verschwinden (ihre Position ist ohne Standort ohnehin nicht bekannt). */
+.hw-window:has(> .hw-hero-gate:not([style*="none"])) .hw-orb{visibility:hidden;}

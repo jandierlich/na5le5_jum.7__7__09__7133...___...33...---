@@ -241,9 +241,9 @@ textarea.field { resize: vertical; }
 .tile b { display: block; font-size: 1.265rem; letter-spacing: -.01em; } .tile small { font-size: 0.794rem; color: var(--muted); }
 .bars { display: flex; align-items: flex-end; gap: 8px; height: 150px; padding-top: 18px; border-bottom: 1px solid var(--line); }
 .bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; outline: none; }
-.bar i { width: 100%; max-width: 36px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; opacity: .85; transition: opacity .2s; }
+.bar i { flex: none; width: 100%; max-width: 36px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; opacity: .85; transition: opacity .2s; }
 .bar.on i, .bar:focus i { opacity: 1; box-shadow: 0 0 0 2px var(--accent-soft); }
-.bv { font-size: 0.794rem; color: var(--ink-2); font-weight: 600; margin-bottom: 3px; }
+.bv { font-size: 0.794rem; color: var(--ink-2); font-weight: 600; margin-bottom: 3px; height: 18px; line-height: 18px; flex: none; }
 .bl { position: absolute; bottom: -20px; font-size: 0.794rem; color: var(--muted); }
 .bar-tip { margin-top: 26px; min-height: 18px; }
 .prog { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 12px; font-size: 0.882rem; font-weight: 600; }

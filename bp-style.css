@@ -352,8 +352,8 @@ input[style*="border:none"]:focus, input[style*="border:none"]:focus-visible, .s
 .map-wrap { position: relative; flex: 1; }
 .map-info-card { position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 500; }
 
-.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-top: 10px; }
-.chart-bars > div { flex: 1; border-radius: 10px; background: linear-gradient(180deg, var(--violet), transparent); }
+.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-top: 10px; border-bottom: 1px solid var(--line, rgba(127,127,127,.3)); }
+.chart-bars > div { flex: 1; border-radius: 10px 10px 0 0; background: linear-gradient(180deg, var(--violet), color-mix(in srgb, var(--violet) 45%, transparent)); }
 
 .total-strip { display: flex; justify-content: space-between; padding: 17px 18px; margin-top: 8px; border-radius: 26px; color: #fff; background: linear-gradient(135deg, var(--violet), var(--violet-deep)); box-shadow: 6px 6px 16px var(--shadow-dark), -4px -4px 12px var(--shadow-light-soft); font-family: ui-rounded, -apple-system, sans-serif; }
 

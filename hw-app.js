@@ -852,6 +852,15 @@ function hwCalcScore(temp, precipProb, wind, uv, gust){
 /* ---------- Wettercode-Text (WMO) ---------- */
 /* Gefrierender Regen/Sprühregen: Glättegefahr */
 function hwIsFreezingCode(code){ return [56,57,66,67].indexOf(code) !== -1; }
+/* Böen-Einstufung nach der Beaufort-Skala (gleiche Grenzen wie in hw-insights.js):
+   stürmische Böen ab 62 km/h (8), Sturmböen ab 75 (9), schwere Sturmböen ab 89 (10),
+   orkanartige Böen ab 103 (11), Orkanböen ab 118 km/h (12). Darunter: null. */
+function hwGustStage(v){
+  if(v == null || !isFinite(v)) return null;
+  var s = [[118,12,'Orkanböen'],[103,11,'orkanartige Böen'],[89,10,'schwere Sturmböen'],[75,9,'Sturmböen'],[62,8,'stürmische Böen']];
+  for(var i = 0; i < s.length; i++) if(v >= s[i][0]) return { min:s[i][0], bft:s[i][1], name:s[i][2], Name:s[i][2].charAt(0).toUpperCase() + s[i][2].slice(1) };
+  return null;
+}
 function hwWeatherCodeText(code){
   var map = {
     0:'Klarer Himmel',1:'Überwiegend klar',2:'Teilweise bewölkt',3:'Bedeckt',
@@ -978,7 +987,7 @@ function hwRenderForecast(containerId, weatherData){
         '<div class="hw-forecast-desc">' + hwWeatherCodeText(d.weather_code[i]) + '</div>' +
         '<div class="hw-forecast-temps"><strong>' + Math.round(d.temperature_2m_max[i]) + '°</strong> / ' + Math.round(d.temperature_2m_min[i]) + '°</div>' +
         '<div class="hw-row"><span>Regen</span><span>' + d.precipitation_probability_max[i] + ' % · ' + d.precipitation_sum[i].toFixed(1) + ' mm</span></div>' +
-        '<div class="hw-row" style="border-bottom:none;"><span>Wind' + (d.wind_gusts_10m_max && d.wind_gusts_10m_max[i] >= 60 ? ' ' + hwIcon('warning', 13) + '' : '') + '</span><span' + (d.wind_gusts_10m_max && d.wind_gusts_10m_max[i] >= 60 ? ' style="color:var(--red-fg);font-weight:700;"' : '') + '>' + Math.round(d.wind_speed_10m_max[i]) + ' km/h' + (d.wind_gusts_10m_max && d.wind_gusts_10m_max[i] != null ? ' (Böen ' + Math.round(d.wind_gusts_10m_max[i]) + ')' : '') + '</span></div>' +
+        '<div class="hw-row" style="border-bottom:none;"><span>Wind' + (d.wind_gusts_10m_max && hwGustStage(d.wind_gusts_10m_max[i]) ? ' ' + hwIcon('warning', 13) + '' : '') + '</span><span' + (d.wind_gusts_10m_max && hwGustStage(d.wind_gusts_10m_max[i]) ? ' style="color:var(--red-fg);font-weight:700;"' : '') + '>' + Math.round(d.wind_speed_10m_max[i]) + ' km/h' + (d.wind_gusts_10m_max && d.wind_gusts_10m_max[i] != null ? ' (Böen ' + Math.round(d.wind_gusts_10m_max[i]) + ')' : '') + '</span></div>' +
       '</button>'
     );
   }
@@ -1009,7 +1018,9 @@ function hwOpenForecastDayDetail(i){
   ];
   if(d.wind_gusts_10m_max && d.wind_gusts_10m_max[i] != null){
     var gust = d.wind_gusts_10m_max[i];
-    rows.push(['Windböen (max.)' + (gust >= 60 ? ' ' + hwIcon('warning', 13) + '' : ''), Math.round(gust) + ' km/h']);
+    var gst = hwGustStage(gust);
+    rows.push(['Windböen (max.)' + (gst ? ' ' + hwIcon('warning', 13) + '' : ''), Math.round(gust) + ' km/h']);
+    if(gst) rows.push(['Einstufung', gst.Name + ' (Stärke ' + gst.bft + ')']);
   }
   if(uv != null) rows.push(['UV-Index (max.)', uv]);
   rows.push(['Sonnenaufgang', sunrise]);
@@ -1177,9 +1188,9 @@ function hwRenderDetailTiles(weatherData){
       desc:'Der Luftdruck auf Meereshöhe. Ein fallender Trend deutet häufig auf eine Wetterverschlechterung hin, ein steigender auf eine Besserung.' };
   }
   if(c.wind_gusts_10m != null){
-    var stormy = c.wind_gusts_10m >= 60;
-    map.windgust = { cls:'hw-stat-wind' + (stormy ? ' hw-stat-storm' : ''), icon: hwIcon('gust', 22), value: Math.round(c.wind_gusts_10m) + ' km/h', label: stormy ? 'Windböen ' + hwIcon('warning', 13) : 'Windböen',
-      desc:'Die höchste erwartete kurzzeitige Windgeschwindigkeit – meist deutlich stärker als der mittlere, anhaltende Wind.' + (stormy ? ' Aktuell im stürmischen Bereich (ab 60 km/h).' : '') };
+    var stormy = hwGustStage(c.wind_gusts_10m);
+    map.windgust = { cls:'hw-stat-wind' + (stormy ? ' hw-stat-storm' : ''), icon: hwIcon('gust', 22), value: Math.round(c.wind_gusts_10m) + ' km/h', label: stormy ? stormy.Name + ' ' + hwIcon('warning', 13) : 'Windböen',
+      desc:'Die höchste erwartete kurzzeitige Windgeschwindigkeit – meist deutlich stärker als der mittlere, anhaltende Wind. Eingestuft nach der Beaufort-Skala: stürmische Böen ab 62 km/h, Sturmböen ab 75, schwere Sturmböen ab 89, orkanartige Böen ab 103 und Orkanböen ab 118 km/h.' + (stormy ? ' Aktuell: ' + stormy.name + ' (Stärke ' + stormy.bft + ').' : '') };
   }
   if(c.wind_direction_10m != null){
     var arrowHtml = '<span class="hw-wind-arrow" style="display:inline-block;transform:rotate(' + c.wind_direction_10m + 'deg);">' + hwIcon('arrowUp', 22) + '</span>';

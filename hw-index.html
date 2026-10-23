@@ -210,9 +210,9 @@ function hwRenderWeather(data, lat, lon, cachedTs){
       '<span style="vertical-align:middle;margin-right:6px;color:' + hwWeatherIconColor(c.weather_code, c.is_day === 1) + ';">' + hwWeatherIcon(c.weather_code, 20, c.is_day === 1) + '</span>' + hwWeatherCodeText(c.weather_code);
     document.getElementById('hw-r-cloud').textContent = c.cloud_cover + ' %';
     document.getElementById('hw-r-precip').textContent = (c.precipitation_probability != null ? c.precipitation_probability + ' %' : '–');
-    var gustBad = c.wind_gusts_10m != null && c.wind_gusts_10m >= 60;
+    var gustSt = hwGustStage(c.wind_gusts_10m), gustBad = !!gustSt;
     document.getElementById('hw-r-wind').innerHTML = c.wind_speed_10m + ' km/h' +
-      (c.wind_gusts_10m != null ? ' <span style="' + (gustBad ? 'color:var(--red-fg);font-weight:700;' : 'color:var(--text-secondary);') + '">(Böen ' + Math.round(c.wind_gusts_10m) + (gustBad ? ' ' + hwIcon('warning', 13) : '') + ')</span>' : '');
+      (c.wind_gusts_10m != null ? ' <span style="' + (gustBad ? 'color:var(--red-fg);font-weight:700;' : 'color:var(--text-secondary);') + '">(Böen ' + Math.round(c.wind_gusts_10m) + (gustBad ? ' · ' + gustSt.name + ' ' + hwIcon('warning', 13) : '') + ')</span>' : '');
     hwRenderPrecipChart('hw-r-precip-chart', data, 5);
 
     var feel = c.apparent_temperature != null ? c.apparent_temperature : c.temperature_2m;
@@ -274,7 +274,7 @@ function hwRenderInsights(data, lat, lon){
   hwInsightsLast = list;
   var box = document.getElementById('hw-insights');
   if(!list.length){
-    box.innerHTML = '<p class="hw-ins-empty">Gerade nichts Besonderes. Sobald sich ein Blick nach oben lohnt oder Frost droht, steht es hier.</p>';
+    box.innerHTML = '<p class="hw-ins-empty">Gerade nichts Besonderes. Sobald sich ein Blick nach oben lohnt oder Frost, Sturm oder Gewitter drohen, steht es hier.</p>';
   } else {
     box.innerHTML = list.map(function(r, i){
       return '<button type="button" class="hw-ins-row" data-i="' + i + '">' +
@@ -292,8 +292,8 @@ function hwRenderInsights(data, lat, lon){
 function hwOpenInsight(r){
   if(!r) return;
   var amp = r.stufe ? '<span class="hw-ampel ' + r.stufe + '" style="margin-bottom:10px;"><span class="hw-dot hw-dot-' + r.stufe + '"></span>' +
-    (r.stufe === 'gruen' ? 'Lohnt sich' : (r.stufe === 'gelb' ? 'Möglich' : 'Eher nicht')) + '</span>' : '';
-  var more = r.href && r.href.indexOf('hw-index') === -1 ? '<a class="hw-btn" href="' + r.href + '" style="margin-top:6px;">Mehr dazu im Nachthimmel</a>' : '';
+    (r.ampel && r.ampel[r.stufe] ? r.ampel[r.stufe] : (r.stufe === 'gruen' ? 'Lohnt sich' : (r.stufe === 'gelb' ? 'Möglich' : 'Eher nicht'))) + '</span>' : '';
+  var more = r.href && r.href.indexOf('hw-index') === -1 ? '<a class="hw-btn" href="' + r.href + '" style="margin-top:6px;">' + hwEsc(r.moreLabel || 'Mehr dazu im Nachthimmel') + '</a>' : '';
   hwOpenSheet(hwEsc(r.title),
     amp + '<p style="margin:0 0 12px;">' + hwEsc(r.text) + '</p>' +
     '<h3 style="margin:0 0 6px;font-size:15px;">Warum?</h3><p style="font-size:14px;line-height:1.55;color:var(--text-secondary);margin:0 0 12px;">' + hwEsc(r.why) + '</p>' +

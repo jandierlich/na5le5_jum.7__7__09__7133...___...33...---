@@ -81,7 +81,7 @@ function hwMsg(t){ var m = document.getElementById('hw-reset-msg'); m.textConten
 document.addEventListener('DOMContentLoaded', function(){
   hwRenderSectionSettings();
   (function(){
-    var items = [['sterne','Sternenhimmel heute Nacht'],['regenbogen','Regenbogen-Chance'],['frost','Frost, Bodenfrost, Tau und Nebel']];
+    var items = [['sterne','Sternenhimmel heute Nacht'],['regenbogen','Regenbogen-Chance'],['frost','Frost, Bodenfrost, Tau und Nebel'],['sturm','Sturmböen'],['gewitter','Gewitter']];
     var off = []; try{ off = JSON.parse(localStorage.getItem('hw-insights-off') || '[]') || []; }catch(e){}
     var box = document.getElementById('hw-ins-settings');
     box.innerHTML = items.map(function(it){ return '<label><input type="checkbox" data-ins="' + it[0] + '"' + (off.indexOf(it[0]) === -1 ? ' checked' : '') + '> ' + it[1] + '</label>'; }).join('');

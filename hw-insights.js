@@ -5,6 +5,9 @@
    und formuliert daraus kurze, konkrete Hinweise:
      · Sternenhimmel heute Nacht   · Regenbogen-Chance
      · Frost, Bodenfrost, Tau und Nebel
+     · Sturmböen (Einstufung nach Beaufort) · Gewitter
+   Sturm und Gewitter sind Hinweise aus Modelldaten, keine amtlichen
+   Unwetterwarnungen.
    Reine Rechenfunktionen ohne Seitenzugriff – genutzt von
    HimmelsWahr (hw-index.html) und der „Heute“-Karte des Hubs.
    Benötigt hw-astro.js. Keine zusätzlichen Datenquellen.
@@ -160,13 +163,95 @@
     return null;
   }
 
+  /* ---------- Gemeinsame Helfer für Sturm und Gewitter ---------- */
+  /* Böen-Einstufung nach Beaufort (gleiche Grenzen wie hwGustStage in hw-app.js) */
+  var GUST_STAGES = [[118, 12, "Orkanböen"], [103, 11, "orkanartige Böen"], [89, 10, "schwere Sturmböen"], [75, 9, "Sturmböen"], [62, 8, "stürmische Böen"]];
+  function gustStage(v) {
+    if (v == null || !isFinite(v)) return null;
+    for (var i = 0; i < GUST_STAGES.length; i++) if (v >= GUST_STAGES[i][0]) return { min: GUST_STAGES[i][0], bft: GUST_STAGES[i][1], name: GUST_STAGES[i][2] };
+    return null;
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function dayWord(ms, nowMs, off) {
+    if (dayKey(ms, off) === dayKey(nowMs, off)) return "heute";
+    if (dayKey(ms, off) === dayKey(nowMs + 864e5, off)) return "morgen";
+    return "übermorgen";
+  }
+  /* Zeitfenster in Worten: „Jetzt bis 18:00 Uhr“ oder „Heute 14:00–18:00 Uhr“ */
+  function windowText(from, to, nowMs, off) {
+    if (from <= nowMs + 60000) return "Jetzt bis " + hh(to, off) + " Uhr";
+    return cap(dayWord(from, nowMs, off)) + " " + hh(from, off) + "–" + hh(to, off) + " Uhr";
+  }
+  var MODEL_NOTE = " Das ist ein Hinweis aus Modelldaten, keine amtliche Unwetterwarnung – Zeitpunkt, Ort und Stärke können abweichen.";
+  var WARN_AMPEL = { gelb: "Vorsicht", rot: "Achtung" };
+
+  /* ---------- 4. Sturmböen (nächste 24 Stunden) ---------- */
+  function storm(P, lat, lon, nowMs) {
+    /* Open-Meteo liefert je Stunde die stärkste Böe der vorangegangenen Stunde */
+    var max = null, maxK = -1, first = -1, last = -1, end = nowMs + 24 * 3600000;
+    for (var k = P.i0; k < P.n; k++) {
+      var t0 = P.t(k);
+      if (t0 <= nowMs) continue;
+      if (t0 - 3600000 >= end) break;
+      var g = num(P.h.wind_gusts_10m, k);
+      if (g == null || g < GUST_STAGES[GUST_STAGES.length - 1][0]) continue;
+      if (first < 0) first = k;
+      last = k;
+      if (max == null || g > max) { max = g; maxK = k; }
+    }
+    if (max == null) return null;
+    var st = gustStage(max);
+    var from = Math.max(P.t(first) - 3600000, nowMs), to = P.t(last);
+    var peak = P.t(maxK);
+    var advice = st.bft >= 11 ? "Möglichst drinnen bleiben und unnötige Fahrten vermeiden."
+      : st.bft === 10 ? "Wald, Alleen und Gerüste meiden – mit umstürzenden Bäumen rechnen."
+      : st.bft === 9 ? "Gartenmöbel und lose Gegenstände sichern, Abstand zu Bäumen halten – Äste können abbrechen."
+      : "Lose Gegenstände sichern, mit Rad oder Anhänger vorsichtig fahren.";
+    var peakTxt = first === last ? "" : ", am stärksten zwischen " + hour(peak - 3600000, P.off) + " und " + hour(peak, P.off) + " Uhr";
+    return {
+      id: "sturm", icon: "gust", stufe: st.bft >= 10 ? "rot" : "gelb", ampel: WARN_AMPEL,
+      prio: st.bft >= 10 ? 100 : (st.bft === 9 ? 95 : 85), href: "./hw-index.html",
+      title: cap(st.name) + " bis " + Math.round(max) + "\u00a0km/h",
+      text: windowText(from, to, nowMs, P.off) + peakTxt + ". " + advice,
+      why: "Grundlage sind die stündlich vorhergesagten Windböen in 10 m Höhe für die nächsten 24 Stunden. " +
+        "Eingestuft wird nach der Beaufort-Skala: stürmische Böen ab 62 km/h (Stärke 8), Sturmböen ab 75 km/h (9), schwere Sturmböen ab 89 km/h (10), orkanartige Böen ab 103 km/h (11) und Orkanböen ab 118 km/h (12). " +
+        "Erwartet werden hier bis zu " + Math.round(max) + " km/h, also Stärke " + st.bft + "." + MODEL_NOTE
+    };
+  }
+
+  /* ---------- 5. Gewitter (nächste 24 Stunden) ---------- */
+  function thunder(P, lat, lon, nowMs) {
+    var first = -1, last = -1, worst = 0, end = nowMs + 24 * 3600000;
+    for (var k = P.i0; k < P.n; k++) {
+      var t0 = P.t(k);
+      if (t0 + 3600000 <= nowMs) continue;
+      if (t0 >= end) break;
+      var c = num(P.h.weather_code, k);
+      if (c !== 95 && c !== 96 && c !== 99) continue;
+      if (first < 0) first = k;
+      last = k;
+      if (c > worst) worst = c;
+    }
+    if (first < 0) return null;
+    var from = Math.max(P.t(first), nowMs), to = P.t(last) + 3600000, hail = worst >= 96;
+    return {
+      id: "gewitter", icon: "bolt", stufe: hail ? "rot" : "gelb", ampel: WARN_AMPEL,
+      prio: hail ? 98 : 92, href: "./mw-index.html#gewitter", moreLabel: "Gewitter-Peiler in MessWahr öffnen",
+      title: worst === 99 ? "Schweres Gewitter mit Hagel möglich" : (hail ? "Gewitter mit Hagel möglich" : "Gewitter möglich"),
+      text: windowText(from, to, nowMs, P.off) + ". Bei Donner ins Haus oder Auto, nicht unter einzelne Bäume und nicht aufs freie Feld.",
+      why: "Grundlage ist die stündlich vorhergesagte Wetterlage für die nächsten 24 Stunden – angezeigt wird der Hinweis, sobald dort Gewitter (mit oder ohne Hagel) auftauchen. " +
+        "Gewitter entstehen oft kleinräumig und kurzfristig, deshalb lassen sich Ort und Uhrzeit nur ungefähr vorhersagen. " +
+        "Wie weit ein Gewitter entfernt ist und wohin es zieht, kannst du mit dem Gewitter-Peiler in MessWahr selbst bestimmen." + MODEL_NOTE
+    };
+  }
+
   /* ---------- Gesamt ---------- */
   function hwInsights(data, lat, lon, opts) {
     opts = opts || {};
     var nowMs = opts.now || Date.now(), P = prep(data, nowMs);
     if (!P || typeof hwSunPosition !== "function") return [];
     var out = [];
-    [rainbow, frost, stars].forEach(function (fn) {
+    [storm, thunder, rainbow, frost, stars].forEach(function (fn) {
       try { var r = fn(P, lat, lon, nowMs); if (r) out.push(r); } catch (e) { }
     });
     out.sort(function (a, b) { return b.prio - a.prio; });
@@ -178,7 +263,9 @@
     rainbow: '<path d="M3 17a9 9 0 0 1 18 0"/><path d="M6.2 17a5.8 5.8 0 0 1 11.6 0"/><path d="M9.3 17a2.7 2.7 0 0 1 5.4 0"/>',
     star: '<path d="M12 3.3l2.57 5.76 6.27.67-4.68 4.22 1.31 6.17L12 16.97l-5.47 3.15 1.31-6.17-4.68-4.22 6.27-.67Z"/>',
     snowflake: '<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5 4.2 16.5"/><path d="M9.8 4.8 12 6.6l2.2-1.8M9.8 19.2 12 17.4l2.2 1.8"/>',
-    haze: '<path d="M4 8h16M4 12h10M4 16h16M16.5 12h3.5"/>'
+    haze: '<path d="M4 8h16M4 12h10M4 16h16M16.5 12h3.5"/>',
+    gust: '<path d="M3 8h12a2 2 0 1 0-2-2"/><path d="M3 12h16a2 2 0 1 1-2 2"/><path d="M3 16h10a2 2 0 1 1-2 2"/>',
+    bolt: '<path d="M5.5 12h12.2a3.1 3.1 0 0 0 .3-6.2 4.6 4.6 0 0 0-8.9-1.3A3.6 3.6 0 0 0 5.5 12z"/><path d="M12.5 14l-2.7 4.2h2.4L10.8 22"/>'
   };
   function hwInsightIcon(name, size) {
     var s = size || 20;
@@ -186,6 +273,7 @@
   }
 
   global.hwInsights = hwInsights;
+  global.hwInsightGustStage = gustStage;
   global.hwInsightIcon = hwInsightIcon;
   global.HW_INSIGHTS_HOURLY = HOURLY;
 })(typeof window !== "undefined" ? window : this);

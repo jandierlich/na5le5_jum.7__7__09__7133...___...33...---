@@ -718,7 +718,7 @@ function renderSetup(){
     const row = document.createElement('div');
     row.className = 'player-row';
     row.innerHTML =
-      '<input type="text" maxlength="12" value="' + escapeHtml(p.name) + '" data-idx="' + i + '">' +
+      '<input type="text" maxlength="12" aria-label="Name von Spieler ' + (i + 1) + '" value="' + escapeHtml(p.name) + '" data-idx="' + i + '">' +
       '<div class="seg" data-idx="' + i + '">' +
         '<button data-type="human" class="' + (p.type === 'human' ? 'on' : '') + '">Mensch</button>' +
         '<button data-type="ai" class="' + (p.type === 'ai' ? 'on' : '') + '">KI</button>' +

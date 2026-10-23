@@ -23,7 +23,7 @@
    BUILD ändert sich dabei, damit Geräte die neue Liste übernehmen.
    ============================================================ */
 
-const BUILD = 'wz113final';
+const BUILD = 'wz114final';
 const CACHE = 'wahrzentrale-' + BUILD;
 const LIBS_CACHE = 'wahrzentrale-libs-v4';
 // Große Geodaten von WowarWahr: eigener Speicher, der Updates der App überdauert
@@ -84,6 +84,7 @@ const PRECACHE = [
 "./icon-180.png",
 "./icon-192.png",
 "./icon-512.png",
+"./icon-maskable-512.png",
 "./impressum.html",
 "./inci-database.js",
 "./kg-ambient.js",

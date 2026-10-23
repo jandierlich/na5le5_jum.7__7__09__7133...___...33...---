@@ -494,3 +494,18 @@ html.wzd-typing body .wzd-bar, html.wzd-typing[data-wz-app="wow"] body nav.tabba
 @media (prefers-reduced-transparency: reduce) {
   html body .wzd-bar { background: var(--wz-card) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
+
+/* Stand 23. Oktober 2026 – größere Tippflächen (unsichtbar): kleine Knöpfe
+   bekommen eine durchsichtige Tippzone von mindestens 44 × 40 px. Optik und
+   Abstände bleiben unverändert. */
+.area-tg, #favEdit, #sortToggle, #btnShowOnboarding, #kw-show-onboarding,
+#openReview, #editThresholdBtn, #btnOpenProfil, #btnUndoDelete,
+#close-drawer-btn, .close-drawer-btn, #motion-toggle-btn, #ambient-toggle-btn { position: relative; }
+.area-tg::after, #favEdit::after, #sortToggle::after, #btnShowOnboarding::after,
+#kw-show-onboarding::after, #openReview::after, #editThresholdBtn::after,
+#btnOpenProfil::after, #btnUndoDelete::after, #close-drawer-btn::after,
+.close-drawer-btn::after, #motion-toggle-btn::after, #ambient-toggle-btn::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: max(100%, 44px); height: max(100%, 40px);
+  transform: translate(-50%, -50%); background: transparent;
+}

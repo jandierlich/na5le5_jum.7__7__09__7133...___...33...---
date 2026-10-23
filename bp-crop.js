@@ -166,7 +166,7 @@ function openCropTool(sourceCanvas) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, outCanvas.width, outCanvas.height);
-      // Große Zwischen-Canvas sofort freigeben (entlastet den Arbeitsspeicher auf dem iPhone)
+      // Große Zwischen-Canvas sofort freigeben (entlastet den Arbeitsspeicher des Geräts)
       sourceCanvas.width = sourceCanvas.height = 0;
       resolve(outCanvas.toDataURL('image/jpeg', 0.85));
     }

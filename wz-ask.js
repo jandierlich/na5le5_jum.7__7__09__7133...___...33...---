@@ -8,6 +8,8 @@
      · Tipps aus HimmelsWahr (Sterne, Regenbogen, Frost)
      · Parkplatz, Abos, Vorräte, Urlaub, Gedanken, Fahrten –
        aus den Daten, die bereits auf dem Gerät liegen.
+     · Rechnen und Umrechnen, Uhrzeit weltweit, Kalender und
+       Feiertage, Wegweiser zu den Werkzeug-Apps (Stand 23.10.2026).
    Die Erkennung arbeitet mit festen Stichwörtern; es wird nichts
    übertragen oder gespeichert.
    © 2026 Jan Dierlich – Alle Rechte vorbehalten.
@@ -28,7 +30,7 @@
   function realMs(iso, off) { return off == null ? new Date(iso).getTime() : Date.parse(iso + "Z") - off * 1000; }
 
   /* ---------- Beispiele (für die Vorschläge unter dem Eingabefeld) ---------- */
-  var EXAMPLES = ["Regnet es heute?", "Wann geht die Sonne unter?", "Wo habe ich geparkt?", "Was läuft bald ab?", "Lohnt sich heute der Sternenhimmel?", "Wie viel zahle ich für Abos?"];
+  var EXAMPLES = ["Regnet es heute?", "Wann geht die Sonne unter?", "Wo habe ich geparkt?", "Was läuft bald ab?", "Lohnt sich heute der Sternenhimmel?", "Wie viel zahle ich für Abos?", "Wie spät ist es in Florida?", "Wie lange noch bis Weihnachten?", "12 km in Meilen", "19 % von 250"];
 
   /* ---------- Zeitangaben verstehen ---------- */
   function timeWindow(q, now) {
@@ -73,6 +75,9 @@
   /* ---------- Absichten (Reihenfolge = Vorrang) ---------- */
   var INTENTS = [
     { id: "hilfe", re: /\b(was kannst du|was kann ich fragen|hilfe|wie funktioniert (das|die suche|wahrzentrale))\b/ },
+    { id: "uhrzeit", re: /\b(wie spat|wieviel uhr|wie viel uhr|uhrzeit|zeitverschiebung|zeitunterschied)\b/ },
+    { id: "datum", re: /(welcher tag ist|welches datum|der wievielte|kalenderwoche|welche woche|\bkw\b|zeitumstellung|uhr(en)? umgestellt|uhr umstellen|sommerzeit|winterzeit|(wann|wie (viele|lange)|tage bis|wochen bis|noch bis).*(heiligabend|weihnacht|silvester|neujahr|nikolaus|advent|karfreitag|oster|himmelfahrt|vatertag|pfingst|muttertag|valentinstag|halloween|reformationstag|einheit|tag der arbeit|fruhlingsanfang|sommeranfang|herbstanfang|winteranfang|\d{1,2}\.\s?\d{1,2}\.))/ },
+    { id: "wegweiser", re: /gewitter.*(wie weit|entfern|abstand|weg|kommt|zieht)|(wie weit|entfernung).*gewitter|blitz.*donner/ },
     { id: "parken", re: /(wo .*(geparkt|parkt|auto|wagen|parkplatz))|\bmein (auto|wagen|parkplatz)\b|\bparkplatz\b|\bgeparkt\b/ },
     { id: "regenbogen", re: /regenbogen/ },
     { id: "sterne", re: /\b(sterne|sternenhimmel|sternschnupp|planet|jupiter|venus|mars|saturn|merkur|milchstrasse|nachthimmel)/ },
@@ -94,7 +99,10 @@
   function detect(raw) {
     var q = norm(raw);
     if (q.length < 3) return null;
+    if (convParse(raw)) return "umrechnen";
+    if (calcLooks(raw)) return "rechnen";
     for (var i = 0; i < INTENTS.length; i++) if (INTENTS[i].re.test(q)) return INTENTS[i].id;
+    if (guideFor(q)) return "wegweiser";
     return null;
   }
   function looksLikeQuestion(raw) {
@@ -102,14 +110,17 @@
     if (q.length < 3) return false;
     if (/\?\s*$/.test(raw) || QWORD.test(q)) return true;
     var id = detect(raw);
+    if (id === "rechnen" || id === "umrechnen" || id === "uhrzeit" || id === "datum") return true;
     /* ohne Fragezeichen nur bei eindeutigen Stichwörtern antworten (z. B. „Sonnenuntergang“, „Vollmond“, „Parkplatz“) */
     return !!id && /^(sonnenuntergang|sonnenaufgang|vollmond|neumond|mondphase|parkplatz|regenbogen|sternenhimmel|goldene stunde|blaue stunde|wetter( morgen| heute)?|abos?|fixkosten)$/.test(q);
   }
 
   /* ---------- Antworten ---------- */
   function A(o) { return o; }
-  function needLoc(H) {
+  var FB_NOTE = "Für Deutschland (Mitte) berechnet – für deinen Ort in HimmelsWahr den Standort freigeben";
+  function needLoc(H, fallback) {
     var loc = H.loc();
+    if (!loc && fallback) return { loc: { lat: 51.3, lon: 9.5, fallback: true } };
     if (!loc) return { err: A({ app: "hw", title: "Dafür fehlt dein Ort", text: "Einmal in HimmelsWahr den Standort freigeben oder einen Ort wählen – danach kann ich das beantworten.", href: "./hw-index.html" }) };
     return { loc: loc };
   }
@@ -217,7 +228,7 @@
     },
 
     sonne: function (q, H, now) {
-      var L = needLoc(H); if (L.err) return Promise.resolve(L.err);
+      var L = needLoc(H, true); if (L.err) return Promise.resolve(L.err);
       return astro(H).then(function () {
         var loc = L.loc, w = timeWindow(q, now), day = dayStart(new Date(w.from));
         if (w.label.indexOf("heute") === -1 && w.label.indexOf("morgen") === -1 && w.label.indexOf("übermorgen") === -1) day = dayStart(now);
@@ -228,18 +239,18 @@
         if (!rise && !set) return A({ app: "hw", title: "Heute kein Sonnenauf- oder -untergang", text: "An deinem Ort bleibt die Sonne den ganzen Tag " + (global.hwSunPosition(new Date(s0 + 12 * 3600000), loc.lat, loc.lon).altitude > 0 ? "über" : "unter") + " dem Horizont." });
         var len = rise && set ? (set.ms - rise.ms) / 60000 : null;
         var lenTxt = len ? "Tageslicht " + Math.floor(len / 60) + " Std. " + Math.round(len % 60) + " Min." : "";
-        if (/aufgang|sonne auf|hell/.test(q) && rise) return A({ app: "hw", href: "./hw-index.html", title: "Sonnenaufgang " + dayLbl + " um " + hm(new Date(rise.ms)) + " Uhr", text: dot(lenTxt), note: "Auf deinem Gerät berechnet" });
+        if (/aufgang|sonne auf|hell/.test(q) && rise) return A({ app: "hw", href: "./hw-index.html", title: "Sonnenaufgang " + dayLbl + " um " + hm(new Date(rise.ms)) + " Uhr", text: dot(lenTxt), note: L.loc.fallback ? FB_NOTE : "Auf deinem Gerät berechnet" });
         if (/goldene stunde/.test(q)) {
           var g = cross(6).filter(function (c) { return !c.rising; })[0];
-          return A({ app: "hw", href: "./hw-abendrot.html", title: g ? "Goldene Stunde " + dayLbl + " ab " + hm(new Date(g.ms)) + " Uhr" : "Heute keine Goldene Stunde am Abend", text: set ? "Bis zum Sonnenuntergang um " + hm(new Date(set.ms)) + " Uhr." : "", note: "Auf deinem Gerät berechnet" });
+          return A({ app: "hw", href: "./hw-abendrot.html", title: g ? "Goldene Stunde " + dayLbl + " ab " + hm(new Date(g.ms)) + " Uhr" : "Heute keine Goldene Stunde am Abend", text: set ? "Bis zum Sonnenuntergang um " + hm(new Date(set.ms)) + " Uhr." : "", note: L.loc.fallback ? FB_NOTE : "Auf deinem Gerät berechnet" });
         }
         if (/blaue stunde|dunkel/.test(q)) {
           var c6 = cross(-6).filter(function (c) { return !c.rising; })[0], c12 = cross(-12).filter(function (c) { return !c.rising; })[0];
           return A({ app: "hw", href: "./hw-abendrot.html", title: c6 ? "Dunkel wird es " + dayLbl + " gegen " + hm(new Date(c6.ms)) + " Uhr" : "Es wird nicht richtig dunkel",
-            text: (set ? "Sonnenuntergang " + hm(new Date(set.ms)) + " Uhr, danach Blaue Stunde" : "") + (c12 ? "; richtig dunkel ab " + hm(new Date(c12.ms)) + " Uhr." : "."), note: "Auf deinem Gerät berechnet" });
+            text: (set ? "Sonnenuntergang " + hm(new Date(set.ms)) + " Uhr, danach Blaue Stunde" : "") + (c12 ? "; richtig dunkel ab " + hm(new Date(c12.ms)) + " Uhr." : "."), note: L.loc.fallback ? FB_NOTE : "Auf deinem Gerät berechnet" });
         }
         return A({ app: "hw", href: "./hw-abendrot.html", title: set ? "Sonnenuntergang " + dayLbl + " um " + hm(new Date(set.ms)) + " Uhr" : "Heute kein Sonnenuntergang",
-          text: dot((rise ? "Aufgang " + hm(new Date(rise.ms)) + " Uhr · " : "") + lenTxt), note: "Auf deinem Gerät berechnet" });
+          text: dot((rise ? "Aufgang " + hm(new Date(rise.ms)) + " Uhr · " : "") + lenTxt), note: L.loc.fallback ? FB_NOTE : "Auf deinem Gerät berechnet" });
       });
     },
 
@@ -319,6 +330,286 @@
     }
   };
 
+  /* ============================================================
+     Erweiterung 23. Oktober 2026 – alles lokal, ohne Netz:
+     Rechnen, Umrechnen, Uhrzeit weltweit, Kalender/Feiertage
+     und ein Wegweiser zu den Werkzeug-Apps.
+     ============================================================ */
+
+  /* ---------- Rechnen (eigener Rechenparser, kein eval) ---------- */
+  function calcPrep(raw) {
+    var s = String(raw || "").toLowerCase().trim()
+      .replace(/^(was (ist|ergibt|sind)|wie ?viel (ist|sind|ergibt)|rechne|berechne|rechnen)\s+/, "")
+      .replace(/\s*(=|\?)+\s*$/, "")
+      .replace(/×|\bmal\b/g, "*").replace(/÷|\bgeteilt durch\b|\bdurch\b/g, "/").replace(/\bplus\b/g, "+")
+      .replace(/−|–|\bminus\b/g, "-").replace(/\bhoch\b/g, "^").replace(/\bprozent\b/g, "%")
+      .replace(/\b(quadrat)?wurzel( aus)?\b/g, "√").replace(/(\d)\s*:\s*(\d)/g, "$1/$2");
+    // Zahlen: 1.234,56 → 1234.56 ; 3,5 → 3.5
+    s = s.replace(/\d[\d.]*,\d+|\d{1,3}(?:\.\d{3})+(?![\d,])/g, function (n) { return n.indexOf(",") !== -1 ? n.replace(/\./g, "").replace(",", ".") : n.replace(/\./g, ""); });
+    return s.replace(/\s+/g, "");
+  }
+  function calcLooks(raw) {
+    if (/^\d[\d.,]*-\d[\d.,]*$/.test(String(raw || "").trim())) return false; // Nummern wie 040-123456
+    var s = calcPrep(raw);
+    if (!s || s.length > 80 || !/^[\d.+\-*/^%()√von]+$/.test(s)) return false;
+    if (!/\d/.test(s)) return false;
+    return /[+\-*/^√]|%von|\d%/.test(s.replace(/^-/, "")) && !/^\d+%$/.test(s);
+  }
+  function calcEval(s) {
+    var i = 0;
+    function peek() { return s.charAt(i); }
+    function num() {
+      var m = s.slice(i).match(/^\d+(\.\d+)?/); if (!m) throw 0;
+      i += m[0].length; return parseFloat(m[0]);
+    }
+    function atom() {
+      var c = peek();
+      if (c === "(") { i++; var v = expr(); if (peek() !== ")") throw 0; i++; return v; }
+      if (c === "-") { i++; return -atom(); }
+      if (c === "+") { i++; return atom(); }
+      if (c === "√") { i++; var r = atom(); if (r < 0) throw 0; return Math.sqrt(r); }
+      return num();
+    }
+    function power() {
+      var b = atom();
+      if (peek() === "^") { i++; var e = power(); return Math.pow(b, e); }
+      if (peek() === "%") {
+        i++;
+        if (s.slice(i, i + 3) === "von") { i += 3; return b / 100 * power(); }
+        return { pct: b };
+      }
+      return b;
+    }
+    function term() {
+      var v = power(); if (typeof v === "object") v = v.pct / 100;
+      for (;;) {
+        var c = peek();
+        if (c === "*" || c === "/") { i++; var r = power(); if (typeof r === "object") r = r.pct / 100; if (c === "/" && r === 0) throw 1; v = c === "*" ? v * r : v / r; }
+        else return v;
+      }
+    }
+    function expr() {
+      var v = term();
+      for (;;) {
+        var c = peek();
+        if (c === "+" || c === "-") {
+          i++;
+          var save = i, r = power();
+          if (typeof r === "object" && (peek() === "" || peek() === ")" || peek() === "+" || peek() === "-")) { v = c === "+" ? v * (1 + r.pct / 100) : v * (1 - r.pct / 100); continue; }
+          i = save; r = term(); v = c === "+" ? v + r : v - r;
+        } else return v;
+      }
+    }
+    var out = expr();
+    if (i !== s.length || !isFinite(out)) throw 0;
+    return out;
+  }
+  function nice(n) {
+    if (Math.abs(n) >= 1e15 || (Math.abs(n) < 1e-6 && n !== 0)) return n.toExponential(6).replace(".", ",").replace("e+", " · 10^").replace("e-", " · 10^-");
+    var r = Math.round(n * 1e10) / 1e10;
+    return r.toLocaleString("de-DE", { maximumFractionDigits: 10 });
+  }
+
+  /* ---------- Umrechnen ---------- */
+  var UNITS = [
+    // [Kategorie, Faktor zur Basis, Anzeige, Stichwörter]
+    ["len", 1000, "km", "km kilometer"], ["len", 1, "m", "m meter"], ["len", 0.01, "cm", "cm zentimeter"], ["len", 0.001, "mm", "mm millimeter"],
+    ["len", 1609.344, "Meile|Meilen", "meile meilen mi mile miles"], ["len", 1852, "Seemeile|Seemeilen", "seemeile seemeilen sm nm"],
+    ["len", 0.3048, "Fuß", "fuss ft feet foot"], ["len", 0.0254, "Zoll", "zoll inch inches"], ["len", 0.9144, "Yard|Yards", "yard yards yd"],
+    ["mass", 1000, "kg", "kg kilo kilogramm"], ["mass", 1, "g", "g gramm"], ["mass", 0.001, "mg", "mg milligramm"], ["mass", 1e6, "t", "t tonne tonnen"],
+    ["mass", 453.59237, "lb", "lb lbs pound pounds"], ["mass", 28.349523125, "oz", "oz unze unzen ounce ounces"],
+    ["vol", 1, "l", "l liter"], ["vol", 0.001, "ml", "ml milliliter"], ["vol", 0.01, "cl", "cl zentiliter"], ["vol", 0.1, "dl", "dl deziliter"],
+    ["vol", 3.785411784, "Gallone (US)|Gallonen (US)", "gallone gallonen gal gallon gallons"], ["vol", 0.2365882365, "Cup (US)|Cups (US)", "cup cups tasse tassen"],
+    ["vol", 0.0295735295625, "fl oz (US)", "floz fl.oz flunze"],
+    ["spd", 1 / 3.6, "km/h", "km/h kmh stundenkilometer"], ["spd", 0.44704, "mph", "mph meilen/h"], ["spd", 1, "m/s", "m/s ms"], ["spd", 0.514444, "Knoten", "knoten kn kt"],
+    ["area", 1, "m²", "m2 m² qm quadratmeter"], ["area", 1e6, "km²", "km2 km² qkm quadratkilometer"], ["area", 1e4, "ha", "ha hektar"], ["area", 4046.8564224, "Acre|Acres", "acre acres"], ["area", 0.09290304, "sq ft", "sqft quadratfuss"],
+    ["temp", 0, "°C", "c °c grad celsius gradcelsius"], ["temp", 0, "°F", "f °f fahrenheit gradfahrenheit"], ["temp", 0, "K", "k kelvin"]
+  ];
+  function unit(w) {
+    w = String(w || "").replace(/\s+/g, "").replace(/\.$/, "");
+    for (var k = 0; k < UNITS.length; k++) if ((" " + UNITS[k][3] + " ").indexOf(" " + w + " ") !== -1) return UNITS[k];
+    return null;
+  }
+  var CONV_RE = /^(?:was sind |wie ?viele? (?:sind )?|rechne |umrechnen |umrechnung )?(-?\d[\d.]*(?:,\d+)?)\s*([a-z°²/.]+(?: ?[a-z°²/.]+)?)\s+(?:in|nach|zu|=|als)\s+([a-z°²/.]+(?: ?[a-z°²/.]+)?)\s*\??$/;
+  function convParse(raw) {
+    var s = String(raw || "").toLowerCase().replace(/ß/g, "ss").replace(/\bgrad (celsius|fahrenheit)\b/g, "grad$1").replace(/\bmeilen pro stunde\b/g, "mph").replace(/\bfl\.? ?oz\b/g, "floz").replace(/\bsq ?ft\b/g, "sqft").trim();
+    var m = s.match(CONV_RE); if (!m) return null;
+    var a = unit(m[2]), b = unit(m[3]);
+    if (!a || !b || a[0] !== b[0] || a === b) return null;
+    var n = parseFloat(m[1].indexOf(",") !== -1 ? m[1].replace(/\./g, "").replace(",", ".") : m[1]);
+    if (!isFinite(n)) return null;
+    return { n: n, a: a, b: b };
+  }
+  function convDo(p) {
+    if (p.a[0] === "temp") {
+      var c = p.a[2] === "°C" ? p.n : (p.a[2] === "°F" ? (p.n - 32) * 5 / 9 : p.n - 273.15);
+      return p.b[2] === "°C" ? c : (p.b[2] === "°F" ? c * 9 / 5 + 32 : c + 273.15);
+    }
+    return p.n * p.a[1] / p.b[1];
+  }
+  function round3(v) {
+    var a = Math.abs(v);
+    if (Math.abs(v - Math.round(v)) < 1e-9) return Math.round(v).toLocaleString("de-DE");
+    return a >= 100 ? fmt(v, a >= 1e5 ? 0 : 1) : Number(v.toPrecision(4)).toLocaleString("de-DE", { maximumFractionDigits: 6 });
+  }
+  function uName(u, n) { var t = u[2].split("|"); return Math.abs(n) === 1 && t[1] ? t[0] : (t[1] || t[0]); }
+
+  /* ---------- Uhrzeit weltweit ---------- */
+  var ZONES = [
+    ["florida miami orlando tampa key west keys naples fort lauderdale new york washington boston ostkuste usa", "America/New_York", "Florida / US-Ostküste"],
+    ["los angeles kalifornien san francisco las vegas seattle westkuste", "America/Los_Angeles", "US-Westküste"],
+    ["chicago texas dallas houston", "America/Chicago", "Chicago / Texas"], ["denver colorado", "America/Denver", "Denver"],
+    ["hawaii honolulu", "Pacific/Honolulu", "Hawaii"], ["kanada toronto montreal", "America/Toronto", "Toronto"], ["vancouver", "America/Vancouver", "Vancouver"],
+    ["mexiko cancun", "America/Mexico_City", "Mexiko-Stadt"], ["brasilien rio sao paulo", "America/Sao_Paulo", "São Paulo"], ["argentinien buenos aires", "America/Argentina/Buenos_Aires", "Buenos Aires"],
+    ["london england grossbritannien uk schottland irland dublin", "Europe/London", "London"], ["portugal lissabon porto", "Europe/Lisbon", "Lissabon"],
+    ["kanaren teneriffa gran canaria lanzarote fuerteventura", "Atlantic/Canary", "Kanaren"], ["island reykjavik", "Atlantic/Reykjavik", "Island"],
+    ["madeira", "Atlantic/Madeira", "Madeira"], ["azoren", "Atlantic/Azores", "Azoren"],
+    ["griechenland athen kreta rhodos", "Europe/Athens", "Athen"], ["finnland helsinki", "Europe/Helsinki", "Helsinki"], ["turkei istanbul antalya", "Europe/Istanbul", "Istanbul"],
+    ["agypten kairo hurghada", "Africa/Cairo", "Kairo"], ["moskau russland", "Europe/Moscow", "Moskau"], ["dubai emirate abu dhabi", "Asia/Dubai", "Dubai"],
+    ["indien delhi mumbai", "Asia/Kolkata", "Indien"], ["thailand bangkok phuket", "Asia/Bangkok", "Bangkok"], ["vietnam", "Asia/Ho_Chi_Minh", "Vietnam"], ["bali indonesien", "Asia/Makassar", "Bali"],
+    ["singapur", "Asia/Singapore", "Singapur"], ["china peking shanghai hongkong", "Asia/Shanghai", "China"], ["japan tokio tokyo", "Asia/Tokyo", "Tokio"], ["korea seoul", "Asia/Seoul", "Seoul"],
+    ["australien sydney melbourne", "Australia/Sydney", "Sydney"], ["perth", "Australia/Perth", "Perth"], ["neuseeland auckland", "Pacific/Auckland", "Auckland"],
+    ["sudafrika kapstadt johannesburg", "Africa/Johannesburg", "Südafrika"], ["kenia nairobi", "Africa/Nairobi", "Nairobi"], ["marokko marrakesch", "Africa/Casablanca", "Marokko"],
+    ["deutschland hamburg berlin munchen tangstedt hause", "Europe/Berlin", "Deutschland"],
+    ["spanien mallorca madrid barcelona frankreich paris italien rom osterreich wien schweiz zurich niederlande amsterdam danemark kopenhagen schweden stockholm norwegen oslo polen kroatien", "Europe/Berlin", "Mitteleuropa"]
+  ];
+  function zoneFor(q) {
+    for (var k = 0; k < ZONES.length; k++) {
+      var keys = ZONES[k][0].split(" "), multi = ZONES[k][0].match(/[a-z]+ [a-z]+/g) || [];
+      for (var j = 0; j < keys.length; j++) if (new RegExp("\\b" + keys[j] + "\\b").test(q)) return ZONES[k];
+      for (var mm = 0; mm < multi.length; mm++) if (q.indexOf(multi[mm]) !== -1) return ZONES[k];
+    }
+    return null;
+  }
+  function zoneParts(tz, d) {
+    var o = {};
+    new Intl.DateTimeFormat("de-DE", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", weekday: "long" })
+      .formatToParts(d).forEach(function (p) { o[p.type] = p.value; });
+    return o;
+  }
+  function zoneOffsetMin(tz, d) {
+    var p = zoneParts(tz, d);
+    return Math.round((Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Math.floor(d.getTime() / 60000) * 60000) / 60000);
+  }
+
+  /* ---------- Kalender ---------- */
+  function easter(y) {
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3),
+      h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+      mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(y, mo - 1, da);
+  }
+  function lastSunday(y, m) { var d = new Date(y, m + 1, 0); d.setDate(d.getDate() - d.getDay()); return d; }
+  function nthSunday(y, m, n) { var d = new Date(y, m, 1); d.setDate(1 + ((7 - d.getDay()) % 7) + (n - 1) * 7); return d; }
+  function addD(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  var FEAST = [
+    ["heiligabend", "Heiligabend", function (y) { return new Date(y, 11, 24); }],
+    ["weihnachten|weihnachtstag", "Weihnachten", function (y) { return new Date(y, 11, 25); }],
+    ["silvester", "Silvester", function (y) { return new Date(y, 11, 31); }],
+    ["neujahr|neues jahr|jahreswechsel", "Neujahr", function (y) { return new Date(y, 0, 1); }],
+    ["nikolaus", "Nikolaus", function (y) { return new Date(y, 11, 6); }],
+    ["(1\\.|erster|ersten) advent|\\badvent\\b", "1. Advent", function (y) { return addD(new Date(y, 11, 24), -new Date(y, 11, 24).getDay() - 21); }],
+    ["karfreitag", "Karfreitag", function (y) { return addD(easter(y), -2); }],
+    ["ostermontag", "Ostermontag", function (y) { return addD(easter(y), 1); }],
+    ["ostern|ostersonntag", "Ostern", easter],
+    ["himmelfahrt|vatertag", "Christi Himmelfahrt", function (y) { return addD(easter(y), 39); }],
+    ["pfingstmontag", "Pfingstmontag", function (y) { return addD(easter(y), 50); }],
+    ["pfingsten", "Pfingsten", function (y) { return addD(easter(y), 49); }],
+    ["muttertag", "Muttertag", function (y) { return nthSunday(y, 4, 2); }],
+    ["valentinstag", "Valentinstag", function (y) { return new Date(y, 1, 14); }],
+    ["halloween", "Halloween", function (y) { return new Date(y, 9, 31); }],
+    ["reformationstag", "Reformationstag", function (y) { return new Date(y, 9, 31); }],
+    ["tag der (deutschen )?einheit|3\\. oktober", "Tag der Deutschen Einheit", function (y) { return new Date(y, 9, 3); }],
+    ["tag der arbeit|1\\. mai|maifeiertag", "Tag der Arbeit", function (y) { return new Date(y, 4, 1); }],
+    ["fruhlingsanfang|fruhling", "Frühlingsanfang", function (y) { return new Date(y, 2, 20); }],
+    ["sommeranfang|sommer", "Sommeranfang", function (y) { return new Date(y, 5, 21); }],
+    ["herbstanfang|herbst", "Herbstanfang", function (y) { return new Date(y, 8, 22); }],
+    ["winteranfang|winter", "Winteranfang", function (y) { return new Date(y, 11, 21); }]
+  ];
+  function isoWeek(d) {
+    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
+  }
+  function longDate(d) { return d.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); }
+  function inDays(n) { return n === 0 ? "Heute" : n === 1 ? "Morgen" : n === 2 ? "Übermorgen" : "In " + n.toLocaleString("de-DE") + " Tagen"; }
+
+  /* ---------- Wegweiser zu den Werkzeug-Apps ---------- */
+  var GUIDE = [
+    [/gewitter.*(wie weit|entfern|abstand|weg|kommt|zieht)|(wie weit|entfernung).*gewitter|blitz.*donner/, "mw", "./mw-index.html#gewitter", "Das misst der Gewitter-Peiler", "In MessWahr den Blitz antippen – den Donner hört die App selbst. Daraus werden Entfernung, Richtung und Zug des Gewitters."],
+    [/(wie (hoch|gross) ist|hohe (von|eines|des|der)|hohe messen|wie hoch)/, "mw", "./mw-index.html#hoehe", "Das misst MessWahr", "Fußpunkt und Spitze mit der Kamera anpeilen – MessWahr rechnet die Höhe aus Neigung und Entfernung."],
+    [/(wasserwaage|gerade|schief|neigung|gefalle|steigung)/, "mw", "./mw-index.html#waage", "Wasserwaage in MessWahr", "Smartphone auflegen – Neigung in Grad und Prozent, auch für Bilder und Regale."],
+    [/(wie laut|lautstarke|dezibel|\bdb\b|larm)/, "lw", "./lw-index.html", "Das misst LautstärkeWahr", "Pegel in Dezibel mit Verlauf und Schwellenwert-Alarm – nur live, nichts wird aufgenommen."],
+    [/(welcher ton|welche note|frequenz|hertz|\bhz\b|stimmgerat|gitarre stimmen|stimmen)/, "kl", "./kl-index.html#stimmen", "Das zeigt KlangWahr", "Stimmgerät, Spektrum und Tongenerator – live ausgewertet, ohne Aufnahme."],
+    [/(was ist das fur ein|welcher berg|welche kirche|welche burg|was sehe ich|was ist da hinten|horizont)/, "hz", "./hz-index.html", "Frag HorizontWahr", "Kamera auf den Horizont richten – Kirchen, Burgen, Orte und Berge erscheinen mit Namen und Entfernung."],
+    [/(welcher stern|welches sternbild|sternbild|was leuchtet da|heller punkt am himmel)/, "zh", "./sternewahr-index.html", "Schau im Sternenhimmel nach", "Smartphone an den Himmel halten – Sterne, Sternbilder und Planeten werden live beschriftet."],
+    [/(wo ist norden|himmelsrichtung|welche richtung|kompass)/, "kw", "./kw-index.html", "KompassWahr zeigt die Richtung", "Kompass mit Kamera-Übersicht, Orten und Wegpunkten in deiner Umgebung."],
+    [/(unter mir|andere seite der erde|durch die erde|antipode)/, "sn", "./sn-index.html", "Schau durch die Erde", "StaunWahr zeigt, was genau auf der anderen Seite der Erde liegt – mit Röntgenblick zum Himmel darunter."],
+    [/(e-?nummer|zusatzstoff|inhaltsstoff|inci|barcode|ist .* gesund|kosmetik)/, "pw", "./pw-index.html", "Prüf es mit ProduktWahr", "Barcode oder Zutatenliste scannen – Zusatzstoffe und Inhaltsstoffe werden verständlich erklärt."],
+    [/(qr|qr-code)/, "qr", "./qr-index.html", "QRWahr liest den Code", "Code scannen und den Inhalt erst ansehen – nichts öffnet sich automatisch."],
+    [/(pendel|erdbeschleunigung|experiment|versuch|physik)/, "lb", "./lb-index.html", "Probier es in LabWahr aus", "18 Physik-Versuche mit den Sensoren deines Smartphones – messen, auswerten, verstehen."]
+  ];
+  function guideFor(q) {
+    for (var k = 0; k < GUIDE.length; k++) if (GUIDE[k][0].test(q)) return GUIDE[k];
+    return null;
+  }
+
+  var EXTRA_HANDLERS = {
+    rechnen: function (q, H, now, raw) {
+      var s = calcPrep(raw), v;
+      try { v = calcEval(s); } catch (e) { return A({ app: "wz", title: e === 1 ? "Durch null teilen geht nicht" : "Das kann ich nicht rechnen", text: "Erlaubt sind + − × ÷, Klammern, hoch (^), Wurzel und Prozent, z. B. „19 % von 250“ oder „250 + 19 %“." }); }
+      return A({ app: "wz", title: "= " + nice(v), text: String(raw).trim().replace(/\s*[=?]+\s*$/, "") + " = " + nice(v), note: "Auf deinem Gerät gerechnet" });
+    },
+    umrechnen: function (q, H, now, raw) {
+      var p = convParse(raw); if (!p) return null;
+      var v = convDo(p);
+      return A({ app: "wz", title: round3(p.n) + " " + uName(p.a, p.n) + " = " + round3(v) + " " + uName(p.b, Number(round3(v).replace(/\./g, "").replace(",", "."))), text: p.a[0] === "temp" || p.n === 1 ? "" : "1 " + uName(p.a, 1) + " = " + round3(p.a[1] / p.b[1]) + " " + uName(p.b, p.a[1] / p.b[1]) + ".", note: "Auf deinem Gerät umgerechnet" });
+    },
+    uhrzeit: function (q, H, now) {
+      var z = zoneFor(q.replace(/^.*?\b(in|auf|im|nach|fur)\b/, ""));
+      var here = hm(now) + " Uhr";
+      if (!z) {
+        if (/\b(in|auf|im|nach)\b/.test(q) && !/\b(jetzt|gerade|hier|bei mir)\b\s*\??$/.test(q)) return A({ app: "wz", title: "Diesen Ort kenne ich nicht", text: "Bei dir ist es " + here + ". Ich kenne u. a. Florida, New York, London, Kanaren, Dubai, Bangkok, Tokio, Sydney und Hawaii." });
+        return A({ app: "wz", title: "Es ist " + here, text: longDate(now) + " · Kalenderwoche " + isoWeek(now) + "." });
+      }
+      var p = zoneParts(z[1], now), diff = (zoneOffsetMin(z[1], now) - zoneOffsetMin(Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Berlin", now)) / 60;
+      var dTxt = diff === 0 ? "Gleiche Zeit wie bei dir" : (Math.abs(diff) + (Math.abs(diff) === 1 ? " Stunde " : " Stunden ")).replace(".", ",") + (diff < 0 ? "hinter dir" : "vor dir");
+      var sameDay = p.weekday === now.toLocaleDateString("de-DE", { weekday: "long" });
+      return A({ app: "wz", title: z[2] + ": " + p.hour + ":" + p.minute + " Uhr", text: dTxt + (sameDay ? "" : " · dort ist " + p.weekday) + ". Bei dir: " + here + ".", note: "Zeitzonen und Sommerzeit aus deinem Gerät" });
+    },
+    datum: function (q, H, now) {
+      var y = now.getFullYear(), t0 = dayStart(now);
+      if (/(zeitumstellung|uhr(en)? umgestellt|umstellung|sommerzeit|winterzeit|normalzeit)/.test(q)) {
+        var a = [lastSunday(y, 2), lastSunday(y, 9), lastSunday(y + 1, 2)].filter(function (d) { return d >= t0; })[0];
+        var toSummer = a.getMonth() === 2, n = Math.round((a - t0) / 864e5);
+        return A({ app: "wz", title: "Nächste Zeitumstellung: " + a.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }),
+          text: inDays(n) + ". " + (toSummer ? "Um 2 Uhr wird die Uhr auf 3 Uhr vorgestellt – eine Stunde weniger Schlaf." : "Um 3 Uhr wird die Uhr auf 2 Uhr zurückgestellt – eine Stunde mehr Schlaf."), note: "Gesetzliche Regel: letzter Sonntag im März bzw. Oktober" });
+      }
+      for (var k = 0; k < FEAST.length; k++) {
+        if (new RegExp(FEAST[k][0]).test(q)) {
+          var d = FEAST[k][2](y); if (d < t0) d = FEAST[k][2](y + 1);
+          var n2 = Math.round((dayStart(d) - t0) / 864e5);
+          return A({ app: "wz", title: FEAST[k][1] + ": " + (n2 === 0 ? "heute" : n2 === 1 ? "morgen" : "noch " + n2.toLocaleString("de-DE") + " Tage"), text: longDate(d) + (n2 > 13 ? " – " + (n2 % 7 ? Math.floor(n2 / 7) + " Wochen und " + (n2 % 7) + (n2 % 7 === 1 ? " Tag." : " Tage.") : "genau " + n2 / 7 + " Wochen.") : "."), note: "Auf deinem Gerät berechnet" });
+        }
+      }
+      var m = q.match(/(\d{1,2})\.\s?(\d{1,2})\.?(\d{2,4})?/);
+      if (m && /\bbis\b|wann|wie (viele|lange)/.test(q)) {
+        var yy = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : y, dd = new Date(yy, +m[2] - 1, +m[1]);
+        if (!m[3] && dd < t0) dd = new Date(y + 1, +m[2] - 1, +m[1]);
+        if (dd.getDate() === +m[1]) {
+          var n3 = Math.round((dd - t0) / 864e5);
+          return A({ app: "wz", title: n3 >= 0 ? inDays(n3) : "Vor " + (-n3).toLocaleString("de-DE") + " Tagen", text: longDate(dd) + ".", note: "Auf deinem Gerät berechnet" });
+        }
+      }
+      var start = new Date(y, 0, 1), doy = Math.round((t0 - start) / 864e5) + 1, len = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 366 : 365;
+      return A({ app: "wz", title: longDate(now), text: "Kalenderwoche " + isoWeek(now) + " · Tag " + doy + " von " + len + " · noch " + (len - doy) + " Tage bis Jahresende.", note: "Auf deinem Gerät berechnet" });
+    },
+    wegweiser: function (q) {
+      var g = guideFor(q); if (!g) return null;
+      return A({ app: g[1], href: g[2], title: g[3], text: g[4], note: "Tippen zum Öffnen" });
+    }
+  };
+
   /* Tipps aus HimmelsWahr (gleiche Berechnung wie „Heute lohnt sich …“) */
   var TIP_NONE = {
     frost: ["Kein Frost in Sicht", "Die kommende Nacht bleibt frostfrei."],
@@ -335,11 +626,13 @@
     });
   }
 
+  for (var hk in EXTRA_HANDLERS) if (Object.prototype.hasOwnProperty.call(EXTRA_HANDLERS, hk)) HANDLERS[hk] = EXTRA_HANDLERS[hk];
+
   function answer(raw, H) {
     var id = detect(raw);
     if (!id || !HANDLERS[id]) return Promise.resolve(null);
     var q = norm(raw), now = new Date();
-    try { return Promise.resolve(HANDLERS[id](q, H, now)).catch(function () { return null; }); }
+    try { return Promise.resolve(HANDLERS[id](q, H, now, raw)).catch(function () { return null; }); }
     catch (e) { return Promise.resolve(null); }
   }
 

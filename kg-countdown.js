@@ -19,7 +19,7 @@ function renderCountdown() {
     el.innerHTML = `
       <p class="countdown-empty">Noch kein Reisedatum eingetragen.</p>
       <div class="countdown-set-row">
-        <input type="date" id="countdown-date-input">
+        <input type="date" id="countdown-date-input" aria-label="Reisedatum">
         <button id="countdown-set-btn" class="btn-primary">Reise-Countdown starten</button>
       </div>
     `;

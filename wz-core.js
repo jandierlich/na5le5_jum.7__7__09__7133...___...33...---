@@ -684,6 +684,7 @@
             running = running.filter(function (x) { return x !== r; });
             if (finished) return;
             if (cancelled()) return end(reject, cancelErr());
+            try { e.message = url.split('/')[2] + ": " + (e.name === "AbortError" ? "Zeitüberschreitung" : e.message); } catch (e3) { }
             lastErr = e;
             // war der gemerkte Server der Ausfall, beim nächsten Mal nicht mehr zuerst fragen
             try { if (get(OP_KEY) === url) localStorage.removeItem(OP_KEY); } catch (e2) { }

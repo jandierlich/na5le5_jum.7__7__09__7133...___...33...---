@@ -1117,6 +1117,7 @@ async function kwLoadUmfeld(){
   content.innerHTML = html;
 }
 
+var kwLastOpErr = "";
 /* ===================== Orte (Overpass) ===================== */
 function kwRenderPoiFilters(){
   const wrap = document.getElementById("kw-poi-filters");
@@ -1377,7 +1378,7 @@ async function kwSearchPOIs(){
       if (searchId !== kwPoiSearchId) return;
       statusEl.textContent = `Suche ${t.label} … (${done + 1} von ${queryTypes.length}, Umkreis ${radiusLabel})`;
       try { got[t.id] = kwDedupePois(toItems(await fetchType(t), t)).slice(0, perCat); }
-      catch (e) { if (e.stale) return; failed[t.id] = e.heavy ? "heavy" : "busy"; }
+      catch (e) { if (e.stale) return; failed[t.id] = e.heavy ? "heavy" : "busy"; kwLastOpErr = (e && e.message) || ""; }
       done++;
     }
   };
@@ -1389,7 +1390,7 @@ async function kwSearchPOIs(){
     const heavy = queryTypes.some(t => failed[t.id] === "heavy");
     statusEl.textContent = heavy
       ? "Die Suche war für den Kartenserver zu umfangreich – bitte kleineren Umkreis oder weniger Ortstypen wählen."
-      : "Suche derzeit nicht möglich (Server überlastet oder ohne Antwort), bitte in 1–2 Minuten erneut versuchen.";
+      : "Suche derzeit nicht möglich (Server überlastet oder ohne Antwort), bitte in 1–2 Minuten erneut versuchen." + (kwLastOpErr ? " (" + kwLastOpErr + ")" : "");
     return;
   }
   const items = okTypes.flatMap(t => got[t.id]).sort((a, b) => a.dist - b.dist);

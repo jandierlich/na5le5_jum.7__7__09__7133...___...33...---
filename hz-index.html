@@ -787,7 +787,7 @@ function camStop(stream, video){
         status(e && e.message && /Standort/.test(e.message) ? e.message : e && e.heavy
           ? "Die Abfrage war für den Kartenserver zu umfangreich. Bitte einen kleineren Umkreis oder weniger Arten wählen."
           : busy
-          ? "Der Kartenserver ist gerade überlastet oder nicht erreichbar. Bitte in ein paar Minuten noch einmal versuchen – mit kleinerem Umkreis klappt es meist schneller."
+          ? "Der Kartenserver ist gerade überlastet oder nicht erreichbar. Bitte in ein paar Minuten noch einmal versuchen – mit kleinerem Umkreis klappt es meist schneller. (" + ((e && e.message) || "") + ")"
           : "Laden nicht möglich (" + ((e && e.message) || "Fehler") + "). Bitte später noch einmal versuchen.");
       }).then(function(){ loadUi(false); });
     });

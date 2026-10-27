@@ -648,9 +648,9 @@ function camStop(stream, video){
     out.forEach(function(it){ delete it.d; });
     return out;
   }
-  var MIRRORS = ["https://overpass.private.coffee/api/interpreter", "https://overpass-api.de/api/interpreter"];
+  var MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
   function overpass(query, status, tmo){
-    var per = ((tmo || 30) + 10) * 1000;
+    var per = ((tmo || 30) + 30) * 1000;
     /* Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
        bei Ablehnung sofort der nächste, bei langer Wartezeit zusätzlich der nächste. */
     if(window.wzCore && wzCore.overpass){

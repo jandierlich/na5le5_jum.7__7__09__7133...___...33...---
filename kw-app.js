@@ -1260,7 +1260,7 @@ async function kwSearchPOIs(){
     await kwRefreshPositionForSearch();
     if (searchId !== kwPoiSearchId) return;
   }
-  statusEl.textContent = "Suche läuft … (kann bis zu 45 Sek dauern)";
+  statusEl.textContent = "Suche läuft … (kann bis zu 2 Minuten dauern)";
   const radius = kwState.poiRadius;
   const radiusLabel = radius < 1000 ? `${radius} m` : `${radius/1000} km`;
   const lat = kwState.lat, lon = kwState.lon;
@@ -1291,22 +1291,22 @@ async function kwSearchPOIs(){
   // Nur Server mit weltweiten Daten. overpass.osm.ch wurde entfernt: der enthält nur die
   // Schweiz und hat für Deutschland blitzschnell "0 Treffer" geliefert – das wurde als
   // gültiges Ergebnis übernommen, und die Suche fand scheinbar nichts.
-  const mirrors = ["https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"];
+  const mirrors = ["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter"];
   // Pro Anfrage MEHR Zeit als das Server-Timeout (25 s): Früher brach die App schon nach 22 s
   // ab – schwere, aber gültige Antworten kamen dadurch nie an und wurden als "überlastet" gemeldet.
-  const perRequestMs = 33000;
+  const perRequestMs = 60000;
   const fetchType = async t => {
     const query = qFor(t);
     // Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
     // bei Ablehnung sofort der nächste, nach 10 s ohne Antwort zusätzlich der nächste.
     if (window.wzCore && wzCore.overpass) {
       try {
-        return await wzCore.overpass(query, { perMs: perRequestMs, maxMs: 70000, hedgeMs: 10000,
+        return await wzCore.overpass(query, { perMs: perRequestMs, maxMs: 120000, hedgeMs: 10000,
           onSlow: () => { statusEl.textContent = `Server antwortet langsam (${t.label}) – versuche es weiter …`; },
           cancelled: () => searchId !== kwPoiSearchId });
       } catch (e) { if (e && e.cancel) e.stale = true; throw e; }
     }
-    const deadline = Date.now() + 70000;
+    const deadline = Date.now() + 120000;
     let lastErr = null;
     for (let m = 0; m < mirrors.length; m++) {
       // Pro Server bis zu 2 Versuche; bei "zu viele Anfragen" (429) oder Serverfehler direkt weiter.

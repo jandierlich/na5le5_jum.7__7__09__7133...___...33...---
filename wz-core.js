@@ -626,8 +626,39 @@
     if (i > 0) { list.splice(i, 1); list.unshift(pref); }
     return list;
   }
+  /* Zwischenspeicher: gleiche Suche (o.cacheKey) am gleichen Ort wird einige Stunden lang aus dem
+     Gerätespeicher beantwortet. Gespeichert wird nur auf diesem Gerät (Schlüssel "wz_opc:…"),
+     höchstens 10 Einträge, nichts davon verlässt das Gerät. */
+  var OPC = "wz_opc:", OPC_IDX = "wz_opc_idx", OPC_MAX = 10, OPC_BYTES = 450000;
+  function cacheGet(key, ttl) {
+    try {
+      var raw = localStorage.getItem(OPC + key); if (!raw) return null;
+      var c = JSON.parse(raw);
+      if (!c || !c.j || Date.now() - c.t > ttl) { localStorage.removeItem(OPC + key); return null; }
+      return c.j;
+    } catch (e) { return null; }
+  }
+  function cachePut(key, j) {
+    try {
+      var s = JSON.stringify({ t: Date.now(), j: j });
+      if (s.length > OPC_BYTES) return;
+      var idx = []; try { idx = JSON.parse(localStorage.getItem(OPC_IDX) || "[]"); } catch (e) { idx = []; }
+      idx = idx.filter(function (k) { return k !== key; });
+      idx.push(key);
+      while (idx.length > OPC_MAX) { try { localStorage.removeItem(OPC + idx.shift()); } catch (e) { } }
+      localStorage.setItem(OPC + key, s);
+      localStorage.setItem(OPC_IDX, JSON.stringify(idx));
+    } catch (e) {
+      /* Speicher voll: alten Zwischenspeicher leeren, Suche läuft trotzdem normal */
+      try { var ix = JSON.parse(localStorage.getItem(OPC_IDX) || "[]"); ix.forEach(function (k) { localStorage.removeItem(OPC + k); }); localStorage.removeItem(OPC_IDX); } catch (e2) { }
+    }
+  }
   function overpass(query, o) {
     o = o || {};
+    if (o.cacheKey) {
+      var hit = cacheGet(o.cacheKey, o.cacheMs || 6 * 3600 * 1000);
+      if (hit) return Promise.resolve(hit);
+    }
     var order = overpassOrder(), maxMs = o.maxMs || 120000, hedgeMs = o.hedgeMs || 10000, perMs = o.perMs || 60000;
     var t0 = Date.now(), round = 0;
     return new Promise(function (resolve, reject) {
@@ -677,6 +708,7 @@
             if (j.remark && /error|timed out|out of memory/i.test(j.remark)) { var e = new Error("Overpass: " + j.remark); e.heavy = /timed out|out of memory/i.test(j.remark); throw e; }
             if (finished) return;
             try { if (get(OP_KEY) !== url) localStorage.setItem(OP_KEY, url); } catch (e) { }
+            if (o.cacheKey) cachePut(o.cacheKey, j);
             end(resolve, j);
           })
           .catch(function (e) {

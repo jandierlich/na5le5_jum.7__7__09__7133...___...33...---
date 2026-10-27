@@ -590,7 +590,7 @@ function camStop(stream, video){
       sehens: 'nwr["tourism"="attraction"]' + a + ';nwr["historic"="monument"]' + a + ';',
       hoch: 'wr["building"]["height"~"^([4-9][0-9]|[1-9][0-9][0-9])([.,][0-9]+)?( ?m)?$"]' + a + ';wr["building"]["building:levels"~"^(1[4-9]|[2-9][0-9])$"]' + a + ';nwr["building"="skyscraper"]' + a + ';nwr["aeroway"="aerodrome"]' + a + ';'
     };
-    return "[out:json][timeout:" + qTimeout(id) + "];(" + C[id] + ");out center 2000;";
+    return "[out:json][timeout:" + qTimeout(id) + "][maxsize:67108864];(" + C[id] + ");out center 2000;";
   }
   /* Hochhaus-Suche ist für den Server am aufwendigsten – sie bekommt mehr Zeit */
   function qTimeout(id){ return id === "hoch" ? 55 : 30; }
@@ -649,13 +649,13 @@ function camStop(stream, video){
     return out;
   }
   var MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
-  function overpass(query, status, tmo){
+  function overpass(query, status, tmo, cacheKey){
     var per = ((tmo || 30) + 30) * 1000;
     /* Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
        bei Ablehnung sofort der nächste, bei langer Wartezeit zusätzlich der nächste. */
     if(window.wzCore && wzCore.overpass){
       return wzCore.overpass(query, { perMs: per, maxMs: per * 2, hedgeMs: (tmo || 30) > 30 ? 20000 : 10000,
-        onSlow: status, cancelled: function(){ return !!loadCtl.stop; },
+        onSlow: status, cacheKey: cacheKey, cacheMs: 12 * 3600 * 1000, cancelled: function(){ return !!loadCtl.stop; },
         track: function(c){ (loadCtl.all = loadCtl.all || []).push(c); } });
     }
     var deadline = Date.now() + per * 2, m = 0, attempt = 0;
@@ -726,13 +726,13 @@ function camStop(stream, video){
      -2 = Abfrage für den Server zu umfangreich. Schlägt eine Art fehl, werden – falls vorhanden – ihre Objekte
      aus der letzten Ladung am selben Ort übernommen (-3 = ältere Daten übernommen). */
   function loadCats(ids, rKm, p){
-    var cs = {}, got = {}, done = 0, idx = 0, firstErr = null;
+    var cs = {}, got = {}, done = 0, idx = 0, firstErr = null, t0 = Date.now();
     function name(id){ return CAT[id] ? CAT[id].name : id; }
     function one(){
       if(idx >= ids.length) return Promise.resolve();
       var id = ids[idx++];
       status("Suche " + name(id) + " im Umkreis von " + rKm + " km … (" + (done + 1) + " von " + ids.length + ")");
-      return overpass(qCat(id, rKm * 1000, p.lat, p.lon), function(){ status("Server antwortet langsam (" + name(id) + ") – versuche es weiter …"); }, qTimeout(id))
+      return overpass(qCat(id, rKm * 1000, p.lat, p.lon), function(){ status("Server ist ausgelastet (" + name(id) + ", " + (done + 1) + " von " + ids.length + ") – bitte warten, " + Math.round((Date.now() - t0) / 1000) + " s …"); }, qTimeout(id), "hz|" + id + "|" + rKm + "|" + p.lat.toFixed(3) + "|" + p.lon.toFixed(3))
         .then(function(j){ got[id] = parse(j, p.lat, p.lon, id); cs[id] = got[id].length; },
               function(e){ if(e && e.cancel) throw e; if(!firstErr) firstErr = e; cs[id] = e && e.heavy ? -2 : -1; })
         .then(function(){ done++; return one(); });

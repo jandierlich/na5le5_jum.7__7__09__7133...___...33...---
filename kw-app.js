@@ -1261,6 +1261,7 @@ async function kwSearchPOIs(){
     if (searchId !== kwPoiSearchId) return;
   }
   statusEl.textContent = "Suche läuft … (kann bis zu 2 Minuten dauern)";
+  const kwSearchT0 = Date.now();
   const radius = kwState.poiRadius;
   const radiusLabel = radius < 1000 ? `${radius} m` : `${radius/1000} km`;
   const lat = kwState.lat, lon = kwState.lon;
@@ -1286,7 +1287,7 @@ async function kwSearchPOIs(){
   // Limit von 40/60 lieferte bei dichten Kategorien eine zufällige Auswahl, und die
   // nächstgelegenen Treffer konnten fehlen. Sortiert und gekürzt wird hier auf dem Gerät.
   // "out tags center" liefert nur Namen/Kennzeichen und den Mittelpunkt – klein und schnell.
-  const qFor = t => `[out:json][timeout:25];(` + t.sel.map(([k, v]) =>
+  const qFor = t => `[out:json][timeout:20][maxsize:33554432];(` + t.sel.map(([k, v]) =>
       `nwr["${k}"="${v}"]${t.extra || ""}(around:${radius},${lat},${lon});`).join("") + `);out tags center 800;`;
   // Nur Server mit weltweiten Daten. overpass.osm.ch wurde entfernt: der enthält nur die
   // Schweiz und hat für Deutschland blitzschnell "0 Treffer" geliefert – das wurde als
@@ -1297,12 +1298,14 @@ async function kwSearchPOIs(){
   const perRequestMs = 60000;
   const fetchType = async t => {
     const query = qFor(t);
+    // Zwischenspeicher: gleiche Art + Umkreis am (auf ca. 100 m gerundeten) gleichen Ort
+    const cacheKey = `kw|${t.id}|${radius}|${lat.toFixed(3)}|${lon.toFixed(3)}`;
     // Gemeinsamer Ablauf der WahrZentrale (wz-core.js): zuletzt schneller Server zuerst,
     // bei Ablehnung sofort der nächste, nach 10 s ohne Antwort zusätzlich der nächste.
     if (window.wzCore && wzCore.overpass) {
       try {
-        return await wzCore.overpass(query, { perMs: perRequestMs, maxMs: 120000, hedgeMs: 10000,
-          onSlow: () => { statusEl.textContent = `Server antwortet langsam (${t.label}) – versuche es weiter …`; },
+        return await wzCore.overpass(query, { perMs: perRequestMs, maxMs: 120000, hedgeMs: 10000, cacheKey, cacheMs: 6 * 3600 * 1000,
+          onSlow: () => { statusEl.textContent = `Server ist ausgelastet (${t.label}, ${done + 1} von ${queryTypes.length}) – bitte warten, ${Math.round((Date.now() - kwSearchT0) / 1000)} s …`; },
           cancelled: () => searchId !== kwPoiSearchId });
       } catch (e) { if (e && e.cancel) e.stale = true; throw e; }
     }

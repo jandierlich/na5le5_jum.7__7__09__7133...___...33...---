@@ -618,7 +618,7 @@
         nächsten Server; die erste gültige Antwort gilt, die übrigen Anfragen werden abgebrochen.
         So bleibt eine langsame, aber gültige Antwort möglich, ohne auf sie warten zu müssen.
      Fehler tragen .heavy (Abfrage für den Server zu umfangreich) bzw. .cancel (abgebrochen). */
-  var OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
+  var OVERPASS = ["https://overpass.private.coffee/api/interpreter", "https://overpass-api.de/api/interpreter"];
   var OP_KEY = "wz_overpass";
   function overpassOrder() {
     var pref = get(OP_KEY), list = OVERPASS.slice();
@@ -660,7 +660,7 @@
           if (!running.length) {
             if (round >= 1 || (lastErr && lastErr.heavy)) return end(reject, lastErr || new Error("Kein Overpass-Server erreichbar"));
             round++; next = 0;
-            setTimeout(launch, 800);
+            setTimeout(launch, 2500);
           }
           return;
         }

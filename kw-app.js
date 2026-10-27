@@ -1290,7 +1290,7 @@ async function kwSearchPOIs(){
   // Nur Server mit weltweiten Daten. overpass.osm.ch wurde entfernt: der enthält nur die
   // Schweiz und hat für Deutschland blitzschnell "0 Treffer" geliefert – das wurde als
   // gültiges Ergebnis übernommen, und die Suche fand scheinbar nichts.
-  const mirrors = ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter","https://overpass.private.coffee/api/interpreter"];
+  const mirrors = ["https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"];
   // Pro Anfrage MEHR Zeit als das Server-Timeout (25 s): Früher brach die App schon nach 22 s
   // ab – schwere, aber gültige Antworten kamen dadurch nie an und wurden als "überlastet" gemeldet.
   const perRequestMs = 33000;

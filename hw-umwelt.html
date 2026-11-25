@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Umweltbelastung – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>Umweltbelastung</h1>
+    <p class="hw-sub">Aktuelle Belastung durch Feinstaub, Ozon &amp; Co. an deinem Standort.</p>
+  </div>
+
+  <div class="hw-card" id="hw-card-status">
+    <p class="hw-loc-current" id="hw-active-loc-label"></p>
+    <p id="hw-status">Standort wird benötigt.</p>
+    <button class="hw-btn primary" onclick="hwLoadUmwelt()">Standort verwenden</button>
+  </div>
+
+  <div class="hw-card" id="hw-card-result" style="display:none;">
+    <h2>Europäischer Luftqualitätsindex</h2>
+    <div style="text-align:center;margin-bottom:10px;" id="hw-ampel-box"></div>
+    <p id="hw-erklaerung"></p>
+    <p style="font-size:12px;color:var(--text-secondary);">Automatisierte Schätzung aus Modelldaten, keine amtliche Messung an deinem genauen Standort.</p>
+    <p id="hw-leading" style="font-size:13px;color:var(--text-secondary);margin-top:-6px;"></p>
+    <p id="hw-yesterday-compare" style="font-size:13px;color:var(--text-secondary);margin-top:2px;"></p>
+    <div class="hw-row"><span>Feinstaub PM2,5</span><span id="hw-pm25">–</span></div>
+    <div class="hw-row"><span>Feinstaub PM10</span><span id="hw-pm10">–</span></div>
+    <div class="hw-row"><span>Ozon (O₃)</span><span id="hw-ozone">–</span></div>
+    <div class="hw-row"><span>Stickstoffdioxid (NO₂)</span><span id="hw-no2">–</span></div>
+    <div class="hw-row"><span>Schwefeldioxid (SO₂)</span><span id="hw-so2">–</span></div>
+    <div class="hw-row"><span>UV-Index</span><span id="hw-uv">–</span></div>
+    <p id="hw-umwelt-updated" style="font-size:12px;color:var(--text-secondary);text-align:center;margin-top:8px;"></p>
+    <p class="hw-attrib">Luftqualitätsdaten von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), enthält modifizierte Copernicus Atmosphere Monitoring Service-Informationen 2026 (Modellbasis CAMS)</p>
+  </div>
+
+  <div class="hw-card" id="hw-card-aqi-chart" style="display:none;">
+    <h2>Verlauf der letzten 24 Stunden</h2>
+    <div class="hw-aqi-scroll"><div id="hw-aqi-chart"></div></div>
+    <p style="font-size:12px;color:var(--text-secondary);margin-top:12px;">Europäischer Luftqualitätsindex je Stunde.</p>
+  </div>
+
+  <div class="hw-card">
+    <h3>Was bedeuten die Werte?</h3>
+    <p><strong>Feinstaub PM2,5</strong> – Partikel unter 2,5 µm, dringen bis in Lunge und Blutbahn vor. Hauptquellen: Verkehr, Holzfeuerung, Industrie, Landwirtschaft. WHO-Richtwert: 15 µg/m³ im 24-Stunden-Mittel.</p>
+    <p><strong>Feinstaub PM10</strong> – Partikel unter 10 µm, reizen vor allem die Atemwege. Zusätzliche Quellen: aufgewirbelter Staub, Reifen-/Bremsabrieb, Pollen. WHO-Richtwert: 45 µg/m³ im 24-Stunden-Mittel.</p>
+    <p><strong>Ozon (O₃)</strong> – entsteht bodennah unter Sonneneinstrahlung aus Vorläuferstoffen, daher meist an sonnigen Nachmittagen am höchsten. Reizt Atemwege und Augen.</p>
+    <p><strong>Stickstoffdioxid (NO₂)</strong> – stammt überwiegend aus dem Straßenverkehr (v. a. Diesel) und Verbrennungsprozessen, dadurch an stark befahrenen Straßen meist deutlich höher als abseits.</p>
+    <p><strong>Schwefeldioxid (SO₂)</strong> – entsteht vor allem bei Industrie- und Kohleverbrennung, in Deutschland heute meist niedrig.</p>
+    <p style="font-size:12px;color:var(--text-secondary);">Alle Angaben in µg/m³ (Mikrogramm pro Kubikmeter Luft). Die Pfeile neben den Werten zeigen den Trend der letzten 3 Stunden (steigend/fallend/stabil).</p>
+  </div>
+
+  <div class="hw-card" id="hw-card-pollen" style="display:none;">
+    <h2>Pollenbelastung</h2>
+    <div id="hw-pollen-ampel" style="text-align:center;margin-bottom:10px;"></div>
+    <div class="hw-row"><span>Erle</span><span id="hw-pollen-alder">–</span></div>
+    <div class="hw-row"><span>Birke</span><span id="hw-pollen-birch">–</span></div>
+    <div class="hw-row"><span>Gräser</span><span id="hw-pollen-grass">–</span></div>
+    <div class="hw-row"><span>Beifuß</span><span id="hw-pollen-mugwort">–</span></div>
+    <div class="hw-row"><span>Olive</span><span id="hw-pollen-olive">–</span></div>
+    <div class="hw-row"><span>Ambrosia (Ragweed)</span><span id="hw-pollen-ragweed">–</span></div>
+    <p style="margin-top:8px;">Angaben in Pollen/m³. Außerhalb der jeweiligen Saison zeigen einzelne Pollenarten „–“ (keine Daten) statt 0 an. Pollendaten deckt nur den europäischen Raum ab.</p>
+    <p class="hw-attrib">Pollendaten von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), enthält modifizierte Copernicus Atmosphere Monitoring Service-Informationen 2026 (Modellbasis CAMS)</p>
+  </div>
+
+  <div class="hw-card" id="hw-card-pollen-forecast" style="display:none;">
+    <h2><span data-hwi="calendar" data-hwi-size="18"></span> Pollen-Vorhersage</h2>
+    <p style="font-size:12px;color:var(--text-secondary);margin-top:-6px;">Jeweils stärkste Pollenart des Tages</p>
+    <div id="hw-pollen-forecast-body"></div>
+    <p class="hw-attrib">Pollendaten von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), enthält modifizierte Copernicus Atmosphere Monitoring Service-Informationen 2026 (Modellbasis CAMS)</p>
+  </div>
+
+  <div class="hw-card">
+    <h3>Was bedeutet der Index?</h3>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-gruen"></span>0–20</span><span>Gut</span></div>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-gruen"></span>20–40</span><span>Mäßig</span></div>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-gelb"></span>40–60</span><span>Mittelmäßig</span></div>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-gelb"></span>60–80</span><span>Schlecht</span></div>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-rot"></span>80–100</span><span>Sehr schlecht</span></div>
+    <div class="hw-row"><span><span class="hw-dot hw-dot-rot"></span>&gt;100</span><span>Extrem schlecht</span></div>
+    <p>Der europäische Luftqualitätsindex (EAQI) der Europäischen Umweltagentur (EEA) fasst Feinstaub (PM2,5/PM10), Ozon, Stickstoffdioxid und Schwefeldioxid zu einer Gesamteinschätzung zusammen – maßgeblich ist jeweils der ungünstigste Einzelwert, dieser wird oben unter dem Index-Wert benannt.</p>
+  </div>
+
+  <a class="hw-btn" href="hw-index.html">Zur Startseite</a>
+
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('hw-umwelt.html');
+function hwLoadUmwelt(){
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  document.getElementById('hw-status').textContent = 'Standort wird ermittelt …';
+  hwGetActiveLocation().then(function(pos){
+    document.getElementById('hw-status').textContent = 'Umweltdaten werden geladen …';
+    window.hwCurPos = pos;
+    return hwFetchAirQuality(pos.lat, pos.lon);
+  }).then(function(data){
+    var c = data.current;
+    var aqi = c.european_aqi;
+    document.getElementById('hw-pm25').innerHTML = c.pm2_5 + ' µg/m³ ' + hwPollutantTrend(data, 'pm2_5');
+    document.getElementById('hw-pm10').innerHTML = c.pm10 + ' µg/m³ ' + hwPollutantTrend(data, 'pm10');
+    document.getElementById('hw-ozone').innerHTML = c.ozone + ' µg/m³ ' + hwPollutantTrend(data, 'ozone');
+    document.getElementById('hw-no2').innerHTML = c.nitrogen_dioxide + ' µg/m³ ' + hwPollutantTrend(data, 'nitrogen_dioxide');
+    document.getElementById('hw-so2').innerHTML = (c.sulphur_dioxide != null ? (c.sulphur_dioxide + ' µg/m³ ' + hwPollutantTrend(data, 'sulphur_dioxide')) : '–');
+    document.getElementById('hw-uv').textContent = (c.uv_index != null ? c.uv_index : '–');
+
+    var band = hwEaqiBand(aqi);
+    document.getElementById('hw-ampel-box').innerHTML = '<span class="hw-ampel '+band.stufe+'"><span class="hw-dot hw-dot-'+band.stufe+'"></span>EAQI ' + aqi + ' · ' + band.label + '</span>';
+
+    var leitschadstoff = hwEaqiLeadingPollutant(c);
+    document.getElementById('hw-leading').textContent = leitschadstoff ? ('Bestimmender Schadstoff gerade: ' + leitschadstoff) : '';
+
+    var vergleichDiff = hwUpdateAqiYesterdayCompare(aqi, hwLocKey(window.hwCurPos.lat, window.hwCurPos.lon));
+    var vergleichText = hwAqiYesterdayCompareText(vergleichDiff);
+    document.getElementById('hw-yesterday-compare').textContent = vergleichText || '';
+
+    var hinweis = band.hinweis + ' Werte gelten für die aktuelle Stunde an deinem Standort.';
+    if(c.uv_index >= 6){ hinweis += ' UV-Index ' + c.uv_index + ': Sonnenschutz empfohlen.'; }
+    document.getElementById('hw-erklaerung').textContent = hinweis;
+
+    hwRenderAqiChart('hw-aqi-chart', data);
+    document.getElementById('hw-card-aqi-chart').style.display = (data.hourly && data.hourly.european_aqi) ? 'block' : 'none';
+
+    document.getElementById('hw-card-status').style.display='none';
+    document.getElementById('hw-card-result').style.display='block';
+    document.getElementById('hw-umwelt-updated').innerHTML = hwIcon('refresh', 13) + ' Zuletzt aktualisiert: ' + new Date().toLocaleTimeString('de-DE');
+
+    var pollenFelder = [
+      ['alder_pollen','hw-pollen-alder'], ['birch_pollen','hw-pollen-birch'],
+      ['grass_pollen','hw-pollen-grass'], ['mugwort_pollen','hw-pollen-mugwort'],
+      ['olive_pollen','hw-pollen-olive'], ['ragweed_pollen','hw-pollen-ragweed']
+    ];
+    var maxPollen = 0, hatPollenDaten = false;
+    pollenFelder.forEach(function(p){
+      var val = c[p[0]];
+      var el = document.getElementById(p[1]);
+      if(val == null){ el.textContent = '–'; }
+      else{ el.textContent = val + ' /m³'; hatPollenDaten = true; if(val > maxPollen) maxPollen = val; }
+    });
+    if(hatPollenDaten){
+      var pStufe, pLabel;
+      if(maxPollen < 20){ pStufe='gruen'; pLabel='Geringe Pollenbelastung'; }
+      else if(maxPollen < 100){ pStufe='gelb'; pLabel='Mäßige bis hohe Pollenbelastung'; }
+      else { pStufe='rot'; pLabel='Sehr hohe Pollenbelastung'; }
+      document.getElementById('hw-pollen-ampel').innerHTML = '<span class="hw-ampel '+pStufe+'"><span class="hw-dot hw-dot-'+pStufe+'"></span>' + pLabel + '</span>';
+      document.getElementById('hw-card-pollen').style.display = 'block';
+    } else {
+      document.getElementById('hw-pollen-ampel').innerHTML = '<span class="hw-ampel gruen"><span class="hw-dot hw-dot-gelb"></span>Keine Pollendaten verfügbar (außerhalb der Saison oder des Modellgebiets)</span>';
+      document.getElementById('hw-card-pollen').style.display = 'block';
+    }
+
+    var hasPollenForecast = hwRenderPollenForecast('hw-pollen-forecast-body', data);
+    document.getElementById('hw-card-pollen-forecast').style.display = hasPollenForecast ? 'block' : 'none';
+  }).catch(function(err){
+    document.getElementById('hw-status').textContent = 'Nicht verfügbar: ' + (err.message || 'Standort/Dienst nicht erreichbar');
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  window.hwPageReload = hwLoadUmwelt;
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  if(hwHasActiveLocationReady()) hwLoadUmwelt();
+  setInterval(function(){
+    if(hwHasActiveLocationReady()) hwLoadUmwelt();
+  }, 600000);
+});
+</script>
+</body>
+</html>

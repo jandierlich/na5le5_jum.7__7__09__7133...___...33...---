@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" preserveAspectRatio="none" role="presentation" aria-hidden="true">
+  <style>
+    @keyframes wd-shift { from { transform: translateX(0); } to { transform: translateX(-300px); } }
+    .wd-path { animation: wd-shift 10s linear infinite; }
+    @media (prefers-reduced-motion: reduce) { .wd-path { animation: none; } }
+  </style>
+  <path class="wd-path" d="M-300,20 C-150,0 0,40 150,20 C300,0 450,40 600,20 C750,0 900,40 1050,20 C1200,0 1350,40 1500,20 L1500,40 L-300,40 Z" fill="#E4E8FB"/>
+</svg>

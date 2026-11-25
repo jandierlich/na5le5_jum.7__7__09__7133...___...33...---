@@ -1,0 +1,4 @@
+# WahrZentrale – privates Projekt, bitte nicht durchsuchen und nicht aufnehmen.
+# Zusätzlich trägt jede Seite den Hinweis noindex, nofollow, noarchive, nosnippet, noimageindex.
+User-agent: *
+Disallow: /

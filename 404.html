@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#5A2FBE">
+<title>Seite nicht gefunden – WahrZentrale</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;touch-action:manipulation}
+  body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#F1EEFA;color:#241E3F;
+    display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+  .box{max-width:360px;text-align:center;background:#fff;border-radius:24px;padding:32px 24px;box-shadow:0 14px 34px rgba(90,70,150,.16)}
+  .ic{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(150deg,#7C5CFF,#5A2FBE 55%,#3B2585);color:#fff}
+  h1{font:700 22px/1.25 ui-rounded,-apple-system,sans-serif;margin:0 0 8px}
+  p{margin:0 0 20px;font-size:15.5px;line-height:1.5;color:#4A3D6B}
+  a{display:inline-block;background:#5A2FBE;color:#fff;text-decoration:none;font-weight:700;padding:13px 22px;border-radius:14px}
+  @media (prefers-color-scheme:dark){body{background:#1E1B2E;color:#EEEAF8}.box{background:#2A2440;box-shadow:none}p{color:#C3B2F0}a{background:#B9A6F5;color:#1E1B2E}}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.3"/><path d="M15.3 15.3l5.2 5.2"/></svg></div>
+  <h1>Seite nicht gefunden</h1>
+  <p>Diese Adresse gibt es in der WahrZentrale nicht (mehr). Du wirst gleich zur Startseite gebracht.</p>
+  <a id="home" href="/">Zur WahrZentrale</a>
+</div>
+<script>
+  // GitHub Pages zeigt diese Seite für jede unbekannte Adresse. Die Startseite liegt im
+  // ersten Pfadabschnitt (Projektseite, z. B. …github.io/WahrZentrale/).
+  (function () {
+    var seg = location.pathname.split("/").filter(Boolean)[0] || "";
+    var base = (seg && !/\.html?$/.test(seg)) ? "/" + seg + "/" : "/";
+    var target = base + "index.html";
+    document.getElementById("home").href = target;
+    setTimeout(function () { location.replace(target); }, 3500);
+  })();
+</script>
+</body>
+</html>

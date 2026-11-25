@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Geschichte">
+  <rect x="10" y="10" width="28" height="4" rx="1" fill="#0B1440"/>
+  <rect x="8" y="38" width="32" height="4" rx="1" fill="#0B1440"/>
+  <rect x="13" y="16" width="4" height="20" fill="#FF8C00"/>
+  <rect x="22" y="16" width="4" height="20" fill="#FF8C00"/>
+  <rect x="31" y="16" width="4" height="20" fill="#FF8C00"/>
+  <path d="M10,10 L24,4 L38,10 Z" fill="#0B1440"/>
+</svg>

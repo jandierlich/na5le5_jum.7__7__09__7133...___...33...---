@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Tipps">
+  <path d="M24,6 a12,12 0 0 1 7,22 c-1.5,1.2 -2,2.5 -2,4 h-10 c0,-1.5 -0.5,-2.8 -2,-4 a12,12 0 0 1 7,-22 Z" fill="#FF8C00"/>
+  <rect x="19" y="34" width="10" height="4" rx="1.5" fill="#0B1440"/>
+  <rect x="20" y="39" width="8" height="3" rx="1.5" fill="#0B1440"/>
+</svg>

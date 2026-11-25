@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="kg">
+<head>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>Keysglade</title>
+<meta name="description" content="Keysglade: interaktiver Reisebegleiter für Florida mit Karte, Live-Wetter, Reiseplaner mit Routenberechnung, Währungsrechner und über 110 Zielen und Themen.">
+<!-- Ein gemeinsames Home-Bildschirm-Icon für ReiseWahr (gemeinsamer Speicher aller Apps) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<link rel="icon" type="image/png" href="kg-icon-192.png">
+<meta name="theme-color" content="#1E2A78">
+<link rel="stylesheet" href="kg-style.css">
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Zum Inhalt springen</a>
+
+<header class="app-header">
+  <div class="app-header-inner">
+    <a class="back-home-btn" href="./index.html#unterwegs" aria-label="Zur WahrZentrale" title="Zur WahrZentrale">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 11 L12 4 L21 11 V20 A1 1 0 0 1 20 21 H4 A1 1 0 0 1 3 20 Z"/>
+        <path d="M9 21 V13 H15 V21"/>
+      </svg>
+    </a>
+    <a class="brand brand-link" href="./index.html#unterwegs" aria-label="Zur WahrZentrale">
+      <img class="brand-mark" src="kg-icon-192.png" alt="" width="34" height="34">
+      Keysglade
+    </a>
+    <nav class="main-nav">
+      <button class="nav-link active" data-nav-target="page-home">Start</button>
+      <button class="nav-link" data-nav-target="page-explore">Entdecken</button>
+      <button class="nav-link" data-nav-target="page-map">Karte</button>
+      <button class="nav-link" data-nav-target="page-weather">Wetter</button>
+      <button class="nav-link" data-nav-target="page-planner">Reiseplaner</button>
+      <button class="nav-link" data-nav-target="page-tips">Tipps</button>
+      <button class="nav-link" data-nav-target="page-games">Spiele</button>
+    </nav>
+    <button class="help-btn" id="help-btn" aria-label="Kurze Einführung anzeigen" title="Einführung">Anleitung</button>
+    <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Dark Mode umschalten"></button>
+    <button class="bookmark-nav-btn" id="open-drawer-btn" data-i="bookmark">Merkliste <span class="bookmark-count">0</span></button>
+  </div>
+</header>
+
+<!-- ============ HOME ============ -->
+<div id="main-content" tabindex="-1">
+
+<main id="page-home" class="page active">
+  <div class="hero-banner">
+    <div id="hero-illustration" class="hero-illustration" role="presentation" aria-hidden="true"></div>
+    <div class="hero-banner-text">
+      <span class="eyebrow eyebrow-light">Sunshine State · Reisebegleiter</span>
+      <h1>Florida, übersichtlich geplant.</h1>
+      <p>Entdecke Strände, Städte und Freizeitparks, behalte das Live-Wetter im Blick und plane deine Reise mit Budget-Rechner und Packliste — alles an einem Ort.</p>
+    </div>
+  </div>
+  <div id="wave-divider" class="wave-divider" role="presentation" aria-hidden="true"></div>
+
+  <div class="planner-section countdown-section" id="countdown-widget"></div>
+
+  <div class="home-weather-preview">
+    <h3>Aktuelles Wetter</h3>
+    <div id="home-weather-mini"><span class="skeleton-block skeleton-line skeleton-line-short" style="display:inline-block; vertical-align:middle;"></span></div>
+    <p class="weather-attribution"><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a></p>
+  </div>
+
+  <div class="time-compare-widget" id="time-compare-widget"></div>
+
+  <p id="visited-stats" class="visited-stats-line"></p>
+
+  <div class="home-grid">
+    <div class="home-card" data-nav-target="page-explore" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-beaches.svg" alt="" width="30" height="30">
+      <h3>Entdecken</h3>
+      <p>Über 110 Ziele und Themen in 9 Kategorien — Strände, Städte, Parks, Essen, Geschichte, Kunst und mehr.</p>
+    </div>
+    <div class="home-card" data-nav-target="page-map" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-map.svg" alt="" width="30" height="30">
+      <h3>Karte & In der Nähe</h3>
+      <p>Alle Ziele auf der Karte oder per Standort sortiert nach Entfernung.</p>
+    </div>
+    <div class="home-card" data-nav-target="page-weather" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-weather.svg" alt="" width="30" height="30">
+      <h3>Live-Wetter</h3>
+      <p>Aktuelle Werte und 6-Tage-Vorschau für sieben Städte.</p>
+    </div>
+    <div class="home-card" data-nav-target="page-planner" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-planner.svg" alt="" width="30" height="30">
+      <h3>Reiseplaner</h3>
+      <p>Tagesplan mit Routenberechnung, Budget, Packliste, Währungsrechner und Notizen.</p>
+    </div>
+    <div class="home-card" data-nav-target="page-tips" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-tips.svg" alt="" width="30" height="30">
+      <h3>Tipps</h3>
+      <p>Praxistipps nach Kategorie sowie der Sprachführer.</p>
+    </div>
+    <div class="home-card" data-nav-target="page-games" tabindex="0" role="button">
+      <img class="home-card-icon" src="kg-icon-tips.svg" alt="" width="30" height="30">
+      <h3>Spiele</h3>
+      <p>Quiz, Zahlenturm und Zahlenfusion — offline spielbar für die Wartezeit.</p>
+    </div>
+  </div>
+</main>
+
+<!-- ============ ENTDECKEN ============ -->
+<section id="page-explore" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-beaches.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Katalog</span>
+      <h1>Entdecken</h1>
+      <p>Strände, Städte, Freizeitparks, Essen, Tierwelt, Geschichte, Kunst, Abenteuer und Reiseplanungs-Themen — durchsuchbar, filterbar und zum Merken.</p>
+    </div>
+  </div>
+
+  <div id="category-banner" class="category-banner" role="presentation" aria-hidden="true"></div>
+  <div style="text-align:center; margin-bottom: 20px;">
+    <button id="random-pick-btn" class="btn-secondary" data-i="dice">Überrasch mich</button>
+  </div>
+
+  <div class="regions-map-wrap">
+    <svg id="florida-regions-map" viewBox="0 0 300 420" role="img" aria-label="Eigenständig gestaltete, stilisierte Karte Floridas mit fünf klickbaren Regionen" class="regions-map">
+      <defs>
+        <clipPath id="peninsulaClip">
+          <path d="M20,58 C20,44 34,34 54,37 C90,41 130,49 150,57 C144,66 139,70 133,67 C137,79 147,85 159,83 C184,79 204,94 212,119 C219,144 217,174 209,204 C203,229 197,254 194,279 C191,299 184,319 171,337 C161,351 149,361 137,367 C129,363 127,355 131,347 C119,351 107,345 99,333 C89,319 83,299 81,277 C79,254 83,231 94,214 C87,204 84,189 89,174 C81,167 77,154 81,139 C74,131 71,117 77,104 C67,97 61,85 67,71 C54,69 39,67 29,61 C25,60 22,59 20,58 Z"/>
+        </clipPath>
+      </defs>
+
+      <!-- Eigenständiger Entwurf, keine externe Kartenquelle -->
+      <path d="M20,58 C20,44 34,34 54,37 C90,41 130,49 150,57 C144,66 139,70 133,67 C137,79 147,85 159,83 C184,79 204,94 212,119 C219,144 217,174 209,204 C203,229 197,254 194,279 C191,299 184,319 171,337 C161,351 149,361 137,367 C129,363 127,355 131,347 C119,351 107,345 99,333 C89,319 83,299 81,277 C79,254 83,231 94,214 C87,204 84,189 89,174 C81,167 77,154 81,139 C74,131 71,117 77,104 C67,97 61,85 67,71 C54,69 39,67 29,61 C25,60 22,59 20,58 Z" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+
+      <g clip-path="url(#peninsulaClip)">
+        <rect x="0" y="0" width="300" height="95" fill="#FF8C00" class="region-shape" data-region="Panhandle"/>
+        <rect x="0" y="95" width="300" height="75" fill="#3355C8" class="region-shape" data-region="Nordflorida"/>
+        <rect x="0" y="170" width="300" height="90" fill="#1E2A78" class="region-shape" data-region="Zentralflorida"/>
+        <rect x="0" y="260" width="300" height="160" fill="#0B1440" class="region-shape" data-region="Südflorida"/>
+      </g>
+
+      <!-- Florida Keys, ziehen sich nach Südwesten -->
+      <path d="M148,362 C142,368 132,373 120,378 C105,384 90,388 78,390" fill="none" stroke="#6C8BFF" stroke-width="1.5" stroke-dasharray="1 4" stroke-linecap="round" opacity="0.8"/>
+      <g class="region-shape" data-region="Florida Keys">
+        <circle cx="148" cy="362" r="5.5" fill="#6C8BFF"/>
+        <circle cx="130" cy="373" r="5" fill="#6C8BFF"/>
+        <circle cx="110" cy="382" r="4.5" fill="#6C8BFF"/>
+        <circle cx="90" cy="388" r="4" fill="#6C8BFF"/>
+        <circle cx="72" cy="391" r="3.5" fill="#6C8BFF"/>
+      </g>
+
+      <!-- Kompass -->
+      <g transform="translate(258,32)" opacity="0.75">
+        <circle cx="0" cy="0" r="20" fill="none" stroke="var(--text-muted)" stroke-width="1.2" opacity="0.6"/>
+        <line x1="-16" y1="0" x2="16" y2="0" stroke="var(--text-muted)" stroke-width="1.2" opacity="0.5"/>
+        <line x1="0" y1="16" x2="0" y2="-16" stroke="var(--text-muted)" stroke-width="1.6"/>
+        <polygon points="0,-16 5,-4 -5,-4" fill="var(--text-muted)"/>
+        <text x="0" y="-23" text-anchor="middle" font-size="11" fill="var(--text-muted)" font-weight="600">N</text>
+      </g>
+    </svg>
+    <div class="regions-map-legend">
+      <p class="regions-map-hint">Klicke auf eine Region, um den Katalog zu filtern.</p>
+      <button class="region-legend-item" data-region="Panhandle"><i style="background:#FF8C00"></i> Panhandle</button>
+      <button class="region-legend-item" data-region="Nordflorida"><i style="background:#3355C8"></i> Nordflorida</button>
+      <button class="region-legend-item" data-region="Zentralflorida"><i style="background:#1E2A78"></i> Zentralflorida</button>
+      <button class="region-legend-item" data-region="Südflorida"><i style="background:#0B1440"></i> Südflorida</button>
+      <button class="region-legend-item" data-region="Florida Keys"><i style="background:#6C8BFF"></i> Florida Keys</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Suche nach Ort, Thema oder Stichwort…">
+    </div>
+  </div>
+
+  <div id="category-tabs"></div>
+  <div id="region-chips"></div>
+  <div id="result-count"></div>
+  <div id="catalog-grid"></div>
+</section>
+
+<!-- ============ KARTE ============ -->
+<section id="page-map" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-map.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Übersicht</span>
+      <h1>Karte</h1>
+      <p>Alle Reiseziele auf einen Blick — oder finde per Standort, was in deiner Nähe liegt.</p>
+    </div>
+  </div>
+
+  <div class="subtab-row" role="tablist">
+    <button class="subtab-btn active" role="tab" aria-selected="true" data-subtab="map-overview" data-i="map">Übersicht</button>
+    <button class="subtab-btn" role="tab" aria-selected="false" data-subtab="map-nearby" data-i="pin">In der Nähe</button>
+  </div>
+
+  <div id="subtab-map-overview" class="subtab-panel active" role="tabpanel">
+    <div class="map-toolbar">
+      <div id="map-category-chips" class="chip-row" style="margin-bottom:0;"></div>
+      <div class="map-toolbar-actions">
+        <button id="map-locate-btn" class="zt-icon-btn" title="Meinen Standort zeigen" aria-label="Meinen Standort zeigen" data-i="locate"></button>
+        <button id="map-fullscreen-btn" class="zt-icon-btn" title="Vollbild" aria-label="Vollbild umschalten" data-i="fullscreen"></button>
+      </div>
+    </div>
+    <p id="map-locate-status" class="map-locate-status"></p>
+    <div id="map-container-wrap">
+      <button id="map-fullscreen-close-btn" class="map-fullscreen-close-btn" aria-label="Vollbild schließen" data-i="close"></button>
+      <div id="map-container"></div>
+    </div>
+    <div class="map-legend">
+      <span><i class="legend-dot" style="background:#3355C8"></i> Strände & Natur</span>
+      <span><i class="legend-dot" style="background:#0B1440"></i> Städte & Kultur</span>
+      <span><i class="legend-dot" style="background:#FF8C00"></i> Freizeitparks</span>
+    </div>
+  </div>
+
+  <div id="subtab-map-nearby" class="subtab-panel" role="tabpanel">
+    <p class="planner-section-intro">Frag deinen Standort ab und sieh, welche Ziele aus dem Katalog am nächsten liegen. Der Standort wird nur einmalig abgefragt und nirgends gespeichert.</p>
+    <button id="nearby-locate-btn" class="btn-primary" data-i="locate">Meinen Standort verwenden</button>
+    <p id="nearby-status" style="color:var(--text-muted); font-size:14px; margin:14px 0;"></p>
+    <div id="nearby-results" class="nearby-grid"></div>
+  </div>
+</section>
+
+<!-- ============ WETTER ============ -->
+<section id="page-weather" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-weather.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Live-Daten</span>
+      <h1>Wetter</h1>
+      <p>Aktuelle Werte und 6-Tage-Vorschau, bereitgestellt von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> — ohne Anmeldung und ohne Tracking.</p>
+    </div>
+  </div>
+  <div id="weather-banner" class="category-banner" role="presentation" aria-hidden="true"></div>
+  <div class="weather-select-row">
+    <select id="weather-city-select"></select>
+  </div>
+  <div id="weather-container"></div>
+  <p class="weather-attribution"><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a></p>
+
+  <div class="planner-section" style="margin-top:24px;">
+    <h2>Gezeiten</h2>
+    <p class="planner-section-intro">Direkter Link zur offiziellen Live-Vorhersage bei NOAA (US-Regierungsbehörde, gemeinfrei).</p>
+    <div class="weather-select-row">
+      <select id="tide-station-select"></select>
+    </div>
+    <div id="tide-container"></div>
+  </div>
+
+  <div class="planner-section">
+    <h2>Celsius ↔ Fahrenheit</h2>
+    <p class="planner-section-intro">In den USA werden Temperaturen in Fahrenheit angegeben — hier in beide Richtungen umrechenbar.</p>
+    <div class="currency-form">
+      <label>Celsius (°C)
+        <input type="text" id="tempconvert-celsius" inputmode="decimal" value="25">
+      </label>
+      <span class="distance-arrow">=</span>
+      <label>Fahrenheit (°F)
+        <input type="text" id="tempconvert-fahrenheit" inputmode="decimal" value="77">
+      </label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REISEPLANER ============ -->
+<section id="page-planner" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-planner.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Planung</span>
+      <h1>Reiseplaner</h1>
+      <p>Budget grob abschätzen, Packliste abhaken und eigene Notizen festhalten — alles bleibt lokal auf deinem Gerät.</p>
+    </div>
+  </div>
+  <img src="kg-title-plannerpage.svg" alt="" class="category-banner">
+
+  <div class="subtab-row" role="tablist">
+    <button class="subtab-btn active" role="tab" aria-selected="true" data-subtab="planner-planung" data-i="calendar">Planung</button>
+    <button class="subtab-btn" role="tab" aria-selected="false" data-subtab="planner-rechner" data-i="calculator">Rechner</button>
+    <button class="subtab-btn" role="tab" aria-selected="false" data-subtab="planner-erinnerungen" data-i="book">Erinnerungen</button>
+  </div>
+
+  <div id="subtab-planner-planung" class="subtab-panel active" role="tabpanel">
+    <div class="planner-section" id="itinerary-print-section">
+      <div class="itinerary-section-header">
+        <h2>Mein Tagesplan</h2>
+        <button id="itinerary-print-btn" class="btn-secondary print-hide" data-i="print">Drucken</button>
+      </div>
+      <p class="planner-section-intro print-hide">Stelle deine Reise Tag für Tag zusammen. Die Reihenfolge lässt sich per Pfeil ändern, Strecke und Fahrzeit werden automatisch geschätzt (Luftlinie, keine echten Verkehrsdaten).</p>
+      <div class="itinerary-template-row print-hide">
+        <select id="itinerary-template-select"></select>
+      </div>
+      <div id="itinerary-template-preview" class="template-preview print-hide"></div>
+      <div id="itinerary-container"></div>
+      <button id="itinerary-add-day-btn" class="btn-primary print-hide" style="margin-top:14px;">+ Neuen Tag hinzufügen</button>
+    </div>
+
+    <div class="planner-section">
+      <h2>Packliste</h2>
+      <div id="packing-container"></div>
+    </div>
+  </div>
+
+  <div id="subtab-planner-rechner" class="subtab-panel" role="tabpanel">
+    <div class="planner-section">
+      <h2>Budget-Rechner</h2>
+      <form id="budget-form" class="budget-form">
+        <label>Reisende
+          <input type="number" id="budget-travelers" min="1" max="12" value="2">
+        </label>
+        <label>Nächte
+          <input type="number" id="budget-nights" min="1" max="60" value="10">
+        </label>
+        <label>Unterkunft
+          <select id="budget-accommodation">
+            <option value="budget">Budget</option>
+            <option value="mittel" selected>Mittelklasse</option>
+            <option value="luxus">Luxus</option>
+          </select>
+        </label>
+        <label>Themenpark-Tage
+          <input type="number" id="budget-parkdays" min="0" max="30" value="3">
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="budget-car" checked>
+          Mietwagen einplanen
+        </label>
+        <button type="submit" class="btn-primary">Budget schätzen</button>
+      </form>
+      <div id="budget-result"></div>
+    </div>
+
+    <div class="planner-section" id="expense-print-section">
+      <h2>Ausgaben-Tracker</h2>
+      <p class="planner-section-intro print-hide">Tatsächliche Ausgaben in US-Dollar erfassen und mit der Euro-Budget-Schätzung vergleichen.</p>
+      <p class="print-only-heading" id="expense-print-heading"></p>
+      <div class="expense-currency-row print-hide">
+        <label class="distance-label" for="expense-currency-select">Anzeige in
+          <select id="expense-currency-select">
+            <option value="USD">US-Dollar ($)</option>
+            <option value="EUR">Euro (€)</option>
+          </select>
+        </label>
+        <button id="expense-print-btn" class="btn-secondary" data-i="print">Ausgaben drucken</button>
+      </div>
+      <form id="expense-form" class="expense-form print-hide">
+        <select id="expense-category"></select>
+        <input type="text" id="expense-amount" inputmode="decimal" placeholder="Betrag ($)" required>
+        <input type="text" id="expense-note" placeholder="Notiz (optional)">
+        <button type="submit" class="btn-primary">Hinzufügen</button>
+      </form>
+      <div class="expense-tax-row print-hide">
+        <label class="checkbox-label">
+          <input type="checkbox" id="expense-add-tax">
+          Sales Tax hinzurechnen
+        </label>
+        <input type="number" id="expense-tax-rate" value="7" min="0" max="15" step="0.1" style="width:70px;"> %
+        <span id="expense-tax-preview" class="expense-tax-preview"></span>
+      </div>
+      <div id="expenses-summary"></div>
+      <div id="expenses-list" class="expenses-list"></div>
+    </div>
+
+    <div class="planner-section">
+      <h2>Entfernungsrechner</h2>
+      <p class="planner-section-intro">Wie weit liegen zwei Ziele auseinander?</p>
+      <div class="distance-form">
+        <label class="distance-label" for="distance-from">Von
+          <select id="distance-from"></select>
+        </label>
+        <span class="distance-arrow" aria-hidden="true">→</span>
+        <label class="distance-label" for="distance-to">Nach
+          <select id="distance-to"></select>
+        </label>
+      </div>
+      <div id="distance-result"></div>
+    </div>
+
+    <div class="planner-section">
+      <h2>Währungsrechner</h2>
+      <p id="currency-status" class="planner-section-intro"><span class="skeleton-block skeleton-line skeleton-line-short" style="display:inline-block; vertical-align:middle;"></span></p>
+      <label class="currency-rate">Kurs: 1 € =
+        <input type="text" id="currency-rate" inputmode="decimal" aria-label="Kurs in US-Dollar für einen Euro"> $
+      </label>
+      <div class="currency-form">
+        <label>Euro (€)
+          <input type="text" id="currency-eur" inputmode="decimal" disabled>
+        </label>
+        <span class="distance-arrow">=</span>
+        <label>US-Dollar ($)
+          <input type="text" id="currency-usd" inputmode="decimal" disabled>
+        </label>
+      </div>
+    </div>
+
+    <div class="planner-section">
+      <h2>Trinkgeld-Rechner</h2>
+      <p class="planner-section-intro">In den USA ist Trinkgeld fester Bestandteil der Bezahlkultur (siehe Tipps).</p>
+      <label class="distance-label" for="tip-bill" style="margin-bottom:14px;">Rechnungsbetrag ($)
+        <input type="text" id="tip-bill" inputmode="decimal" value="50" style="padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:14px;">
+      </label>
+      <div class="tip-percent-row">
+        <button class="tip-percent-btn" data-percent="15">15%</button>
+        <button class="tip-percent-btn active" data-percent="18">18%</button>
+        <button class="tip-percent-btn" data-percent="20">20%</button>
+        <button class="tip-percent-btn" data-percent="25">25%</button>
+        <input type="number" id="tip-custom-percent" placeholder="eigener %" style="width:90px; padding:9px 10px; border-radius:7px; border:1px solid var(--border); font-size:13.5px;">
+      </div>
+      <label class="distance-label" for="tip-people" style="margin:14px 0;">Aufteilen auf (Personen)
+        <input type="number" id="tip-people" min="1" max="20" value="1" style="padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:14px;">
+      </label>
+      <div id="tip-result"></div>
+    </div>
+  </div>
+
+  <div id="subtab-planner-erinnerungen" class="subtab-panel" role="tabpanel">
+    <div class="planner-section">
+      <h2>Meine Notizen</h2>
+      <div id="notes-container"></div>
+    </div>
+
+    <div class="planner-section" id="diary-print-section">
+      <h2>Mein Reise-Tagebuch</h2>
+      <p class="planner-section-intro print-hide">Eigene Fotos und kurze Notizen zu deiner Reise — bleiben ausschließlich auf diesem Gerät gespeichert, kein Upload.</p>
+      <p class="print-only-heading" id="diary-print-heading"></p>
+      <div class="diary-print-range print-hide">
+        <label class="distance-label" for="diary-print-from">Von
+          <input type="date" id="diary-print-from">
+        </label>
+        <label class="distance-label" for="diary-print-to">Bis
+          <input type="date" id="diary-print-to">
+        </label>
+        <button id="diary-print-btn" class="btn-secondary" data-i="print">Tagebuch drucken</button>
+      </div>
+      <div id="diary-list" class="diary-list"></div>
+      <form id="diary-form" class="diary-form print-hide">
+        <label class="distance-label" for="diary-date">Datum
+          <input type="date" id="diary-date">
+        </label>
+        <label class="distance-label" for="diary-photo">Foto (optional)
+          <input type="file" id="diary-photo" accept="image/*">
+        </label>
+        <textarea id="diary-note" placeholder="Was ist heute passiert?" rows="3"></textarea>
+        <button type="submit" class="btn-primary">Eintrag speichern</button>
+      </form>
+    </div>
+
+    <div class="planner-section">
+      <h2>Daten-Backup</h2>
+      <p class="planner-section-intro">Sichere alle deine Daten (Merkliste, Notizen, Tagesplan, Tagebuch-Fotos u. v. m.) in einer Datei — z. B. vor einem Gerätewechsel. Die Datei verlässt dein Gerät nur, wenn du sie selbst weitergibst. In manchen Browsern kannst du beim Export selbst wählen, in welchem Ordner die Datei gespeichert wird — in anderen (je nach Browser) landet sie automatisch im Standard-Downloads-Ordner.</p>
+      <div class="backup-actions">
+        <button id="backup-export-btn" class="btn-primary" data-i="download">Daten exportieren</button>
+        <label class="btn-secondary backup-import-label" data-i="upload">
+          Daten importieren
+          <input type="file" id="backup-import-input" accept="application/json" hidden>
+        </label>
+      </div>
+      <p id="backup-status" class="planner-section-intro" style="margin-top:10px;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TIPPS ============ -->
+<section id="page-tips" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-tips.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Redaktion</span>
+      <h1>Tipps</h1>
+      <p>Kurze, praktische Hinweise für unterwegs. Für eigene persönliche Tipps: siehe "Meine Notizen" im Reiseplaner.</p>
+    </div>
+  </div>
+  <img src="kg-title-tips.svg" alt="" class="category-banner">
+  <div class="planner-section">
+    <div id="tips-category-chips" class="chip-row"></div>
+    <ul id="editorial-tips-list"></ul>
+  </div>
+
+  <div class="planner-section">
+    <h2>Sprachführer</h2>
+    <p class="planner-section-intro">Ein paar nützliche Sätze für unterwegs.</p>
+    <input type="text" id="phrasebook-search" placeholder="Suche (Deutsch oder Englisch)…" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:14px; margin-bottom:14px;">
+    <div id="phrasebook-list" class="phrasebook-list"></div>
+  </div>
+</section>
+
+<!-- ============ SPIELE ============ -->
+<section id="page-games" class="page">
+  <div class="page-hero page-hero-icon">
+    <img src="kg-icon-tips.svg" alt="" class="page-hero-graphic">
+    <div>
+      <span class="eyebrow">Extra</span>
+      <h1>Spiele</h1>
+      <p>Kleine Spiele und ein Quiz für die Wartezeit — z. B. am Flughafen. Alles funktioniert komplett offline.</p>
+    </div>
+  </div>
+
+  <div class="subtab-row" role="tablist">
+    <button class="subtab-btn active" role="tab" aria-selected="true" data-subtab="games-quiz" data-i="bulb">Quiz</button>
+    <button class="subtab-btn" role="tab" aria-selected="false" data-subtab="games-zahlenturm" data-i="tower">Zahlenturm</button>
+    <button class="subtab-btn" role="tab" aria-selected="false" data-subtab="games-zahlenfusion" data-i="tiles">Zahlenfusion</button>
+  </div>
+
+  <div id="subtab-games-quiz" class="subtab-panel active" role="tabpanel">
+    <div class="planner-section">
+      <h2>Reise-Quiz</h2>
+      <p class="planner-section-intro">Wie gut kennst du dich schon mit Florida aus? Die Fragen entstehen zufällig aus dem Katalog.</p>
+      <div id="quiz-container"></div>
+    </div>
+  </div>
+
+  <div id="subtab-games-zahlenturm" class="subtab-panel" role="tabpanel">
+    <div class="planner-section zt-wrap">
+      <h2>Zahlenturm</h2>
+      <p class="planner-section-intro">Spalte antippen, die Zahl fällt hinein und verschmilzt waagerecht wie senkrecht mit gleichen Nachbarn.</p>
+      <div class="zt-scorebar">
+        <div class="zt-score-box">
+          <span class="zt-score-label">Punkte</span>
+          <span id="zt-score" class="zt-score-value">0</span>
+        </div>
+        <div class="zt-score-box">
+          <span class="zt-score-label">Bestwert</span>
+          <span id="zt-best" class="zt-score-value">0</span>
+        </div>
+        <button id="zt-sound-btn" class="zt-icon-btn" aria-label="Sound umschalten" aria-pressed="true" data-i="speaker"></button>
+      </div>
+
+      <div class="zt-next-row">
+        <span class="zt-next-label">Als Nächstes:</span>
+        <span id="zt-next-value" class="zt-next-tile">2</span>
+        <span id="zt-next-value-2" class="zt-next-tile zt-next-tile-2">4</span>
+      </div>
+
+      <div id="zt-board" class="zt-board"></div>
+
+      <p id="zt-status" class="zt-status"></p>
+
+      <div class="zt-actions">
+        <button id="zt-undo-btn" class="btn-secondary" data-i="undo" disabled>Rückgängig</button>
+        <button id="zt-newgame-btn" class="btn-primary" data-i="refresh">Neues Spiel</button>
+      </div>
+
+      <p id="zt-stats" class="zt-stats-line"></p>
+    </div>
+    <div id="zt-toast" class="zt-toast"></div>
+  </div>
+
+  <div id="subtab-games-zahlenfusion" class="subtab-panel" role="tabpanel">
+    <div class="planner-section nf-wrap">
+      <h2>Zahlenfusion</h2>
+      <p class="planner-section-intro">Wische in eine Richtung, um alle Kacheln zu verschieben — gleiche Zahlen verschmelzen. Ziel: möglichst hohe Zahlen erreichen.</p>
+      <div class="zt-scorebar">
+        <div class="zt-score-box">
+          <span class="zt-score-label">Punkte</span>
+          <span id="nf-score" class="zt-score-value">0</span>
+        </div>
+        <div class="zt-score-box">
+          <span class="zt-score-label">Bestwert</span>
+          <span id="nf-best" class="zt-score-value">0</span>
+        </div>
+        <button id="nf-sound-btn" class="zt-icon-btn" aria-label="Sound umschalten" aria-pressed="true" data-i="speaker"></button>
+      </div>
+      <div id="nf-board" class="nf-board"></div>
+      <p id="nf-status" class="zt-status"></p>
+      <div class="zt-actions">
+        <button id="nf-undo-btn" class="btn-secondary" data-i="undo" disabled>Rückgängig</button>
+        <button id="nf-newgame-btn" class="btn-primary" data-i="refresh">Neues Spiel</button>
+      </div>
+      <p id="nf-stats" class="zt-stats-line"></p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ Detail Modal ============ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal-card">
+    <button class="modal-close" data-close-modal aria-label="Schließen" data-i="close"></button>
+    <div class="detail-body"></div>
+  </div>
+</div>
+
+<!-- ============ Tagebuch-Foto-Lightbox ============ -->
+<div class="modal-overlay" id="diary-lightbox">
+  <div class="modal-card diary-lightbox-card">
+    <button class="modal-close" data-close-modal aria-label="Schließen" data-i="close"></button>
+    <img id="diary-lightbox-img" src="" alt="">
+  </div>
+</div>
+
+
+<!-- ============ Wetter-Tages-Detail ============ -->
+<div class="modal-overlay" id="weather-day-modal">
+  <div class="modal-card">
+    <button class="modal-close" data-close-modal aria-label="Schließen" data-i="close"></button>
+    <div class="weather-day-modal-body"></div>
+  </div>
+</div>
+
+<!-- ============ Karten-Einwilligung (OpenStreetMap-Kacheln) ============ -->
+<div class="map-consent-overlay" id="map-consent-modal">
+  <div class="modal-card">
+    <h3 style="margin-top:0;">Karte laden?</h3>
+    <p style="font-size:13.5px;line-height:1.5;">Für die Kartenansicht werden Kartenbilder (Kacheln) vom OpenStreetMap-Kartenserver des FOSSGIS e.V. (tile.openstreetmap.de, gemeinnütziger Verein mit Sitz in Deutschland) geladen. Dabei werden deine IP-Adresse und der angezeigte Kartenausschnitt dorthin übertragen. Die Kartenbibliothek selbst ist Teil der WahrZentrale. Alle anderen Funktionen laufen immer lokal auf deinem Gerät.</p>
+    <p style="font-size:13.5px;line-height:1.5;">Deine Wahl gilt für alle Karten in der WahrZentrale und lässt sich jederzeit in den Einstellungen der WahrZentrale ändern. Details in der <a href="datenschutz.html#karten">Datenschutzerklärung</a>.</p>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+      <button class="btn-secondary" id="map-consent-decline" style="flex:1;">Ohne Karte fortfahren</button>
+      <button class="btn-primary" id="map-consent-accept" style="flex:1;">Karte laden</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Bookmark Drawer ============ -->
+<div id="drawer-overlay"></div>
+<aside class="drawer" id="bookmark-drawer" aria-label="Merkliste">
+  <div class="drawer-header print-hide">
+    <h3>Meine Merkliste</h3>
+    <button id="close-drawer-btn" aria-label="Schließen" data-i="close"></button>
+  </div>
+  <h3 class="print-only-heading">Meine Merkliste</h3>
+  <button id="bookmark-print-btn" class="btn-secondary print-hide" style="margin-bottom:14px;" data-i="print">Drucken</button>
+  <div id="bookmark-list"></div>
+</aside>
+
+<footer class="app-footer">
+  <button id="motion-toggle-btn" class="motion-toggle-btn" aria-pressed="false" data-i="pause">Animationen pausieren</button>
+  <button id="ambient-toggle-btn" class="motion-toggle-btn" aria-pressed="false" data-i="waves">Wellenrauschen</button><br>
+  Keysglade — unabhängiger, privater Reisebegleiter. Keine amtliche Auskunft.
+  Wetterdaten: <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">Open-Meteo</a> ·
+  Karte: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap-Mitwirkende</a><br>
+  <span class="legal-links"><a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html#kg">Datenschutz</a></span>
+</footer>
+
+<script src="rw-icons.js"></script>
+<script src="kg-data.js"></script>
+<script src="kg-storage.js"></script>
+<script src="kg-motion.js"></script>
+<script src="kg-ambient.js"></script>
+<script src="kg-theme.js"></script>
+<script src="kg-countdown.js"></script>
+<script src="kg-distance.js"></script>
+<script src="kg-speak-share.js"></script>
+<script src="kg-weather.js"></script>
+<script src="kg-tide.js"></script>
+<script src="kg-timecompare.js"></script>
+<script src="kg-tipcalc.js"></script>
+<script src="kg-tempconvert.js"></script>
+<script src="kg-map.js"></script>
+<script src="kg-budget.js"></script>
+<script src="kg-expenses.js"></script>
+<script src="kg-packing.js"></script>
+<script src="kg-notes.js"></script>
+<script src="kg-quiz.js"></script>
+<script src="kg-diary.js"></script>
+<script src="kg-backup.js"></script>
+<script src="kg-itinerary.js"></script>
+<script src="kg-templates.js"></script>
+<script src="kg-currency.js"></script>
+<script src="kg-nearby.js"></script>
+<script src="kg-randompick.js"></script>
+<script src="kg-phrasebook.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script src="kg-onboarding.js"></script>
+<script src="kg-gameturm.js"></script>
+<script src="kg-zahlenfusion.js"></script>
+<script src="kg-print.js"></script>
+<script src="kg-wowbridge.js"></script>
+<script src="kg-app.js"></script>
+</body>
+</html>

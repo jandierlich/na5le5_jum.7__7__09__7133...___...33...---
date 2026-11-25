@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Tier- und Pflanzenwelt">
+  <style>
+    @keyframes wl-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes wl-sway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+    .wl-bird { animation: wl-bob 3.2s ease-in-out infinite; transform-origin: center; }
+    .wl-palm { animation: wl-sway 5s ease-in-out infinite; transform-origin: bottom center; }
+    @media (prefers-reduced-motion: reduce) { .wl-bird, .wl-palm { animation: none; } }
+  </style>
+  <rect width="800" height="160" fill="#e7f3ee"/>
+  <path d="M0,130 C150,115 250,140 400,125 C550,110 650,135 800,120 L800,160 L0,160 Z" fill="#3355C8" opacity="0.25"/>
+
+  <g class="wl-palm" transform="translate(120,140)">
+    <rect x="-4" y="-70" width="8" height="70" rx="3" fill="#0B1440"/>
+    <path d="M0,-70 C-30,-78 -45,-100 -50,-115 C-25,-108 -5,-90 0,-70 Z" fill="#3355C8"/>
+    <path d="M0,-70 C28,-80 42,-102 48,-116 C24,-108 4,-90 0,-70 Z" fill="#3355C8"/>
+    <path d="M0,-70 C-16,-95 -12,-115 -8,-128 C4,-105 6,-85 0,-70 Z" fill="#12a89a"/>
+  </g>
+
+  <g class="wl-bird" transform="translate(560,60)">
+    <path d="M0,0 C-18,-10 -30,-4 -34,4 C-22,2 -10,4 0,10 C10,4 22,2 34,4 C30,-4 18,-10 0,0 Z" fill="#FF8C00"/>
+  </g>
+  <g class="wl-bird" style="animation-delay:-1.6s" transform="translate(650,90) scale(0.7)">
+    <path d="M0,0 C-18,-10 -30,-4 -34,4 C-22,2 -10,4 0,10 C10,4 22,2 34,4 C30,-4 18,-10 0,0 Z" fill="#0B1440" opacity="0.7"/>
+  </g>
+
+  <g transform="translate(300,120)">
+    <ellipse cx="0" cy="0" rx="46" ry="16" fill="#5a8f6b"/>
+    <ellipse cx="0" cy="-2" rx="40" ry="12" fill="#6ea87e"/>
+    <circle cx="-14" cy="-6" r="3" fill="#0B1440"/>
+  </g>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Abenteuer und Outdoor">
+  <circle cx="24" cy="24" r="18" fill="none" stroke="#0B1440" stroke-width="2.5"/>
+  <path d="M24,24 L31,14 L26,24 L31,34 Z" fill="#FF8C00"/>
+  <path d="M24,24 L17,34 L22,24 L17,14 Z" fill="#3355C8"/>
+  <circle cx="24" cy="24" r="2.4" fill="#0B1440"/>
+</svg>

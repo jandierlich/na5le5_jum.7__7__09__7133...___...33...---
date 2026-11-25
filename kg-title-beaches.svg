@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Strände und Natur">
+  <defs>
+    <linearGradient id="tbSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fc6e0"/>
+      <stop offset="100%" stop-color="#cfe8f2"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes tb-sun-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.82; } }
+    @keyframes tb-wave-shift { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
+    @keyframes tb-palm-sway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+    .tb-sun { animation: tb-sun-pulse 4s ease-in-out infinite; transform-origin: center; }
+    .tb-wave1 { animation: tb-wave-shift 7s linear infinite alternate; }
+    .tb-wave2 { animation: tb-wave-shift 9s linear infinite alternate-reverse; }
+    .tb-palm1 { animation: tb-palm-sway 4.5s ease-in-out infinite; transform-origin: bottom center; }
+    .tb-palm2 { animation: tb-palm-sway 4.5s ease-in-out infinite; animation-delay: -2s; transform-origin: bottom center; }
+    @media (prefers-reduced-motion: reduce) {
+      .tb-sun, .tb-wave1, .tb-wave2, .tb-palm1, .tb-palm2 { animation: none; }
+    }
+  </style>
+  <rect width="800" height="160" fill="url(#tbSky)"/>
+  <circle class="tb-sun" cx="700" cy="45" r="30" fill="#f4c04d"/>
+  <path class="tb-wave1" d="M0,110 C120,95 180,120 300,108 C420,96 480,122 600,108 C680,100 740,114 800,106 L840,160 L-40,160 Z" fill="#3355C8"/>
+  <path class="tb-wave2" d="M0,125 C130,112 190,132 310,120 C430,110 490,130 610,120 C690,112 745,124 800,118 L840,160 L-40,160 Z" fill="#0a6f66"/>
+  <g class="tb-palm1" transform="translate(60,108)">
+    <rect x="-3" y="0" width="6" height="42" rx="2" fill="#0B1440"/>
+    <path d="M0,0 C-24,-6 -33,-21 -36,-30 C-21,-27 -6,-15 0,0 Z" fill="#3355C8"/>
+    <path d="M0,0 C21,-9 30,-23 35,-31 C19,-25 5,-15 0,0 Z" fill="#3355C8"/>
+  </g>
+  <g class="tb-palm2" transform="translate(120,120) scale(0.7)">
+    <rect x="-3" y="0" width="6" height="42" rx="2" fill="#0B1440"/>
+    <path d="M0,0 C-24,-6 -33,-21 -36,-30 C-21,-27 -6,-15 0,0 Z" fill="#12a89a"/>
+    <path d="M0,0 C21,-9 30,-23 35,-31 C19,-25 5,-15 0,0 Z" fill="#12a89a"/>
+  </g>
+  <path d="M400,50 q10,-10 20,0 q10,-10 20,0" stroke="#0B1440" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M450,70 q8,-8 16,0 q8,-8 16,0" stroke="#0B1440" stroke-width="2" fill="none" opacity="0.35"/>
+</svg>

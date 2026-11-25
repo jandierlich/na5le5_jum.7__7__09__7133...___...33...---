@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Symbol Karte">
+  <path d="M6,12 L18,8 L30,12 L42,8 L42,36 L30,40 L18,36 L6,40 Z" fill="#E4E8FB" stroke="#1E2A78" stroke-width="2.5" stroke-linejoin="round"/>
+  <line x1="18" y1="8" x2="18" y2="36" stroke="#1E2A78" stroke-width="1.5" opacity="0.5"/>
+  <line x1="30" y1="12" x2="30" y2="40" stroke="#1E2A78" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="24" cy="22" r="4" fill="#FF8C00"/>
+</svg>

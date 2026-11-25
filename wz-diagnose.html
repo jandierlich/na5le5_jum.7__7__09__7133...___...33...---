@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<title>Server-Test</title>
+<style>
+body{margin:0;padding:20px;font:16px/1.45 -apple-system,system-ui,sans-serif;background:#f1eef9;color:#241a45}
+h1{font-size:22px;margin:0 0 8px}button{font:inherit;padding:12px 18px;border-radius:14px;border:0;background:#5b2fc9;color:#fff;margin:10px 0}
+.b{background:#fff;border-radius:14px;padding:12px 14px;margin:10px 0;white-space:pre-wrap;word-break:break-word;font-size:14px}
+.ok{border-left:5px solid #2a9d4b}.err{border-left:5px solid #c0392b}
+</style></head><body>
+<h1>Server-Test</h1>
+<p>Prüft, was die Kartenserver wirklich antworten. Dauert bis zu 40 Sekunden pro Server.</p>
+<button id="go">Test starten</button>
+<div id="out"></div>
+<script>
+(function(){
+var S=["https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+var Q='[out:json][timeout:25];node["place"="village"](around:5000,53.7,9.95);out tags center 5;';
+var out=document.getElementById("out");
+function add(t,ok){var d=document.createElement("div");d.className="b "+(ok?"ok":"err");d.textContent=t;out.appendChild(d);}
+function one(url){
+  var t0=Date.now(),ctrl=new AbortController(),tm=setTimeout(function(){ctrl.abort();},40000);
+  return fetch(url,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},body:"data="+encodeURIComponent(Q),signal:ctrl.signal})
+  .then(function(r){return r.text().then(function(x){clearTimeout(tm);
+    var s=((Date.now()-t0)/1000).toFixed(1)+" s · HTTP "+r.status;
+    var ok=r.ok;
+    try{var j=JSON.parse(x);s+=" · "+(j.elements?j.elements.length+" Treffer":"kein elements")+(j.remark?" · remark: "+j.remark:"");if(j.remark)ok=false;}catch(e){s+=" · keine JSON-Antwort: "+x.slice(0,160).replace(/\s+/g," ");ok=false;}
+    add(url.split("/")[2]+"\n"+s,ok);});})
+  .catch(function(e){clearTimeout(tm);add(url.split("/")[2]+"\n"+((Date.now()-t0)/1000).toFixed(1)+" s · "+e.name+": "+e.message,false);});
+}
+document.getElementById("go").addEventListener("click",function(){
+  out.innerHTML="";this.disabled=true;var b=this;
+  add("Netz allgemein: "+(navigator.onLine?"online":"offline"),navigator.onLine);
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=53.7&longitude=9.95&current=temperature_2m").then(function(r){add("Open-Meteo: HTTP "+r.status,r.ok);}).catch(function(e){add("Open-Meteo: "+e.message,false);})
+  .then(function(){return S.reduce(function(p,u){return p.then(function(){return one(u);});},Promise.resolve());})
+  .then(function(){add("Fertig.",true);b.disabled=false;});
+});
+})();
+</script></body></html>

@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="lw">
+<head>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>LautstärkeWahr</title>
+<meta name="description" content="Wie laut ist es wirklich? Lautstärke live messen, verstehen und im Blick behalten. 100% lokal, keine Datensammlung.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="./lw-icon-192.png">
+<style>@view-transition{navigation:auto}.wzi{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.22em;fill:currentColor;flex-shrink:0}.wzi-red{color:#DC2626}.wzi-green{color:#16A34A}.wzi-yellow{color:#EAB308}.wzi-orange{color:#EA8C1E}.wzi-white{color:#9C9CA8}.wzi-chev-up{transform:rotate(-90deg)}.wzi-chev-down{transform:rotate(90deg)}
+  [hidden]{display:none!important}
+  :root{
+    --bg:var(--wzp-f1eefa, #F1EEFA); --card:var(--wzp-f8f6fc, #F8F6FC); --card2:var(--wzp-dac7f2, #DAC7F2); --btn-warm:var(--wzp-dac7f2, #DAC7F2); --text:var(--wzp-241e3f, #241E3F); --sub:var(--wzp-524370, #524370); --sub-onbg:var(--wzp-4a3d56, #4A3D56);
+    --border:var(--wzp-c7b3ec, #C7B3EC); --cta-bg:var(--wzp-5a2fbe, #5A2FBE); --cta-text:#FFFFFF;
+    --green:#34C759; --yellow:#FFCC02; --red:#FF3B30;
+    --tint-green:#D2F0D8; --tint-yellow:#FFEEA8; --tint-red:#FBD6D6;
+    --pill-green:#1B5E20; --pill-yellow:#7A5A00; --pill-red:#7A1F1F;
+    --shadow-dark-soft: rgba(var(--wzq-241e3f, 36, 30, 63),.16); --shadow-light-soft: rgba(255,255,255,.75);
+  }
+  html.theme-dark{
+    --bg:var(--wzp-1e1b2e, #1E1B2E); --card:var(--wzp-2a2440, #2A2440); --card2:var(--wzp-3a2e52, #3A2E52); --btn-warm:var(--card2); --text:var(--wzp-eeeaf8, #EEEAF8); --sub:var(--wzp-c3b2f0, #C3B2F0); --sub-onbg:var(--wzp-c3b2f0, #C3B2F0);
+    --border:var(--wzp-5c4c82, #5C4C82); --cta-bg:var(--wzp-b9a6f5, #B9A6F5); --cta-text:var(--wzp-241e3f, #241E3F);
+    --tint-green:#1B2E22; --tint-yellow:#332B14; --tint-red:#331A1A;
+    --pill-green:#7DDDA0; --pill-yellow:#F5CE6B; --pill-red:#F5A3A3;
+    --shadow-dark-soft: rgba(0,0,0,.45); --shadow-light-soft: rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);width:100%;overflow-x:hidden;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;touch-action:manipulation}
+  
+  body{font-family:-apple-system,sans-serif;color:var(--text);line-height:1.5}
+  .app{max-width:480px;margin:0 auto;min-height:var(--wz-vh, 100dvh);padding:0 16px 28px;position:relative}
+  .safe-top{padding-top:calc(env(safe-area-inset-top) + 60px)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  header{background:linear-gradient(150deg,var(--cta-bg) 0%,var(--wzp-241748, #241748) 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top,0px) + 6px) 24px 26px;margin:calc(-1 * (env(safe-area-inset-top,0px) + 60px)) -16px 20px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10);top:-75px;right:-55px}
+  header::after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-45px;left:30px}
+  .logo-badge{position:relative}
+  .logo-badge img{box-shadow:0 14px 30px rgba(var(--wzq-141023, 20, 16, 35),.35);border-radius:18px}
+  .logo-badge{width:72px;height:72px;margin:0 auto 14px}
+  .logo-badge img{width:100%;height:100%;display:block;object-fit:contain}
+  header h1{font-size:23px;margin:0;font-weight:700;letter-spacing:-.01em;color:#fff;position:relative;font-family:ui-rounded,-apple-system,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+  header p{font-size: 13.5px;color:rgba(255,255,255,.88);margin:8px 0 0;position:relative;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+  .theme-toggle,.home-link{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:9999;width:40px;height:40px;border-radius:20px;border:1px solid rgba(120,120,128,0.3);background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:16px;text-align:center;line-height:38px;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);text-decoration:none;color:var(--wzp-241e3f, #241E3F)}
+  .theme-toggle{right:16px}
+  .home-link{right:64px}
+  @media (min-width:640px){.theme-toggle{right:calc(50vw - 195px + 16px) !important}.home-link{right:calc(50vw - 195px + 64px) !important}}
+
+  .tabs{display:flex;gap:6px;background:var(--card2);border-radius:14px;padding:4px;margin:14px 0 18px}
+  .tab{flex:1;text-align:center;padding:9px 4px;border-radius:11px;font-size: 14.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;border:none;background:transparent;font-family:inherit}
+  .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:6px 6px 14px var(--shadow-dark-soft),-6px -6px 14px var(--shadow-light-soft)}
+  .card h2{font-size:15px;margin:0 0 10px;font-weight:600}
+  .muted{color:var(--sub-onbg);font-size: 13.5px;line-height:1.5}
+
+  .cta{display:block;width:100%;background:var(--btn-warm);color:var(--text);border:none;border-radius:16px;padding:16px 14px;font-size:16px;font-weight:700;text-align:center;cursor:pointer;font-family:inherit}
+  .cta:active{transform:scale(.98)}
+  .cta.secondary{background:var(--btn-warm);color:var(--text)}
+  .cta.danger{background:var(--tint-red);color:var(--pill-red)}
+  .btn-row{display:flex;gap:10px;margin-top:10px}
+  .btn-row .cta{flex:1}
+
+  .db-display{text-align:center;padding:6px 0 4px}
+  .db-number{font-size:46px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .db-unit{font-size: 13.5px;color:var(--sub-onbg);margin-top:2px}
+  .ampel-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size: 13.5px;font-weight:600;margin-top:10px}
+  .ampel-pill.green{background:var(--tint-green);color:var(--pill-green)}
+  .ampel-pill.yellow{background:var(--tint-yellow);color:var(--pill-yellow)}
+  .ampel-pill.red{background:var(--tint-red);color:var(--pill-red)}
+  .ampel-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+
+  .gauge-wrap{position:relative;margin:4px auto 0;max-width:340px}
+  .gauge-aspect{position:relative;width:100%;padding-top:61.7%}
+  .gauge-svg{position:absolute;top:0;left:0;width:100%;height:100%;display:block;overflow:visible}
+  .gauge-tick{font-size: 12.5px;fill:var(--sub-onbg);font-family:inherit}
+  .gauge-peak{fill:var(--text)}
+  .gauge-handle-dot{fill:var(--card);stroke-width:4px;transition:stroke .3s,cx .18s linear,cy .18s linear}
+  .gauge-handle-shadow{fill:rgba(0,0,0,.14);transition:cx .18s linear,cy .18s linear}
+  html.theme-dark .gauge-handle-shadow{fill:rgba(0,0,0,.35)}
+  .gauge-center{position:absolute;left:0;right:0;bottom:4%;text-align:center;pointer-events:none}
+
+  canvas#graph{width:100%;height:190px;display:block;border-radius:14px;background:var(--card2)}
+
+  .stat-row{display:flex;gap:10px;margin-top:12px}
+  .stat{flex:1;background:var(--card2);border-radius:14px;padding:10px 12px;text-align:center}
+  .stat b{display:block;font-size:18px;font-weight:600}
+  .stat span{display:block;font-size: 12.5px;color:var(--sub-onbg);margin-top:2px}
+
+  .exposure-banner{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--tint-red);color:var(--pill-red);font-size: 13.5px;font-weight:600;display:none}
+  .exposure-banner.show{display:block}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+  .toggle-row .label{font-size: 14.5px;font-weight:600}
+  .toggle-row .desc{font-size: 13px;color:var(--sub-onbg);margin-top:2px}
+  .switch{position:relative;width:46px;height:27px;border-radius:999px;background:var(--card2);border:1px solid var(--border);flex-shrink:0;cursor:pointer}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+  .switch.on{background:var(--cta-bg);border-color:var(--cta-bg)}
+  .switch.on::after{transform:translateX(19px)}
+
+  .history-item{background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .history-item .row1{display:flex;justify-content:space-between;align-items:center}
+  .history-item .when{font-size: 13px;color:var(--sub-onbg)}
+  .history-item .vals{font-size: 14px;font-weight:600;margin-top:4px}
+  .history-item .note{font-size: 13.5px;color:var(--sub-onbg);margin-top:3px;font-style:italic}
+  .history-item .actions{display:flex;gap:8px;margin-top:8px}
+  .icon-btn{background:none;border:none;font-size:14px;cursor:pointer;color:var(--sub-onbg);padding:2px 4px;font-family:inherit}
+  .icon-btn.star.active{color:#FFCC02}
+  .empty-hint{text-align:center;color:var(--sub-onbg);font-size: 14px;padding:30px 10px}
+
+  .select-field{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size: 14.5px;font-family:inherit;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+
+  .alarm-cfg{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+  .alarm-cfg .label{font-size: 14.5px;font-weight:600}
+  .alarm-cfg .edit-thr{font-size: 13px;color:var(--sub-onbg);margin-top:2px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;text-decoration:underline}
+
+  @keyframes lw-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .alarm-banner{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--tint-red);color:var(--pill-red);font-size: 13.5px;font-weight:600;display:none;animation:lw-pulse 1s ease-in-out infinite}
+  .alarm-banner.show{display:block}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{padding:6px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--border);font-size: 13.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;font-family:inherit}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+  .tag-badge{display:inline-block;font-size: 13px;color:var(--sub-onbg);background:var(--card);border-radius:8px;padding:2px 8px;margin-top:6px}
+
+  .weekstat-row{display:flex;gap:10px;margin-top:2px}
+  .weekstat-row .stat{flex:1}
+  .weekstat-trend{text-align:center;font-size: 13.5px;color:var(--sub-onbg);margin-top:10px}
+  .weekstat-trend b,.onb-ampel-row b{font-weight:600;color:var(--text)}
+  .weekstat-trend b{color:var(--text)}
+
+  .scale-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size: 14px}
+  .scale-row:last-child{border-bottom:none}
+  .scale-row .db{font-weight:600;color:var(--sub-onbg);font-size: 13.5px}
+
+  footer{text-align:center;padding:22px 0 6px;font-size:14px;font-weight:600;color:var(--text)}
+  footer a,footer button{color:var(--text);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:14px;font-weight:600;font-family:inherit;-webkit-appearance:none;appearance:none;padding:0;margin:0}
+
+  .onb-ampel-row{display:flex;align-items:center;gap:10px;padding:8px 4px;font-size: 14.5px}
+</style>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+
+<symbol id="wzi-pin" viewBox="0 0 24 24"><path d="M12 2c-4.1 0-7.4 3.3-7.4 7.4 0 5.6 7.4 12.6 7.4 12.6s7.4-7 7.4-12.6C19.4 5.3 16.1 2 12 2z" fill="currentColor"/><circle cx="12" cy="9.4" r="2.6" fill="var(--wzi-bg,#fff)"/></symbol>
+
+<symbol id="wzi-pushpin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 4h11l-3 4 3 4H6"/></g></symbol>
+
+<symbol id="wzi-home" viewBox="0 0 24 24"><path d="M4 11.5L12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h5v-5.5h2V20h5v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+
+<symbol id="wzi-close" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></g></symbol>
+
+<symbol id="wzi-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2.2 5.2-5.2 2.2 2.2-5.2z" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="var(--wzi-bg,#fff)"/></symbol>
+
+<symbol id="wzi-star-filled" viewBox="0 0 24 24"><path d="M12 3.5l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" fill="currentColor"/></symbol>
+
+<symbol id="wzi-star-outline" viewBox="0 0 24 24"><path d="M12 3.5l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+
+<symbol id="wzi-moon" viewBox="0 0 24 24"><path d="M18.5 15.2A8 8 0 1110.3 4.1a6.4 6.4 0 108.2 11.1z" fill="currentColor"/></symbol>
+
+<symbol id="wzi-sun" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><line x1="12" y1="1.8" x2="12" y2="4.2"/><line x1="12" y1="19.8" x2="12" y2="22.2"/><line x1="1.8" y1="12" x2="4.2" y2="12"/><line x1="19.8" y1="12" x2="22.2" y2="12"/><line x1="4.6" y1="4.6" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.4" y2="4.6"/></g></symbol>
+
+<symbol id="wzi-half-moon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 4a8 8 0 000 16z" fill="currentColor"/></symbol>
+
+<symbol id="wzi-lipstick" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 10l2.2-5.2a1 1 0 011.8 0L15 10" fill="currentColor" stroke="none"/><rect x="8.5" y="10" width="7" height="10" rx="1.2"/><line x1="8.5" y1="14" x2="15.5" y2="14"/></g></symbol>
+
+<symbol id="wzi-obst" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 7.5H15.3 M9.5 7.5V16.5 M9.5 12H14 M9.5 16.5H15.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+<symbol id="wzi-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 8.2h3.2L8.6 6h6.8l1.4 2.2H20v10.6H4z"/><circle cx="12" cy="13" r="3.3"/></g></symbol>
+
+<symbol id="wzi-shuffle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3.5L15 18h4"/><path d="M3 18h3.5l2.3-3.2"/><path d="M11.4 8.6L15 6h4"/><polyline points="16.5 4 19 6 16.5 8"/><polyline points="16.5 16 19 18 16.5 20"/></g></symbol>
+
+<symbol id="wzi-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.2"/><line x1="15.2" y1="15.2" x2="20.5" y2="20.5"/></g></symbol>
+
+<symbol id="wzi-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="currentColor"/></symbol>
+
+<symbol id="wzi-tree" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="9.5" r="6"/><rect x="10.7" y="14" width="2.6" height="7" rx="1"/></g></symbol>
+
+<symbol id="wzi-forest" viewBox="0 0 24 24"><g fill="currentColor"><path d="M7 3l4 7H3z"/><path d="M7 8l4 7H3z"/><path d="M15.5 6l4 6.5h-8z"/><rect x="6" y="14" width="2" height="7" rx="0.8"/><rect x="14.5" y="12" width="2" height="9" rx="0.8"/></g></symbol>
+
+<symbol id="wzi-orchard" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M12 9c-3-1-5-3-5.5-6C10 3 12.3 5 12 9z"/><path d="M12 9c3-1 5-3 5.5-6C14 3 11.7 5 12 9z"/><path d="M8.5 14c-1.5 0-3 1.2-3 3M15.5 17c1.5 0 3-1.2 3-3"/></g></symbol>
+
+<symbol id="wzi-arrow-up" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></g></symbol>
+
+<symbol id="wzi-arrow-down" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></g></symbol>
+
+<symbol id="wzi-arrow-left" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></g></symbol>
+
+<symbol id="wzi-arrow-right" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></g></symbol>
+
+<symbol id="wzi-arrow-up-right" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></g></symbol>
+
+<symbol id="wzi-heart-filled" viewBox="0 0 24 24"><path d="M12 20.2S3.5 15 3.5 9.1C3.5 6.3 5.7 4 8.5 4c1.6 0 3 .8 3.5 2 .5-1.2 1.9-2 3.5-2 2.8 0 5 2.3 5 5.1 0 5.9-8.5 11.1-8.5 11.1z" fill="currentColor"/></symbol>
+
+<symbol id="wzi-heart-outline" viewBox="0 0 24 24"><path d="M12 20.2S3.5 15 3.5 9.1C3.5 6.3 5.7 4 8.5 4c1.6 0 3 .8 3.5 2 .5-1.2 1.9-2 3.5-2 2.8 0 5 2.3 5 5.1 0 5.9-8.5 11.1-8.5 11.1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+
+<symbol id="wzi-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5L21.5 20h-19z"/><line x1="12" y1="9.2" x2="12" y2="14.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-undo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8v5h5"/><path d="M6.3 15.5A7.5 7.5 0 1013 4.5"/></g></symbol>
+
+<symbol id="wzi-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.6 3.6 0 015 5L15.9 11.5"/><path d="M13 17.5l-1.2 1.2a3.6 3.6 0 01-5-5L8.1 12.5"/></g></symbol>
+
+<symbol id="wzi-basket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-1.8 9.2a1.5 1.5 0 01-1.5 1.3H7.3a1.5 1.5 0 01-1.5-1.3z"/><path d="M8 10l1.5-4.5M16 10l-1.5-4.5M4 10l-1.3-1.6M20 10l1.3-1.6"/></g></symbol>
+
+<symbol id="wzi-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 1112 0v5l1.5 2.3H4.5z"/><path d="M10 20a2 2 0 004 0"/></g></symbol>
+
+<symbol id="wzi-briefcase" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="11" rx="1.6"/><path d="M9 7.5V6a2 2 0 012-2h2a2 2 0 012 2v1.5"/><line x1="3.5" y1="12.5" x2="20.5" y2="12.5"/></g></symbol>
+
+<symbol id="wzi-bus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="12" rx="2"/><line x1="3.5" y1="10.5" x2="20.5" y2="10.5"/><circle cx="7.5" cy="19.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="16.5" cy="19.5" r="1.4" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-target" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-signal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="19" r="1.3" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 017 0"/><path d="M5.5 12.5a9.5 9.5 0 0113 0"/><path d="M2.5 9.5a14 14 0 0119 0"/></g></symbol>
+
+<symbol id="wzi-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.2-4-1.7-8-1.7v13c4 0 6.4.5 8 1.7 1.6-1.2 4-1.7 8-1.7v-13c-4 0-6.4.5-8 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></g></symbol>
+
+<symbol id="wzi-bulb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6"/><path d="M12 3.5a5.8 5.8 0 00-3.3 10.6c.6.5 1 1.1 1 1.9h4.6c0-.8.4-1.4 1-1.9A5.8 5.8 0 0012 3.5z"/><line x1="10" y1="20" x2="14" y2="20"/></g></symbol>
+
+<symbol id="wzi-planet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="3.4" transform="rotate(-18 12 12)"/></g></symbol>
+
+<symbol id="wzi-viewpoint" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="6.5" r="2.2"/><path d="M2.5 19l6-9 4 5.5 2-2.5 6.5 6z"/></g></symbol>
+
+<symbol id="wzi-beach" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3-8 15-8 18 0"/><path d="M12 21V9"/><path d="M12 9c4 0 7 2.2 7 2.2S16 4 12 4 5 11.2 5 11.2 8 9 12 9z"/><path d="M3 17.5h18"/></g></symbol>
+
+<symbol id="wzi-coffee" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9h12v5.5a4 4 0 01-4 4h-4a4 4 0 01-4-4z"/><path d="M16.5 10.2h1.4a2.3 2.3 0 010 4.6h-1.4"/><path d="M7.5 6c0-1 .8-1 .8-2M11.5 6c0-1 .8-1 .8-2" /></g></symbol>
+
+<symbol id="wzi-icecream" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10a5 5 0 0110 0z" fill="currentColor" stroke="none"/><path d="M7.5 10h9L12 21z"/></g></symbol>
+
+<symbol id="wzi-restaurant" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 002 2 2 2 0 002-2V3M8 3v18M8 13V3"/><path d="M17 3c-1.7 0-3 2-3 5s1.1 4.6 2.2 5.1L16 21"/></g></symbol>
+
+<symbol id="wzi-bakery" viewBox="0 0 24 24"><path d="M3.5 12c1-4 4.5-8 9-8 3.5 0 6 2.4 6 5.5 0 5-6 9-11.5 9-2 0-3.5-1-3.5-2.8 0-1.2.7-2.1 2-3.2-1.4-.2-2.4-.7-2-.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+
+<symbol id="wzi-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2L8 15h9l2.5-7.5H6.4"/><circle cx="9.5" cy="19.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="19.5" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-pill" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="9.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 13)"/><line x1="10.5" y1="7.3" x2="13.5" y2="18.7" transform="rotate(-35 12 13)"/></g></symbol>
+
+<symbol id="wzi-bank" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 4l9 5.5"/><line x1="4.5" y1="9.5" x2="19.5" y2="9.5"/><line x1="5.5" y1="9.5" x2="5.5" y2="18"/><line x1="9.5" y1="9.5" x2="9.5" y2="18"/><line x1="14.5" y1="9.5" x2="14.5" y2="18"/><line x1="18.5" y1="9.5" x2="18.5" y2="18"/><line x1="3.5" y1="20" x2="20.5" y2="20"/></g></symbol>
+
+<symbol id="wzi-flower" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="7.2" r="2.1"/><circle cx="16.8" cy="12" r="2.1"/><circle cx="12" cy="16.8" r="2.1"/><circle cx="7.2" cy="12" r="2.1"/><circle cx="12" cy="12" r="2.2" fill="var(--wzi-bg,#fff)" stroke="currentColor" stroke-width="1.2"/></g><line x1="12" y1="16.8" x2="12" y2="21.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+
+<symbol id="wzi-fuel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="9" height="16" rx="1.2"/><line x1="4" y1="9" x2="13" y2="9"/><path d="M13 9.5h2.5L18 12v6a1.3 1.3 0 002.6 0v-4.3L18 10.5"/></g></symbol>
+
+<symbol id="wzi-train" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="4" width="13" height="13" rx="4"/><line x1="5.5" y1="11" x2="18.5" y2="11"/><circle cx="9" cy="14" r="0.9" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="0.9" fill="currentColor" stroke="none"/><path d="M8.5 17l-2.5 3.5M15.5 17l2.5 3.5"/></g></symbol>
+
+<symbol id="wzi-bus-stop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="21" x2="7" y2="4"/><rect x="7" y="4" width="11" height="7" rx="1"/></g></symbol>
+
+<symbol id="wzi-hospital" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="1.6"/><line x1="12" y1="9" x2="12" y2="15" stroke-linecap="round"/><line x1="9" y1="12" x2="15" y2="12" stroke-linecap="round"/></g></symbol>
+
+<symbol id="wzi-ferris-wheel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="11" r="7.5"/><circle cx="12" cy="11" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="3.5" x2="12" y2="18.5"/><line x1="4.5" y1="11" x2="19.5" y2="11"/><line x1="6.7" y1="5.7" x2="17.3" y2="16.3"/><line x1="17.3" y1="5.7" x2="6.7" y2="16.3"/><line x1="9" y1="18.5" x2="9" y2="21"/><line x1="15" y1="18.5" x2="15" y2="21"/></g></symbol>
+
+<symbol id="wzi-church" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2.5" x2="12" y2="7"/><line x1="10" y1="4.5" x2="14" y2="4.5"/><path d="M6 21V12L12 7l6 5v9z"/><line x1="9.5" y1="21" x2="9.5" y2="16" /><line x1="14.5" y1="21" x2="14.5" y2="16"/><line x1="6" y1="21" x2="18" y2="21"/></g></symbol>
+
+<symbol id="wzi-masks" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5c2.5-1.5 6-1.5 7 1s-1 5-3.5 6-5-1-5-3.5c0-1.2.5-2.5 1.5-3.5z"/><circle cx="6" cy="9.5" r="0.6" fill="currentColor"/><path d="M13.5 8.5c-1-2.5 2.5-2.5 5-1s3 4.5 1.5 6.5-5.5 1.5-6.5-1-1-3.3 0-4.5z"/><circle cx="17.5" cy="10" r="0.6" fill="currentColor"/></g></symbol>
+
+<symbol id="wzi-museum" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9L12 4l9 5"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="5.5" y1="9" x2="5.5" y2="18"/><line x1="9.5" y1="9" x2="9.5" y2="18"/><line x1="14.5" y1="9" x2="14.5" y2="18"/><line x1="18.5" y1="9" x2="18.5" y2="18"/><line x1="3" y1="20.5" x2="21" y2="20.5"/></g></symbol>
+
+<symbol id="wzi-zoo" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="14.5" r="4.2"/><circle cx="6.3" cy="9" r="2"/><circle cx="17.7" cy="9" r="2"/><circle cx="8.5" cy="6.2" r="1.6"/><circle cx="15.5" cy="6.2" r="1.6"/></g></symbol>
+
+<symbol id="wzi-coaster" viewBox="0 0 24 24"><path d="M2.5 18c2-1 3-4 1.5-6-2-2.5.5-5.5 3-3.5-1.5-2.5 2-5 3.5-2 1-3 4.5-2.5 4.5.5 2-1.5 4.5.5 3 3-1 2 .5 4.5 3 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+
+<symbol id="wzi-hotel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V6"/><path d="M3 14h18v6"/><path d="M3 14v-2.5a2 2 0 012-2h4a2 2 0 012 2V14"/><circle cx="7" cy="9" r="1.1" fill="currentColor" stroke="none"/><line x1="13" y1="9" x2="21" y2="9"/></g></symbol>
+
+<symbol id="wzi-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4z"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="20"/></g></symbol>
+
+<symbol id="wzi-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 12.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5L17.5 7"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></g></symbol>
+
+<symbol id="wzi-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><path d="M5 6.5c1.8 1.2 4.3 2 7 2s5.2-.8 7-2M5 17.5c1.8-1.2 4.3-2 7-2s5.2.8 7 2"/></g></symbol>
+
+<symbol id="wzi-volume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z" fill="currentColor" stroke="none"/><path d="M15.5 9a4 4 0 010 6"/><path d="M18 6.5a8 8 0 010 11"/></g></symbol>
+
+<symbol id="wzi-mute" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z" fill="currentColor" stroke="none"/><line x1="16" y1="9.5" x2="21" y2="14.5"/><line x1="21" y1="9.5" x2="16" y2="14.5"/></g></symbol>
+
+<symbol id="wzi-traffic-light" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="2.5" width="8" height="19" rx="3"/><circle cx="12" cy="7.2" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" opacity="0.45"/><circle cx="12" cy="16.8" r="1.5" fill="currentColor" stroke="none" opacity="0.45"/></g></symbol>
+
+<symbol id="wzi-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-wheelchair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="1.6" fill="currentColor" stroke="none"/><path d="M12 7v6l5 2.5M12 13H7.5"/><path d="M10.5 13l-1 3.5a4 4 0 108 1.2"/></g></symbol>
+
+<symbol id="wzi-cloud-rain" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 15a4 4 0 01.5-8 5.5 5.5 0 0110.6 1.6A3.5 3.5 0 0118 15z"/><line x1="9" y1="18" x2="8" y2="21"/><line x1="13" y1="18" x2="12" y2="21"/><line x1="17" y1="18" x2="16" y2="21"/></g></symbol>
+
+<symbol id="wzi-note" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5L9 20l-5.5 1L4.5 15.5z"/><line x1="13" y1="6" x2="18" y2="11"/></g></symbol>
+
+<symbol id="wzi-printer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8.5V4h10v4.5"/><rect x="4" y="8.5" width="16" height="7.5" rx="1.5"/><path d="M7 15v5h10v-5"/><line x1="7" y1="12" x2="10" y2="12"/></g></symbol>
+
+<symbol id="wzi-expand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></g></symbol>
+
+<symbol id="wzi-document" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h8l3 3v14h-11z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15.5" x2="15" y2="15.5"/><line x1="9" y1="8.5" x2="12" y2="8.5"/></g></symbol>
+
+<symbol id="wzi-chart" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="7" y1="17" x2="7" y2="12"/><line x1="12" y1="17" x2="12" y2="7"/><line x1="17" y1="17" x2="17" y2="10"/></g></symbol>
+
+<symbol id="wzi-jar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="7" y="3" width="10" height="3.5" rx="1"/><path d="M6.5 6.5h11l1 4v9a2 2 0 01-2 2h-9a2 2 0 01-2-2v-9z"/></g></symbol>
+
+<symbol id="wzi-wind" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 8h11.5a2.5 2.5 0 10-2.4-3.2"/><path d="M3 13h14.5a2.8 2.8 0 11-2.7 3.6"/><path d="M3 18h8.5a2 2 0 11-1.9-2.6"/></g></symbol>
+
+<symbol id="wzi-check" viewBox="0 0 24 24"><polyline points="4.5 12.5 9.5 17.5 19.5 6.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+<symbol id="wzi-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11v1a6 6 0 0012 0v-1"/><line x1="12" y1="18" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></g></symbol>
+
+<symbol id="wzi-thermometer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14.5V5a2 2 0 00-4 0v9.5a4 4 0 104 0z"/><circle cx="10" cy="17" r="1.4" fill="currentColor"/></g></symbol>
+
+<symbol id="wzi-thought" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><ellipse cx="12.5" cy="9.5" rx="7.5" ry="5.5"/><circle cx="6" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="9.5" cy="20" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="12" x2="12" y2="7"/><line x1="12" y1="12" x2="15.5" y2="14"/></g></symbol>
+
+<symbol id="wzi-scroll" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5h12v13a2.5 2.5 0 01-2.5 2.5H8.5A2.5 2.5 0 016 17.5z"/><path d="M6 8h12M6 8a2 2 0 00-2 2v7a2.5 2.5 0 002.5 2.5"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></g></symbol>
+
+<symbol id="wzi-walk" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="13.5" cy="4" r="1.8"/><path d="M12.7 8l-3.2 1 .5 4.3-3 5.6 1.7 1 2.9-5.4 1.9 1.6L11.8 21h2l1.5-5.6L13 12l.4-3 1.6 2.3 3.8.9.4-1.9-2.7-.7-2-3.3z"/></g></symbol>
+
+<symbol id="wzi-parking" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M9.5 17V7h3.2a3 3 0 010 6H9.5" stroke-linecap="round"/></g></symbol>
+
+<symbol id="wzi-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/></g></symbol>
+
+<symbol id="wzi-hourglass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12M6 20.5h12"/><path d="M7 3.5v3.2c0 2 1.7 3.4 3.6 4.5.5.3.5 1 0 1.3-1.9 1.1-3.6 2.5-3.6 4.5v3.5M17 3.5v3.2c0 2-1.7 3.4-3.6 4.5-.5.3-.5 1 0 1.3 1.9 1.1 3.6 2.5 3.6 4.5v3.5"/></g></symbol>
+
+<symbol id="wzi-chevron" viewBox="0 0 24 24"><polyline points="7 5 15 12 7 19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+</defs>
+</svg>
+<a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<div class="app safe-top safe-bottom">
+  <header class="wz-hero">
+    <div class="logo-badge"><img class="wz-logo-light" src="./lw-icon-512.png" alt="LautstärkeWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>LautstärkeWahr</h1>
+    <p>Wie laut ist es wirklich? 100% lokal, keine Datensammlung.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="messen">Messen</button>
+    <button class="tab" data-tab="verlauf">Verlauf</button>
+    <button class="tab" data-tab="info">Info</button>
+  </div>
+
+  <!-- ===== MESSEN ===== -->
+  <section class="screen active" id="screen-messen">
+
+    <div class="card" id="startCard">
+      <h2>Lautstärke messen</h2>
+      <p class="muted">Der Browser fragt nach Mikrofon-Zugriff. Das Tonsignal wird nur live analysiert, nie aufgenommen oder gespeichert.</p>
+      <div style="height:12px"></div>
+      <button class="cta" id="startBtn"><svg class="wzi" aria-hidden="true"><use href="#wzi-mic"></use></svg> Messung starten</button>
+
+      <div class="alarm-cfg">
+        <div>
+          <div class="label"><svg class="wzi" aria-hidden="true"><use href="#wzi-bell"></use></svg> Schwellenwert-Alarm</div>
+          <button class="edit-thr" id="editThresholdBtn">Warnt ab <span id="thresholdLabel">85</span> dB · ändern</button>
+        </div>
+        <div class="switch" id="alarmSwitch"></div>
+      </div>
+    </div>
+
+    <div class="card" id="liveCard" style="display:none">
+      <div class="gauge-wrap">
+        <div class="gauge-aspect">
+        <svg class="gauge-svg" viewBox="0 0 300 185" id="gaugeSvg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path id="zoneGreen" fill="none" stroke="#34C759" stroke-width="14"/>
+          <path id="zoneYellow" fill="none" stroke="#FFCC02" stroke-width="14"/>
+          <path id="zoneRed" fill="none" stroke="#FF3B30" stroke-width="14"/>
+          <circle id="capStart" r="7" fill="#34C759"/>
+          <circle id="capEnd" r="7" fill="#FF3B30"/>
+          <text id="tick0" class="gauge-tick" text-anchor="middle"></text>
+          <text id="tick60" class="gauge-tick" text-anchor="middle"></text>
+          <text id="tick85" class="gauge-tick" text-anchor="middle"></text>
+          <text id="tick120" class="gauge-tick" text-anchor="middle"></text>
+          <polygon id="peakMarker" class="gauge-peak" points="0,0 0,0 0,0" opacity="0"></polygon>
+          <circle id="handleShadow" class="gauge-handle-shadow" r="11.5"></circle>
+          <circle id="handleDot" class="gauge-handle-dot" r="10.5" stroke="#34C759"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="db-number" id="dbNumber">–</div>
+          <div class="db-unit">dB (geschätzt)</div>
+          <div class="ampel-pill green" id="ampelPill"><span class="ampel-dot"></span><span id="ampelLabel">Leise</span></div>
+        </div>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+      <canvas id="graph" width="600" height="190"></canvas>
+
+      <div class="stat-row">
+        <div class="stat"><b id="peakVal">–</b><span>Spitze</span></div>
+        <div class="stat"><b id="avgVal">–</b><span>Ø Schnitt</span></div>
+        <div class="stat"><b id="durVal">0:00</b><span>Dauer</span></div>
+      </div>
+
+      <div class="alarm-banner" id="alarmBanner"><svg class="wzi" aria-hidden="true"><use href="#wzi-bell"></use></svg> Schwellenwert überschritten!</div>
+      <div class="exposure-banner" id="exposureBanner"><svg class="wzi wzi-red" aria-hidden="true"><use href="#wzi-dot"></use></svg> Du bist schon eine Weile lauten Pegeln ausgesetzt. In dauerhaft lauten Umgebungen (&gt; 85 dB) ist Gehörschutz sinnvoll. Kein medizinischer Rat.</div>
+
+      <div class="btn-row">
+        <button class="cta secondary" id="resetPeakBtn">Spitze zurücksetzen</button>
+        <button class="cta danger" id="stopBtn">Stopp</button>
+      </div>
+    </div>
+
+    <div class="card" id="saveCard" style="display:none">
+      <h2>Sitzung speichern</h2>
+      <p class="muted" id="saveSummary">–</p>
+      <div style="height:10px"></div>
+      <select id="tagSelect" class="select-field">
+        <option value="home"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg> Zuhause</option>
+        <option value="office"><svg class="wzi" aria-hidden="true"><use href="#wzi-briefcase"></use></svg> Büro</option>
+        <option value="outside"><svg class="wzi" aria-hidden="true"><use href="#wzi-tree"></use></svg> Draußen</option>
+        <option value="transit"><svg class="wzi" aria-hidden="true"><use href="#wzi-bus"></use></svg> Verkehrsmittel</option>
+        <option value="other"><svg class="wzi" aria-hidden="true"><use href="#wzi-pin"></use></svg> Sonstiges</option>
+      </select>
+      <div style="height:8px"></div>
+      <input type="text" id="noteInput" placeholder="Notiz (optional), z. B. „Klassenzimmer“" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13.5px;font-family:inherit;box-sizing:border-box">
+      <div class="btn-row">
+        <button class="cta secondary" id="discardBtn">Verwerfen</button>
+        <button class="cta" id="saveSessionBtn">In Verlauf speichern</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VERLAUF ===== -->
+  <section class="screen" id="screen-verlauf">
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <div class="label">Verlauf dauerhaft speichern</div>
+          <div class="desc">Standard: aus. Nur lokal auf diesem Gerät (localStorage).</div>
+        </div>
+        <div class="switch" id="persistSwitch"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Wochen-Statistik</h2>
+      <div id="weekStatsBody"><p class="muted">Noch keine gespeicherten Sitzungen.</p></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+        <h2 style="margin:0">Gespeicherte Sitzungen</h2>
+        <button class="icon-btn" id="clearAllBtn">Alle löschen</button>
+      </div>
+      <div class="chip-row" id="filterRow">
+        <button class="chip active" data-filter="all">Alle</button>
+        <button class="chip" data-filter="home"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg> Zuhause</button>
+        <button class="chip" data-filter="office"><svg class="wzi" aria-hidden="true"><use href="#wzi-briefcase"></use></svg> Büro</button>
+        <button class="chip" data-filter="outside"><svg class="wzi" aria-hidden="true"><use href="#wzi-tree"></use></svg> Draußen</button>
+        <button class="chip" data-filter="transit"><svg class="wzi" aria-hidden="true"><use href="#wzi-bus"></use></svg> Verkehr</button>
+        <button class="chip" data-filter="other"><svg class="wzi" aria-hidden="true"><use href="#wzi-pin"></use></svg> Sonstiges</button>
+        <button class="chip" data-filter="fav"><svg class="wzi" aria-hidden="true"><use href="#wzi-star-filled"></use></svg> Favoriten</button>
+      </div>
+      <div id="historyList"><div class="empty-hint">Noch keine gespeicherten Sitzungen.<br>Starte eine Messung und speichere sie hier.</div></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="cta secondary" id="exportHistoryBtn"><svg class="wzi" aria-hidden="true"><use href="#wzi-arrow-up"></use></svg> Exportieren</button>
+        <button class="cta secondary" id="importHistoryBtn"><svg class="wzi" aria-hidden="true"><use href="#wzi-arrow-down"></use></svg> Importieren</button>
+      </div>
+      <input type="file" id="importHistoryFile" accept="application/json,.json" style="display:none">
+      <p class="muted" style="margin-top:8px">Sichert deinen Verlauf als Datei (z. B. für ein neues Smartphone) – bleibt dabei komplett auf deinem Gerät bzw. in deiner eigenen Ablage.</p>
+    </div>
+  </section>
+
+  <!-- ===== INFO ===== -->
+  <section class="screen" id="screen-info">
+    <div class="card">
+      <h2>Die Ampel-Erklärung</h2>
+      <div class="onb-ampel-row"><span class="ampel-pill green"><span class="ampel-dot"></span></span>&nbsp;<b>Leise</b> (&lt; 60 dB) – unbedenklich, normales Sprechen, ruhige Umgebung</div>
+      <div class="onb-ampel-row"><span class="ampel-pill yellow"><span class="ampel-dot"></span></span>&nbsp;<b>Moderat</b> (60–85 dB) – auf Dauer anstrengend, z. B. Straßenverkehr</div>
+      <div class="onb-ampel-row"><span class="ampel-pill red"><span class="ampel-dot"></span></span>&nbsp;<b>Laut</b> (&gt; 85 dB) – bei längerer Dauer ist Gehörschutz sinnvoll</div>
+    </div>
+
+    <div class="card">
+      <h2>Typische Lautstärken zur Orientierung</h2>
+      <div class="scale-row"><span>Blätterrauschen, Flüstern</span><span class="db">~20–30 dB</span></div>
+      <div class="scale-row"><span>Ruhiges Zimmer</span><span class="db">~35–40 dB</span></div>
+      <div class="scale-row"><span>Normales Gespräch</span><span class="db">~55–65 dB</span></div>
+      <div class="scale-row"><span>Straßenverkehr</span><span class="db">~70–85 dB</span></div>
+      <div class="scale-row"><span>Konzert, Club</span><span class="db">~95–110 dB</span></div>
+      <div class="scale-row"><span>Presslufthammer</span><span class="db">~100–115 dB</span></div>
+      <p class="muted" style="margin-top:10px">Gerundete, allgemein bekannte Richtwerte zur groben Orientierung – keine wissenschaftliche Messreihe.</p>
+    </div>
+
+    <div class="card">
+      <h2>Genauigkeit</h2>
+      <p class="muted">Die App misst nicht kalibriert – Mikrofon, Gerät und Betriebssystem beeinflussen das Ergebnis. Die Werte sind eine Orientierung, kein Ersatz für ein geeichtes Schallpegelmessgerät und keine medizinische Beratung.</p>
+    </div>
+
+    <div class="card">
+      <h2>Über diese App</h2>
+      <p class="muted">Teil der WahrZentrale</p>
+      <div style="height:10px"></div>
+      <button class="cta secondary" id="showOnboardingBtn">Einführung erneut anzeigen</button>
+    </div>
+  </section>
+
+  <footer class="wz-footer">
+    <button type="button" onclick="LW.showOnboarding()">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#lw">Datenschutz</a>
+  </footer>
+</div>
+
+<script src="./wz-onboarding.js"></script>
+<script>function wzIcon(id,cls){return '<svg class="wzi'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#wzi-'+id+'"></use></svg>';}</script>
+<script>
+(function(){
+
+  // ---------- Tabs ----------
+  var tabs=document.querySelectorAll(".tab");
+  var screens={
+    messen: document.getElementById("screen-messen"),
+    verlauf: document.getElementById("screen-verlauf"),
+    info: document.getElementById("screen-info")
+  };
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active")});
+      t.classList.add("active");
+      Object.keys(screens).forEach(function(k){screens[k].classList.remove("active")});
+      screens[t.dataset.tab].classList.add("active");
+      if(t.dataset.tab==="verlauf") renderHistory();
+    });
+  });
+
+  // ---------- Ampel helper ----------
+  function ampelFor(db){
+    if(db < 60) return {cls:"green", label:"Leise"};
+    if(db <= 85) return {cls:"yellow", label:"Moderat"};
+    return {cls:"red", label:"Laut"};
+  }
+  function colorFor(cls){
+    return cls==="green" ? "var(--green)" : cls==="yellow" ? "var(--yellow)" : "var(--red)";
+  }
+
+  // ---------- Audio measurement ----------
+  var audioCtx=null, analyser=null, micStream=null, rafId=null;
+  var running=false;
+  var startTime=0;
+  var peakDb=0, sumDb=0, countDb=0;
+  var loudSeconds=0, lastLoudTick=0;
+  var history60=[]; // {t, db} rolling ~60s
+  var dataArray=null;
+
+  // Beruhigte Anzeige (Zeiger/Zahl/Graph): schneller Anstieg, sanftes Absinken,
+  // reduzierte Update-Frequenz für Zahl und Graph-Abtastung
+  var displayDb=0;
+  var GAUGE_ATTACK=0.35, GAUGE_RELEASE=0.06;
+  var NUMBER_UPDATE_MS=220, lastNumberUpdate=0, lastShownNumber=null;
+  var GRAPH_SAMPLE_MS=180, lastGraphSample=0;
+
+  // ---------- Schwellenwert-Alarm ----------
+  var LS_ALARM_ON = "lw_alarm_on";
+  var LS_ALARM_DB = "lw_alarm_threshold";
+  var wasOverAlarm = false, lastBeepTime = 0;
+  function isAlarmOn(){ try{ return localStorage.getItem(LS_ALARM_ON)==="1"; }catch(e){ return false; } }
+  function setAlarmOn(on){ try{ localStorage.setItem(LS_ALARM_ON, on?"1":"0"); }catch(e){} }
+  function getAlarmThreshold(){
+    var v = 85;
+    try{ var raw = localStorage.getItem(LS_ALARM_DB); if(raw) v = parseInt(raw,10); }catch(e){}
+    if(isNaN(v) || v<30 || v>130) v = 85;
+    return v;
+  }
+  function setAlarmThreshold(v){ try{ localStorage.setItem(LS_ALARM_DB, String(v)); }catch(e){} }
+
+  function playBeep(){
+    if(!audioCtx) return;
+    try{
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 880;
+      gain.gain.value = 0.06;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.16);
+    }catch(e){}
+  }
+
+  // ---------- Orts-Tags ----------
+  var TAG_LABELS = {home:wzIcon("home")+" Zuhause", office:wzIcon("briefcase")+" Büro", outside:wzIcon("tree")+" Draußen", transit:wzIcon("bus")+" Verkehrsmittel", other:wzIcon("pin")+" Sonstiges"};
+  var currentFilter = "all";
+
+  var dbNumber=document.getElementById("dbNumber");
+  var ampelPill=document.getElementById("ampelPill");
+  var ampelLabel=document.getElementById("ampelLabel");
+  var peakVal=document.getElementById("peakVal");
+  var avgVal=document.getElementById("avgVal");
+  var durVal=document.getElementById("durVal");
+  var exposureBanner=document.getElementById("exposureBanner");
+  var alarmBanner=document.getElementById("alarmBanner");
+  var canvas=document.getElementById("graph");
+  var ctx=canvas.getContext("2d");
+
+  // ---------- Gauge (Halbkreis-Anzeige mit Marker-Punkt, Vorschlag B) ----------
+  var GAUGE_MAX = 120;
+  var GAUGE_CX = 150, GAUGE_CY = 160, GAUGE_R = 116, GAUGE_T = 14;
+  var GAUGE_RMID = GAUGE_R - GAUGE_T/2;
+  var GAUGE_HEX = {green:"#34C759", yellow:"#FFCC02", red:"#FF3B30"};
+
+  function gaugePoint(r, db){
+    var angle = (180 + Math.min(1, Math.max(0, db/GAUGE_MAX)) * 180) * Math.PI/180;
+    return { x: GAUGE_CX + r*Math.cos(angle), y: GAUGE_CY + r*Math.sin(angle) };
+  }
+  function gaugeArcPath(r, v0, v1){
+    var p0 = gaugePoint(r, v0), p1 = gaugePoint(r, v1);
+    return "M "+p0.x.toFixed(2)+" "+p0.y.toFixed(2)+" A "+r+" "+r+" 0 0 1 "+p1.x.toFixed(2)+" "+p1.y.toFixed(2);
+  }
+  function initGauge(){
+    document.getElementById("zoneGreen").setAttribute("d", gaugeArcPath(GAUGE_RMID, 0, 60));
+    document.getElementById("zoneYellow").setAttribute("d", gaugeArcPath(GAUGE_RMID, 60, 85));
+    document.getElementById("zoneRed").setAttribute("d", gaugeArcPath(GAUGE_RMID, 85, GAUGE_MAX));
+    var capA = gaugePoint(GAUGE_RMID, 0), capB = gaugePoint(GAUGE_RMID, GAUGE_MAX);
+    var capStart = document.getElementById("capStart"), capEnd = document.getElementById("capEnd");
+    capStart.setAttribute("cx", capA.x); capStart.setAttribute("cy", capA.y);
+    capEnd.setAttribute("cx", capB.x); capEnd.setAttribute("cy", capB.y);
+    [[ "tick0",0,16 ], ["tick60",60,-16], ["tick85",85,-16], ["tick120",120,16]].forEach(function(t){
+      var p = gaugePoint(GAUGE_R + 20, t[1]);
+      var el = document.getElementById(t[0]);
+      el.setAttribute("x", p.x); el.setAttribute("y", p.y + (t[1]===60||t[1]===85 ? -2 : 4));
+      el.textContent = t[1];
+    });
+  }
+  function updateGauge(db, peak){
+    var a = ampelFor(db);
+    var hp = gaugePoint(GAUGE_RMID, db);
+    var dot = document.getElementById("handleDot");
+    var shadow = document.getElementById("handleShadow");
+    dot.setAttribute("cx", hp.x); dot.setAttribute("cy", hp.y);
+    dot.setAttribute("stroke", GAUGE_HEX[a.cls]);
+    shadow.setAttribute("cx", hp.x); shadow.setAttribute("cy", hp.y+2.5);
+
+    if(peak > 0.5){
+      var tip = gaugePoint(GAUGE_R + 1, peak);
+      var o1 = gaugePoint(GAUGE_R + 13, Math.max(0, peak-2));
+      var o2 = gaugePoint(GAUGE_R + 13, Math.min(GAUGE_MAX, peak+2));
+      var poly = document.getElementById("peakMarker");
+      poly.setAttribute("points", tip.x+","+tip.y+" "+o1.x+","+o1.y+" "+o2.x+","+o2.y);
+      poly.setAttribute("opacity", "1");
+    }
+  }
+  initGauge();
+
+  var alarmSwitch=document.getElementById("alarmSwitch");
+  var thresholdLabel=document.getElementById("thresholdLabel");
+  function refreshAlarmUI(){
+    alarmSwitch.classList.toggle("on", isAlarmOn());
+    thresholdLabel.textContent = getAlarmThreshold();
+  }
+  alarmSwitch.addEventListener("click", function(){
+    setAlarmOn(!isAlarmOn());
+    refreshAlarmUI();
+  });
+  document.getElementById("editThresholdBtn").addEventListener("click", function(){
+    var current = getAlarmThreshold();
+    var input = prompt("Ab welcher Lautstärke (in dB) soll gewarnt werden?", String(current));
+    if(input===null) return;
+    var v = parseInt(input,10);
+    if(isNaN(v) || v<30 || v>130){ alert("Bitte einen Wert zwischen 30 und 130 dB eingeben."); return; }
+    setAlarmThreshold(v);
+    refreshAlarmUI();
+  });
+  refreshAlarmUI();
+
+  function fmtDur(sec){
+    var m=Math.floor(sec/60), s=Math.floor(sec%60);
+    return m+":"+(s<10?"0":"")+s;
+  }
+
+  function rmsToDb(rms){
+    // Ausgleichswert nach Vergleichsmessung mit Referenz-Apps (Jan, 08/2026):
+    // LautstärkeWahr lag im Schnitt 11 dB darunter -> Basiswert von 100 auf 111 angehoben.
+    // Weiterhin eine grobe, unkalibrierte Schätzung (siehe Datenschutz/Info-Tab), aber jetzt
+    // näher an typischen Referenzwerten aus dem Alltag.
+    if(rms <= 0.00001) return 0;
+    var db = 20*Math.log10(rms) + 111;
+    if(db < 0) db = 0;
+    if(db > 130) db = 130;
+    return db;
+  }
+
+  async function startMeasuring(){
+    try{
+      micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    }catch(err){
+      alert("Kein Zugriff aufs Mikrofon möglich. Bitte die Berechtigung in den Browser-Einstellungen erlauben.");
+      return;
+    }
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    var source = audioCtx.createMediaStreamSource(micStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.3;
+    dataArray = new Float32Array(analyser.fftSize);
+    source.connect(analyser);
+
+    running = true;
+    startTime = performance.now();
+    peakDb = 0; sumDb = 0; countDb = 0; loudSeconds = 0; lastLoudTick = performance.now();
+    displayDb = 0; lastNumberUpdate = 0; lastShownNumber = null; lastGraphSample = 0;
+    history60 = [];
+    wasOverAlarm = false; lastBeepTime = 0;
+
+    document.getElementById("startCard").style.display="none";
+    document.getElementById("saveCard").style.display="none";
+    document.getElementById("liveCard").style.display="block";
+    exposureBanner.classList.remove("show");
+    alarmBanner.classList.remove("show");
+    document.getElementById("peakMarker").setAttribute("opacity","0");
+
+    tick();
+  }
+
+  function tick(){
+    if(!running) return;
+    analyser.getFloatTimeDomainData(dataArray);
+    var sum=0;
+    for(var i=0;i<dataArray.length;i++){ sum += dataArray[i]*dataArray[i]; }
+    var rms = Math.sqrt(sum/dataArray.length);
+    var db = rmsToDb(rms);
+    var now = performance.now();
+
+    // Beruhigte Anzeige: schnelles Ansteigen (Attack), sanftes Absinken (Release) -
+    // wie bei einem klassischen Pegelmesser. Spitzenwert/Alarm/Expositions-Logik
+    // bleiben unten bewusst auf dem ungeglätteten Rohwert, damit kurze Spitzen nicht
+    // "weggeglättet" werden.
+    var smoothing = db > displayDb ? GAUGE_ATTACK : GAUGE_RELEASE;
+    displayDb += (db - displayDb) * smoothing;
+
+    var a = ampelFor(displayDb);
+    ampelPill.className = "ampel-pill " + a.cls;
+    ampelLabel.textContent = a.label;
+    updateGauge(displayDb, peakDb);
+
+    if(now - lastNumberUpdate > NUMBER_UPDATE_MS){
+      var rounded = Math.round(displayDb);
+      if(rounded !== lastShownNumber){
+        dbNumber.textContent = rounded;
+        lastShownNumber = rounded;
+      }
+      lastNumberUpdate = now;
+    }
+
+    if(db > peakDb) peakDb = db;
+    sumDb += db; countDb++;
+
+    if(now - lastGraphSample > GRAPH_SAMPLE_MS){
+      history60.push({t:now, db:displayDb});
+      lastGraphSample = now;
+    }
+    while(history60.length && now - history60[0].t > 60000) history60.shift();
+
+    if(db > 85){
+      loudSeconds += (now - lastLoudTick)/1000;
+    }
+    lastLoudTick = now;
+    if(loudSeconds > 60) exposureBanner.classList.add("show");
+
+    if(isAlarmOn()){
+      var thr = getAlarmThreshold();
+      if(db > thr){
+        alarmBanner.innerHTML = wzIcon('bell') + " Schwellenwert überschritten: " + Math.round(db) + " dB (Warnung ab " + thr + " dB)";
+        alarmBanner.classList.add("show");
+        if(!wasOverAlarm || (now - lastBeepTime > 5000)){
+          playBeep();
+          if(navigator.vibrate) navigator.vibrate(200);
+          lastBeepTime = now;
+        }
+        wasOverAlarm = true;
+      } else {
+        alarmBanner.classList.remove("show");
+        wasOverAlarm = false;
+      }
+    } else {
+      alarmBanner.classList.remove("show");
+      wasOverAlarm = false;
+    }
+
+    peakVal.textContent = Math.round(peakDb);
+    avgVal.textContent = Math.round(sumDb/countDb);
+    durVal.textContent = fmtDur((now-startTime)/1000);
+
+    drawGraph();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function drawGraph(){
+    // Zeichenfläche in echter Bildschirmauflösung, damit Schrift und Linien scharf bleiben
+    var dpr = Math.min(3, window.devicePixelRatio || 1), cw = canvas.clientWidth || 300, chh = canvas.clientHeight || 190;
+    if(canvas.width !== Math.round(cw*dpr) || canvas.height !== Math.round(chh*dpr)){ canvas.width = Math.round(cw*dpr); canvas.height = Math.round(chh*dpr); }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    var w=cw, h=chh;
+    ctx.clearRect(0,0,w,h);
+    if(history60.length < 2) return;
+    var now = history60[history60.length-1].t;
+    var minT = now - 60000;
+
+    // Referenzlinien mit dB-Kennzahlen, damit erkennbar ist, in welchem
+    // Lautstärke-Bereich sich die Kurve bewegt (nicht nur die nackte Linie).
+    function yFor(db){ return h - Math.min(1, db/120)*h; }
+    var marks = [
+      {db:40, label:"40 dB · leise"},
+      {db:60, label:"60 dB"},
+      {db:85, label:"85 dB"},
+      {db:100, label:"100 dB · laut"}
+    ];
+    var labelCol = getComputedStyle(canvas).getPropertyValue("--sub-onbg").trim() || "#5B5470";
+    ctx.font = "600 11.5px -apple-system, system-ui, sans-serif";
+    ctx.textBaseline = "bottom";
+    marks.forEach(function(mark){
+      var y = yFor(mark.db);
+      ctx.strokeStyle = "rgba(128,128,128,0.32)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+      ctx.fillStyle = labelCol;
+      ctx.fillText(mark.label, 8, y - 3);
+    });
+
+    ctx.beginPath();
+    history60.forEach(function(p,i){
+      var x = w * (p.t - minT)/60000;
+      var y = yFor(p.db);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    var lastDb = history60[history60.length-1].db;
+    var a = ampelFor(lastDb);
+    ctx.strokeStyle = a.cls==="green" ? "#34C759" : a.cls==="yellow" ? "#FFCC02" : "#FF3B30";
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke();
+  }
+
+  function stopMeasuring(){
+    running = false;
+    if(rafId) cancelAnimationFrame(rafId);
+    if(micStream){ micStream.getTracks().forEach(function(t){t.stop()}); micStream=null; }
+    if(audioCtx){ audioCtx.close(); audioCtx=null; }
+
+    document.getElementById("liveCard").style.display="none";
+    var durSec = (performance.now()-startTime)/1000;
+    if(countDb > 0 && durSec > 1.5){
+      document.getElementById("saveSummary").textContent =
+        "Spitze " + Math.round(peakDb) + " dB · Ø " + Math.round(sumDb/countDb) + " dB · Dauer " + fmtDur(durSec);
+      document.getElementById("saveCard").style.display="block";
+      window._lwLastSession = {peak:Math.round(peakDb), avg:Math.round(sumDb/countDb), dur:Math.round(durSec)};
+    } else {
+      document.getElementById("startCard").style.display="block";
+    }
+  }
+
+  document.getElementById("startBtn").addEventListener("click", startMeasuring);
+  document.getElementById("stopBtn").addEventListener("click", stopMeasuring);
+  document.getElementById("resetPeakBtn").addEventListener("click", function(){
+    peakDb = 0; sumDb = 0; countDb = 0;
+    document.getElementById("peakMarker").setAttribute("opacity","0");
+  });
+  document.getElementById("discardBtn").addEventListener("click", function(){
+    document.getElementById("saveCard").style.display="none";
+    document.getElementById("noteInput").value="";
+    document.getElementById("startCard").style.display="block";
+  });
+  document.getElementById("saveSessionBtn").addEventListener("click", function(){
+    var note = document.getElementById("noteInput").value.trim();
+    var tag = document.getElementById("tagSelect").value;
+    var s = window._lwLastSession;
+    if(s){
+      addHistoryEntry(s.peak, s.avg, s.dur, note, tag);
+    }
+    document.getElementById("saveCard").style.display="none";
+    document.getElementById("noteInput").value="";
+    document.getElementById("startCard").style.display="block";
+  });
+
+  // ---------- History (opt-in localStorage) ----------
+  var LS_PERSIST = "lw_persist";
+  var LS_HISTORY = "lw_history";
+  var LS_ONBOARDED = "lw_onboarded";
+  var sessionHistory = []; // used when persist is off (memory only for this session)
+
+  function isPersist(){ try{ return localStorage.getItem(LS_PERSIST)==="1"; }catch(e){ return false; } }
+  function setPersist(on){ try{ localStorage.setItem(LS_PERSIST, on?"1":"0"); }catch(e){} }
+
+  function loadHistory(){
+    if(isPersist()){
+      try{
+        var raw = localStorage.getItem(LS_HISTORY);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){ return []; }
+    }
+    return sessionHistory;
+  }
+  function saveHistory(arr){
+    if(isPersist()){
+      try{ localStorage.setItem(LS_HISTORY, JSON.stringify(arr)); }catch(e){}
+    } else {
+      sessionHistory = arr;
+    }
+  }
+
+  function addHistoryEntry(peak, avg, dur, note, tag){
+    var arr = loadHistory();
+    arr.unshift({
+      id: Date.now()+"_"+Math.random().toString(36).slice(2,7),
+      ts: Date.now(),
+      peak: peak, avg: avg, dur: dur,
+      note: note || "",
+      tag: tag || "other",
+      fav: false
+    });
+    saveHistory(arr);
+  }
+
+  function deleteHistoryEntry(id){
+    var arr = loadHistory().filter(function(e){return e.id!==id});
+    saveHistory(arr);
+    renderHistory();
+  }
+  function toggleFav(id){
+    var arr = loadHistory();
+    arr.forEach(function(e){ if(e.id===id) e.fav=!e.fav; });
+    saveHistory(arr);
+    renderHistory();
+  }
+
+  function fmtWhen(ts){
+    var d = new Date(ts);
+    return d.toLocaleDateString("de-DE") + " · " + d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  }
+  function escapeHtml(s){
+    return String(s)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#39;");
+  }
+
+  function renderHistory(){
+    var list = document.getElementById("historyList");
+    var full = loadHistory();
+    renderWeekStats(full);
+
+    var arr = full;
+    if(currentFilter==="fav"){ arr = full.filter(function(e){return e.fav}); }
+    else if(currentFilter!=="all"){ arr = full.filter(function(e){return (e.tag||"other")===currentFilter}); }
+
+    if(full.length===0){
+      list.innerHTML = '<div class="empty-hint">Noch keine gespeicherten Sitzungen.<br>Starte eine Messung und speichere sie hier.</div>';
+      return;
+    }
+    if(arr.length===0){
+      list.innerHTML = '<div class="empty-hint">Keine Sitzungen für diesen Filter.</div>';
+      return;
+    }
+    list.innerHTML = "";
+    arr.forEach(function(e){
+      var a = ampelFor(e.peak);
+      var tagLabel = TAG_LABELS[e.tag] || TAG_LABELS.other;
+      var div = document.createElement("div");
+      div.className = "history-item";
+      div.innerHTML =
+        '<div class="row1"><span class="when">'+fmtWhen(e.ts)+'</span>'+
+        '<button class="icon-btn star'+(e.fav?" active":"")+'" data-id="'+e.id+'">'+(e.fav?wzIcon("star-filled"):wzIcon("star-outline"))+'</button></div>'+
+        '<div class="vals"><span class="ampel-pill '+a.cls+'"><span class="ampel-dot"></span></span>&nbsp; Spitze '+e.peak+' dB · Ø '+e.avg+' dB · '+fmtDur(e.dur)+'</div>'+
+        '<div><span class="tag-badge">'+tagLabel+'</span></div>'+
+        (e.note ? '<div class="note">„'+escapeHtml(e.note)+'"</div>' : '')+
+        '<div class="actions"><button class="icon-btn del" data-id="'+e.id+'"><svg class="wzi" aria-hidden="true"><use href="#wzi-trash"></use></svg> Löschen</button></div>';
+      list.appendChild(div);
+    });
+    list.querySelectorAll(".del").forEach(function(b){
+      b.addEventListener("click", function(){ deleteHistoryEntry(b.dataset.id); });
+    });
+    list.querySelectorAll(".star").forEach(function(b){
+      b.addEventListener("click", function(){ toggleFav(b.dataset.id); });
+    });
+  }
+
+  function renderWeekStats(full){
+    var body = document.getElementById("weekStatsBody");
+    if(!full || full.length===0){
+      body.innerHTML = '<p class="muted">Noch keine gespeicherten Sitzungen.</p>';
+      return;
+    }
+    var now = Date.now();
+    var weekMs = 7*24*3600*1000;
+    var thisWeek = full.filter(function(e){ return now - e.ts < weekMs; });
+    var lastWeek = full.filter(function(e){ return (now - e.ts >= weekMs) && (now - e.ts < 2*weekMs); });
+
+    if(thisWeek.length===0){
+      body.innerHTML = '<p class="muted">Diese Woche noch keine gespeicherten Sitzungen.</p>';
+      return;
+    }
+    function meanAvg(arr){ return arr.reduce(function(s,e){return s+e.avg},0) / arr.length; }
+    var avgThis = meanAvg(thisWeek);
+    var loudCount = thisWeek.filter(function(e){ return e.peak>85; }).length;
+
+    var html = '<div class="weekstat-row">'+
+      '<div class="stat"><b>'+Math.round(avgThis)+' dB</b><span>Ø diese Woche</span></div>'+
+      '<div class="stat"><b>'+thisWeek.length+'</b><span>Sitzungen</span></div>'+
+      '<div class="stat"><b>'+loudCount+'</b><span>&gt; 85 dB</span></div>'+
+      '</div>';
+
+    if(lastWeek.length>0){
+      var avgLast = meanAvg(lastWeek);
+      var diff = Math.round(avgThis - avgLast);
+      var trendText;
+      if(diff > 1) trendText = wzIcon('arrow-up','wzi-red') + ' <b>'+diff+' dB lauter</b> als letzte Woche';
+      else if(diff < -1) trendText = wzIcon('arrow-down','wzi-green') + ' <b>'+Math.abs(diff)+' dB leiser</b> als letzte Woche';
+      else trendText = 'Etwa <b>genauso laut</b> wie letzte Woche';
+      html += '<div class="weekstat-trend">'+trendText+'</div>';
+    } else {
+      html += '<div class="weekstat-trend">Noch keine Vergleichsdaten aus der Vorwoche.</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  var persistSwitch = document.getElementById("persistSwitch");
+  function refreshSwitch(){ persistSwitch.classList.toggle("on", isPersist()); }
+  persistSwitch.addEventListener("click", function(){
+    var newState = !isPersist();
+    if(!newState){
+      // turning off: clear persisted data (per privacy notice)
+      try{ localStorage.removeItem(LS_HISTORY); }catch(e){}
+      sessionHistory = [];
+    } else {
+      sessionHistory = [];
+    }
+    setPersist(newState);
+    refreshSwitch();
+    renderHistory();
+  });
+  refreshSwitch();
+
+  document.querySelectorAll("#filterRow .chip").forEach(function(chip){
+    chip.addEventListener("click", function(){
+      document.querySelectorAll("#filterRow .chip").forEach(function(c){c.classList.remove("active")});
+      chip.classList.add("active");
+      currentFilter = chip.dataset.filter;
+      renderHistory();
+    });
+  });
+
+  document.getElementById("clearAllBtn").addEventListener("click", function(){
+    if(!confirm("Wirklich alle gespeicherten Sitzungen löschen?")) return;
+    saveHistory([]);
+    renderHistory();
+  });
+
+  // ---------- Export / Import (Backup, z. B. für ein neues Smartphone) ----------
+  function exportHistory(){
+    var data = loadHistory();
+    if(data.length === 0){ alert("Es gibt noch keine gespeicherten Sitzungen zum Exportieren."); return; }
+    var payload = {
+      app: "LautstärkeWahr",
+      format: "lautstaerkewahr-verlauf",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      entries: data
+    };
+    var json = JSON.stringify(payload, null, 2);
+    var filename = "lautstaerkewahr-verlauf-" + new Date().toISOString().slice(0,10) + ".json";
+    try{
+      var file = new File([json], filename, {type:"application/json"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:"LautstärkeWahr Verlauf"}).catch(function(){});
+        return;
+      }
+    }catch(e){}
+    // Fallback: Datei über einen Download-Link speichern (landet in "Dateien" / Downloads)
+    var blob = new Blob([json], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  function importHistoryFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      var entries;
+      try{
+        var payload = JSON.parse(String(reader.result));
+        entries = Array.isArray(payload) ? payload : payload.entries;
+        if(!Array.isArray(entries)) throw new Error("kein Array");
+      }catch(e){
+        alert("Diese Datei konnte nicht gelesen werden. Bitte eine Datei auswählen, die zuvor über \"Exportieren\" in LautstärkeWahr erzeugt wurde.");
+        return;
+      }
+      entries = entries.filter(function(e){
+        return e && typeof e.ts === "number" && typeof e.peak === "number" && typeof e.avg === "number";
+      });
+      if(entries.length === 0){
+        alert("In dieser Datei wurden keine gültigen Sitzungen gefunden.");
+        return;
+      }
+      var addToExisting = confirm(
+        entries.length + " Sitzung(en) in der Datei gefunden.\n\n" +
+        "OK = zum bestehenden Verlauf hinzufügen\n" +
+        "Abbrechen = bestehenden Verlauf ersetzen"
+      );
+      var current = loadHistory();
+      var merged;
+      if(addToExisting){
+        var existingIds = {};
+        current.forEach(function(e){ existingIds[e.id] = true; });
+        var toAdd = entries.filter(function(e){ return !e.id || !existingIds[e.id]; });
+        toAdd.forEach(function(e){ if(!e.id){ e.id = Date.now()+"_"+Math.random().toString(36).slice(2,7); } });
+        merged = toAdd.concat(current);
+      } else {
+        merged = entries;
+      }
+      if(!isPersist()){
+        setPersist(true);
+        refreshSwitch();
+      }
+      saveHistory(merged);
+      renderHistory();
+      alert("Import abgeschlossen: " + entries.length + " Sitzung(en) verarbeitet.");
+    };
+    reader.onerror = function(){
+      alert("Die Datei konnte nicht gelesen werden.");
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById("exportHistoryBtn").addEventListener("click", exportHistory);
+  document.getElementById("importHistoryBtn").addEventListener("click", function(){
+    document.getElementById("importHistoryFile").click();
+  });
+  document.getElementById("importHistoryFile").addEventListener("change", function(e){
+    var file = e.target.files && e.target.files[0];
+    if(file) importHistoryFile(file);
+    e.target.value = "";
+  });
+
+  // ---------- Einführung (einheitlich über wz-onboarding.js) ----------
+  var onb = wzOnboarding({
+    key: LS_ONBOARDED,
+    slides: [
+      {icon:"volume", title:"Willkommen bei LautstärkeWahr", text:"Miss live, wie laut es um dich herum ist – als Zahl, als Zeiger und als Verlauf über die Zeit."},
+      {icon:"traffic-light", title:"Die Ampel auf einen Blick", html:
+        '<div class="wz-onb-row">'+wzIcon("dot","wzi-green")+'<span><b>Leise</b> (&lt; 60 dB) – unbedenklich</span></div>'+
+        '<div class="wz-onb-row">'+wzIcon("dot","wzi-yellow")+'<span><b>Moderat</b> (60–85 dB) – auf Dauer anstrengend</span></div>'+
+        '<div class="wz-onb-row">'+wzIcon("dot","wzi-red")+'<span><b>Laut</b> (&gt; 85 dB) – Gehörschutz empfehlenswert</span></div>'},
+      {icon:"lock", title:"100% lokal & privat", text:"Der Mikrofon-Ton wird nur live analysiert – nie aufgenommen, gespeichert oder übertragen. Ein Verlauf wird nur gespeichert, wenn du „Dauerhaft merken“ aktivierst."}
+    ]
+  });
+  window.LW = window.LW || {};
+  window.LW.showOnboarding = function(){ onb.show(); };
+  document.getElementById("showOnboardingBtn").addEventListener("click", function(){ onb.show(); });
+
+  window.addEventListener("pagehide", function(){
+    if(micStream){ micStream.getTracks().forEach(function(t){t.stop()}); }
+  });
+})();
+</script>
+<script>
+
+</script>
+</body>
+</html>

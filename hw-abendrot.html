@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="hw">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="theme-color" content="#4A7FBE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Abend- und Morgenrot – HimmelsWahr</title>
+<link rel="icon" href="hw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="hw-style.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<div class="hw-wrap">
+  <div class="hw-header">
+    <h1>Abend- und Morgenrot</h1>
+    <p class="hw-sub">Wie stark färbt sich der Himmel an deinem Standort?</p>
+  </div>
+
+  <div class="hw-seg" role="group" aria-label="Zeitpunkt wählen">
+    <button type="button" id="hw-mode-evening" aria-pressed="true" onclick="hwSetGlowMode('evening')">Abendrot</button>
+    <button type="button" id="hw-mode-morning" aria-pressed="false" onclick="hwSetGlowMode('morning')">Morgenrot</button>
+  </div>
+
+  <div class="hw-card" id="hw-card-status">
+    <p class="hw-loc-current" id="hw-active-loc-label"></p>
+    <p id="hw-status">Standort wird benötigt.</p>
+    <button class="hw-btn primary" onclick="hwLoadGlow()">Standort verwenden</button>
+  </div>
+
+  <div class="hw-card" id="hw-card-result" style="display:none;">
+    <h2 id="hw-ev-title">Sonnenuntergang</h2>
+    <div class="hw-score">
+      <div class="hw-score-num" id="hw-score-num" aria-label="Wert von 0 bis 100">–</div>
+      <div class="hw-score-side">
+        <div id="hw-ampel-box"></div>
+        <div id="hw-countdown" style="font-size:14px;color:var(--text-secondary);"></div>
+      </div>
+    </div>
+    <div class="hw-meter" aria-hidden="true"><i id="hw-meter-pos" style="left:0%"></i></div>
+    <p id="hw-glow-text" style="font-size:15px;line-height:1.55;color:var(--text);margin:12px 0 0;"></p>
+  </div>
+
+  <div class="hw-card" id="hw-card-cols" style="display:none;">
+    <h2>Wolken auf dem Weg der Sonne</h2>
+    <p style="font-size:13px;margin-top:-6px;" id="hw-dir-line"></p>
+    <div class="hw-cols" id="hw-cols"></div>
+    <div id="hw-light-times" style="margin-top:14px;"></div>
+    <p id="hw-glow-updated" style="font-size:12px;color:var(--text-secondary);text-align:center;margin-top:10px;"></p>
+    <p class="hw-attrib">Wetterdaten von <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), aufbereitet und umgerechnet</p>
+  </div>
+
+  <div class="hw-card">
+    <h3>So wird geschätzt</h3>
+    <p>Für den Sonnenuntergang (bzw. -aufgang) werden Wolkendaten an drei Punkten abgefragt: über dir sowie 60 und 150 km entfernt in Richtung der Sonne. Ein freier Horizont dort lässt das Licht durch. Mittlere und hohe Wolken (ideal etwa 35–65 %) werden von unten angestrahlt und färben sich. Tiefe Wolken vor der Sonne, Regen und Dunst mindern den Wert.</p>
+    <p style="font-size:12px;">Eigene Faustformel auf Basis von Modelldaten, nicht wissenschaftlich validiert. Der Wert ist eine Orientierung, keine Garantie.</p>
+  </div>
+
+  <div class="hw-footer">
+    <a href="hw-info.html">Einführung</a>·<a href="./impressum.html">Impressum</a>·<a href="./datenschutz.html#hw">Datenschutz</a>·<a href="./lizenzen.html">Lizenzen</a>
+  </div>
+</div>
+
+<script src="hw-astro.js"></script>
+<script src="hw-app.js"></script>
+<script src="hw-sky.js"></script>
+<script>
+hwRenderNav('hw-abendrot.html');
+
+var hwGlowSunset = true, hwGlowData = null;
+function hwSetGlowMode(m){
+  hwGlowSunset = (m === 'evening');
+  document.getElementById('hw-mode-evening').setAttribute('aria-pressed', hwGlowSunset ? 'true' : 'false');
+  document.getElementById('hw-mode-morning').setAttribute('aria-pressed', hwGlowSunset ? 'false' : 'true');
+  hwLoadGlow();
+}
+function hwCountdownText(ms){
+  var d = ms - Date.now();
+  if(d < -900000) return 'Vorbei';
+  if(d <= 0) return hwGlowSunset ? 'Gerade jetzt' : 'Gerade jetzt';
+  var m = Math.round(d / 60000), h = Math.floor(m / 60);
+  return 'in ' + (h > 0 ? h + ' Std ' : '') + (m % 60) + ' Min';
+}
+function hwLoadGlow(){
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  document.getElementById('hw-status').textContent = 'Standort wird ermittelt …';
+  document.getElementById('hw-card-status').style.display = 'block';
+  hwGetActiveLocation().then(function(pos){
+    document.getElementById('hw-status').textContent = 'Wolkendaten werden geladen …';
+    return hwComputeGlow(pos.lat, pos.lon, hwGlowSunset);
+  }).then(function(r){
+    hwGlowData = r;
+    var off = r.off, today = hwFmtLocalDay(Date.now(), off), evDay = hwFmtLocalDay(r.ms, off);
+    var dayWord = today === evDay ? 'heute' : (hwFmtLocalDay(Date.now() + 86400000, off) === evDay ? 'morgen' : evDay);
+    document.getElementById('hw-ev-title').textContent = (r.sunrise ? 'Sonnenaufgang ' : 'Sonnenuntergang ') + dayWord + ', ' + hwFmtLocal(r.ms, off) + ' Uhr';
+    document.getElementById('hw-score-num').innerHTML = r.calc.score + '<small>/100</small>';
+    document.getElementById('hw-ampel-box').innerHTML = '<span class="hw-ampel ' + r.cls.stufe + '"><span class="hw-dot hw-dot-' + r.cls.stufe + '"></span>' + r.cls.label + '</span>';
+    document.getElementById('hw-meter-pos').style.left = r.calc.score + '%';
+    document.getElementById('hw-glow-text').textContent = r.text;
+    document.getElementById('hw-countdown').textContent = hwCountdownText(r.ms);
+
+    var dir = hwCompassWord(r.azimuth);
+    document.getElementById('hw-dir-line').textContent = (r.sunrise ? 'Die Sonne geht' : 'Die Sonne geht') + ' bei ' + Math.round(r.azimuth) + '° (' + dir + ') ' + (r.sunrise ? 'auf' : 'unter') + '.';
+    function cell(title, p){
+      return '<div class="hw-col-cell"><b>' + title + '</b><span>Tief ' + Math.round(p.low) + ' %</span><span>Mittel ' + Math.round(p.mid) + ' %</span><span>Hoch ' + Math.round(p.high) + ' %</span></div>';
+    }
+    document.getElementById('hw-cols').innerHTML = cell('Über dir', r.own) + cell('60 km ' + dir, r.near) + cell('150 km ' + dir, r.far);
+
+    /* Goldene und Blaue Stunde für den Ortstag des Ereignisses */
+    var d = new Date(r.ms + off * 1000);
+    var dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - off * 1000;
+    var ev = hwDayEvents(dayStart, r.lat, r.lon), rows = '';
+    function row(label, from, to){
+      if(!from || !to) return;
+      rows += '<div class="hw-row"><span>' + label + '</span><span>' + hwFmtLocal(from, off) + ' – ' + hwFmtLocal(to, off) + ' Uhr</span></div>';
+    }
+    if(r.sunrise){ row('Blaue Stunde', ev.blueStartMorning, ev.goldenStartMorning); row('Goldene Stunde', ev.goldenStartMorning, ev.goldenEndMorning); }
+    else { row('Goldene Stunde', ev.goldenStartEvening, ev.goldenEndEvening); row('Blaue Stunde', ev.goldenEndEvening, ev.blueEndEvening); }
+    document.getElementById('hw-light-times').innerHTML = rows +
+      '<p style="font-size:12px;margin:8px 0 0;">Goldene Stunde: Sonne zwischen −4° und +6° Höhe · Blaue Stunde: −8° bis −4°. Berechnet auf deinem Gerät.</p>';
+    document.getElementById('hw-glow-updated').innerHTML = hwIcon('refresh', 13) + ' Zuletzt aktualisiert: ' + new Date().toLocaleTimeString('de-DE');
+
+    document.getElementById('hw-card-status').style.display = 'none';
+    document.getElementById('hw-card-result').style.display = 'block';
+    document.getElementById('hw-card-cols').style.display = 'block';
+  }).catch(function(err){
+    document.getElementById('hw-card-result').style.display = 'none';
+    document.getElementById('hw-card-cols').style.display = 'none';
+    document.getElementById('hw-card-status').style.display = 'block';
+    document.getElementById('hw-status').textContent = 'Nicht verfügbar: ' + (err && err.message ? err.message : 'Standort/Dienst nicht erreichbar');
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  window.hwPageReload = hwLoadGlow;
+  document.getElementById('hw-active-loc-label').innerHTML = hwActiveLocationLabel();
+  if(hwHasActiveLocationReady()) hwLoadGlow();
+  setInterval(function(){ if(hwGlowData) document.getElementById('hw-countdown').textContent = hwCountdownText(hwGlowData.ms); }, 30000);
+  setInterval(function(){ if(!document.hidden && hwHasActiveLocationReady()) hwLoadGlow(); }, 600000);
+});
+
+</script>
+</body>
+</html>

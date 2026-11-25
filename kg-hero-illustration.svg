@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" role="img" aria-labelledby="hero-title">
+  <title id="hero-title">Illustrierte Florida-Küstenszene mit Sonne, Wellen, Palmen und Kompassrose</title>
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0B1440"/>
+      <stop offset="100%" stop-color="#1E2A78"/>
+    </linearGradient>
+    <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3355C8"/>
+      <stop offset="100%" stop-color="#0c766c"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes hi-sun-glow { 0%,100% { opacity: 1; } 50% { opacity: 0.8; } }
+    @keyframes hi-ring-pulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.08); opacity: 0.3; } }
+    @keyframes hi-wave-drift1 { from { transform: translateX(0); } to { transform: translateX(-60px); } }
+    @keyframes hi-wave-drift2 { from { transform: translateX(0); } to { transform: translateX(50px); } }
+    @keyframes hi-palm-sway { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+    @keyframes hi-bird-flap { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.4); } }
+    @keyframes hi-compass-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .hi-sun { animation: hi-sun-glow 5s ease-in-out infinite; }
+    .hi-sun-ring { animation: hi-ring-pulse 5s ease-in-out infinite; transform-origin: 645px 95px; }
+    .hi-sea1 { animation: hi-wave-drift1 14s linear infinite alternate; }
+    .hi-sea2 { animation: hi-wave-drift2 18s linear infinite alternate; }
+    .hi-wave-line { animation: hi-wave-drift1 6s ease-in-out infinite alternate; }
+    .hi-palm1 { animation: hi-palm-sway 5s ease-in-out infinite; transform-origin: bottom center; }
+    .hi-palm2 { animation: hi-palm-sway 5s ease-in-out infinite; animation-delay: -2.5s; transform-origin: bottom center; }
+    .hi-bird { animation: hi-bird-flap 1.4s ease-in-out infinite; transform-origin: center; }
+    .hi-compass-needle { animation: hi-compass-spin 20s linear infinite; transform-origin: 0 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .hi-sun, .hi-sun-ring, .hi-sea1, .hi-sea2, .hi-wave-line, .hi-palm1, .hi-palm2, .hi-bird, .hi-compass-needle { animation: none; }
+    }
+  </style>
+
+  <rect width="800" height="320" fill="url(#skyGrad)"/>
+
+  <!-- Sonne -->
+  <circle class="hi-sun" cx="645" cy="95" r="58" fill="#FF8C00"/>
+  <circle class="hi-sun-ring" cx="645" cy="95" r="58" fill="none" stroke="#f4c04d" stroke-width="3" opacity="0.6"/>
+
+  <!-- Kompassrose, dezent im Himmel -->
+  <g transform="translate(150,80)" opacity="0.35">
+    <circle cx="0" cy="0" r="46" fill="none" stroke="#f4c04d" stroke-width="2"/>
+    <g class="hi-compass-needle">
+      <polygon points="0,-40 8,0 -8,0" fill="#f4c04d"/>
+      <polygon points="0,40 8,0 -8,0" fill="#E4E8FB"/>
+    </g>
+    <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Meer -->
+  <path class="hi-sea1" d="M-60,210 C60,190 120,230 240,215 C360,200 420,235 540,215 C620,202 680,222 740,210 L860,210 L860,320 L-60,320 Z" fill="url(#seaGrad)"/>
+  <path class="hi-sea2" d="M-50,230 C80,215 140,245 260,232 C380,220 440,248 560,232 C640,222 695,238 750,230 L850,230 L850,320 L-50,320 Z" fill="#0a5f57" opacity="0.55"/>
+
+  <!-- Wellenlinien -->
+  <path class="hi-wave-line" d="M40,190 q20,-10 40,0 q20,10 40,0" stroke="#E4E8FB" stroke-width="3" fill="none" opacity="0.5"/>
+  <path class="hi-wave-line" d="M500,180 q20,-10 40,0 q20,10 40,0" stroke="#E4E8FB" stroke-width="3" fill="none" opacity="0.4" style="animation-delay:-3s"/>
+
+  <!-- Palmen -->
+  <g class="hi-palm1" transform="translate(90,215)">
+    <rect x="-4" y="0" width="8" height="70" rx="3" fill="#0B1440"/>
+    <path d="M0,0 C-40,-10 -55,-35 -60,-50 C-35,-45 -10,-25 0,0 Z" fill="#3355C8"/>
+    <path d="M0,0 C35,-15 50,-38 58,-52 C32,-42 8,-25 0,0 Z" fill="#3355C8"/>
+    <path d="M0,0 C-25,-30 -20,-52 -15,-65 C0,-45 5,-20 0,0 Z" fill="#12a89a"/>
+    <path d="M0,0 C22,-28 20,-50 18,-62 C2,-42 -3,-18 0,0 Z" fill="#12a89a"/>
+  </g>
+  <g class="hi-palm2" transform="translate(730,225) scale(0.8)">
+    <rect x="-4" y="0" width="8" height="70" rx="3" fill="#0B1440"/>
+    <path d="M0,0 C-40,-10 -55,-35 -60,-50 C-35,-45 -10,-25 0,0 Z" fill="#3355C8"/>
+    <path d="M0,0 C35,-15 50,-38 58,-52 C32,-42 8,-25 0,0 Z" fill="#3355C8"/>
+    <path d="M0,0 C-25,-30 -20,-52 -15,-65 C0,-45 5,-20 0,0 Z" fill="#12a89a"/>
+    <path d="M0,0 C22,-28 20,-50 18,-62 C2,-42 -3,-18 0,0 Z" fill="#12a89a"/>
+  </g>
+
+  <!-- Vögel -->
+  <path class="hi-bird" d="M300,60 q8,-8 16,0 q8,-8 16,0" stroke="#E4E8FB" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <path class="hi-bird" d="M340,80 q6,-6 12,0 q6,-6 12,0" stroke="#E4E8FB" stroke-width="2" fill="none" opacity="0.5" style="animation-delay:-0.5s"/>
+</svg>

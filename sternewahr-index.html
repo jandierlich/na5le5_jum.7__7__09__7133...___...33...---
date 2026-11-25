@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="zh">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" href="./zh-icon-192.png" type="image/png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>Sternenhimmel</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<link rel="stylesheet" href="sternewahr-style.css">
+<style>html,body{background:var(--wzp-0b0921, #0b0921);}</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-mark" viewBox="0 0 24 24"><path d="M14.2 3.2a8 8 0 108.6 8.6A6.4 6.4 0 0114.2 3.2z"/><path d="M19.2 4.6l.7 1.7 1.7.7-1.7.7-.7 1.7-.7-1.7-1.7-.7 1.7-.7z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
+    <symbol id="i-sensor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5.5v13M16 5.5v13"/></symbol>
+    <symbol id="i-rev" viewBox="0 0 24 24"><path d="M16 5.5v13l-10-6.5z"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 14l6-6 6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 019.5 4.5a8 8 0 1010 10z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></symbol>
+  </defs>
+</svg>
+
+<video id="cam" playsinline muted autoplay></video>
+<canvas id="sky" aria-label="Sternenhimmel" role="img"></canvas>
+
+<header id="top">
+  <div id="brand">
+    <a class="wz-inline-home" href="./index.html#himmel" aria-label="Zur WahrZentrale" title="Zur WahrZentrale" id="wzHomeBtn" target="_top" style="margin-right:6px"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10.5V20h4.5v-5.5h3V20H18v-9.5"/></svg></a>
+    <button id="placeBtn" class="linkbtn" aria-label="Ort ändern"><svg class="ic"><use href="#i-pin"/></svg><span id="place">Ort</span></button>
+  </div>
+  <div id="tools">
+    <button class="ibtn" id="bSearch" aria-label="Suchen"><svg class="ic"><use href="#i-search"/></svg></button>
+    <button class="ibtn" id="bSensor" aria-label="Live-Ausrichtung mit Lagesensor" aria-pressed="false"><svg class="ic"><use href="#i-sensor"/></svg></button>
+    <button class="ibtn" id="bCam" aria-label="Kamerabild als Hintergrund" aria-pressed="false"><svg class="ic"><use href="#i-camera"/></svg></button>
+    <button class="ibtn" id="bMenu" aria-label="Menü"><svg class="ic"><use href="#i-menu"/></svg></button>
+  </div>
+</header>
+
+<div id="hud" aria-live="off"><span id="hudTxt">S 180° · 30°</span></div>
+<div id="calib" hidden>
+  <span id="calibTxt">Ziel mittig ausrichten, dann bestätigen</span>
+  <button class="btn small" id="calibOk">Passt</button>
+  <button class="btn small ghost" id="calibReset">Zurücksetzen</button>
+</div>
+<div id="toast" role="status"></div>
+
+<section id="card" hidden aria-live="polite">
+  <div class="card-head">
+    <div>
+      <h2 id="cardTitle">Objekt</h2>
+      <p id="cardSub">Art</p>
+    </div>
+    <button class="ibtn small" id="cardClose" aria-label="Schließen"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <div id="cardRows"></div>
+  <div class="card-actions">
+    <button class="btn small" id="cardGoto"><svg class="ic"><use href="#i-target"/></svg>Hinschwenken</button>
+    <button class="btn small ghost" id="cardZoom">Nah heran</button>
+  </div>
+</section>
+
+<footer id="timebar">
+  <div class="tb-row">
+    <button id="timeBtn" class="timebtn" aria-label="Datum und Uhrzeit wählen"><svg class="ic"><use href="#i-clock"/></svg><span id="timeTxt">…</span><small id="timeZone"></small></button>
+    <button id="nowBtn" class="btn small">Jetzt</button>
+    <button id="tbToggle" class="ibtn small" aria-label="Zeitraffer und Einheiten ein-/ausblenden" aria-expanded="false"><svg class="ic"><use href="#i-chev"/></svg></button>
+  </div>
+  <div class="tb-speed" id="tbSpeed" hidden>
+    <div class="tb-speed-row">
+      <button class="ibtn small" id="spRev" aria-label="Rückwärts" aria-pressed="false"><svg class="ic"><use href="#i-rev"/></svg></button>
+      <button class="ibtn small" id="spPlay" aria-label="Pause / Weiter"><svg class="ic" id="spPlayIc"><use href="#i-pause"/></svg></button>
+      <div class="chips" id="speedChips" role="group" aria-label="Zeitraffer"></div>
+    </div>
+    <div class="chips" id="unitChips" role="group" aria-label="Schrittweite beim Verschieben"></div>
+  </div>
+  <div class="tb-scrub">
+    <div id="scrub" role="slider" aria-label="Zeit verschieben (ziehen)" tabindex="0"><div id="scrubTicks"></div><div id="scrubMark"></div></div>
+    <button class="chip" id="unitBtn" aria-label="Schrittweite wechseln">Std</button>
+  </div>
+</footer>
+
+<div id="searchWrap" hidden>
+  <div class="search-box">
+    <svg class="ic"><use href="#i-search"/></svg>
+    <input id="searchIn" type="search" placeholder="Stern, Planet, Sternbild, Objekt …" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Suchen">
+    <button class="ibtn small" id="searchClose" aria-label="Suche schließen"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <ul id="searchRes"></ul>
+</div>
+
+<div id="scrim" hidden></div>
+<section id="sheet" hidden aria-label="Menü">
+  <div class="grab"></div>
+  <div class="tabs-wrap">
+    <nav id="tabs" role="tablist">
+      <button role="tab" data-tab="ueber" class="on">Heute</button>
+      <button role="tab" data-tab="entdecken">Entdecken</button>
+      <button role="tab" data-tab="erinnerungen">Erinnerungen</button>
+      <button role="tab" data-tab="zeit">Zeit</button>
+      <button role="tab" data-tab="ebenen">Ansicht</button>
+      <button role="tab" data-tab="ort">Ort</button>
+      <button role="tab" data-tab="info">Info</button>
+    </nav>
+    <div class="tabs-fade" id="tabsFade" aria-hidden="true"></div>
+  </div>
+  <div id="sheetBody"></div>
+  <button class="btn ghost sheet-close" id="sheetClose">Schließen</button>
+</section>
+
+<div id="modal" hidden>
+  <div class="modal-box">
+    <h3 id="modalTitle">Datum und Uhrzeit</h3>
+    <label class="field">Zeitpunkt (Anzeigezeit)
+      <input id="dtIn" type="datetime-local" step="60" min="1000-01-01T00:00" max="2999-12-31T23:59">
+    </label>
+    <p class="hint" id="modalHint">Vor dem Jahr 1582 rechnet die App im proleptischen gregorianischen Kalender. Planetenpositionen sind zwischen 1800 und 2050 am genauesten.</p>
+    <div class="row">
+      <button class="btn" id="dtOk">Übernehmen</button>
+      <button class="btn ghost" id="dtCancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div id="welcome" hidden>
+  <div class="modal-box">
+    <h3>Willkommen beim Sternenhimmel</h3>
+    <p>Dein Sternenhimmel, live und in der Zeit verschiebbar. Alles bleibt auf deinem Gerät: kein Konto, kein Tracking.</p>
+    <p>Für deinen Himmel braucht die App deinen Standort. Er wird nur lokal zur Berechnung genutzt und nie übertragen.</p>
+    <div class="row">
+      <button class="btn" id="wLoc">Standort verwenden</button>
+      <button class="btn ghost" id="wLater">Später</button>
+    </div>
+  </div>
+</div>
+
+<div id="cine" hidden><div id="cineCap" aria-live="polite"></div><div id="cineBar"><i id="cineFill"></i></div><button class="btn ghost small" id="cineEnd">Beenden</button></div>
+
+<div id="poster" hidden>
+  <div class="modal-box poster-box">
+    <h3>Poster</h3>
+    <img id="posterImg" alt="Vorschau des Posters">
+    <p class="hint" id="posterInfo" style="text-align:center;margin:0 0 6px"></p>
+    <label class="field">Titel<input id="posterTitle" maxlength="60" autocomplete="off"></label>
+    <label class="field">Widmung (optional)<input id="posterNote" maxlength="80" autocomplete="off" placeholder="z. B. Die Nacht, in der du geboren wurdest"></label>
+    <div class="seg"><button class="chip" data-pmode="view" aria-pressed="true">Aktuelle Ansicht</button><button class="chip" data-pmode="zenith" aria-pressed="false">Rundumblick</button></div>
+    <div class="seg"><button class="chip" data-psize="2" aria-pressed="true">Zum Teilen</button><button class="chip" data-psize="3" aria-pressed="false">Für den Druck</button></div>
+    <div class="row"><button class="btn" id="posterShare">Teilen oder speichern</button><button class="btn ghost" id="posterClose">Schließen</button></div>
+  </div>
+</div>
+
+<div id="rotate" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg><p>Bitte drehe dein Smartphone ins Hochformat.</p></div>
+
+<script src="sternewahr-astro.js"></script>
+<script src="sternewahr-stars.js"></script>
+<script src="sternewahr-render.js"></script>
+<script src="sternewahr-app.js"></script>
+<script>try{if(window.self!==window.top){var h=document.getElementById("wzHomeBtn");if(h)h.remove();}}catch(e){}</script>
+</body>
+</html>

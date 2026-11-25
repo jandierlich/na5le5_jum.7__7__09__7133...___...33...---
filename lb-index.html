@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="lb">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>LabWahr</title>
+<meta name="description" content="LabWahr – 18 Physik-Versuche mit den Sensoren des Smartphones: Messung, Auswertung mit Messunsicherheit, Protokoll und Wissenstest. 100% lokal.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="./lb-icon-192.png">
+<!-- LabWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<link rel="stylesheet" href="./lb-style.css">
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+<symbol id="wzi-home" viewBox="0 0 24 24"><path d="M4 11.5L12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h5v-5.5h2V20h5v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-check" viewBox="0 0 24 24"><polyline points="4.5 12.5 9.5 17.5 19.5 6.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5L21.5 20h-19z"/><line x1="12" y1="9.2" x2="12" y2="14.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 12.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5L17.5 7"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></g></symbol>
+<symbol id="wzi-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4M10 13h5M10 16.5h5"/></g></symbol>
+<symbol id="wzi-flask" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h5M10.3 3.5v6L4.8 18.6a1.4 1.4 0 0 0 1.2 2.1h12a1.4 1.4 0 0 0 1.2-2.1L13.7 9.5v-6"/><path d="M7.4 14.6c1.6-1 3.2-1 4.8 0s3.1 1 4.5.1"/></g></symbol>
+<symbol id="wzi-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17M3.5 3.5v17"/><path d="M6.5 15l3.5-5 3.5 3 5-7"/></g></symbol>
+<symbol id="wzi-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs>
+</svg>
+<div class="lb-statusbar" aria-hidden="true"></div>
+<a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<div class="app safe-top safe-bottom">
+  <header class="wz-hero">
+    <div class="logo-badge"><img class="wz-logo-light" src="./lb-icon-512.png" alt="LabWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>LabWahr</h1>
+    <p>Physikalische Versuche mit den Sensoren deines Smartphones – messen, auswerten, verstehen. 100% lokal.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="versuche" role="tab">Versuche</button>
+    <button class="tab" data-tab="messen" role="tab">Messen</button>
+    <button class="tab" data-tab="protokolle" role="tab">Protokolle</button>
+    <button class="tab" data-tab="fortschritt" role="tab">Fortschritt</button>
+  </div>
+
+  <!-- ===== VERSUCHE ===== -->
+  <section class="screen active" id="screen-versuche">
+    <div id="lbOverview"></div>
+    <div class="card" style="margin-top:22px">
+      <h2>Hinweise</h2>
+      <p class="muted">Die Versuche sind Lernexperimente. Die Sensoren eines Smartphones sind nicht kalibriert; Ergebnisse dienen dem Verständnis und ersetzen keine geeichten Messgeräte. Bitte die Sicherheitshinweise jedes Versuchs beachten und das Smartphone gegen Herunterfallen sichern.</p>
+    </div>
+  </section>
+
+  <!-- ===== FREIES MESSEN ===== -->
+  <section class="screen" id="screen-messen">
+    <div class="card" id="lbFreeCard">
+      <h2>Freies Messen</h2>
+      <p class="muted">Rohdaten eines Sensors aufzeichnen – für eigene Versuche. Export als CSV für Tabellenkalkulationen.</p>
+      <div class="lb-sensgrid" id="lbFreeSens" role="group" aria-label="Sensor wählen"></div>
+      <div class="lb-chart"><canvas id="lbFreeChart"></canvas></div>
+      <div class="lb-vals" id="lbFreeVals"></div>
+      <p class="muted small" id="lbFreeInfo" aria-live="polite"></p>
+      <button type="button" class="cta primary" id="lbFreeMain">Aufzeichnung starten</button>
+      <div class="btn-row"><button type="button" class="cta slim" id="lbFreeCsv" disabled>Als CSV teilen</button><button type="button" class="cta slim" id="lbFreeNote" disabled>Im Protokoll notieren</button></div>
+    </div>
+    <div class="card" id="lbToneCard">
+      <h2>Tongenerator</h2>
+      <p class="muted">Dauerton als Schallquelle, z. B. für die Versuche „Doppler-Effekt“ und „Abstandsgesetz“ auf einem zweiten Gerät.</p>
+      <div class="field"><label for="lbToneF">Frequenz<span class="hint">20 bis 20 000 Hz</span></label><span><input class="num-input" id="lbToneF" type="text" inputmode="decimal" value="1000"> <span class="muted">Hz</span></span></div>
+      <div class="lb-tone-row"><label for="lbToneR">Grob</label><input type="range" id="lbToneR" min="1.30103" max="4.30103" step="0.001" value="3"></div>
+      <div id="lbTonePre">
+        <div class="chip-row" role="group" aria-label="Voreinstellungen"><button type="button" class="chip" data-f="440">440 Hz</button><button type="button" class="chip" data-f="1000">1000 Hz</button><button type="button" class="chip" data-f="3000">3000 Hz</button><button type="button" class="chip" data-f="5000">5000 Hz</button></div>
+        <div class="chip-row" role="radiogroup" aria-label="Wellenform"><button type="button" class="chip" role="radio" data-wave="sine">Sinus</button><button type="button" class="chip" role="radio" data-wave="triangle">Dreieck</button><button type="button" class="chip" role="radio" data-wave="square">Rechteck</button></div>
+      </div>
+      <div class="lb-tone-row"><label for="lbToneV">Lautstärke</label><input type="range" id="lbToneV" min="0.02" max="0.5" step="0.01" value="0.2"></div>
+      <div class="lb-tone-out" id="lbToneOut" aria-live="polite"></div>
+      <button type="button" class="cta primary" id="lbToneBtn">Ton abspielen</button>
+      <p class="muted small">Lautstärke langsam erhöhen (auf 50 % begrenzt). Laute hohe Töne können Gehör und Lautsprecher schädigen.</p>
+    </div>
+  </section>
+
+  <!-- ===== PROTOKOLLE ===== -->
+  <section class="screen" id="screen-protokolle">
+    <div class="card">
+      <h2>Protokolle</h2>
+      <p class="muted">Jeder ausgewertete Versuch wird automatisch festgehalten – mit Parametern, Messwerten, Hypothese und deiner Notiz.</p>
+      <div class="btn-row"><button type="button" class="cta slim" id="lbProtPdf">Laborbuch als PDF</button><button type="button" class="cta slim" id="lbProtCsv">Tabelle (CSV)</button></div>
+    </div>
+    <div id="lbProtList"></div>
+  </section>
+
+  <!-- ===== FORTSCHRITT ===== -->
+  <section class="screen" id="screen-fortschritt">
+    <div id="lbProgress"></div>
+    <div class="card">
+      <h2>Über diese App</h2>
+      <p class="muted">Teil der WahrZentrale. Messdaten werden nur auf deinem Gerät verarbeitet und gespeichert.</p>
+      <div style="height:10px"></div>
+      <button class="cta" id="showOnboardingBtn">Einführung erneut anzeigen</button>
+    </div>
+  </section>
+
+  <footer class="wz-footer">
+    <button type="button" onclick="LB.showOnboarding()">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#lb">Datenschutz</a><span class="sep" aria-hidden="true">·</span><a href="./lizenzen.html">Lizenzen</a>
+  </footer>
+</div>
+
+<!-- Versuchsansicht -->
+<div class="lb-x" id="lbX" role="dialog" aria-modal="true" aria-labelledby="lbXTitle" hidden>
+  <div class="lb-x-in">
+    <header class="lb-xh">
+      <div class="lb-xh-top"><button type="button" class="lb-back" id="lbXBack" aria-label="Zurück zur Übersicht"><svg class="wzi" aria-hidden="true"><use href="#wzi-back"></use></svg></button><span class="lb-xh-theme" id="lbXTheme"></span></div>
+      <h1 id="lbXTitle"></h1>
+      <p id="lbXQ"></p>
+      <nav class="lb-steps" id="lbXSteps" aria-label="Versuchsschritte"></nav>
+    </header>
+    <div id="lbXBody"></div>
+  </div>
+  <div class="lb-xnav"><div class="lb-xnav-in"><button type="button" class="cta" id="lbXPrev">Zurück</button><button type="button" class="cta primary" id="lbXNext">Weiter</button></div></div>
+</div>
+
+<script src="./wz-ui.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script src="./lb-core.js"></script>
+<script src="./lb-exp.js"></script>
+<script src="./lb-sense.js"></script>
+<script src="./lb-run.js"></script>
+<script src="./lb-app.js"></script>
+</body>
+</html>

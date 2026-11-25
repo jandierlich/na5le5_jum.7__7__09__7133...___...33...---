@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="aw">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<title>AlltagWahr</title>
+<meta name="description" content="AlltagWahr verwaltet Abos, Versicherungen und andere wiederkehrende Zahlungen – lokal auf deinem Gerät, ohne Cloud, ohne Tracking.">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="aw-icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<link rel="stylesheet" href="aw-style.css">
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+
+<a class="home-link wz-hbtn" href="./index.html" id="homeLink" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"></a>
+<button type="button" class="settings-toggle wz-hbtn" id="settingsBtn" aria-label="Einstellungen" title="Einstellungen"></button>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<header class="wz-hero">
+  <div class="blob1"></div><div class="blob2"></div>
+  <div class="header-inner">
+    <div class="logo-badge">
+      <img src="./aw-icon-512.png" alt="AlltagWahr Logo" class="app-logo app-logo-light" width="84" height="84" decoding="sync" fetchpriority="high">
+      
+    </div>
+    <h1>AlltagWahr</h1>
+    <p>Wiederkehrende Ausgaben im Blick – 100% lokal, keine Datensammlung.</p>
+  </div>
+</header>
+
+<div class="hero nm-raised-deep">
+  <p class="hero-label">Monatliche Belastung</p>
+  <p class="hero-amount" id="monthlyTotal">0,00 €</p>
+  <p class="hero-sub" id="yearlyHint">≈ 0,00 € im Jahr</p>
+  <span class="hero-compare" id="monthCompare" style="display:none;"></span>
+</div>
+
+<div class="tiles">
+  <div class="tile nm-raised nm-pressable" id="tileNextPayment" role="button" tabindex="0">
+    <div class="tile-icon violet" id="tileIconCalendar"></div>
+    <p class="tile-title">Nächste Zahlung</p>
+    <p class="tile-value" id="nextPayment">–</p>
+    <p class="tile-extra" id="nextPaymentExtra"></p>
+  </div>
+  <div class="tile nm-raised nm-pressable" id="tileCancelRadar" role="button" tabindex="0">
+    <div class="tile-icon warn" id="tileIconClock"></div>
+    <p class="tile-title">Kündigungen</p>
+    <p class="tile-value" id="cancelRadar">Keine Fristen nah</p>
+    <p class="tile-extra" id="cancelRadarExtra"></p>
+  </div>
+</div>
+
+<div class="chart-card nm-raised" id="chartCard">
+  <div class="section-title" style="margin-bottom:10px;">Kategorien</div>
+  <div class="chart-wrap" id="chartWrap"></div>
+  <div class="chart-legend" id="chartLegend"></div>
+</div>
+
+<div class="section-head">
+  <p class="section-title">Alle Einträge</p>
+  <button class="section-action" id="sortToggle">nach Datum</button>
+</div>
+<div class="field" style="margin-bottom:10px;"><input id="searchInput" type="text" placeholder="Eintrag suchen …"></div>
+<div class="filter-bar" id="categoryFilterBar"></div>
+<div class="filter-status" id="filterStatus" style="display:none;">
+  <span id="filterStatusText"></span>
+  <button type="button" aria-label="Filter zurücksetzen" id="clearFilterMode"></button>
+</div>
+<div id="entryList"></div>
+
+<footer class="legal-links wz-footer">
+  <button type="button" id="btnShowOnboarding">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#aw">Datenschutz</a>
+</footer>
+
+<button class="fab" id="addBtn" aria-label="Neuer Eintrag">+</button>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastAction" class="toast-action" style="display:none;"></button></div>
+
+<!-- Eintrag anlegen/bearbeiten -->
+<div class="sheet-backdrop" id="sheetBackdrop">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <p class="sheet-title" id="sheetTitle">Neuer Eintrag</p>
+    <form id="entryForm">
+      <div class="field"><label for="fName">Name</label><input id="fName" type="text" placeholder="z. B. Streaming-Abo" required></div>
+      <div class="row2">
+        <div class="field"><label for="fAmount">Betrag (€)</label><input id="fAmount" type="number" step="0.01" min="0" placeholder="0,00" required></div>
+        <div class="field"><label for="fRhythm">Rhythmus</label>
+          <select id="fRhythm">
+            <option value="monthly">monatlich</option>
+            <option value="quarterly">vierteljährlich</option>
+            <option value="yearly">jährlich</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Kategorie</label><div class="cat-picker" id="catPicker"></div></div>
+      <div class="row2">
+        <div class="field"><label for="fDate">Nächste Fälligkeit</label><div class="date-wrap nm-inset"><input id="fDate" type="date" required></div></div>
+        <div class="field"><label for="fNotice">Kündigungsfrist (Tage, optional)</label><input id="fNotice" type="number" min="0" placeholder="z. B. 30"></div>
+      </div>
+      <div class="field"><label for="fContractEnd">Vertragsende (optional)</label><div class="date-wrap nm-inset"><input id="fContractEnd" type="date"></div></div>
+      <div class="field"><label for="fContractTerm">Vertragslaufzeit (Monate, optional)</label><input id="fContractTerm" type="number" min="0" placeholder="z. B. 24"></div>
+      <div class="settings-row" style="padding:8px 4px 14px;">
+        <div>
+          <div class="settings-row-label">Automatische Verlängerung</div>
+          <div class="settings-row-sub">Verlängert sich der Vertrag, wenn nicht rechtzeitig gekündigt wird?</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="fAutoRenew" checked><span class="slider"></span></label>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-secondary" id="cancelBtn">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Speichern</button>
+      </div>
+      <div class="sheet-actions" id="deleteRow" style="display:none;">
+        <button type="button" class="btn btn-delete" id="deleteBtn">Eintrag löschen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Einstellungen -->
+<div class="sheet-backdrop" id="settingsBackdrop">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <p class="sheet-title">Einstellungen</p>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Erinnerungen</div>
+        <div class="settings-row-sub">Hinweis beim Öffnen, wenn eine Zahlung oder Kündigungsfrist ansteht</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="reminderToggle"><span class="slider"></span></label>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Backup exportieren</div>
+        <div class="settings-row-sub">Alle Einträge als JSON-Datei sichern</div>
+      </div>
+      <button class="btn btn-secondary" style="flex:none;padding:10px 16px;" id="exportBtn">Export</button>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Backup importieren</div>
+        <div class="settings-row-sub">Ersetzt aktuelle Einträge durch die Datei</div>
+      </div>
+      <label class="import-label" for="importInput">Datei wählen</label>
+      <input type="file" id="importInput" accept="application/json" style="display:none;">
+    </div>
+
+    <div class="section-head" style="margin:22px 0 4px;">
+      <p class="section-title">Kategorien</p>
+    </div>
+    <div id="categoryManager"></div>
+    <button type="button" class="cat-add-btn" id="addCategoryBtn">+ Kategorie hinzufügen</button>
+
+    <p class="sheet-text" style="margin-top:16px;">Alle Daten bleiben ausschließlich lokal auf diesem Gerät gespeichert. Es gibt keine Cloud-Synchronisierung.</p>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-secondary" id="settingsCloseBtn">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Kategorie anlegen/bearbeiten -->
+<div class="sheet-backdrop" id="categoryBackdrop">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <p class="sheet-title" id="categorySheetTitle">Neue Kategorie</p>
+    <form id="categoryForm">
+      <div class="field"><label for="fCatName">Name</label><input id="fCatName" type="text" placeholder="z. B. Kinderbetreuung" required></div>
+      <div class="field"><label>Icon</label><div class="icon-picker" id="iconPicker"></div></div>
+      <div class="field"><label>Farbe</label><div class="color-picker" id="colorPicker"></div></div>
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-secondary" id="categoryCancelBtn">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Speichern</button>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-delete" id="categoryDeleteBtn" style="display:none;">Kategorie löschen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="wz-onboarding.js"></script>
+<script src="aw-app.js"></script>
+</body>
+</html>

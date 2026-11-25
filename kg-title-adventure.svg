@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Abenteuer und Outdoor">
+  <style>
+    @keyframes tad-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .tad-bird { animation: tad-bob 2.6s ease-in-out infinite; transform-origin: center; }
+    @media (prefers-reduced-motion: reduce) { .tad-bird { animation: none; } }
+  </style>
+  <rect width="800" height="160" fill="#e4f2ee"/>
+  <path d="M0,120 L120,55 L220,120 Z" fill="#0B1440"/>
+  <path d="M150,120 L260,45 L370,120 Z" fill="#3355C8"/>
+  <path d="M600,130 L700,60 L800,130 Z" fill="#0B1440"/>
+  <rect x="0" y="120" width="800" height="40" fill="#6C8BFF" opacity="0.5"/>
+  <path class="tad-bird" d="M420,55 q10,-10 20,0 q10,-10 20,0" stroke="#0B1440" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path class="tad-bird" d="M470,40 q8,-8 16,0 q8,-8 16,0" stroke="#0B1440" stroke-width="3" fill="none" stroke-linecap="round" style="animation-delay:-1s"/>
+</svg>

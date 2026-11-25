@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de" class="game-shell" data-wz-app="zw" data-wz-fixed="dark">
+<head>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>ZahlenturmWahr – Spiel</title>
+<meta name="description" content="ZahlenturmWahr — Zahlen steigen in einen 3D-Turm und verschmelzen. Offline spielbar.">
+<meta name="theme-color" content="#0d0a1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="zw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="zw-style.css">
+<script>
+  try {
+    var ztTheme = 'dark'; // Spiele bleiben immer im Nachthimmel-Look
+    document.documentElement.setAttribute('data-theme', ztTheme);
+    if (ztTheme === 'light') { var ztMeta = document.querySelector('meta[name="theme-color"]'); if (ztMeta) ztMeta.setAttribute('content', '#eef1fb'); }
+  } catch (e) {}
+</script>
+<script>
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) { e.preventDefault(); } }, { passive: false });
+</script>
+<style id="fw-familie">
+.fw-i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto;}
+
+.topbar-actions{gap:8px;}
+/* FunWahr-Familienstil – bewusst in jede App kopiert (keine gemeinsame Datei),
+   damit jede App technisch eigenständig bleibt. */
+.fw-home{width:38px!important;height:38px!important;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;
+  background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;text-decoration:none!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);flex:0 0 auto;padding:0!important;font-size:0!important;backdrop-filter:none!important;}
+.fw-home svg{width:18px!important;height:18px!important;display:block;}
+.fw-home:active{transform:scale(.92);}
+.fw-title{background:linear-gradient(90deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-a742ff, #a742ff) 50%,#ff3caa)!important;-webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent;white-space:nowrap;text-shadow:none!important;}
+.fw-primary{background:linear-gradient(150deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-8e75f0, #8E75F0))!important;color:var(--wzp-0d0a1c, #0d0a1c)!important;border:none!important;text-shadow:none!important;
+  font-weight:800!important;box-shadow:0 6px 14px rgba(var(--wzq-5a2fbe, 90, 47, 190),.35)!important;}
+.fw-primary *{color:var(--wzp-0d0a1c, #0d0a1c)!important;}
+.fw-nowrap{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+html[data-theme="light"] .fw-home{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;box-shadow:0 3px 10px rgba(20,30,70,.12);}
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+<style>.brand-icon{width:30px;height:30px;border-radius:8px;flex:0 0 auto;display:block}</style>
+</head>
+<body class="game-shell">
+
+<div class="sky" aria-hidden="true">
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <a class="icon-btn fw-home" href="zw-index.html" title="Zur Startseite" aria-label="Zur WahrZentrale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
+    <img class="brand-icon" src="zw-icon-192.png" alt="" width="30" height="30">
+    <span class="brand-name fw-title">ZahlenturmWahr</span>
+  </div>
+  <div class="topbar-actions">
+    <button id="zt-sound-btn" class="icon-btn fw-home" aria-pressed="true" title="Sound an/aus" aria-label="Sound an/aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 9.4h2.6l4.7-3.9v13L6.8 14.6H4.2a1.2 1.2 0 0 1-1.2-1.2v-2.8a1.2 1.2 0 0 1 1.2-1.2z"/><path d="M15.2 9a4.2 4.2 0 0 1 0 6"/><path d="M17.9 6.3a8 8 0 0 1 0 11.4"/></svg></button>
+  </div>
+</header>
+
+<main class="stage">
+
+  <section class="scoreboard" aria-label="Punktestand">
+    <div class="score-card">
+      <span class="score-label">Punkte</span>
+      <span class="score-value" id="zt-score">0</span>
+    </div>
+    <div class="score-card">
+      <span class="score-label">Bestwert</span>
+      <span class="score-value" id="zt-best">0</span>
+    </div>
+    <div class="score-card" id="zt-goal-card" hidden>
+      <span class="score-label">Ziel</span>
+      <span class="score-value" id="zt-goal-value">–</span>
+    </div>
+    <div class="score-card combo-card" id="zt-combo-card" hidden>
+      <span class="score-label">Kombo</span>
+      <span class="score-value" id="zt-combo">×1</span>
+    </div>
+  </section>
+
+  <section class="next-row" aria-label="Nächste Zahlen">
+    <div class="next-slot">
+      <span class="next-label">steigt jetzt</span>
+      <span class="next-tile zt-tile" id="zt-next-value">2</span>
+    </div>
+    <span class="next-arrow" aria-hidden="true">→</span>
+    <div class="next-slot next-slot-small">
+      <span class="next-label">danach</span>
+      <span class="next-tile zt-tile" id="zt-next-value-2">4</span>
+    </div>
+  </section>
+
+  <section class="tower-wrap">
+    <div class="silo-frame">
+      <div class="silo-ceiling" aria-hidden="true"></div>
+      <div class="silo-3d" id="zt-board" role="group" aria-label="Turm-Spielfeld"></div>
+    </div>
+
+    <p class="status-line" id="zt-status" hidden></p>
+  </section>
+
+  <section class="controls">
+    <button id="zt-undo-btn" class="btn btn-ghost" disabled><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 5 4 9.5 8.5 14"/><path d="M4 9.5h10.2a5.3 5.3 0 0 1 0 10.6h-2.7"/></svg> Rückgängig</button>
+    <button id="zt-newgame-btn" class="btn btn-primary"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5v5h-5"/><path d="M4 19v-5h5"/><path d="M5.6 9a7 7 0 0 1 12.7-1.3L20 10"/><path d="M18.4 15a7 7 0 0 1-12.7 1.3L4 14"/></svg> Neuer Turm</button>
+  </section>
+
+  <div class="highest-badge">Höchster Wert je Stein: <span id="zt-highest">–</span></div>
+</main>
+
+<div class="toast" id="zt-toast" role="status" aria-live="polite"></div>
+
+<div class="modal-backdrop" id="zt-goal-modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="zt-goal-modal-title">
+    <h2 id="zt-goal-modal-title"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg> Ziel erreicht!</h2>
+    <p id="zt-goal-modal-text" class="goal-modal-text"></p>
+    <div class="goal-modal-actions">
+      <button class="btn btn-primary" id="zt-goal-next-btn">Nächstes Ziel</button>
+      <button class="btn btn-ghost" id="zt-goal-continue-btn">Weiterspielen</button>
+      <a class="btn btn-ghost" href="zw-index.html">Zur Startseite</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="zt-confirm-modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="zt-confirm-modal-title">
+    <h2 id="zt-confirm-modal-title">Bist du sicher?</h2>
+    <p id="zt-confirm-modal-text" class="goal-modal-text"></p>
+    <div class="goal-modal-actions">
+      <button class="btn btn-primary" id="zt-confirm-yes-btn">Ja</button>
+      <button class="btn btn-ghost" id="zt-confirm-no-btn">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<script src="zw-game.js"></script>
+<script>
+
+</script>
+<script>/* FunWahr: Zeitstempel für „Zuletzt gespielt“ auf der Startseite (nur dieser eine Wert) */try{localStorage.setItem('funwahr-zuletzt-zw',String(Date.now()));}catch(e){}</script>
+</body>
+</html>
+

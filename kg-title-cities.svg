@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" role="img" aria-label="Titelbild Städte und Kultur">
+  <defs>
+    <linearGradient id="tcSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0B1440"/>
+      <stop offset="100%" stop-color="#1E2A78"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="160" fill="url(#tcSky)"/>
+  <circle cx="120" cy="40" r="22" fill="#FF8C00" opacity="0.9"/>
+  <g fill="#E4E8FB" opacity="0.95">
+    <rect x="40" y="90" width="46" height="70"/>
+    <rect x="95" y="70" width="40" height="90"/>
+    <rect x="145" y="100" width="36" height="60"/>
+    <rect x="330" y="80" width="50" height="80"/>
+    <rect x="390" y="60" width="34" height="100"/>
+    <rect x="435" y="95" width="44" height="65"/>
+    <rect x="600" y="75" width="38" height="85"/>
+    <rect x="648" y="95" width="50" height="65"/>
+    <rect x="710" y="55" width="30" height="105"/>
+  </g>
+  <g fill="#0B1440" opacity="0.4">
+    <rect x="48" y="100" width="8" height="10"/>
+    <rect x="64" y="100" width="8" height="10"/>
+    <rect x="48" y="120" width="8" height="10"/>
+    <rect x="64" y="120" width="8" height="10"/>
+    <rect x="104" y="82" width="7" height="9"/>
+    <rect x="118" y="82" width="7" height="9"/>
+    <rect x="104" y="102" width="7" height="9"/>
+    <rect x="118" y="102" width="7" height="9"/>
+    <rect x="340" y="92" width="8" height="10"/>
+    <rect x="356" y="92" width="8" height="10"/>
+    <rect x="608" y="88" width="7" height="9"/>
+    <rect x="622" y="88" width="7" height="9"/>
+  </g>
+  <rect x="0" y="158" width="800" height="2" fill="#0a2c47"/>
+</svg>

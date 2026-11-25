@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="kl">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>KlangWahr</title>
+<meta name="description" content="KlangWahr – Töne sichtbar machen: Spektrum, Stimmgerät und Tongenerator. 100% lokal, keine Aufnahme, keine Datensammlung.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<meta name="theme-color" content="#5A2FBE">
+<link rel="icon" href="./kl-icon-192.png">
+<!-- KlangWahr · Teil der WahrZentrale · © 2026 Jan Dierlich – Alle Rechte vorbehalten. -->
+<style>@view-transition{navigation:auto}.wzi{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.22em;fill:currentColor;flex-shrink:0}
+  [hidden]{display:none!important}
+  :root{
+    --bg:var(--wzp-f1eefa, #F1EEFA); --card:var(--wzp-f8f6fc, #F8F6FC); --card2:var(--wzp-dac7f2, #DAC7F2); --btn-warm:var(--wzp-dac7f2, #DAC7F2); --text:var(--wzp-241e3f, #241E3F); --sub:var(--wzp-524370, #524370); --sub-onbg:var(--wzp-4a3d56, #4A3D56);
+    --border:var(--wzp-c7b3ec, #C7B3EC); --cta-bg:var(--wzp-5a2fbe, #5A2FBE); --cta-text:#FFFFFF; --accent:var(--wzp-5a2fbe, #5A2FBE); --soft:var(--wzp-e6ddf7, #E6DDF7);
+    --red:#FF3B30; --tint-red:#FBD6D6; --pill-red:#7A1F1F;
+    --shadow-dark-soft: rgba(var(--wzq-241e3f, 36, 30, 63),.16); --shadow-light-soft: rgba(255,255,255,.75);
+    --mono: ui-monospace, Menlo, -apple-system, sans-serif;
+  }
+  html.theme-dark{
+    --bg:var(--wzp-1e1b2e, #1E1B2E); --card:var(--wzp-2a2440, #2A2440); --card2:var(--wzp-3a2e52, #3A2E52); --btn-warm:var(--card2); --text:var(--wzp-eeeaf8, #EEEAF8); --sub:var(--wzp-c3b2f0, #C3B2F0); --sub-onbg:var(--wzp-c3b2f0, #C3B2F0);
+    --border:var(--wzp-5c4c82, #5C4C82); --cta-bg:var(--wzp-b9a6f5, #B9A6F5); --cta-text:var(--wzp-241e3f, #241E3F); --accent:var(--wzp-b9a6f5, #B9A6F5); --soft:var(--wzp-362c52, #362C52);
+    --tint-red:#331A1A; --pill-red:#F5A3A3;
+    --shadow-dark-soft: rgba(0,0,0,.45); --shadow-light-soft: rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);width:100%;overflow-x:hidden;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;touch-action:manipulation}
+  body{font-family:-apple-system,sans-serif;color:var(--text);line-height:1.5}
+  .app{max-width:480px;margin:0 auto;min-height:var(--wz-vh, 100dvh);padding:0 16px 28px;position:relative}
+  .safe-top{padding-top:calc(env(safe-area-inset-top) + 60px)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  header{background:linear-gradient(150deg,var(--cta-bg) 0%,var(--wzp-241748, #241748) 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top,0px) + 6px) 24px 26px;margin:calc(-1 * (env(safe-area-inset-top,0px) + 60px)) -16px 20px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10);top:-75px;right:-55px}
+  header::after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-45px;left:30px}
+  .logo-badge{position:relative;width:72px;height:72px;margin:0 auto 14px}
+  .logo-badge img{width:100%;height:100%;display:block;object-fit:contain;box-shadow:0 14px 30px rgba(var(--wzq-141023, 20, 16, 35),.35);border-radius:18px}
+  header h1{font-size:23px;margin:0;font-weight:700;letter-spacing:-.01em;color:#fff;position:relative;font-family:ui-rounded,-apple-system,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+  header p{font-size: 13.5px;color:rgba(255,255,255,.88);margin:8px 0 0;position:relative;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+  .theme-toggle,.home-link{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:9999;width:40px;height:40px;border-radius:20px;border:1px solid rgba(120,120,128,0.3);background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:16px;text-align:center;line-height:38px;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);text-decoration:none;color:var(--wzp-241e3f, #241E3F)}
+  .theme-toggle{right:16px}
+  .home-link{right:64px}
+  @media (min-width:640px){.theme-toggle{right:calc(50vw - 195px + 16px) !important}.home-link{right:calc(50vw - 195px + 64px) !important}}
+
+  .tabs{display:flex;gap:6px;background:var(--card2);border-radius:14px;padding:4px;margin:14px 0 18px}
+  .tab{flex:1;text-align:center;padding:9px 4px;border-radius:11px;font-size: 14.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;border:none;background:transparent;font-family:inherit}
+  .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:6px 6px 14px var(--shadow-dark-soft),-6px -6px 14px var(--shadow-light-soft)}
+  .card h2{font-size:15px;margin:0 0 10px;font-weight:600}
+  .card h3{font-size:14px;margin:14px 0 6px;font-weight:600}
+  .muted{color:var(--sub-onbg);font-size: 13.5px;line-height:1.5}
+  .muted p{margin:0 0 8px}
+  .small{font-size:12.5px}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--btn-warm);color:var(--text);border:none;border-radius:16px;padding:16px 14px;font-size:16px;font-weight:700;text-align:center;cursor:pointer;font-family:inherit}
+  .cta:active{transform:scale(.98)}
+  .cta:disabled{opacity:.5;cursor:default}
+  .cta.primary{background:var(--wz-primary-bg, var(--cta-bg)) !important;color:var(--wz-primary-fg, var(--cta-text)) !important;box-shadow:var(--wz-primary-shadow, none) !important;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .cta.danger{background:var(--tint-red);color:var(--pill-red)}
+  .cta.slim{padding:12px 12px;font-size:15px;border-radius:14px}
+  .btn-row{display:flex;gap:10px;margin-top:10px}
+  .btn-row .cta{flex:1}
+
+  .stat-row{display:flex;gap:10px;margin-top:12px}
+  .stat{flex:1;background:var(--card2);border-radius:14px;padding:10px 12px;text-align:center;min-width:0}
+  .stat b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat span{display:block;font-size: 12.5px;color:var(--sub-onbg);margin-top:2px}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0}
+  .toggle-row .label{font-size: 14.5px;font-weight:600}
+  .toggle-row .desc{font-size: 13px;color:var(--sub-onbg);margin-top:2px}
+  .switch{position:relative;width:46px;height:27px;border-radius:999px;background:var(--card2);border:1px solid var(--border);flex-shrink:0;cursor:pointer;padding:0}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+  .switch.on{background:var(--cta-bg);border-color:var(--cta-bg)}
+  .switch.on::after{transform:translateX(19px)}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{padding:6px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--border);font-size: 13.5px;font-weight:600;color:var(--sub-onbg);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .field:last-child{border-bottom:none}
+  .field label{font-size:14.5px;font-weight:600}
+  .field .hint{display:block;font-size:12.5px;font-weight:400;color:var(--sub-onbg)}
+  .num-input{width:108px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;text-align:right;font-variant-numeric:tabular-nums;-webkit-appearance:none;appearance:none}
+  .text-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none}
+  input[type=range]{accent-color:var(--accent);width:100%}
+
+  .history-item{background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .history-item .row1{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .history-item .when{font-size: 13px;color:var(--sub-onbg)}
+  .history-item .vals{font-size: 15px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+  .history-item .note{font-size: 13.5px;color:var(--sub-onbg);margin-top:3px}
+  .history-item .actions{display:flex;gap:14px;margin-top:8px}
+  .icon-btn{background:none;border:none;font-size:14px;cursor:pointer;color:var(--sub-onbg);padding:2px 0;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+  .empty-hint{text-align:center;color:var(--sub-onbg);font-size: 14px;padding:22px 10px}
+
+  .scale-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size: 14px}
+  .scale-row:last-child{border-bottom:none}
+  .scale-row .v{font-weight:600;color:var(--sub-onbg);font-size: 13.5px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .steps{margin:0;padding:0 0 0 20px;font-size:13.5px;color:var(--sub-onbg)}
+  .steps li{margin:0 0 6px}
+  .notice{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--soft);color:var(--text);font-size: 13.5px}
+  .notice.warn{background:var(--tint-red);color:var(--pill-red);font-weight:600}
+
+  /* Messanzeige (dunkle Instrumentenfläche, wie die Sonnenbahn in HimmelsWahr) */
+  .instr{background:linear-gradient(165deg,var(--wzp-241748, #241748) 0%,var(--wzp-15102a, #15102A) 100%);border-radius:16px;color:#fff;position:relative;overflow:hidden;border:1px solid rgba(226,220,255,.14)}
+  .instr-lbl{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .instr-val{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .instr-sub{display:block;font:500 11px var(--mono);color:rgba(226,220,255,.72);margin-top:2px}
+  .instr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;border-top:1px solid rgba(226,220,255,.14)}
+
+  /* Vollbild-Kamera (gleiche Optik wie die Sonnenbahn in HimmelsWahr) */
+  .ar{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;z-index:2000;display:none;color:#fff}
+  .ar.on{display:block}
+  .ar video,.ar canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ar video{object-fit:cover}
+  .ar-top{position:absolute;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;z-index:3}
+  .ar-btn{border-radius:10px;border:1px solid rgba(226,220,255,0.24);background:rgba(12,10,32,0.72);color:#fff;font:inherit;font-size:13px;font-weight:650;padding:10px 13px;min-height:44px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+  .ar-btn.main{background:linear-gradient(150deg,var(--wzp-6e4fe0, #6E4FE0) 0%,var(--wzp-5a2fbe, #5A2FBE) 100%);border-color:transparent;font-size:15px;padding:13px 16px}
+  .ar-btn:disabled{opacity:.45}
+  .ar-title{background:rgba(12,10,32,0.72);border:1px solid rgba(226,220,255,0.24);border-radius:10px;padding:6px 10px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);align-self:center;text-align:center;white-space:pre-line;line-height:1.35;color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px rgba(10,8,30,.85);font-variant-numeric:tabular-nums}
+  .ar-info{position:absolute;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;border-radius:12px;padding:12px 14px;background:rgba(12,10,32,0.84);border:1px solid rgba(226,220,255,0.24);line-height:1.3;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .ar-info small{display:block;opacity:.85;font-size:12px;margin-top:6px;line-height:1.4}
+  .ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ar-grid.three{grid-template-columns:repeat(3,1fr)}
+  .ar-grid span,.ar-ev span{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#B9A6F5;margin-bottom:3px}
+  .ar-grid b,.ar-ev b{display:block;font:600 15px var(--mono);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ar-grid .gold b{color:#FFD27A}
+  .ar-grid i,.ar-ev i{display:block;font:500 11px var(--mono);font-style:normal;color:rgba(226,220,255,0.72);margin-top:2px}
+  .ar-row{display:flex;gap:8px;margin-top:10px}
+  .ar-row .ar-btn{flex:1}
+  .ar-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;color:#fff}
+  .ar-field label{min-width:76px;font-size:13px}
+  .ar-field input[type=range]{flex:1;min-width:0;accent-color:#B9A6F5}
+  .ar-field output{min-width:44px;text-align:right;font:600 13px var(--mono)}
+  .ar-sep{margin-top:10px;padding-top:10px;border-top:1px solid rgba(226,220,255,0.18)}
+  html:has(.ar.on) .wz-hbtn, html:has(.ar.on) .home-link, html:has(.ar.on) .theme-toggle{display:none !important}
+
+  footer{text-align:center;padding:22px 0 6px;font-size:14px;font-weight:600;color:var(--text)}
+  footer a,footer button{color:var(--text);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:14px;font-weight:600;font-family:inherit;-webkit-appearance:none;appearance:none;padding:0;margin:0}
+  .field > span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+  .muted a{color:var(--accent);font-weight:600}
+  /* KlangWahr */
+  .kl-instr{position:relative}
+  .kl-water{display:block;width:100%;height:320px;background:#0B0921}
+  .kl-spec{display:block;width:100%;height:110px;border-top:1px solid rgba(226,220,255,.14)}
+  .kl-idle{position:absolute;left:0;right:0;top:0;height:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(226,220,255,.75);font-size:13.5px;pointer-events:none}
+  .kl-idle .wzi{width:34px;height:34px;color:#B9A6F5}
+  .kl-tuner{padding-top:4px}
+  #klTunerSvg{display:block;width:100%;height:auto}
+  .kl-note{text-align:center;margin-top:2px;position:relative}
+  .kl-note b{display:block;font:600 44px ui-rounded,-apple-system,sans-serif;color:#fff;line-height:1}
+  .kl-note b.ok{color:#34C759}
+  .kl-note b.near{color:#FFD27A}
+  .kl-note b.far{color:#FF3B30}
+  .kl-note b{transition:color .25s}
+  .kl-note span{display:block;font:500 12px var(--mono);color:rgba(226,220,255,.75);margin-top:6px;min-height:15px}
+  .kl-strings{display:flex;justify-content:center;gap:8px;padding:12px 10px 4px;flex-wrap:wrap}
+  .kl-strings span{min-width:38px;padding:5px 8px;border-radius:9px;border:1px solid rgba(226,220,255,.22);font:600 13px var(--mono);color:rgba(226,220,255,.8);text-align:center}
+  .kl-strings span.on{border-color:#FFD27A;color:#FFD27A;background:rgba(255,210,122,.1)}
+  .kl-a4{font:600 15px var(--mono);min-width:66px;text-align:center;display:inline-block}
+  .kl-gen{padding:16px 14px 10px;text-align:center}
+  .kl-genf b{font:600 40px var(--mono);color:#fff;font-variant-numeric:tabular-nums}
+  .kl-genf span{font:600 14px var(--mono);color:#B9A6F5;margin-left:6px}
+  .kl-gennote{font:500 12px var(--mono);color:rgba(226,220,255,.75);margin-top:2px}
+  .kl-wave{display:block;width:100%;height:70px;margin-top:8px}
+  .kl-scale{display:flex;justify-content:space-between;font:500 11px var(--mono);color:var(--sub-onbg);margin:2px 2px 0}
+  .kl-thumb{display:block;width:100%;height:46px;border-radius:10px;margin-top:8px;background:#0B0921}</style>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+<symbol id="wzi-home" viewBox="0 0 24 24"><path d="M4 11.5L12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h5v-5.5h2V20h5v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="wzi-close" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></g></symbol>
+<symbol id="wzi-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11v1a6 6 0 0012 0v-1"/><line x1="12" y1="18" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></g></symbol>
+<symbol id="wzi-spectrum" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M3 18.5c1.8 0 2.6-1.6 4-1.6s1.7-10.4 3.4-10.4 1.7 9.2 3.2 9.2 1.8-4.2 3-4.2 1.7 6.4 4.4 6.4"/></g></symbol>
+<symbol id="wzi-tuning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3v7.5a3.5 3.5 0 0 0 7 0V3"/><path d="M12 14v7.5"/></g></symbol>
+<symbol id="wzi-wave" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12c1.6-5 3.2-5 4.75 0s3.15 5 4.75 0 3.2-5 4.75 0 3.15 5 4.75 0"/></g></symbol>
+<symbol id="wzi-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z" fill="currentColor"/></symbol>
+<symbol id="wzi-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></symbol>
+<symbol id="wzi-pause" viewBox="0 0 24 24"><g fill="currentColor"><rect x="6.5" y="5.5" width="4" height="13" rx="1.2"/><rect x="13.5" y="5.5" width="4" height="13" rx="1.2"/></g></symbol>
+<symbol id="wzi-bookmark" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></g></symbol>
+<symbol id="wzi-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="1" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 12.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5L17.5 7"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></g></symbol>
+<symbol id="wzi-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M6 11H5a1.5 1.5 0 0 0-1.5 1.5v6.5A1.5 1.5 0 0 0 5 20.5h14a1.5 1.5 0 0 0 1.5-1.5v-6.5A1.5 1.5 0 0 0 19 11h-1"/></g></symbol>
+<symbol id="wzi-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5L21.5 20h-19z"/><line x1="12" y1="9.2" x2="12" y2="14.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="wzi-volume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z" fill="currentColor" stroke="none"/><path d="M15.5 9a4 4 0 010 6"/><path d="M18 6.5a8 8 0 010 11"/></g></symbol>
+</defs>
+</svg>
+<a class="home-link wz-hbtn" href="./index.html" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg class="wzi" aria-hidden="true"><use href="#wzi-home"></use></svg></a>
+<button type="button" class="theme-toggle wz-hbtn" id="themeToggle" data-wz-theme-toggle aria-label="Hell-/Dunkelmodus umschalten"></button>
+
+<div class="app safe-top safe-bottom">
+  <header class="wz-hero">
+    <div class="logo-badge"><img class="wz-logo-light" src="./kl-icon-192.png" alt="KlangWahr Logo" width="84" height="84" decoding="sync" fetchpriority="high"></div>
+    <h1>KlangWahr</h1>
+    <p>Töne sichtbar machen – Spektrum, Stimmgerät und Tongenerator. 100% lokal, keine Aufnahme.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="spektrum" role="tab">Spektrum</button>
+    <button class="tab" data-tab="stimmen" role="tab">Stimmen</button>
+    <button class="tab" data-tab="ton" role="tab">Ton</button>
+    <button class="tab" data-tab="momente" role="tab">Momente</button>
+  </div>
+
+  <!-- ===== SPEKTRUM ===== -->
+  <section class="screen active" id="screen-spektrum">
+    <div class="card">
+      <h2>Spektrum und Klangbild</h2>
+      <p class="muted" id="klSpecIntro">Zeigt, welche Tonhöhen gerade erklingen – von tiefem Brummen bis zum hellen Zirpen. Der Ton wird nur live ausgewertet, nie aufgenommen oder gespeichert.</p>
+      <div class="instr kl-instr">
+        <canvas id="klWater" class="kl-water" aria-label="Klangbild (Wasserfall)"></canvas>
+        <canvas id="klSpec" class="kl-spec" aria-label="Spektrum"></canvas>
+        <div class="kl-idle" id="klIdle1"><svg class="wzi" aria-hidden="true"><use href="#wzi-spectrum"></use></svg><span>Tippe auf „Mikrofon starten“</span></div>
+        <div class="instr-grid">
+          <div><span class="instr-lbl">Stärkste</span><b class="instr-val" id="klPeakF">–</b><i class="instr-sub" id="klPeakN">&nbsp;</i></div>
+          <div><span class="instr-lbl">Pegel</span><b class="instr-val" id="klLevel">–</b><i class="instr-sub">dBFS, unkalibriert</i></div>
+          <div><span class="instr-lbl">Schwerpunkt</span><b class="instr-val" id="klCent">–</b><i class="instr-sub" id="klCentSub">Klangfarbe</i></div>
+        </div>
+      </div>
+      <div class="notice" id="klHint" hidden></div>
+      <div class="chip-row" style="margin-top:12px" id="klRange" role="radiogroup" aria-label="Bereich">
+        <button type="button" class="chip active" data-r="voll" role="radio" aria-checked="true">Alles</button>
+        <button type="button" class="chip" data-r="tief" role="radio" aria-checked="false">Tief bis 1 kHz</button>
+        <button type="button" class="chip" data-r="stimme" role="radio" aria-checked="false">Stimme</button>
+        <button type="button" class="chip" data-r="hoch" role="radio" aria-checked="false">Hoch ab 2 kHz</button>
+      </div>
+      <div class="btn-row">
+        <button class="cta primary" id="klMicBtn"><svg class="wzi" aria-hidden="true"><use href="#wzi-mic"></use></svg> Mikrofon starten</button>
+      </div>
+      <div class="btn-row">
+        <button class="cta slim" id="klFreeze" disabled><svg class="wzi" aria-hidden="true"><use href="#wzi-pause"></use></svg> Anhalten</button>
+        <button class="cta slim" id="klSnap" disabled><svg class="wzi" aria-hidden="true"><use href="#wzi-bookmark"></use></svg> Merken</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>So liest du das Klangbild</h2>
+      <p class="muted">Oben läuft das Klangbild von oben nach unten durch: Jede Zeile ist ein Augenblick, links sind tiefe, rechts hohe Töne. Je heller, desto lauter. Zu sehen sind etwa die letzten 8 Sekunden. Ein gleichmäßiger Ton zeichnet eine senkrechte Linie, eine Vogelstimme schnelle Bögen, Sprache viele waagerechte Streifen. Unten siehst du das aktuelle Spektrum.</p>
+    </div>
+  </section>
+
+  <!-- ===== STIMMGERÄT ===== -->
+  <section class="screen" id="screen-stimmen">
+    <div class="card">
+      <h2>Stimmgerät</h2>
+      <div class="chip-row" id="klInst" role="radiogroup" aria-label="Instrument"></div>
+      <div class="instr kl-tuner">
+        <svg id="klTunerSvg" viewBox="0 8 300 152" role="img" aria-label="Stimmanzeige"></svg>
+        <div class="kl-note"><b id="klNote">–</b><span id="klNoteSub">Spiel einen Ton</span></div>
+        <div class="kl-strings" id="klStrings"></div>
+        <div class="instr-grid">
+          <div><span class="instr-lbl">Frequenz</span><b class="instr-val" id="klTF">–</b><i class="instr-sub">Hz</i></div>
+          <div><span class="instr-lbl">Abweichung</span><b class="instr-val" id="klTC">–</b><i class="instr-sub">Cent</i></div>
+          <div><span class="instr-lbl">Ziel</span><b class="instr-val" id="klTT">–</b><i class="instr-sub" id="klTTs">Hz</i></div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:6px">
+        <label for="klA4">Kammerton a′<span class="hint">üblich 440 Hz, Orchester oft 442–443 Hz</span></label>
+        <span><button type="button" class="chip" id="klA4m" aria-label="Kammerton tiefer">−</button><b id="klA4" class="kl-a4">440 Hz</b><button type="button" class="chip" id="klA4p" aria-label="Kammerton höher">+</button></span>
+      </div>
+      <div class="btn-row">
+        <button class="cta primary" id="klMicBtn2"><svg class="wzi" aria-hidden="true"><use href="#wzi-mic"></use></svg> Mikrofon starten</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Tipps</h2>
+      <p class="muted">Halte das Instrument nah ans Smartphone und zupfe oder streiche eine Saite einzeln. Die Skala reicht bis ±25 Cent. Bis ±5 Cent leuchtet die Anzeige grün (gestimmt), bis ±10 Cent golden (minimal daneben), darüber rot. Das kleine Feld unten in der Skala zeigt die Abweichung als Zahl. Ein Cent ist ein Hundertstel Halbton; Abweichungen unter ±5 Cent hört kaum jemand.</p>
+    </div>
+  </section>
+
+  <!-- ===== TONGENERATOR ===== -->
+  <section class="screen" id="screen-ton">
+    <div class="card">
+      <h2>Tongenerator</h2>
+      <p class="muted">Erzeugt einen reinen Ton zum Ausprobieren: Wie klingt 50 Hz, wo liegt das hohe C, welche Töne höre ich noch?</p>
+      <div class="instr kl-gen">
+        <div class="kl-genf"><b id="klGF">440</b><span>Hz</span></div>
+        <div class="kl-gennote" id="klGN">a′ · A4</div>
+        <canvas id="klWave" class="kl-wave" aria-hidden="true"></canvas>
+      </div>
+      <div class="field" style="border-bottom:none">
+        <label for="klFreq">Frequenz</label>
+        <span><input class="num-input" id="klFreqNum" type="text" inputmode="decimal" value="440" aria-label="Frequenz in Hertz"> <span class="muted">Hz</span></span>
+      </div>
+      <input type="range" id="klFreq" min="0" max="1000" step="1" aria-label="Frequenz">
+      <div class="kl-scale"><span>20 Hz</span><span>200</span><span>2 kHz</span><span>20 kHz</span></div>
+      <h3>Klangform</h3>
+      <div class="chip-row" id="klWaveRow" role="radiogroup" aria-label="Klangform">
+        <button type="button" class="chip active" data-w="sine" role="radio" aria-checked="true">Sinus</button>
+        <button type="button" class="chip" data-w="triangle" role="radio" aria-checked="false">Dreieck</button>
+        <button type="button" class="chip" data-w="square" role="radio" aria-checked="false">Rechteck</button>
+        <button type="button" class="chip" data-w="sawtooth" role="radio" aria-checked="false">Sägezahn</button>
+      </div>
+      <div class="field">
+        <label for="klVol">Lautstärke<span class="hint">auf höchstens 50 % begrenzt</span></label>
+        <span style="width:140px"><input type="range" id="klVol" min="1" max="50" value="15" aria-label="Lautstärke"></span>
+      </div>
+      <div class="chip-row" style="margin-top:10px">
+        <button type="button" class="chip" data-step="-12">− Oktave</button>
+        <button type="button" class="chip" data-step="-1">− Halbton</button>
+        <button type="button" class="chip" data-step="1">+ Halbton</button>
+        <button type="button" class="chip" data-step="12">+ Oktave</button>
+      </div>
+      <div class="btn-row">
+        <button class="cta primary" id="klPlay"><svg class="wzi" aria-hidden="true"><use href="#wzi-play"></use></svg> Ton abspielen</button>
+      </div>
+      <div class="btn-row">
+        <button class="cta slim" id="klSweep"><svg class="wzi" aria-hidden="true"><use href="#wzi-wave"></use></svg> Frequenzlauf 20 Hz – 20 kHz</button>
+      </div>
+      <div class="notice warn">Leise beginnen, vor allem mit Kopfhörern. Sehr tiefe und sehr hohe Töne können lauter sein, als sie klingen. Der Frequenzlauf ist ein Experiment, kein Hörtest.</div>
+    </div>
+  </section>
+
+  <!-- ===== MOMENTE ===== -->
+  <section class="screen" id="screen-momente">
+    <div class="card">
+      <h2>Gemerkte Momente</h2>
+      <p class="muted small">Gemerkt werden nur Zahlen (stärkste Frequenzen, Pegel, Zeitpunkt) und ein kleines Spektrum-Bild – keine Tonaufnahme.</p>
+      <div id="klList"></div>
+    </div>
+    <div class="card">
+      <h2>Genauigkeit</h2>
+      <p class="muted">Das Mikrofon des Smartphones ist nicht kalibriert und filtert sehr tiefe und sehr hohe Töne. Pegel in dBFS sind relativ zum lautesten möglichen Signal, keine Schalldruckpegel. Für Lautstärke in Dezibel gibt es LautstärkeWahr. Frequenzen werden dagegen recht genau erkannt – im Stimmgerät auf etwa einen Cent.</p>
+    </div>
+    <div class="card">
+      <h2>Über diese App</h2>
+      <p class="muted">Teil der WahrZentrale</p>
+      <div style="height:10px"></div>
+      <button class="cta" id="showOnboardingBtn">Einführung erneut anzeigen</button>
+    </div>
+  </section>
+
+  <footer class="wz-footer">
+    <button type="button" onclick="KL.showOnboarding()">Einführung</button><span class="sep" aria-hidden="true">·</span><a href="./impressum.html">Impressum</a><span class="sep" aria-hidden="true">·</span><a href="./datenschutz.html#kl">Datenschutz</a>
+  </footer>
+</div>
+
+<script src="./wz-ui.js"></script>
+<script src="./wz-onboarding.js"></script>
+<script>function wzIcon(id,cls){return '<svg class="wzi'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#wzi-'+id+'"></use></svg>';}</script>
+<script>
+/* ============================================================
+   KlangWahr – Spektrum/Klangbild, Stimmgerät, Tongenerator
+   Das Mikrofon wird nur live ausgewertet (Web Audio API), nie
+   aufgenommen, gespeichert oder übertragen.
+   © 2026 Jan Dierlich – Alle Rechte vorbehalten.
+   ============================================================ */
+(function(){
+  "use strict";
+  var LS_CFG = "klangwahr_cfg", LS_LIST = "klangwahr_momente", LS_ONB = "klangwahr_onboarded";
+  var $ = function(id){ return document.getElementById(id); };
+  function load(k, d){ try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } }
+  function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function f(n, d){ return n == null || !isFinite(n) ? "–" : n.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function hz(v){ return v >= 1000 ? f(v / 1000, v >= 10000 ? 1 : 2) + " kHz" : f(v, v < 100 ? 1 : 0) + " Hz"; }
+  function toast(t){ if(window.wzToast) wzToast(t); }
+  var cfg = load(LS_CFG, {}) || {};
+  if(!(cfg.a4 >= 430 && cfg.a4 <= 450)) cfg.a4 = 440;
+  function saveCfg(){ save(LS_CFG, cfg); }
+
+  /* ---------- Noten (deutsche Schreibweise: B = b, H = h) ---------- */
+  var NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "B", "H"];
+  function midiOf(fr){ return 69 + 12 * Math.log(fr / cfg.a4) / Math.LN2; }
+  function freqOf(m){ return cfg.a4 * Math.pow(2, (m - 69) / 12); }
+  function noteName(m){ m = Math.round(m); return NAMES[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1); }
+  function noteInfo(fr){ var m = midiOf(fr), r = Math.round(m); return { midi: r, name: noteName(r), cents: (m - r) * 100 }; }
+
+  /* ---------- Tabs ---------- */
+  var current = "spektrum";
+  function showTab(id){
+    current = id;
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ var on = t.getAttribute("data-tab") === id; t.classList.toggle("active", on); t.setAttribute("aria-selected", on ? "true" : "false"); });
+    Array.prototype.forEach.call(document.querySelectorAll(".screen"), function(s){ s.classList.toggle("active", s.id === "screen-" + id); });
+    if(id === "momente") renderList();
+    if(id === "ton") drawWave();
+    if(id === "spektrum") sizeCanvases();
+    try { history.replaceState(null, "", "#" + id); } catch(e){}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){ t.addEventListener("click", function(){ showTab(t.getAttribute("data-tab")); }); });
+
+  /* ---------- Audio ---------- */
+  var ac = null, mic = null, src = null, an = null, raf = 0, frozen = false;
+  var fbuf = null, tbuf = null;
+  function ctx(){
+    if(!ac){ var C = window.AudioContext || window.webkitAudioContext; if(!C) throw new Error("Web Audio wird nicht unterstützt."); ac = new C(); }
+    if(ac.state === "suspended") ac.resume();
+    return ac;
+  }
+  function micLabel(on){
+    [$("klMicBtn"), $("klMicBtn2")].forEach(function(b){ b.innerHTML = wzIcon(on ? "stop" : "mic") + " " + (on ? "Mikrofon stoppen" : "Mikrofon starten"); });
+    $("klFreeze").disabled = !on; $("klSnap").disabled = !on;
+    $("klIdle1").hidden = on;
+  }
+  function micStart(){
+    try { ctx(); } catch(e){ wzAlert(e.message); return; }
+    if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){ wzAlert("Das Mikrofon ist in diesem Browser nicht verfügbar."); return; }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }).then(function(s){
+      mic = s; src = ac.createMediaStreamSource(s);
+      an = ac.createAnalyser(); an.fftSize = 8192; an.smoothingTimeConstant = 0; an.minDecibels = -120; an.maxDecibels = 0;
+      src.connect(an);
+      fbuf = new Float32Array(an.frequencyBinCount); tbuf = new Float32Array(an.fftSize);
+      frozen = false; $("klFreeze").innerHTML = wzIcon("pause") + " Anhalten";
+      micLabel(true); sizeCanvases();
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    }).catch(function(){ wzAlert("Kein Zugriff auf das Mikrofon. Du kannst ihn in den Website-Einstellungen deines Browsers erlauben."); });
+  }
+  function micStop(){
+    cancelAnimationFrame(raf); raf = 0;
+    if(src){ try { src.disconnect(); } catch(e){} src = null; }
+    if(mic){ mic.getTracks().forEach(function(t){ t.stop(); }); mic = null; }
+    an = null; micLabel(false);
+    hist = []; smC = null; tuneTarget = null; tunerUi(null); dispC = 0; dispA = 0; lastAnim = 0; animTuner();
+  }
+  function toggleMic(){ if(mic) micStop(); else micStart(); }
+  $("klMicBtn").addEventListener("click", toggleMic);
+  $("klMicBtn2").addEventListener("click", toggleMic);
+  $("klFreeze").addEventListener("click", function(){ frozen = !frozen; this.innerHTML = wzIcon(frozen ? "play" : "pause") + " " + (frozen ? "Weiter" : "Anhalten"); });
+
+  /* ---------- Spektrum ---------- */
+  var RANGES = { voll: [20, 20000], tief: [20, 1000], stimme: [70, 4000], hoch: [2000, 20000] };
+  var range = RANGES[cfg.range] ? cfg.range : "voll";
+  function setRange(r){
+    range = r; cfg.range = r; saveCfg(); heldTop = null; lastUi = 0; wfMax = null;
+    Array.prototype.forEach.call($("klRange").children, function(c){ var on = c.getAttribute("data-r") === r; c.classList.toggle("active", on); c.setAttribute("aria-checked", on ? "true" : "false"); });
+    var w = $("klWater"); if(w.width) w.getContext("2d").clearRect(0, 0, w.width, w.height);
+  }
+  Array.prototype.forEach.call($("klRange").children, function(c){ c.addEventListener("click", function(){ setRange(c.getAttribute("data-r")); }); });
+  setRange(range);
+
+  /* Farbskala im Nachthimmel-Ton: tiefe Nacht → Violett → Lavendel → Gold */
+  var STOPS = [[0, 11, 9, 33], [0.35, 59, 37, 133], [0.62, 142, 117, 240], [0.82, 230, 221, 247], [1, 255, 210, 122]];
+  var LUT = (function(){ var a = []; for(var i = 0; i < 256; i++){ var t = i / 255, k = 0; while(k < STOPS.length - 2 && t > STOPS[k + 1][0]) k++; var s0 = STOPS[k], s1 = STOPS[k + 1], u = (t - s0[0]) / (s1[0] - s0[0]); a.push([Math.round(s0[1] + (s1[1] - s0[1]) * u), Math.round(s0[2] + (s1[2] - s0[2]) * u), Math.round(s0[3] + (s1[3] - s0[3]) * u)]); } return a; })();
+  var DBMIN = -105, DBMAX = -25;
+  function sizeCanvases(){
+    [$("klWater"), $("klSpec")].forEach(function(c){
+      var dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(c.clientWidth * dpr), h = Math.round(c.clientHeight * dpr);
+      if(w && (c.width !== w || c.height !== h)){ c.width = w; c.height = h; }
+    });
+  }
+  window.addEventListener("resize", sizeCanvases);
+  function bounds(){ var r = RANGES[range], ny = ac ? ac.sampleRate / 2 : 24000; return [r[0], Math.min(r[1], ny)]; }
+  function xOf(fr, W){ var b = bounds(); return W * Math.log(fr / b[0]) / Math.log(b[1] / b[0]); }
+  function frOfX(x, W){ var b = bounds(); return b[0] * Math.pow(b[1] / b[0], x / W); }
+
+  function peaks(){
+    var sr = ac.sampleRate, n = fbuf.length, bw = sr / an.fftSize, b = bounds(), out = [];
+    var i0 = Math.max(2, Math.floor(b[0] / bw)), i1 = Math.min(n - 2, Math.ceil(b[1] / bw));
+    for(var i = i0; i <= i1; i++){
+      var v = fbuf[i];
+      if(v > -80 && v >= fbuf[i - 1] && v > fbuf[i + 1] && v >= fbuf[i - 2] && v > fbuf[i + 2]){
+        var a = fbuf[i - 1], c = fbuf[i + 1], p = 0.5 * (a - c) / (a - 2 * v + c || 1e-9);
+        out.push({ f: (i + p) * bw, db: v - 0.25 * (a - c) * p });
+      }
+    }
+    out.sort(function(x, y){ return y.db - x.db; });
+    var res = [];
+    for(var k = 0; k < out.length && res.length < 3; k++){
+      var ok = true; for(var j = 0; j < res.length; j++) if(Math.abs(Math.log(out[k].f / res[j].f)) < 0.06) ok = false;
+      if(ok) res.push(out[k]);
+    }
+    return res;
+  }
+  var lastStats = null, lastUi = 0, heldTop = null, wfMax = null, wfAcc = 0, wfT = 0, WF_SEC = 8;
+  function drawSpectrum(){
+    var w = $("klWater"), s = $("klSpec"), W = w.width, H = w.height; if(!W) return;
+    /* Wasserfall: ganze Höhe in etwa 8 Sekunden; zwischen zwei Zeilen wird je Spalte der lauteste Wert gesammelt,
+       damit kurze Töne nicht verloren gehen */
+    var g = w.getContext("2d"), sr = ac.sampleRate, bw = sr / an.fftSize, n = fbuf.length, now0 = performance.now();
+    if(!wfMax || wfMax.length !== W){ wfMax = new Float32Array(W); wfMax.fill(-200); wfAcc = 0; wfT = now0; }
+    for(var x = 0; x < W; x++){
+      var fa = frOfX(x, W), fb = frOfX(x + 1, W), ia = Math.max(1, Math.floor(fa / bw)), ib = Math.min(n - 1, Math.max(ia, Math.floor(fb / bw))), m = -200;
+      for(var i = ia; i <= ib; i++) if(fbuf[i] > m) m = fbuf[i];
+      if(m > wfMax[x]) wfMax[x] = m;
+    }
+    wfAcc += Math.min(200, now0 - wfT) / 1000 * H / WF_SEC; wfT = now0;
+    var rowH = Math.floor(wfAcc);
+    if(rowH >= 1){
+      wfAcc -= rowH;
+      g.drawImage(w, 0, 0, W, H - rowH, 0, rowH, W, H - rowH);
+      var row = g.createImageData(W, 1), d = row.data;
+      for(x = 0; x < W; x++){
+        var t = Math.max(0, Math.min(1, (wfMax[x] - DBMIN) / (DBMAX - DBMIN))), c = LUT[Math.round(t * 255)];
+        d[x * 4] = c[0]; d[x * 4 + 1] = c[1]; d[x * 4 + 2] = c[2]; d[x * 4 + 3] = 255;
+      }
+      for(var r = 0; r < rowH; r++) g.putImageData(row, 0, r);
+      wfMax.fill(-200);
+    }
+    /* Spektrum-Kurve */
+    var sg = s.getContext("2d"), SW = s.width, SH = s.height, dpr = SW / s.clientWidth;
+    sg.clearRect(0, 0, SW, SH);
+    sg.strokeStyle = "rgba(226,220,255,.14)"; sg.lineWidth = 1; sg.font = "500 " + Math.round(10 * dpr) + "px ui-monospace,Menlo,sans-serif"; sg.fillStyle = "rgba(226,220,255,.6)";
+    [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000].forEach(function(fr){ var b = bounds(); if(fr < b[0] || fr > b[1]) return; var x = xOf(fr, SW); sg.beginPath(); sg.moveTo(x, 0); sg.lineTo(x, SH); sg.stroke(); sg.fillText(fr >= 1000 ? fr / 1000 + "k" : String(fr), x + 3 * dpr, SH - 4 * dpr); });
+    sg.beginPath();
+    for(var xx = 0; xx <= SW; xx += 2){
+      var f0 = frOfX(xx, SW), i0 = Math.min(n - 1, Math.max(1, Math.round(f0 / bw))), v = fbuf[i0];
+      var y = SH - Math.max(0, Math.min(1, (v - DBMIN) / (DBMAX - DBMIN))) * (SH - 14 * dpr) - 12 * dpr;
+      if(xx === 0) sg.moveTo(xx, y); else sg.lineTo(xx, y);
+    }
+    sg.lineTo(SW, SH); sg.lineTo(0, SH); sg.closePath();
+    sg.fillStyle = "rgba(142,117,240,.25)"; sg.fill();
+    sg.strokeStyle = "#E6DDF7"; sg.lineWidth = 1.4 * dpr; sg.stroke();
+    var pk = peaks();
+    pk.forEach(function(p, k){ var x = xOf(p.f, SW); sg.fillStyle = k ? "rgba(255,210,122,.6)" : "#FFD27A"; sg.beginPath(); sg.moveTo(x, 3 * dpr); sg.lineTo(x - 4 * dpr, -3 * dpr + 3 * dpr); sg.lineTo(x + 4 * dpr, 0); sg.closePath(); sg.fill(); sg.fillRect(x - 0.5 * dpr, 3 * dpr, 1 * dpr, SH - 16 * dpr); });
+    /* Zahlen (gedrosselt) */
+    var now = performance.now(); if(now - lastUi < 150) return; lastUi = now;
+    an.getFloatTimeDomainData(tbuf);
+    var sum = 0; for(var q = 0; q < tbuf.length; q++) sum += tbuf[q] * tbuf[q];
+    var lvl = 10 * Math.log10(sum / tbuf.length + 1e-12);
+    var num = 0, den = 0; for(var j = Math.ceil(50 / bw); j < n; j++){ var mg = Math.pow(10, fbuf[j] / 20); num += mg * j * bw; den += mg; }
+    var cen = den > 0 && lvl > -70 && pk.length ? num / den : null;
+    lastStats = { peaks: pk, level: lvl, centroid: cen };
+    var top = pk[0];
+    /* kurzer Ton: den letzten deutlichen Wert noch eine Sekunde zeigen */
+    if(top){ heldTop = { p: top, t: now }; } else if(heldTop && now - heldTop.t < 1200){ top = heldTop.p; }
+    $("klPeakF").textContent = top ? hz(top.f) : "–";
+    if(top){ var ni = noteInfo(top.f); $("klPeakN").textContent = ni.name + " " + (ni.cents >= 0 ? "+" : "−") + Math.abs(Math.round(ni.cents)) + " ct"; } else $("klPeakN").textContent = "zu leise";
+    $("klLevel").textContent = f(Math.max(-99, lvl), 0);
+    $("klCent").textContent = cen ? hz(cen) : "–";
+    $("klCentSub").textContent = !cen ? "Klangfarbe" : cen < 500 ? "dunkel" : cen < 1500 ? "warm" : cen < 4000 ? "hell" : "scharf, zischend";
+    var hint = $("klHint");
+    var hum = top && (Math.abs(top.f - 50) < 2 || Math.abs(top.f - 100) < 3 || Math.abs(top.f - 150) < 3);
+    if(hum){ hint.hidden = false; hint.innerHTML = "<b>Brummen bei " + hz(top.f) + "</b> – typisch für das Stromnetz (50 Hz und Vielfache), etwa von Trafos, Netzteilen, Leuchtstofflampen oder Kühlschränken."; }
+    else if(top && top.f > 15000){ hint.hidden = false; hint.innerHTML = "<b>Sehr hoher Ton bei " + hz(top.f) + "</b> – viele Erwachsene hören so hohe Töne nicht mehr; oft kommen sie von Netzteilen oder Marderabwehr."; }
+    else hint.hidden = true;
+  }
+
+  /* ---------- Stimmgerät (YIN-Verfahren) ---------- */
+  var INST = [
+    { id: "chrom", name: "Chromatisch", notes: [] },
+    { id: "gitarre", name: "Gitarre", notes: [40, 45, 50, 55, 59, 64] },
+    { id: "bass", name: "Bass", notes: [28, 33, 38, 43] },
+    { id: "ukulele", name: "Ukulele", notes: [67, 60, 64, 69] },
+    { id: "violine", name: "Violine", notes: [55, 62, 69, 76] }
+  ];
+  var inst = INST.filter(function(i){ return i.id === cfg.inst; })[0] || INST[0];
+  $("klInst").innerHTML = INST.map(function(i){ return '<button type="button" class="chip' + (i === inst ? " active" : "") + '" data-i="' + i.id + '" role="radio" aria-checked="' + (i === inst) + '">' + i.name + '</button>'; }).join("");
+  $("klInst").addEventListener("click", function(e){
+    var b = e.target.closest("[data-i]"); if(!b) return;
+    inst = INST.filter(function(i){ return i.id === b.getAttribute("data-i"); })[0]; cfg.inst = inst.id; saveCfg();
+    Array.prototype.forEach.call($("klInst").children, function(c){ var on = c === b; c.classList.toggle("active", on); c.setAttribute("aria-checked", on ? "true" : "false"); });
+    renderStrings(null);
+  });
+  function renderStrings(on){
+    $("klStrings").innerHTML = inst.notes.map(function(m){ return '<span class="' + (m === on ? "on" : "") + '">' + noteName(m) + '</span>'; }).join("");
+    $("klStrings").hidden = !inst.notes.length;
+  }
+  renderStrings(null);
+  function a4ui(){ $("klA4").textContent = cfg.a4 + " Hz"; }
+  a4ui();
+  $("klA4m").addEventListener("click", function(){ cfg.a4 = Math.max(430, cfg.a4 - 1); saveCfg(); a4ui(); });
+  $("klA4p").addEventListener("click", function(){ cfg.a4 = Math.min(450, cfg.a4 + 1); saveCfg(); a4ui(); });
+
+  function yin(buf, sr){
+    var W = 2048, tMin = Math.floor(sr / 1400), tMax = Math.min(Math.floor(sr / 38), buf.length - W - 1), d = new Float32Array(tMax + 1), rms = 0;
+    for(var i = 0; i < W; i++) rms += buf[i] * buf[i];
+    if(Math.sqrt(rms / W) < 0.006) return null;
+    for(var t = 1; t <= tMax; t++){ var s = 0; for(var j = 0; j < W; j++){ var x = buf[j] - buf[j + t]; s += x * x; } d[t] = s; }
+    var run = 0; d[0] = 1;
+    for(t = 1; t <= tMax; t++){ run += d[t]; d[t] = d[t] * t / (run || 1); }
+    var tau = -1;
+    for(t = tMin; t <= tMax; t++){ if(d[t] < 0.12){ while(t + 1 <= tMax && d[t + 1] < d[t]) t++; tau = t; break; } }
+    if(tau < 0) return null;
+    var a = d[tau - 1], b = d[tau], c = tau + 1 <= tMax ? d[tau + 1] : b, den = a - 2 * b + c, p = den ? 0.5 * (a - c) / den : 0;
+    return { f: sr / (tau + p), q: 1 - b };
+  }
+  /* Anzeige: ±25 Cent, grün bis ±5, golden bis ±10, darüber rot. Die Nadel folgt dem Messwert weich gedämpft. */
+  var T_RANGE = 25, T_DEG = 80 / T_RANGE, T_GOLD = "#FFD27A", T_GREEN = "#34C759", T_RED = "#FF3B30";
+  function zoneOf(c){ var a = Math.abs(c); return a <= 5 ? "ok" : a <= 10 ? "near" : "far"; }
+  function zoneCol(z){ return z === "ok" ? T_GREEN : z === "near" ? T_GOLD : T_RED; }
+  var hist = [], smC = null, lastTune = 0, lastHit = 0, dispC = 0, dispA = 0, lastAnim = 0;
+  function tune(){
+    var now = performance.now(); if(now - lastTune < 50) return; lastTune = now;
+    an.getFloatTimeDomainData(tbuf);
+    var r = yin(tbuf, ac.sampleRate);
+    if(!r){
+      /* kurze Lücken überbrücken, damit die Nadel nicht springt */
+      if(smC != null && now - lastHit > 700){ hist = []; smC = null; tunerUi(null); }
+      return;
+    }
+    lastHit = now;
+    hist.push(r.f); if(hist.length > 5) hist.shift();
+    var fr = hist.slice().sort(function(a, b){ return a - b; })[Math.floor(hist.length / 2)];
+    var m = midiOf(fr), target;
+    if(inst.notes.length){ target = inst.notes.reduce(function(best, n){ return Math.abs(n - m) < Math.abs(best - m) ? n : best; }, inst.notes[0]); }
+    else target = Math.round(m);
+    var cents = (m - target) * 100;
+    if(smC == null || target !== tuneTarget || Math.abs(cents - smC) > 35) smC = cents;
+    else smC += (cents - smC) * 0.3;
+    tuneTarget = target;
+    tunerUi({ c: smC, fr: fr, target: target });
+  }
+  var tuneTarget = null;
+  function tunerUi(v){
+    if(!v){
+      $("klNote").textContent = "–"; $("klNote").classList.remove("ok", "near", "far");
+      $("klNoteSub").textContent = "Spiel einen Ton";
+      $("klTF").textContent = "–"; $("klTC").textContent = "–"; $("klTT").textContent = "–"; $("klTTs").textContent = "Hz";
+      renderStrings(null); return;
+    }
+    var c = v.c, z = zoneOf(c), hi = c > 0;
+    $("klNote").textContent = noteName(v.target);
+    $("klNote").classList.toggle("ok", z === "ok"); $("klNote").classList.toggle("near", z === "near"); $("klNote").classList.toggle("far", z === "far");
+    $("klNoteSub").textContent = Math.abs(c) > T_RANGE ? (hi ? "viel zu hoch" : "viel zu tief") : z === "ok" ? "gestimmt" : z === "near" ? (hi ? "minimal zu hoch" : "minimal zu tief") : (hi ? "zu hoch" : "zu tief");
+    $("klTF").textContent = f(v.fr, 1); $("klTC").textContent = (c >= 0 ? "+" : "−") + f(Math.abs(c), 0); $("klTT").textContent = f(freqOf(v.target), 1);
+    $("klTTs").textContent = "Hz · " + noteName(v.target);
+    renderStrings(inst.notes.length ? v.target : null);
+  }
+  /* Nadel und Digitalfeld: jedes Bild weich nachführen */
+  function animTuner(){
+    var now = performance.now(), dt = Math.min(100, now - (lastAnim || now)); lastAnim = now;
+    var on = smC != null, goal = on ? Math.max(-T_RANGE - 0.5, Math.min(T_RANGE + 0.5, smC)) : 0;
+    var k = 1 - Math.exp(-dt / 140);
+    dispC += (goal - dispC) * k; dispA += ((on ? 1 : 0) - dispA) * (1 - Math.exp(-dt / 180));
+    var col = on ? zoneCol(zoneOf(smC)) : "#fff";
+    var nd = $("klNeedle"); if(!nd) return;
+    nd.setAttribute("transform", "rotate(" + (dispC * T_DEG).toFixed(2) + " 150 150)");
+    nd.setAttribute("stroke", col); nd.setAttribute("opacity", (0.25 + 0.75 * dispA).toFixed(2));
+    var dg = $("klDig"), bx = $("klDigBox");
+    if(on){ var r = Math.round(smC); dg.textContent = (r > 0 ? "+" : r < 0 ? "−" : "±") + Math.abs(r) + " ct"; }
+    else dg.textContent = "– – ct";
+    dg.setAttribute("fill", on ? col : "rgba(226,220,255,.55)");
+    bx.setAttribute("stroke", on ? col : "rgba(226,220,255,.3)");
+  }
+  function tunerSvg(){
+    var cx = 150, cy = 150, R = 118, D2R = Math.PI / 180, GR = "rgba(226,220,255,", s = "";
+    function pt(c, r){ var a = (-90 + c * T_DEG) * D2R; return (cx + Math.cos(a) * r).toFixed(1) + " " + (cy + Math.sin(a) * r).toFixed(1); }
+    function arc(c0, c1, r, col, w){ return '<path d="M' + pt(c0, r) + 'A' + r + ' ' + r + ' 0 0 1 ' + pt(c1, r) + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="butt"/>'; }
+    s += arc(-T_RANGE, T_RANGE, R, GR + '.18)', 1);
+    /* Farbzonen */
+    s += arc(-T_RANGE, -10, R - 20, "rgba(255,59,48,.45)", 4) + arc(10, T_RANGE, R - 20, "rgba(255,59,48,.45)", 4);
+    s += arc(-10, -5, R - 20, "rgba(255,210,122,.7)", 4) + arc(5, 10, R - 20, "rgba(255,210,122,.7)", 4);
+    s += arc(-5, 5, R - 20, "rgba(52,199,89,.6)", 4);
+    for(var k = -T_RANGE; k <= T_RANGE; k++){
+      var big = k === 0 || Math.abs(k) === 10 || Math.abs(k) === T_RANGE, mid = !big && k % 5 === 0, r1 = R - (big ? 14 : mid ? 10 : 5);
+      s += '<path d="M' + pt(k, R) + 'L' + pt(k, r1) + '" stroke="' + (k === 0 ? T_GREEN : GR + (big ? ".75)" : mid ? ".5)" : ".25)")) + '" stroke-width="' + (k === 0 ? 2 : 1) + '"/>';
+      if(k !== 0 && (big || mid)){ var p = pt(k, R + 13).split(" "); s += '<text x="' + p[0] + '" y="' + (+p[1] + 4).toFixed(1) + '" fill="' + GR + (big ? '.75)' : '.55)') + '" font-size="' + (big ? 10 : 9) + '" text-anchor="middle" font-family="ui-monospace,Menlo,sans-serif">' + (k > 0 ? "+" : "−") + Math.abs(k) + '</text>'; }
+    }
+    s += '<path id="klNeedle" d="M' + cx + ' ' + (cy - 12) + 'L' + cx + ' ' + (cy - R + 4) + '" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".25"/>';
+    /* kleines Digitalfeld am Drehpunkt */
+    s += '<rect id="klDigBox" x="' + (cx - 38) + '" y="' + (cy - 15) + '" width="76" height="24" rx="7" fill="#0B0921" stroke="rgba(226,220,255,.3)" stroke-width="1"/>';
+    s += '<text id="klDig" x="' + cx + '" y="' + (cy + 2) + '" text-anchor="middle" font-size="13" font-weight="600" font-family="ui-monospace,Menlo,sans-serif" fill="rgba(226,220,255,.55)">– – ct</text>';
+    $("klTunerSvg").innerHTML = s;
+  }
+  tunerSvg(); animTuner();
+
+  function tick(){
+    if(!an) return;
+    raf = requestAnimationFrame(tick);
+    if(frozen) return;
+    an.getFloatFrequencyData(fbuf);
+    if(current === "spektrum") drawSpectrum();
+    else if(current === "stimmen"){ tune(); animTuner(); }
+  }
+
+  /* ---------- Momente ---------- */
+  function list(){ var l = load(LS_LIST, []); return Array.isArray(l) ? l : []; }
+  $("klSnap").addEventListener("click", function(){
+    if(!lastStats){ toast("Noch keine Werte"); return; }
+    var thumb = null;
+    try { var c = document.createElement("canvas"); c.width = 300; c.height = 46; c.getContext("2d").drawImage($("klSpec"), 0, 0, 300, 46); thumb = c.toDataURL("image/jpeg", 0.7); } catch(e){}
+    var it = { id: Date.now().toString(36), ts: Date.now(), name: "", range: range,
+      peaks: lastStats.peaks.map(function(p){ return { f: Math.round(p.f * 10) / 10, db: Math.round(p.db) }; }),
+      level: Math.round(lastStats.level), centroid: lastStats.centroid ? Math.round(lastStats.centroid) : null, thumb: thumb };
+    var l = list(); l.unshift(it); l = l.slice(0, 60);
+    if(!save(LS_LIST, l)){ it.thumb = null; save(LS_LIST, l); }
+    toast("Moment gemerkt");
+  });
+  function renderList(){
+    var l = list(), box = $("klList");
+    if(!l.length){ box.innerHTML = '<div class="empty-hint">Noch nichts gemerkt. Starte im Spektrum das Mikrofon und tippe auf „Moment merken“.</div>'; return; }
+    box.innerHTML = l.map(function(it){
+      var p = it.peaks || [];
+      return '<div class="history-item" data-id="' + esc(it.id) + '"><div class="row1"><span class="vals">' + esc(it.name || (p[0] ? "Ton bei " + hz(p[0].f) : "Moment")) + '</span><span class="when">' + new Date(it.ts).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) + '</span></div>' +
+        '<div class="note">' + (p.length ? p.map(function(x){ return hz(x.f) + " (" + noteInfo(x.f).name + ")"; }).join(" · ") : "kein deutlicher Ton") + (it.centroid ? " · Schwerpunkt " + hz(it.centroid) : "") + '</div>' +
+        (it.thumb && /^data:image\/jpeg;base64,/.test(it.thumb) ? '<img class="kl-thumb" alt="Spektrum" src="' + it.thumb + '">' : "") +
+        '<div class="actions"><button type="button" class="icon-btn" data-act="name">Benennen</button><button type="button" class="icon-btn" data-act="tone">' + wzIcon("play") + 'Als Ton</button><button type="button" class="icon-btn" data-act="del">' + wzIcon("trash") + 'Löschen</button></div></div>';
+    }).join("");
+  }
+  $("klList").addEventListener("click", function(e){
+    var b = e.target.closest("[data-act]"); if(!b) return;
+    var item = b.closest(".history-item"), id = item.getAttribute("data-id"), l = list(), it = l.filter(function(x){ return x.id === id; })[0]; if(!it) return;
+    var act = b.getAttribute("data-act");
+    if(act === "del"){
+      wzConfirm("Diesen Moment löschen?", { okLabel: "Löschen", cancelLabel: "Abbrechen" }).then(function(ok){ if(!ok) return; save(LS_LIST, l.filter(function(x){ return x.id !== id; })); renderList(); });
+    } else if(act === "tone"){
+      if(it.peaks && it.peaks[0]){ setFreq(it.peaks[0].f); showTab("ton"); }
+    } else {
+      if(item.querySelector("input")) return;
+      var inp = document.createElement("input"); inp.className = "text-input"; inp.style.marginTop = "8px"; inp.maxLength = 60; inp.placeholder = "z. B. Brummen im Keller"; inp.value = it.name || "";
+      item.insertBefore(inp, item.querySelector(".actions")); inp.focus();
+      var done = function(){ it.name = inp.value.trim(); save(LS_LIST, l); renderList(); };
+      inp.addEventListener("blur", done); inp.addEventListener("keydown", function(ev){ if(ev.key === "Enter") inp.blur(); });
+    }
+  });
+
+  /* ---------- Tongenerator ---------- */
+  var osc = null, gain = null, wave = cfg.wave || "sine", freq = cfg.freq > 0 ? cfg.freq : 440, sweeping = null;
+  function sliderOf(fr){ return Math.round(1000 * Math.log(fr / 20) / Math.log(1000)); }
+  function freqOfSlider(v){ return 20 * Math.pow(1000, v / 1000); }
+  function volGain(){ var v = Math.max(1, Math.min(50, +$("klVol").value)) / 100; return v * v * 1.6; }
+  function genUi(){
+    $("klGF").textContent = f(freq, freq < 100 ? 1 : 0);
+    var ni = noteInfo(freq); $("klGN").textContent = ni.name + " " + (ni.cents >= 0 ? "+" : "−") + Math.abs(Math.round(ni.cents)) + " ct";
+  }
+  function setFreq(fr, fromSlider){
+    freq = Math.max(20, Math.min(20000, fr)); cfg.freq = Math.round(freq * 10) / 10; saveCfg();
+    if(!fromSlider) $("klFreq").value = sliderOf(freq);
+    $("klFreqNum").value = f(freq, freq < 100 ? 1 : 0).replace(/\./g, "");
+    if(osc && !sweeping) osc.frequency.setTargetAtTime(freq, ac.currentTime, 0.015);
+    genUi();
+  }
+  $("klFreq").addEventListener("input", function(){ setFreq(freqOfSlider(+this.value), true); });
+  $("klFreqNum").addEventListener("change", function(){ var v = parseFloat(String(this.value).replace(/\./g, "").replace(",", ".")); if(isFinite(v)) setFreq(v); else setFreq(freq); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-step]"), function(b){ b.addEventListener("click", function(){ setFreq(freq * Math.pow(2, (+b.getAttribute("data-step")) / 12)); }); });
+  Array.prototype.forEach.call($("klWaveRow").children, function(c){
+    c.classList.toggle("active", c.getAttribute("data-w") === wave); c.setAttribute("aria-checked", c.getAttribute("data-w") === wave ? "true" : "false");
+    c.addEventListener("click", function(){
+      wave = c.getAttribute("data-w"); cfg.wave = wave; saveCfg();
+      Array.prototype.forEach.call($("klWaveRow").children, function(x){ x.classList.toggle("active", x === c); x.setAttribute("aria-checked", x === c ? "true" : "false"); });
+      if(osc) osc.type = wave; drawWave();
+    });
+  });
+  if(cfg.vol) $("klVol").value = cfg.vol;
+  $("klVol").addEventListener("input", function(){ cfg.vol = +this.value; saveCfg(); if(gain) gain.gain.setTargetAtTime(volGain() * (wave === "square" || wave === "sawtooth" ? 0.5 : 1), ac.currentTime, 0.03); });
+  function playOn(){
+    try { ctx(); } catch(e){ wzAlert(e.message); return false; }
+    osc = ac.createOscillator(); gain = ac.createGain();
+    osc.type = wave; osc.frequency.value = freq; gain.gain.value = 0;
+    osc.connect(gain); gain.connect(ac.destination); osc.start();
+    gain.gain.setTargetAtTime(volGain() * (wave === "square" || wave === "sawtooth" ? 0.5 : 1), ac.currentTime, 0.03);
+    $("klPlay").innerHTML = wzIcon("stop") + " Ton stoppen";
+    return true;
+  }
+  function playOff(){
+    if(!osc) return;
+    var o = osc, g = gain; osc = gain = null; sweeping = null;
+    g.gain.setTargetAtTime(0, ac.currentTime, 0.03);
+    setTimeout(function(){ try { o.stop(); o.disconnect(); g.disconnect(); } catch(e){} }, 250);
+    $("klPlay").innerHTML = wzIcon("play") + " Ton abspielen";
+    $("klSweep").innerHTML = wzIcon("wave") + " Frequenzlauf 20 Hz – 20 kHz";
+  }
+  $("klPlay").addEventListener("click", function(){ if(osc) playOff(); else playOn(); });
+  $("klSweep").addEventListener("click", function(){
+    if(sweeping){ playOff(); setFreq(freq); return; }
+    if(osc) playOff();
+    var dur = 15; if(!playOn()) return;
+    var t0 = ac.currentTime; osc.frequency.setValueAtTime(20, t0); osc.frequency.exponentialRampToValueAtTime(20000, t0 + dur);
+    sweeping = { t0: t0, dur: dur };
+    this.innerHTML = wzIcon("stop") + " Frequenzlauf stoppen";
+    (function step(){
+      if(!sweeping) return;
+      var u = (ac.currentTime - sweeping.t0) / sweeping.dur;
+      if(u >= 1){ playOff(); return; }
+      freq = 20 * Math.pow(1000, u); $("klFreq").value = sliderOf(freq); genUi();
+      requestAnimationFrame(step);
+    })();
+  });
+  function drawWave(){
+    var c = $("klWave"), dpr = Math.min(2, window.devicePixelRatio || 1), W = Math.round(c.clientWidth * dpr), H = Math.round(c.clientHeight * dpr); if(!W) return;
+    c.width = W; c.height = H; var g = c.getContext("2d");
+    g.strokeStyle = "rgba(226,220,255,.18)"; g.lineWidth = 1; g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.stroke();
+    g.strokeStyle = "#FFD27A"; g.lineWidth = 2 * dpr; g.beginPath();
+    for(var x = 0; x <= W; x++){
+      var ph = (x / W * 3) % 1, v;
+      if(wave === "sine") v = Math.sin(ph * 2 * Math.PI);
+      else if(wave === "triangle") v = 1 - 4 * Math.abs(ph - 0.5);
+      else if(wave === "square") v = ph < 0.5 ? 1 : -1;
+      else v = 2 * ph - 1;
+      var y = H / 2 - v * (H / 2 - 6 * dpr); if(x === 0) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.stroke();
+  }
+  setFreq(freq);
+
+  /* ---------- Einführung ---------- */
+  var onb = wzOnboarding({
+    key: LS_ONB,
+    slides: [
+      { icon: "spectrum", title: "Willkommen bei KlangWahr", text: "Mach Töne sichtbar: Das Klangbild zeigt Brummen, Pfeifen, Vogelstimmen und Musik als leuchtende Spuren." },
+      { icon: "tuning", title: "Stimmgerät", text: "Gitarre, Bass, Ukulele, Violine oder chromatisch – mit Nadel, Cent-Anzeige und einstellbarem Kammerton." },
+      { icon: "wave", title: "Tongenerator", text: "Erzeuge reine Töne von 20 Hz bis 20 kHz und probiere aus, wie Frequenzen klingen. Bitte leise beginnen." },
+      { icon: "lock", title: "100% lokal & privat", text: "Das Mikrofon wird nur live ausgewertet – nie aufgenommen, gespeichert oder übertragen. Gemerkt werden nur Zahlen, die du selbst sicherst." }
+    ]
+  });
+  window.KL = { showOnboarding: function(){ onb.show(); } };
+  $("showOnboardingBtn").addEventListener("click", function(){ onb.show(); });
+
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ micStop(); playOff(); } });
+  window.addEventListener("pagehide", function(){ micStop(); playOff(); });
+  var h0 = (location.hash || "").slice(1);
+  if(["spektrum", "stimmen", "ton", "momente"].indexOf(h0) !== -1) showTab(h0);
+})();
+
+</script>
+</body>
+</html>

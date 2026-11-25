@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="zw" data-wz-fixed="dark">
+<head>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<title>ZahlenturmWahr</title>
+<meta name="description" content="ZahlenturmWahr — Zahlen steigen in einen 3D-Turm und verschmelzen. Endlos-Modus oder Ziel-Modus. Offline spielbar.">
+<meta name="theme-color" content="#0d0a1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="zw-icon-192.png" type="image/png">
+<link rel="stylesheet" href="zw-style.css">
+<script>
+  try {
+    var ztTheme = 'dark'; // Spiele bleiben immer im Nachthimmel-Look
+    document.documentElement.setAttribute('data-theme', ztTheme);
+    if (ztTheme === 'light') { var ztMeta = document.querySelector('meta[name="theme-color"]'); if (ztMeta) ztMeta.setAttribute('content', '#eef1fb'); }
+  } catch (e) {}
+</script>
+<script>
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) { e.preventDefault(); } }, { passive: false });
+</script>
+<style id="fw-familie">
+.fw-i{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto;}
+
+.topbar-actions{gap:8px;}
+/* FunWahr-Familienstil – bewusst in jede App kopiert (keine gemeinsame Datei),
+   damit jede App technisch eigenständig bleibt. */
+.fw-home{width:38px!important;height:38px!important;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;
+  background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;text-decoration:none!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);flex:0 0 auto;padding:0!important;font-size:0!important;backdrop-filter:none!important;}
+.fw-home svg{width:18px!important;height:18px!important;display:block;}
+.fw-home:active{transform:scale(.92);}
+.fw-s-bar .fw-home{margin:0!important;}
+.fw-title{background:linear-gradient(90deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-a742ff, #a742ff) 50%,#ff3caa)!important;-webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent;white-space:nowrap;text-shadow:none!important;}
+.fw-primary{background:linear-gradient(150deg,var(--wzp-b9a6f5, #B9A6F5),var(--wzp-8e75f0, #8E75F0))!important;color:var(--wzp-0d0a1c, #0d0a1c)!important;border:none!important;text-shadow:none!important;
+  font-weight:800!important;box-shadow:0 6px 14px rgba(var(--wzq-5a2fbe, 90, 47, 190),.35)!important;}
+.fw-primary *{color:var(--wzp-0d0a1c, #0d0a1c)!important;}
+.fw-nowrap{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+html[data-theme="light"] .fw-home{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;box-shadow:0 3px 10px rgba(20,30,70,.12);}
+/* ===== FunWahr-Startstandard (in jeder App identisch) =====
+   Home oben links, App-Aktionen oben rechts, App-Icon + Titel + einzeiliger Untertitel,
+   einheitlicher Hauptknopf, „Impressum · Datenschutz“ unten. */
+.fw-s-bar{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;right:16px;z-index:70;
+  display:flex;align-items:center;justify-content:space-between;}
+.fw-s-bar .fw-s-actions{display:flex;gap:8px;}
+.fw-s-hero{text-align:center;display:flex;flex-direction:column;align-items:center;}
+.fw-s-icon{width:68px;height:68px;border-radius:17px;display:block;margin:0 auto 14px;
+  box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);}
+.fw-s-title{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif!important;
+  font-size:34px!important;font-weight:800!important;font-style:normal!important;letter-spacing:.005em!important;
+  line-height:1.15!important;margin:0 0 8px!important;padding:0!important;text-transform:none!important;text-align:center;}
+.fw-s-sub{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif!important;
+  font-size:15px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  color:rgba(var(--wzq-f1eefb, 241, 238, 251),.68)!important;margin:0 0 26px!important;line-height:1.45!important;
+  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+.fw-s-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:320px;
+  margin:0 auto!important;padding:15px 20px!important;border-radius:14px!important;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;font-size:16px!important;
+  font-weight:800!important;letter-spacing:.01em!important;text-transform:none!important;text-decoration:none!important;
+  white-space:nowrap;box-sizing:border-box;cursor:pointer;}
+.fw-s-btn:active{transform:scale(.98);}
+.fw-s-ghost{background:rgba(var(--wzq-2a2440, 42, 36, 64),.85)!important;border:1px solid rgba(255,255,255,.16)!important;color:var(--wzp-f1ecff, #F1ECFF)!important;
+  box-shadow:none!important;font-weight:700!important;text-shadow:none!important;}
+.fw-s-stack{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin:0 auto;}
+.fw-s-legal{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:auto;padding-top:22px;}
+.fw-s-legal--fixed{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:65;margin:0;padding:0;}
+.fw-s-legal a,.fw-s-legal button{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.6)!important;text-decoration:none!important;background:none!important;
+  border:none!important;box-shadow:none!important;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;
+  padding:12px 6px!important;margin:0!important;min-height:0!important;width:auto!important;cursor:pointer;}
+.fw-s-legal span{color:rgba(var(--wzq-f1eefb, 241, 238, 251),.32);font-size:13px;}
+html[data-theme="light"] .fw-s-sub{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal a,html[data-theme="light"] .fw-s-legal button{color:#4a5378!important;}
+html[data-theme="light"] .fw-s-legal span{color:#9aa3c4;}
+html[data-theme="light"] .fw-s-ghost{background:#ffffff!important;border-color:#c2cbec!important;color:#1b2340!important;}
+
+/* ZahlenturmWahr: Startseite unter der festen Leiste */
+.menu-page{padding-top:62px!important;}
+.menu-page .fw-s-sub{margin-bottom:22px!important;}
+</style>
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body class="menu-shell">
+
+<div class="sky" aria-hidden="true">
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
+</div>
+
+<div class="fw-s-bar">
+  <a class="icon-btn fw-home" href="./index.html#spiel" title="Zur WahrZentrale" aria-label="Zur WahrZentrale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
+  <div class="fw-s-actions">
+  </div>
+</div>
+
+<main class="menu-page">
+
+  <div class="fw-s-hero">
+    <img class="fw-s-icon" src="zw-icon-192.png" alt="" width="68" height="68">
+    <h1 class="fw-title fw-s-title">ZahlenturmWahr</h1>
+    <p class="fw-s-sub">Zahlen im Turm verschmelzen.</p>
+  </div>
+
+  <section class="menu-section continue-card" id="zt-continue-section" hidden>
+    <h2 class="menu-heading"><svg class="fw-i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg> Weiterspielen</h2>
+    <p class="menu-sub" id="zt-continue-sub"></p>
+    <a class="btn btn-primary menu-btn" id="zt-continue-btn" href="zw-spiel.html">Spiel fortsetzen</a>
+  </section>
+
+  <section class="menu-section">
+    <h2 class="menu-heading">Endlos-Modus</h2>
+    <p class="menu-sub">Ohne Ziel – wird immer schwerer.</p>
+    <a class="btn btn-primary menu-btn" href="zw-spiel.html?mode=endless&amp;new=1"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5v5h-5"/><path d="M4 19v-5h5"/><path d="M5.6 9a7 7 0 0 1 12.7-1.3L20 10"/><path d="M18.4 15a7 7 0 0 1-12.7 1.3L4 14"/></svg> Ohne Ziel spielen</a>
+  </section>
+
+  <section class="menu-section">
+    <h2 class="menu-heading">Ziel-Modus</h2>
+    <p class="menu-sub">Erreiche die Zahl in wenigen Zügen.</p>
+    <div class="goal-grid">
+      <a class="goal-chip zt-tile" data-v="128" href="zw-spiel.html?mode=goal&amp;target=128&amp;new=1">128</a>
+      <a class="goal-chip zt-tile" data-v="256" href="zw-spiel.html?mode=goal&amp;target=256&amp;new=1">256</a>
+      <a class="goal-chip zt-tile" data-v="512" href="zw-spiel.html?mode=goal&amp;target=512&amp;new=1">512</a>
+      <a class="goal-chip zt-tile" data-v="1024" href="zw-spiel.html?mode=goal&amp;target=1024&amp;new=1">1024</a>
+      <a class="goal-chip zt-tile" data-v="2048" href="zw-spiel.html?mode=goal&amp;target=2048&amp;new=1">2048</a>
+      <a class="goal-chip zt-tile" data-prism="true" href="zw-spiel.html?mode=goal&amp;target=4096&amp;new=1">4096</a>
+      <a class="goal-chip zt-tile" data-prism="true" href="zw-spiel.html?mode=goal&amp;target=8192&amp;new=1">8192</a>
+      <a class="goal-chip zt-tile" data-prism="true" href="zw-spiel.html?mode=goal&amp;target=16384&amp;new=1">16384</a>
+    </div>
+  </section>
+
+
+  <section class="menu-section">
+    <button class="btn btn-ghost menu-btn" id="zt-info-btn"><svg class="fw-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/></svg> Anleitung</button>
+  </section>
+
+  <div class="highest-badge">Höchster Wert je Stein: <span id="zt-highest">–</span></div>
+
+  <nav class="fw-s-legal" aria-label="Rechtliches">
+    <a href="./impressum.html">Impressum</a><span>·</span><a href="./datenschutz.html#zw">Datenschutz</a>
+  </nav>
+</main>
+
+<div class="modal-backdrop" id="zt-info-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="zt-info-title">
+    <h2 id="zt-info-title">So funktioniert ZahlenturmWahr</h2>
+    <ul class="rules-list">
+      <li>Tippe auf eine der 5 Turmspalten — die angezeigte Zahl steigt von unten in die Spalte auf.</li>
+      <li>Der Turm baut sich von oben nach unten auf: Der erste Stein einer Spalte landet ganz oben (an der Oberkante), jeder weitere darunter.</li>
+      <li>Zwei gleiche Zahlen verschmelzen zur doppelten Zahl — senkrecht übereinander oder waagerecht nebeneinander.</li>
+      <li>Löst ein Fall mehrere Verschmelzungen hintereinander aus, steigt deine Kombo — und der Bonus pro Verschmelzung wächst.</li>
+      <li>Der Turm ist voll, wenn keine Spalte mehr Platz hat. Dann ist die Runde vorbei.</li>
+      <li>Ein Zug lässt sich mit „Rückgängig" zurücknehmen — einmal pro Zug.</li>
+      <li>Im <strong>Ziel-Modus</strong> gewinnst du, sobald die gewählte Zahl auf dem Feld entsteht — die Zahl der Züge bis dahin zählt.</li>
+    </ul>
+    <button class="btn btn-primary" id="zt-info-close">Verstanden</button>
+  </div>
+</div>
+
+<script src="zw-game.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof ztApplyTheme === 'function') ztApplyTheme(ztLoadThemePref());
+    const themeBtn = document.getElementById('zt-theme-btn');
+    if (themeBtn) themeBtn.addEventListener('click', ztToggleTheme);
+
+    const infoBtn = document.getElementById('zt-info-btn');
+    const infoBackdrop = document.getElementById('zt-info-backdrop');
+    const infoClose = document.getElementById('zt-info-close');
+    if (infoBtn && infoBackdrop) infoBtn.addEventListener('click', () => { infoBackdrop.hidden = false; });
+    if (infoClose && infoBackdrop) infoClose.addEventListener('click', () => { infoBackdrop.hidden = true; });
+    if (infoBackdrop) infoBackdrop.addEventListener('click', (e) => {
+      if (e.target === infoBackdrop) infoBackdrop.hidden = true;
+    });
+
+    try {
+      const stats = JSON.parse(localStorage.getItem('ztw-stats') || '{}');
+      const el = document.getElementById('zt-highest');
+      if (el) el.textContent = stats.highestTileEver || '–';
+    } catch (e) {}
+
+    // Weiterspielen-Kachel: nur einblenden, wenn ein unfertiges Spiel existiert.
+    try {
+      const saved = typeof ztLoadState === 'function' ? ztLoadState() : null;
+      const hasTiles = saved && Array.isArray(saved.grid) && saved.grid.some((col) => col.length > 0);
+      if (saved && hasTiles && !saved.over) {
+        const section = document.getElementById('zt-continue-section');
+        const sub = document.getElementById('zt-continue-sub');
+        const btn = document.getElementById('zt-continue-btn');
+        if (section && sub && btn) {
+          const mode = saved.mode || 'endless';
+          let href = 'zw-spiel.html?mode=endless';
+          let label = 'Endlos-Modus — Punkte: ' + (saved.score || 0);
+          if (mode === 'goal' && saved.goalTarget) {
+            href = 'zw-spiel.html?mode=goal&target=' + saved.goalTarget;
+            label = 'Ziel-Modus ' + saved.goalTarget + ' — Punkte: ' + (saved.score || 0) + ', Züge: ' + (saved.dropCount || 0);
+          }
+          sub.textContent = label;
+          btn.href = href;
+          section.hidden = false;
+        }
+      }
+    } catch (e) {}
+  });
+
+
+</script>
+<script>/* FunWahr: Zeitstempel für „Zuletzt gespielt“ auf der Startseite (nur dieser eine Wert) */try{localStorage.setItem('funwahr-zuletzt-zw',String(Date.now()));}catch(e){}</script>
+</body>
+</html>

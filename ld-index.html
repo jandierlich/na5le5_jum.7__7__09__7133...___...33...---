@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="de" data-wz-app="ld" data-wz-fixed="dark">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.de; media-src 'self' data: blob: mediastream:; font-src 'self' data:; connect-src 'self' data: blob: https://api.open-meteo.com https://air-quality-api.open-meteo.com https://geocoding-api.open-meteo.com https://routing.openstreetmap.de https://photon.komoot.io https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://world.openfoodfacts.org https://world.openbeautyfacts.org https://world.openproductsfacts.org; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'self' blob:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="./wz-theme.js"></script>
+<script src="./wz-core.js"></script>
+<script src="./wz-design.js" defer></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>LosDenkWahr</title>
+<meta name="description" content="Ein ruhiger Ort, um Gedanken kurz wegzuparken.">
+<meta name="theme-color" content="#15102A">
+<link rel="icon" href="ld-icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WahrZentrale">
+<style>
+  :root{
+    --navy-deep: var(--wzp-15102a, #15102A);
+    --navy: var(--wzp-1e1b2e, #1E1B2E);
+    --navy-soft: var(--wzp-3b2585, #3B2585);
+    --gold: var(--wzp-b9a6f5, #B9A6F5);
+    --gold-soft: var(--wzp-e8e4ff, #E8E4FF);
+    --lavender: var(--wzp-aba0ce, #ABA0CE);
+    --rose: var(--wzp-c9a6ff, #C9A6FF);
+    --ink: var(--wzp-eeeaf8, #EEEAF8);
+    --ink-dim: var(--wzp-c7c0d6, #C7C0D6);
+    --radius: 26px;
+    color-scheme: dark;
+  }
+  /* Übernimmt die Textgröße aus den System-Einstellungen (Dynamic Type); 1rem ≈ 17px im Standard */
+  html{ font: -apple-system-body; }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ height:var(--wz-vh, 100%); margin:0; overscroll-behavior:none; overflow-x:hidden; width:100%; background: var(--navy-deep); }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(120% 90% at 50% -10%, var(--navy-soft) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+    color: var(--ink);
+    min-height:var(--wz-vh, 100dvh);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+  button{ touch-action: manipulation; }
+  #stars{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .screen{
+    position:relative;
+    z-index:1;
+    flex:1;
+    display:none;
+    flex-direction:column;
+    padding: max(24px, env(safe-area-inset-top)) 22px calc(max(24px, env(safe-area-inset-bottom)) + 26px);
+    height:var(--wz-vh, 100dvh); height:var(--wz-vh, 100dvh);
+  }
+  .screen.active{ display:flex; }
+  h1, h2, .display{
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif;
+    font-weight:500;
+    letter-spacing:0.2px;
+  }
+
+  /* ---------- HOME ---------- */
+  #home{ justify-content:space-between; align-items:center; text-align:center; overflow-y:auto; }
+  .home-gear{
+    position:absolute; top:max(14px, env(safe-area-inset-top)); right:14px;
+    width:44px; height:44px; border-radius:50%; background:none; border:none; color: rgba(238,234,248,0.55);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2;
+  }
+  .home-gear svg{ width:22px; height:22px; }
+  .home-hub{
+    position:absolute; top:max(14px, env(safe-area-inset-top)); left:14px;
+    width:44px; height:44px; border-radius:50%; color: rgba(238,234,248,0.55);
+    display:flex; align-items:center; justify-content:center; z-index:2; text-decoration:none;
+  }
+  .home-hub svg{ width:22px; height:22px; }
+  .home-top{ padding-top: 8vh; }
+  .wordmark{ position:relative; display:flex; align-items:baseline; justify-content:center; gap:2px; margin-bottom:14px; padding-bottom:8px; }
+  .wordmark .w-moon{ width:0.42em; height:0.42em; align-self:center; margin:0 1px; opacity:0.9; }
+  .wordmark .w-swash{
+    position:absolute; left:50%; bottom:-2px; transform: translateX(-50%);
+    width:118px; height:10px; opacity:0.55;
+  }
+  .wordmark .w-word{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:400; font-size:1.41rem; color:var(--ink-dim); }
+  .wordmark .w-script{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:2rem; color:var(--gold); margin-left:3px; }
+  .home-top h1{ font-size: 1.88rem; margin:0 0 12px; color:var(--ink); font-weight:400; }
+  .home-top h1 .script-accent{
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.15em;
+    color: var(--gold); display:inline-block; transform:none;
+  }
+  .home-top p{ margin:0 auto; color:var(--ink-dim); font-size:0.88rem; max-width:290px; line-height:1.45; }
+
+  .moon-button{
+    width:168px; height:168px; border-radius:50%;
+    background: radial-gradient(circle at 38% 32%, var(--gold-soft), var(--gold) 60%, var(--wzp-8e75f0, #8E75F0) 100%);
+    border:none;
+    box-shadow: 0 0 0 1px rgba(185,166,245,0.15), 0 20px 60px -10px rgba(185,166,245,0.45), 0 0 40px rgba(185,166,245,0.25);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition: transform .25s ease, box-shadow .35s ease;
+    position:relative;
+    -webkit-user-select:none; user-select:none;
+    flex-shrink:0;
+  }
+  .moon-button:active{ transform: scale(0.96); }
+  .moon-button .face{ width:104px; height:104px; }
+  .mic-indicator{
+    position:absolute; right:8px; bottom:10px;
+    width:38px; height:38px; border-radius:50%;
+    background: rgba(42,36,64,0.15);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 0 1px rgba(42,36,64,0.2);
+  }
+  .mic-indicator svg{ width:18px; height:18px; }
+  .moon-badge{
+    position:absolute; top:6px; right:6px; min-width:34px; height:34px; padding:0 9px;
+    border-radius:999px; background: var(--navy); color: var(--gold-soft);
+    border:1.5px solid rgba(185,166,245,0.55);
+    font-size:15px; font-weight:600; line-height:31px; text-align:center;
+    box-shadow: 0 4px 14px rgba(6,9,26,0.45);
+    display:none;
+  }
+  .moon-badge.show{ display:block; }
+  .moon-button.listening{ animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse{
+    0%,100%{ box-shadow: 0 0 0 1px rgba(185,166,245,0.15), 0 20px 60px -10px rgba(185,166,245,0.45), 0 0 40px rgba(185,166,245,0.25); }
+    50%{ box-shadow: 0 0 0 1px rgba(185,166,245,0.2), 0 20px 70px -6px rgba(185,166,245,0.6), 0 0 70px rgba(185,166,245,0.45); }
+  }
+  .mic-wrap{ width:100%; display:flex; flex-direction:column; align-items:center; padding:16px 0; }
+  .hint{ margin-top:18px; color:var(--ink-dim); font-size:0.82rem; min-height:20px; width:100%; text-align:center; padding:0 12px; }
+  .live-text{
+    margin-top:12px; max-width:320px; max-height:28vh; overflow-y:auto;
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-style:normal;
+    font-size:1.06rem; line-height:1.45; color: var(--ink);
+    display:none;
+  }
+  .live-text.show{ display:block; }
+  .live-text .dots{ color: var(--gold); letter-spacing:2px; }
+
+  .evening-cta{
+    display:none; margin-top:14px;
+    background: rgba(185,166,245,0.1); border:1px solid rgba(185,166,245,0.4); color: var(--gold-soft);
+    padding:10px 18px; border-radius:999px; font-family:inherit; font-size:0.85rem; cursor:pointer;
+  }
+  .evening-cta.show{ display:inline-flex; align-items:center; gap:8px; }
+
+  .home-bottom{ display:flex; flex-direction:column; align-items:center; gap:16px; padding-bottom:6px; }
+  .type-toggle{
+    background:none; border:1px solid rgba(245,243,238,0.18); color:var(--ink-dim);
+    padding:10px 18px; border-radius:999px; font-size:0.85rem; font-family:inherit; cursor:pointer;
+  }
+  .footer-links{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px 12px; font-size:0.8rem; }
+  .footer-links .divider{ color: rgba(245,243,238,0.2); }
+  .footer-links a, .footer-links button{
+    color: rgba(238,234,248,0.7); background:none; border:none;
+    font-family:inherit; font-size:0.8rem; cursor:pointer; padding:4px;
+  }
+
+  /* ---------- TEXT ENTRY ---------- */
+  #textEntry{ justify-content:flex-start; }
+  .text-wrap{ flex:1; display:flex; flex-direction:column; padding-top:4vh; min-height:0; }
+  .entry-label{ color: var(--gold); font-size:0.82rem; margin:0 0 12px; letter-spacing:0.3px; }
+  #thoughtInput{
+    flex:1; background:none; border:none; color:var(--ink);
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-size:1.41rem; line-height:1.5;
+    resize:none; outline:none; caret-color: var(--gold); min-height:120px;
+  }
+  #thoughtInput::placeholder{ color: rgba(245,243,238,0.3); }
+  .dictation-hint{ color: rgba(var(--wzq-c7c0d6, 199, 192, 214),0.7); font-size:0.76rem; line-height:1.45; margin:10px 0 0; display:none; }
+  .dictation-hint.show{ display:block; }
+  .entry-actions{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:16px; }
+  .entry-actions .right{ display:flex; align-items:center; gap:6px; }
+  .ghost-btn{
+    background:none; border:none; color:var(--ink-dim); font-family:inherit; font-size:0.9rem; cursor:pointer; padding:10px;
+  }
+  .ghost-btn.retry{ display:none; align-items:center; gap:6px; color: var(--gold-soft); }
+  .ghost-btn.retry.show{ display:inline-flex; }
+  .ghost-btn.retry svg{ width:16px; height:16px; }
+  .send-btn{
+    background: var(--gold); color:var(--navy-deep); border:none; border-radius:999px;
+    padding:13px 28px; font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-size:1.3rem; font-weight:700; cursor:pointer;
+  }
+  .entry-actions .send-btn{ padding:11px 22px; font-size:1.1rem; }
+  .send-btn:disabled{ opacity:0.35; }
+
+  /* ---------- RELEASE ANIMATION ---------- */
+  #release{ align-items:center; justify-content:center; }
+  .release-msg{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.76rem; color: var(--gold-soft); margin-top:26px; opacity:0; transition:opacity .6s ease; text-align:center; }
+  .release-msg.show{ opacity:1; }
+  .rising-star{
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    background: radial-gradient(circle, var(--gold-soft), var(--gold));
+    box-shadow: 0 0 18px 4px rgba(185,166,245,0.55);
+    animation: rise 2.4s cubic-bezier(.2,.7,.3,1) forwards;
+    pointer-events:none; z-index:3;
+  }
+  @keyframes rise{
+    0%{ transform: translateY(0) scale(1); opacity:1; }
+    70%{ opacity:1; }
+    100%{ transform: translateY(-46vh) scale(0.4); opacity:0; }
+  }
+
+  /* ---------- REVIEW ---------- */
+  .review-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .review-header h2{ font-size:1.35rem; margin:0; font-weight:400; }
+  .review-header h2 .script-accent{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.35em; color:var(--gold); }
+  .close-x{ background:none; border:none; color:var(--ink-dim); font-size:1.4rem; cursor:pointer; padding:6px 8px; min-width:44px; min-height:44px; }
+  .review-sub{ color:var(--ink-dim); font-size:0.82rem; margin:0 0 18px; }
+  .ritual-start{
+    display:flex; align-items:center; justify-content:center; gap:10px; width:100%; flex-shrink:0;
+    background: var(--gold); color: var(--navy-deep); border:none; border-radius:18px;
+    padding:15px 18px; cursor:pointer;
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.3rem;
+    box-shadow: 0 12px 34px -12px rgba(185,166,245,0.55);
+  }
+  .ritual-start small{ font-family:-apple-system,sans-serif; font-weight:500; font-size:0.78rem; opacity:0.75; }
+  .thought-list{ display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1; padding-bottom:20px; -webkit-overflow-scrolling:touch; }
+  .group-label{ color: var(--gold); font-size:0.74rem; letter-spacing:1.2px; text-transform:uppercase; opacity:0.85; margin:10px 2px 0; }
+  .group-toggle{
+    display:flex; align-items:center; justify-content:space-between; width:100%; flex-shrink:0;
+    background:none; border:none; padding:10px 2px 0; cursor:pointer; font-family:inherit;
+    color: var(--ink-dim); font-size:0.74rem; letter-spacing:1.2px; text-transform:uppercase;
+  }
+  .group-toggle .chev{ transition: transform .2s ease; display:inline-block; font-size:1.1rem; }
+  .group-toggle.open .chev{ transform: rotate(90deg); }
+  .thought-card{
+    position:relative; flex-shrink:0;
+    background: rgba(245,243,238,0.06); border:1px solid rgba(245,243,238,0.08);
+    border-radius: 18px; padding:16px 18px;
+  }
+  .thought-card.is-done{ opacity:0.6; }
+  .thought-card.is-keep{ border-color: rgba(var(--wzq-aba0ce, 171, 160, 206),0.28); }
+  .thought-card .t-time{ font-size:0.72rem; color: var(--gold); opacity:0.8; margin-bottom:6px; letter-spacing:0.4px; padding-right:74px; }
+  .thought-card .t-tag{ margin-left:6px; color: var(--rose); }
+  .thought-card .t-text{
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-style:normal; font-weight:400;
+    font-size:1rem; line-height:1.45; margin:0 0 14px; white-space:pre-wrap; overflow-wrap:anywhere;
+    transition: filter .25s ease;
+  }
+  .discreet .thought-card .t-text{ filter: blur(7px); -webkit-user-select:none; user-select:none; }
+  .discreet .thought-card.revealed .t-text{ filter:none; }
+  .discreet-note{ color: rgba(var(--wzq-c7c0d6, 199, 192, 214),0.6); font-size:0.74rem; margin:0; }
+  .thought-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .t-icons{ position:absolute; top:6px; right:6px; display:flex; z-index:2; }
+  .t-icons button{
+    background:none; border:none; color: rgba(238,234,248,0.4);
+    width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+  }
+  .t-icons button svg{ width:17px; height:17px; }
+  .t-icons .t-delete{ font-size:1.2rem; line-height:1; }
+  .chip{
+    border:1px solid rgba(245,243,238,0.18); background:none; color:var(--ink-dim);
+    font-family:inherit; font-size:0.78rem; padding:8px 14px; border-radius:999px; cursor:pointer;
+  }
+  .chip.keep{ color: var(--lavender); border-color: rgba(var(--wzq-aba0ce, 171, 160, 206),0.35); }
+  .chip.done{ color: var(--gold); border-color: rgba(185,166,245,0.35); }
+  .chip.done.active{ background: rgba(185,166,245,0.15); }
+  .chip.keep.active{ background: rgba(var(--wzq-aba0ce, 171, 160, 206),0.15); }
+  .chip.danger{ color: var(--rose); border-color: rgba(201,166,166,0.35); align-self:center; flex-shrink:0; }
+  .empty-state{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--ink-dim); gap:10px; padding:20px; }
+  .empty-state.compact{ flex:0 0 auto; }
+  .empty-state .display{ font-size:1.12rem; color:var(--ink); }
+  .backup-nudge{
+    margin-top:6px; padding:12px 14px; border-radius:14px; font-size:0.78rem; color: var(--ink-dim); flex-shrink:0;
+    background: rgba(var(--wzq-aba0ce, 171, 160, 206),0.08); border:1px dashed rgba(var(--wzq-aba0ce, 171, 160, 206),0.3);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .backup-nudge button{ background:none; border:none; color: var(--lavender); font-family:inherit; font-size:0.78rem; cursor:pointer; padding:4px; white-space:nowrap; }
+
+  /* ---------- RITUAL ---------- */
+  .ritual-top{ position:relative; display:flex; align-items:center; justify-content:space-between; min-height:44px; }
+  .ritual-count{ position:absolute; left:50%; transform:translateX(-50%); pointer-events:none; color: var(--ink-dim); font-size:0.82rem; letter-spacing:0.5px; }
+  .ritual-undo{
+    background:none; border:1px solid rgba(238,234,248,0.18); color: var(--ink-dim);
+    font-family:inherit; font-size:0.78rem; border-radius:999px; padding:7px 14px; cursor:pointer;
+    visibility:hidden;
+  }
+  .ritual-undo.show{ visibility:visible; }
+  .ritual-stage{ position:relative; flex:1; min-height:0; margin:10px 0; }
+  .r-card{
+    position:absolute; left:0; right:0; margin:0 auto; top:50%;
+    transform: translateY(-50%);
+    width:100%; max-width:380px; min-height:min(46vh, 360px); max-height:100%;
+    display:flex; flex-direction:column; justify-content:center;
+    background: linear-gradient(180deg, #3B2585, #1E1B2E);
+    border:1px solid rgba(185,166,245,0.25); border-radius:28px;
+    padding:30px 26px; text-align:center;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    touch-action:none; -webkit-user-select:none; user-select:none; cursor:grab;
+    will-change: transform;
+  }
+  .r-card.behind{ transform: translateY(-50%) translateY(16px) scale(0.94); opacity:0.45; pointer-events:none; }
+  .r-card.animate{ transition: transform .34s cubic-bezier(.2,.7,.3,1), opacity .34s ease; }
+  .r-card .r-time{ color: var(--gold); font-size:0.74rem; letter-spacing:0.6px; opacity:0.85; margin-bottom:16px; }
+  .r-card .r-text{
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-style:normal; font-size:1.3rem; line-height:1.5;
+    color: var(--ink); overflow-y:auto; white-space:pre-wrap; overflow-wrap:anywhere;
+  }
+  .r-label{
+    position:absolute; font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.2rem;
+    padding:3px 14px; border-radius:999px; opacity:0; pointer-events:none;
+  }
+  .r-label.up{ top:14px; left:50%; transform:translateX(-50%); color: var(--gold); border:1.5px solid var(--gold); }
+  .r-label.right{ top:18px; left:18px; color: var(--lavender); border:1.5px solid var(--lavender); transform: rotate(-8deg); }
+  .r-label.left{ top:18px; right:18px; color: var(--rose); border:1.5px solid var(--rose); transform: rotate(8deg); }
+  .ritual-help{ text-align:center; color: rgba(var(--wzq-c7c0d6, 199, 192, 214),0.7); font-size:0.74rem; margin:0 0 14px; line-height:1.5; }
+  .ritual-actions{ display:flex; justify-content:center; align-items:flex-start; gap:18px; }
+  .r-btn{ display:flex; flex-direction:column; align-items:center; gap:7px; background:none; border:none; cursor:pointer; font-family:inherit; font-size:0.74rem; color: var(--ink-dim); padding:0; min-width:64px; }
+  .r-btn .circle{
+    width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid rgba(238,234,248,0.2); background: rgba(245,243,238,0.04);
+  }
+  .r-btn .circle svg{ width:24px; height:24px; }
+  .r-btn.later .circle{ border-color: rgba(201,166,166,0.5); color: var(--rose); }
+  .r-btn.keep .circle{ border-color: rgba(var(--wzq-aba0ce, 171, 160, 206),0.5); color: var(--lavender); }
+  .r-btn.release .circle{ width:72px; height:72px; background: var(--gold); border:none; color: var(--navy-deep); box-shadow: 0 10px 30px -8px rgba(185,166,245,0.6); }
+  .r-btn.release{ color: var(--gold-soft); }
+  .ritual-end{ flex:1; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:10px; }
+  .ritual-end.show{ display:flex; }
+  .ritual-end .end-moon{ width:120px; height:120px; margin-bottom:14px; }
+  .ritual-end h2{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; color: var(--gold-soft); font-size:2rem; margin:0; }
+  .ritual-end p{ color: var(--ink-dim); font-size:0.88rem; margin:0; line-height:1.6; white-space:pre-line; }
+  .ritual-end .send-btn{ margin-top:22px; }
+
+  /* ---------- SETTINGS ---------- */
+  .settings-body{ overflow-y:auto; flex:1; padding-bottom:10px; }
+  .set-group{ background: rgba(245,243,238,0.05); border:1px solid rgba(245,243,238,0.08); border-radius:18px; margin:0 0 18px; overflow:hidden; }
+  .set-title{ color: var(--gold); font-size:0.74rem; letter-spacing:1.2px; text-transform:uppercase; opacity:0.85; margin:14px 4px 8px; }
+  .set-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border-top:1px solid rgba(245,243,238,0.07); }
+  .set-row:first-child{ border-top:none; }
+  .set-row .txt{ flex:1; }
+  .set-row .txt strong{ display:block; font-weight:500; font-size:0.94rem; color: var(--ink); }
+  .set-row .txt span{ display:block; font-size:0.76rem; color: var(--ink-dim); margin-top:3px; line-height:1.4; }
+  .set-row input[type=checkbox]{ width:44px; height:26px; accent-color: var(--gold); flex-shrink:0; }
+  .set-row input[type=time]{
+    background: rgba(245,243,238,0.08); color: var(--ink); border:1px solid rgba(245,243,238,0.15);
+    border-radius:10px; padding:7px 10px; font-size:16px; font-family:inherit;
+  }
+  .set-row input[type=time]:disabled{ opacity:0.4; }
+  .set-btn{
+    display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+    background:none; border:none; border-top:1px solid rgba(245,243,238,0.07);
+    color: var(--ink); font-family:inherit; font-size:0.94rem; text-align:left; padding:14px 16px; cursor:pointer;
+  }
+  .set-btn:first-child{ border-top:none; }
+  .set-btn .sub{ display:block; font-size:0.76rem; color: var(--ink-dim); margin-top:3px; }
+  .set-btn .arrow{ color: var(--ink-dim); opacity:0.6; font-size:1.2rem; }
+  .set-btn.danger{ color: var(--rose); }
+  .set-foot{ color: rgba(var(--wzq-c7c0d6, 199, 192, 214),0.6); font-size:0.74rem; line-height:1.5; margin:-8px 4px 4px; }
+
+  /* ---------- LEGAL ---------- */
+  .legal-body{ overflow-y:auto; flex:1; color: var(--ink-dim); font-size:0.85rem; line-height:1.7; }
+  .legal-body h3{ color: var(--ink); font-size:0.94rem; margin:22px 0 8px; font-weight:600; }
+  .legal-body p{ margin:0 0 12px; }
+  .legal-tabs{ display:flex; gap:8px; margin-bottom:18px; }
+  .legal-tab{
+    flex:1; background: rgba(245,243,238,0.06); border:1px solid rgba(245,243,238,0.1);
+    color: var(--ink-dim); padding:10px; border-radius:12px; font-family:inherit; font-size:0.78rem; cursor:pointer;
+  }
+  .legal-tab.active{ color: var(--ink); border-color: rgba(185,166,245,0.4); background: rgba(185,166,245,0.08); }
+  .legal-section{ display:none; }
+  .legal-section.active{ display:block; }
+
+  ::-webkit-scrollbar{ display:none; }
+
+  .ios-hint{
+    position:fixed; left:16px; right:16px; bottom:max(16px, env(safe-area-inset-bottom));
+    z-index:5; display:none; align-items:center; gap:10px;
+    background: rgba(18,27,62,0.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border:1px solid rgba(238,234,248,0.14); border-radius:16px;
+    padding:12px 14px; font-size:0.78rem; color: var(--ink-dim); line-height:1.4;
+  }
+  .ios-hint.show{ display:flex; }
+  .ios-hint button{ background:none; border:none; color: var(--ink-dim); font-size:1.1rem; cursor:pointer; padding:0 4px; margin-left:auto; }
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed; left:50%; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 8px);
+    transform: translate(-50%, 20px); opacity:0; pointer-events:none;
+    z-index:40; display:flex; align-items:center; gap:14px; width:max-content; max-width: calc(100% - 32px);
+    background: rgba(42,36,64,0.97); border:1px solid rgba(185,166,245,0.3); border-radius:999px;
+    padding:8px 8px 8px 18px; font-size:0.85rem; color: var(--ink);
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,0.6);
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .toast.show{ opacity:1; transform: translate(-50%, 0); pointer-events:auto; }
+  .toast button{
+    background: rgba(185,166,245,0.15); border:none; color: var(--gold-soft); font-family:inherit; font-size:0.82rem;
+    font-weight:600; padding:8px 14px; border-radius:999px; cursor:pointer; white-space:nowrap;
+  }
+  .toast.no-action{ padding:11px 18px; }
+  .toast.no-action button{ display:none; }
+
+  /* ---------- ONBOARDING ---------- */
+  .onboarding-overlay{
+    position:fixed; inset:0; z-index:30;
+    background: rgba(6,9,26,0.88); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    display:none; align-items:center; justify-content:center; padding:28px; overflow-y:auto;
+  }
+  .onboarding-overlay.show{ display:flex; }
+  .onboarding-card{
+    max-width:340px; text-align:center; margin:auto;
+    background: linear-gradient(180deg, rgba(42,36,64,0.55), rgba(18,27,62,0.55));
+    border:1px solid rgba(238,234,248,0.1);
+    border-radius: 28px; padding:34px 26px 28px;
+  }
+  .onboarding-moon{ width:84px; height:84px; margin:0 auto 20px; }
+  .onboarding-moon svg{ width:100%; height:100%; }
+  .onboarding-card h2{
+    font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:400; font-size:1.3rem; color:var(--ink);
+    margin:0 0 14px; line-height:1.3;
+  }
+  .onboarding-card h2 .w-word{ font-weight:600; font-size:0.9em; }
+  .onboarding-card h2 .w-script{ font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; color:var(--gold); font-size:1.15em; margin-left:2px; }
+  .w-moon-inline{ width:0.4em; height:0.4em; margin:0 1px; opacity:0.9; }
+  .onboarding-card p{ color: var(--ink-dim); font-size:0.85rem; line-height:1.6; margin:0 0 12px; }
+  .onboarding-card button{
+    margin-top:12px;
+    background: var(--gold); color: var(--navy-deep); border:none; border-radius:999px;
+    padding:13px 30px; font-family:ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif; font-weight:700; font-size:1.06rem; cursor:pointer;
+  }
+
+  .undo-btn{
+    margin-top:34px; background:none; border:1px solid rgba(238,234,248,0.2); color: var(--ink-dim);
+    padding:9px 20px; border-radius:999px; font-size:0.8rem; cursor:pointer;
+    opacity:0; transition: opacity .4s ease; pointer-events:none;
+  }
+  .undo-btn.show{ opacity:1; pointer-events:auto; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  @media (prefers-reduced-motion: reduce){
+    .moon-button.listening{ animation:none; box-shadow: 0 0 0 3px rgba(185,166,245,0.6), 0 0 60px rgba(185,166,245,0.45); }
+    .rising-star{ display:none; }
+    .r-card.animate{ transition-duration: .01s; }
+    .release-msg, .undo-btn, .toast, .thought-card .t-text{ transition:none; }
+  }
+</style>
+<link rel="stylesheet" href="./wz-common.css">
+<link rel="stylesheet" href="./wz-unify.css">
+<link rel="stylesheet" href="./wz-design.css">
+</head>
+<body>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <a class="home-hub" href="./index.html#alltag" aria-label="Zur WahrZentrale" title="Zur WahrZentrale"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10.5V20h4.5v-5.5h3V20H18v-9.5"/></svg></a>
+  <button class="home-gear" id="openSettings" aria-label="Einstellungen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" stroke="currentColor" stroke-width=".9" stroke-linejoin="round" d="M10.12 4.33L10.37 1.93A10.20 10.20 0 0 1 13.63 1.93L13.88 4.33A7.90 7.90 0 0 1 16.10 5.25L17.97 3.73A10.20 10.20 0 0 1 20.27 6.03L18.75 7.90A7.90 7.90 0 0 1 19.67 10.12L22.07 10.37A10.20 10.20 0 0 1 22.07 13.63L19.67 13.88A7.90 7.90 0 0 1 18.75 16.10L20.27 17.97A10.20 10.20 0 0 1 17.97 20.27L16.10 18.75A7.90 7.90 0 0 1 13.88 19.67L13.63 22.07A10.20 10.20 0 0 1 10.37 22.07L10.12 19.67A7.90 7.90 0 0 1 7.90 18.75L6.03 20.27A10.20 10.20 0 0 1 3.73 17.97L5.25 16.10A7.90 7.90 0 0 1 4.33 13.88L1.93 13.63A10.20 10.20 0 0 1 1.93 10.37L4.33 10.12A7.90 7.90 0 0 1 5.25 7.90L3.73 6.03A10.20 10.20 0 0 1 6.03 3.73L7.90 5.25A7.90 7.90 0 0 1 10.12 4.33ZM8.40 12a3.60 3.60 0 1 0 7.20 0a3.60 3.60 0 1 0 -7.20 0Z"/></svg>
+  </button>
+  <div class="home-top">
+    <div class="wordmark">
+      <span class="w-word">LosDenk</span><svg class="w-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a8 8 0 1 0 8 9.2A6.5 6.5 0 0 1 10 2z" fill="#B9A6F5"/></svg><span class="w-script">Wahr</span>
+      <svg class="w-swash" viewBox="0 0 160 14" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M2 8 Q40 2 80 7 T158 6" fill="none" stroke="#B9A6F5" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Was beschäftigt <span class="script-accent">Dich?</span></h1>
+    <p>Sprich es aus oder schreib es kurz auf. Du bekommst keine Antwort &mdash; nur einen ruhigen Ort dafür.</p>
+  </div>
+
+  <div class="mic-wrap">
+    <button class="moon-button" id="micBtn" aria-label="Gedanken aufnehmen">
+      <svg class="face" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <path d="M32 44 Q40 36 48 44" stroke="#1E1B2E" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+        <path d="M56 44 Q64 36 72 44" stroke="#1E1B2E" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+        <path d="M38 60 Q52 72 66 60" stroke="#1E1B2E" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+        <circle cx="28" cy="56" r="4.5" fill="#1E1B2E" opacity="0.14"/>
+        <circle cx="76" cy="56" r="4.5" fill="#1E1B2E" opacity="0.14"/>
+      </svg>
+      <div class="mic-indicator" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1E1B2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3.5M8.5 21.5h7"/></svg>
+      </div>
+      <span class="moon-badge" id="moonBadge" aria-hidden="true">0</span>
+    </button>
+    <div class="hint" id="micHint" aria-live="polite">Antippen und sprechen</div>
+    <div class="live-text" id="liveText" aria-live="polite"></div>
+    <button class="evening-cta" id="eveningCta"><span aria-hidden="true">✦</span><span id="eveningCtaText"></span></button>
+  </div>
+
+  <div class="home-bottom">
+    <button class="type-toggle" id="switchToText">Lieber tippen</button>
+    <div class="footer-links">
+      <button id="openReview">Heute Abend (<span id="pendingCount">0</span>)</button>
+      <span class="divider" aria-hidden="true">&middot;</span>
+      <a href="./impressum.html">Impressum</a>
+      <span class="divider" aria-hidden="true">&middot;</span>
+      <a href="./datenschutz.html#ld">Datenschutz</a>
+    </div>
+  </div>
+</div>
+
+<div id="iosHint" class="ios-hint">
+  <span>Zum Home-Bildschirm: Teilen-Symbol <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px" aria-hidden="true"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><rect x="4" y="12" width="16" height="8" rx="2"/></svg> antippen, dann &bdquo;Zum Home-Bildschirm&ldquo;</span>
+  <button id="dismissIosHint" aria-label="Schließen">&times;</button>
+</div>
+
+<!-- TEXT ENTRY (neu, Sprach-Bestätigung, Bearbeiten) -->
+<div id="textEntry" class="screen">
+  <div class="text-wrap">
+    <p class="entry-label" id="entryLabel">Was beschäftigt dich?</p>
+    <label for="thoughtInput" class="sr-only">Gedanke</label>
+    <textarea id="thoughtInput" placeholder="Schreib es einfach hin&hellip;" autocomplete="off" autocapitalize="sentences"></textarea>
+    <p class="dictation-hint" id="dictationHint">Tipp: Mit dem Mikrofon unten rechts auf der Bildschirmtastatur kannst du auch hier diktieren.</p>
+    <div class="entry-actions">
+      <button class="ghost-btn" id="cancelText">Abbrechen</button>
+      <div class="right">
+        <button class="ghost-btn retry" id="retryVoice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3.5M8.5 21.5h7"/></svg>
+          Nochmal
+        </button>
+        <button class="send-btn" id="sendText" disabled>Wegparken</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELEASE ANIMATION -->
+<div id="release" class="screen">
+  <div class="release-msg" id="releaseMsg" aria-live="polite">Losgelassen.</div>
+  <button class="undo-btn" id="undoBtn">Doch nicht</button>
+</div>
+
+<!-- REVIEW -->
+<div id="review" class="screen">
+  <div class="review-header">
+    <h2>Heute <span class="script-accent">Abend</span></h2>
+    <button class="close-x" id="closeReview" aria-label="Schließen">&times;</button>
+  </div>
+  <p class="review-sub">Was du losgedacht hast. In aller Ruhe.</p>
+  <div class="thought-list" id="thoughtList"></div>
+</div>
+
+<!-- ABENDRITUAL -->
+<div id="ritual" class="screen">
+  <div class="ritual-top">
+    <button class="close-x" id="closeRitual" aria-label="Schließen">&times;</button>
+    <span class="ritual-count" id="ritualCount"></span>
+    <button class="ritual-undo" id="ritualUndo">Rückgängig</button>
+  </div>
+  <div class="ritual-stage" id="ritualStage"></div>
+  <div id="ritualControls">
+    <p class="ritual-help">Nach oben wischen zum Loslassen &middot; nach rechts behalten &middot; nach links auf morgen</p>
+    <div class="ritual-actions">
+      <button class="r-btn later" data-act="later">
+        <span class="circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 14.8A8.2 8.2 0 1 1 9.2 4.5a6.6 6.6 0 0 0 10.3 10.3z"/></svg></span>
+        Morgen
+      </button>
+      <button class="r-btn release" data-act="done">
+        <span class="circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+        Loslassen
+      </button>
+      <button class="r-btn keep" data-act="keep">
+        <span class="circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h10v17.5l-5-3.8-5 3.8z"/></svg></span>
+        Behalten
+      </button>
+    </div>
+  </div>
+  <div class="ritual-end" id="ritualEnd">
+    <svg class="end-moon" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <defs>
+        <radialGradient id="eg" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stop-color="#E8E4FF"/><stop offset="60%" stop-color="#B9A6F5"/><stop offset="100%" stop-color="#8E75F0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="url(#eg)"/>
+      <path d="M32 47 Q40 42 48 47" stroke="#1E1B2E" stroke-width="4" stroke-linecap="round"/>
+      <path d="M56 47 Q64 42 72 47" stroke="#1E1B2E" stroke-width="4" stroke-linecap="round"/>
+      <path d="M40 61 Q52 69 64 61" stroke="#1E1B2E" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <h2 id="ritualEndTitle">Alles abgelegt.</h2>
+    <p id="ritualEndSummary"></p>
+    <button class="send-btn" id="ritualDone">Gute Nacht</button>
+  </div>
+</div>
+
+<!-- EINSTELLUNGEN -->
+<div id="settings" class="screen">
+  <div class="review-header">
+    <h2>Einstellungen</h2>
+    <button class="close-x" id="closeSettings" aria-label="Schließen">&times;</button>
+  </div>
+  <div class="settings-body">
+    <p class="set-title">Abend</p>
+    <div class="set-group">
+      <div class="set-row">
+        <label class="txt" for="setReminder"><strong>Abend-Hinweis</strong><span>Ab dieser Uhrzeit zeigt der Startbildschirm, wie viele Gedanken auf dich warten.</span></label>
+        <input type="checkbox" switch id="setReminder">
+      </div>
+      <div class="set-row">
+        <label class="txt" for="setReminderTime"><strong>Uhrzeit</strong></label>
+        <input type="time" id="setReminderTime" value="19:00">
+      </div>
+    </div>
+
+    <p class="set-title">Privatsphäre</p>
+    <div class="set-group">
+      <div class="set-row">
+        <label class="txt" for="setDiscreet"><strong>Diskret-Modus</strong><span>Gedanken in der Liste sind verschwommen, bis du sie antippst &ndash; falls jemand mit aufs Display schaut.</span></label>
+        <input type="checkbox" switch id="setDiscreet">
+      </div>
+    </div>
+
+    <p class="set-title">Sicherung</p>
+    <div class="set-group">
+      <button class="set-btn" id="exportText"><span>Als Text teilen<span class="sub">Lesbar, z.&nbsp;B. für Notizen oder als Nachricht an dich selbst</span></span><span class="arrow" aria-hidden="true">›</span></button>
+      <button class="set-btn" id="exportBackup"><span>Sicherung exportieren<span class="sub" id="lastBackupInfo">Noch nie gesichert</span></span><span class="arrow" aria-hidden="true">›</span></button>
+      <button class="set-btn" id="importBackup"><span>Sicherung importieren<span class="sub">Bestehende Gedanken bleiben erhalten</span></span><span class="arrow" aria-hidden="true">›</span></button>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <p class="set-foot">Deine Gedanken liegen nur auf diesem Smartphone. Eine Sicherung ab und zu, z.&nbsp;B. in deiner Dateiablage oder einem Cloud-Speicher, schützt sie, falls die App gelöscht wird.</p>
+
+    <p class="set-title">Sonstiges</p>
+    <div class="set-group">
+      <button class="set-btn" id="showIntro"><span>Einführung nochmal zeigen</span><span class="arrow" aria-hidden="true">›</span></button>
+      <button class="set-btn danger" id="purgeDone"><span>Alle losgelassenen Gedanken löschen<span class="sub" id="purgeInfo"></span></span><span class="arrow" aria-hidden="true">›</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL -->
+<div id="legal" class="screen">
+  <div class="review-header">
+    <h2>Rechtliches</h2>
+    <button class="close-x" id="closeLegal" aria-label="Schließen">&times;</button>
+  </div>
+  <div class="legal-body">
+    <p>Impressum und Datenschutzerklärung gelten gemeinsam für die ganze WahrZentrale: <a href="./impressum.html">Impressum</a> · <a href="./datenschutz.html#ld">Datenschutz</a></p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastUndo">Rückgängig</button></div>
+
+<script src="./wz-onboarding.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ---------- Speicher (robust) ----------
+  const K = {
+    thoughts: 'losgedacht_thoughts',
+    onboarded: 'losgedacht_onboarded',
+    iosHint: 'losgedacht_ios_hint_dismissed',
+    settings: 'losdenkwahr_settings'
+  };
+  let ldOnb = null;
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, v); return true; }catch(e){ return false; } }
+
+  const DEFAULT_SETTINGS = { reminder: true, reminderTime: '19:00', discreet: false, lastBackup: null };
+  function loadSettings(){
+    try{ return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(lsGet(K.settings)) || {}); }
+    catch(e){ return Object.assign({}, DEFAULT_SETTINGS); }
+  }
+  let settings = loadSettings();
+  function saveSettings(){ lsSet(K.settings, JSON.stringify(settings)); }
+
+  function loadThoughts(){
+    try{
+      const list = JSON.parse(lsGet(K.thoughts)) || [];
+      return Array.isArray(list) ? list.filter(t => t && typeof t.text === 'string') : [];
+    }catch(e){ return []; }
+  }
+  function saveThoughts(list){
+    if(!lsSet(K.thoughts, JSON.stringify(list))){
+      toast('Speichern hat nicht geklappt. Ist der Speicher voll?');
+      return false;
+    }
+    return true;
+  }
+  let lastId = 0;
+  function newId(){
+    let id = Date.now();
+    if(id <= lastId) id = lastId + 1;
+    lastId = id;
+    return id;
+  }
+  let persistAsked = false;
+  function askPersist(){
+    if(persistAsked) return;
+    persistAsked = true;
+    try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
+  }
+
+  const now = () => Date.now();
+  function isSnoozed(t){ return t.status === 'open' && !!t.snoozeUntil && t.snoozeUntil > now(); }
+  function isOpen(t){ return t.status === 'open' && !isSnoozed(t); }
+  function startOfTomorrow(){ const d = new Date(); d.setHours(24,0,0,0); return d.getTime(); }
+
+  function addThought(text){
+    const list = loadThoughts();
+    const id = newId();
+    list.unshift({ id, text, time: new Date().toISOString(), status:'open' });
+    saveThoughts(list);
+    askPersist();
+    updateCounts();
+    return id;
+  }
+  function updateThought(id, patch){
+    const list = loadThoughts();
+    const item = list.find(x => x.id === id);
+    if(!item) return null;
+    const before = Object.assign({}, item);
+    Object.assign(item, patch);
+    Object.keys(item).forEach(k => { if(item[k] === undefined) delete item[k]; });
+    saveThoughts(list);
+    updateCounts();
+    return before;
+  }
+  function setStatus(id, status){
+    return updateThought(id, {
+      status,
+      snoozeUntil: undefined,
+      doneAt: status === 'done' ? new Date().toISOString() : undefined
+    });
+  }
+  function removeThought(id){
+    const list = loadThoughts();
+    const idx = list.findIndex(t => t.id === id);
+    if(idx < 0) return null;
+    const [item] = list.splice(idx, 1);
+    saveThoughts(list);
+    updateCounts();
+    return { item, idx };
+  }
+  function restoreThought(item, idx){
+    const list = loadThoughts();
+    if(list.some(t => t.id === item.id)) return;
+    list.splice(Math.min(idx, list.length), 0, item);
+    saveThoughts(list);
+    updateCounts();
+  }
+
+  // ---------- Haptik ----------
+  // Mobil-Browser kennt navigator.vibrate nicht. Ab neueren Systemversionen löst das Umschalten eines
+  // nativen Schalters (<input switch>) ein spürbares Tippen aus – das nutzen wir.
+  function haptic(){
+    try{
+      if(navigator.vibrate){ navigator.vibrate(12); return; }
+      const label = document.createElement('label');
+      label.setAttribute('aria-hidden', 'true');
+      label.style.display = 'none';
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('switch', '');
+      label.appendChild(inp);
+      document.head.appendChild(label);
+      label.click();
+      document.head.removeChild(label);
+    }catch(e){}
+  }
+
+  // ---------- Sternenhimmel ----------
+  const canvas = $('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let starLoop = null;
+  function resize(){
+    canvas.width = innerWidth * devicePixelRatio;
+    canvas.height = (window.wzVH ? wzVH() : innerHeight) * devicePixelRatio;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = (window.wzVH ? wzVH() : innerHeight) + 'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    stars = Array.from({length: 70}, () => ({
+      x: Math.random()*innerWidth,
+      y: Math.random()*(window.wzVH ? wzVH() : innerHeight)*0.75,
+      r: Math.random()*1.4 + 0.3,
+      p: Math.random()*Math.PI*2,
+      s: Math.random()*0.02 + 0.005
+    }));
+    drawStars(true);
+  }
+  function drawStars(still){
+    ctx.clearRect(0,0,innerWidth,(window.wzVH ? wzVH() : innerHeight));
+    for(const st of stars){
+      if(!still) st.p += st.s;
+      const a = 0.35 + Math.sin(st.p)*0.35;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(245,243,238,${Math.max(0.12,a)})`;
+      ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  function loop(){ drawStars(false); starLoop = requestAnimationFrame(loop); }
+  function updateStarMotion(){
+    if(starLoop){ cancelAnimationFrame(starLoop); starLoop = null; }
+    if(reducedMotion.matches || document.hidden) drawStars(true);
+    else loop();
+  }
+  addEventListener('resize', resize);
+  if(reducedMotion.addEventListener) reducedMotion.addEventListener('change', updateStarMotion);
+  resize(); updateStarMotion();
+
+  // ---------- Screens ----------
+  let current = 'home';
+  function show(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(id).classList.add('active');
+    current = id;
+    if(id === 'home') updateCounts();
+  }
+
+  // ---------- Toast mit Rückgängig ----------
+  let toastTimer = null;
+  function toast(msg, undoFn){
+    const el = $('toast');
+    $('toastMsg').textContent = msg;
+    el.classList.toggle('no-action', !undoFn);
+    $('toastUndo').onclick = () => { hideToast(); if(undoFn){ haptic(); undoFn(); } };
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, undoFn ? 5500 : 2600);
+  }
+  function hideToast(){ $('toast').classList.remove('show'); clearTimeout(toastTimer); }
+
+  // ---------- Spracheingabe: Elemente ----------
+  const micBtn = $('micBtn');
+  const micHint = $('micHint');
+  const liveText = $('liveText');
+
+  // ---------- Zähler, Mond-Badge, Abend-Hinweis ----------
+  function isEveningNow(){
+    const [h, m] = (settings.reminderTime || '19:00').split(':').map(Number);
+    const d = new Date();
+    const mins = d.getHours()*60 + d.getMinutes();
+    return mins >= (h*60 + (m||0)) || d.getHours() < 4;
+  }
+  function updateCounts(){
+    const open = loadThoughts().filter(isOpen).length;
+    $('pendingCount').textContent = open;
+    const badge = $('moonBadge');
+    badge.textContent = open > 99 ? '99+' : open;
+    badge.classList.toggle('show', open > 0);
+    micBtn.setAttribute('aria-label', 'Gedanken aufnehmen' + (open ? ` (${open} warten auf heute Abend)` : ''));
+    const showCta = settings.reminder && open > 0 && isEveningNow() && !micBtn.classList.contains('listening');
+    $('eveningCtaText').textContent = open === 1 ? '1 Gedanke wartet auf dich' : `${open} Gedanken warten auf dich`;
+    $('eveningCta').classList.toggle('show', showCta);
+  }
+
+  // ---------- Spracheingabe ----------
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let recText = '';
+  let speechUnavailable = false;
+  let silenceTimer = null, maxTimer = null, hintTimer = null;
+  const DEFAULT_HINT = 'Antippen und sprechen';
+
+  function setHint(text, resetAfter){
+    clearTimeout(hintTimer);
+    micHint.textContent = text;
+    if(resetAfter) hintTimer = setTimeout(() => { micHint.textContent = DEFAULT_HINT; }, resetAfter);
+  }
+
+  // Setzt das Transkript aus allen Ergebnissen zusammen. Manche Systemversionen liefern
+  // bei "continuous" jedes Ergebnis inklusive des bisherigen Texts – das fangen wir ab.
+  function joinResults(results){
+    let text = '';
+    for(let i = 0; i < results.length; i++){
+      const part = ((results[i][0] && results[i][0].transcript) || '').trim();
+      if(!part) continue;
+      const norm = text.toLowerCase();
+      const p = part.toLowerCase();
+      if(norm && p.startsWith(norm)) text = part;
+      else if(norm && norm.endsWith(p)) continue;
+      else text = text ? text + ' ' + part : part;
+    }
+    return text.replace(/\s+/g, ' ').trim();
+  }
+
+  function renderLive(){
+    liveText.textContent = recText ? recText + ' ' : '';
+    const dots = document.createElement('span');
+    dots.className = 'dots';
+    dots.textContent = '…';
+    liveText.appendChild(dots);
+  }
+
+  function armSilence(){
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => { if(recognition) try{ recognition.stop(); }catch(e){} }, recText ? 3200 : 8000);
+  }
+
+  function startListening(){
+    if(!SpeechRec || speechUnavailable){ openEntry('new', '', true); return; }
+    hideToast();
+    recText = '';
+    let failed = null;
+    try{
+      recognition = new SpeechRec();
+      recognition.lang = 'de-DE';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+    }catch(e){ recognition = null; speechUnavailable = true; openEntry('new', '', true); return; }
+
+    recognition.onresult = (e) => {
+      recText = joinResults(e.results);
+      renderLive();
+      armSilence();
+    };
+    recognition.onerror = (e) => {
+      if(['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'].includes(e.error)){
+        speechUnavailable = true;
+      }
+      failed = e.error;
+    };
+    recognition.onend = () => finishListening(failed);
+
+    micBtn.classList.add('listening');
+    $('eveningCta').classList.remove('show');
+    setHint('Ich höre zu … zum Beenden antippen');
+    liveText.classList.add('show');
+    renderLive();
+    try{ recognition.start(); }
+    catch(e){ speechUnavailable = true; finishListening('start'); return; }
+    armSilence();
+    clearTimeout(maxTimer);
+    maxTimer = setTimeout(() => { if(recognition) try{ recognition.stop(); }catch(e){} }, 120000);
+  }
+
+  function stopListening(){
+    if(!recognition) return;
+    try{ recognition.stop(); }catch(e){ finishListening(); }
+  }
+
+  function finishListening(failed){
+    clearTimeout(silenceTimer); clearTimeout(maxTimer);
+    if(!micBtn.classList.contains('listening')) return;
+    recognition = null;
+    micBtn.classList.remove('listening');
+    liveText.classList.remove('show');
+    const text = recText.trim();
+    recText = '';
+    if(text){
+      setHint(DEFAULT_HINT);
+      openEntry('voice', text);
+    } else if(speechUnavailable){
+      setHint(DEFAULT_HINT);
+      openEntry('new', '', true);
+    } else if(failed === 'network'){
+      setHint('Spracherkennung gerade nicht erreichbar. Tippen geht auch.', 3500);
+    } else {
+      setHint('Nichts gehört. Nochmal antippen – oder tippen.', 3000);
+    }
+    updateCounts();
+  }
+
+  micBtn.addEventListener('click', () => {
+    haptic();
+    if(micBtn.classList.contains('listening')){ stopListening(); return; }
+    startListening();
+  });
+
+  // ---------- Texteingabe: neu / Sprach-Bestätigung / Bearbeiten ----------
+  const input = $('thoughtInput');
+  const sendBtn = $('sendText');
+  let entryMode = 'new';
+  let editingId = null;
+
+  function openEntry(mode, text, showDictationHint){
+    entryMode = mode;
+    input.value = text || '';
+    const labels = {
+      new: 'Was beschäftigt dich?',
+      voice: 'Stimmt so? Du kannst noch korrigieren.',
+      edit: 'Gedanken bearbeiten'
+    };
+    $('entryLabel').textContent = labels[mode];
+    $('cancelText').textContent = mode === 'voice' ? 'Verwerfen' : 'Abbrechen';
+    $('retryVoice').classList.toggle('show', mode === 'voice' && !!SpeechRec && !speechUnavailable);
+    sendBtn.textContent = mode === 'edit' ? 'Speichern' : 'Wegparken';
+    $('dictationHint').classList.toggle('show', mode === 'new' && (!!showDictationHint || !SpeechRec || speechUnavailable));
+    sendBtn.disabled = input.value.trim().length === 0;
+    show('textEntry');
+    if(mode !== 'voice'){
+      setTimeout(() => { input.focus(); try{ input.setSelectionRange(input.value.length, input.value.length); }catch(e){} }, 200);
+    }
+  }
+  function closeEntry(){
+    input.value = '';
+    input.blur();
+    if(entryMode === 'edit'){ editingId = null; renderReview(); show('review'); }
+    else show('home');
+  }
+
+  $('switchToText').addEventListener('click', () => openEntry('new', '', false));
+  $('cancelText').addEventListener('click', closeEntry);
+  $('retryVoice').addEventListener('click', () => { input.value = ''; input.blur(); show('home'); startListening(); });
+  input.addEventListener('input', () => { sendBtn.disabled = input.value.trim().length === 0; });
+  sendBtn.addEventListener('click', () => {
+    const text = input.value.trim();
+    if(!text) return;
+    haptic();
+    input.blur();
+    if(entryMode === 'edit' && editingId !== null){
+      updateThought(editingId, { text });
+      editingId = null;
+      input.value = '';
+      renderReview();
+      show('review');
+      toast('Gespeichert.');
+      return;
+    }
+    input.value = '';
+    releaseThought(text);
+  });
+
+  // ---------- Loslass-Animation ----------
+  let releaseTimers = [];
+  function clearReleaseTimers(){ releaseTimers.forEach(t => clearTimeout(t)); releaseTimers = []; }
+  function spawnStar(parent, x, y){
+    const star = document.createElement('div');
+    star.className = 'rising-star';
+    star.style.left = (x - 7) + 'px';
+    star.style.top = (y - 7) + 'px';
+    parent.appendChild(star);
+    setTimeout(() => star.remove(), 2600);
+    return star;
+  }
+
+  function releaseThought(text){
+    clearReleaseTimers();
+    const id = addThought(text);
+
+    show('release');
+    const msg = $('releaseMsg');
+    const undoBtn = $('undoBtn');
+    msg.classList.remove('show');
+    undoBtn.classList.remove('show');
+    msg.textContent = pickReleasePhrase();
+
+    const star = spawnStar($('release'), innerWidth/2, innerHeight*0.55);
+
+    undoBtn.onclick = () => {
+      clearReleaseTimers();
+      haptic();
+      removeThought(id);
+      star.remove();
+      undoBtn.classList.remove('show');
+      openEntry('new', text);
+    };
+
+    const fast = reducedMotion.matches;
+    releaseTimers.push(setTimeout(()=> msg.classList.add('show'), fast ? 0 : 300));
+    releaseTimers.push(setTimeout(()=> undoBtn.classList.add('show'), fast ? 0 : 500));
+    releaseTimers.push(setTimeout(()=> undoBtn.classList.remove('show'), 3400));
+    releaseTimers.push(setTimeout(()=> show('home'), 3500));
+  }
+  const phrases = ['Losgelassen.', 'Das ist jetzt geparkt.', 'Gut, dass es raus ist.', 'Abgelegt für heute Abend.'];
+  function pickReleasePhrase(){ return phrases[Math.floor(Math.random()*phrases.length)]; }
+
+  // ---------- Übersicht "Heute Abend" ----------
+  let doneExpanded = false;
+  const ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5l1-4.2L16 4.8a1.9 1.9 0 0 1 2.7 0l.5.5a1.9 1.9 0 0 1 0 2.7L8.7 18.5z"/><path d="M14 6.8l3.2 3.2"/></svg>';
+
+  function dayKey(d){ return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+  function dayGroup(iso){
+    const d = new Date(iso);
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    if(dayKey(d) === dayKey(new Date())) return 'Heute';
+    if(dayKey(d) === dayKey(y)) return 'Gestern';
+    return 'Älter';
+  }
+  function fmtTime(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'}) + ' · ' + d.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function buildCard(t){
+    const card = document.createElement('div');
+    card.className = 'thought-card' + (t.status === 'done' ? ' is-done' : '') + (t.status === 'keep' ? ' is-keep' : '');
+    card.innerHTML = `
+      <div class="t-icons">
+        <button class="t-edit" aria-label="Bearbeiten">${ICON_EDIT}</button>
+        <button class="t-delete" aria-label="Löschen">&times;</button>
+      </div>
+      <div class="t-time"></div>
+      <p class="t-text"></p>
+      <div class="thought-actions">
+        <button class="chip done ${t.status==='done'?'active':''}" data-action="done">${t.status==='done' ? 'Losgelassen' : 'Loslassen'}</button>
+        <button class="chip keep ${t.status==='keep'?'active':''}" data-action="keep">Behalten</button>
+      </div>`;
+    const timeEl = card.querySelector('.t-time');
+    timeEl.textContent = fmtTime(t.time);
+    if(isSnoozed(t)){
+      const tag = document.createElement('span');
+      tag.className = 't-tag';
+      tag.textContent = '· morgen wieder da';
+      timeEl.appendChild(tag);
+    }
+    card.querySelector('.t-text').textContent = t.text;
+
+    card.querySelector('.t-edit').addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingId = t.id;
+      openEntry('edit', t.text);
+    });
+    card.querySelector('.t-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      haptic();
+      const removed = removeThought(t.id);
+      renderReview();
+      if(removed) toast('Gelöscht.', () => { restoreThought(removed.item, removed.idx); renderReview(); });
+    });
+    card.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        haptic();
+        const action = btn.dataset.action;
+        setStatus(t.id, t.status === action ? 'open' : action);
+        renderReview();
+      });
+    });
+    card.addEventListener('click', () => {
+      if(settings.discreet) card.classList.toggle('revealed');
+    });
+    return card;
+  }
+
+  function renderReview(){
+    const list = loadThoughts();
+    const container = $('thoughtList');
+    container.innerHTML = '';
+    container.classList.toggle('discreet', !!settings.discreet);
+
+    if(list.length === 0){
+      container.innerHTML = '<div class="empty-state"><div class="display">Noch ist es still hier.</div><div>Und das ist auch gut so. Alles, was du loswirst, taucht hier auf.</div></div>';
+      return;
+    }
+
+    const open = list.filter(isOpen);
+    const snoozed = list.filter(isSnoozed);
+    const kept = list.filter(t => t.status === 'keep');
+    const done = list.filter(t => t.status === 'done');
+
+    if(open.length){
+      const b = document.createElement('button');
+      b.className = 'ritual-start';
+      b.innerHTML = '<span>Abendritual starten</span>';
+      const small = document.createElement('small');
+      small.textContent = open.length === 1 ? '1 Gedanke' : open.length + ' Gedanken';
+      b.appendChild(small);
+      b.addEventListener('click', () => { haptic(); startRitual('review'); });
+      container.appendChild(b);
+    }
+    if(settings.discreet){
+      const n = document.createElement('p');
+      n.className = 'discreet-note';
+      n.textContent = 'Diskret-Modus: Gedanken zum Lesen antippen.';
+      container.appendChild(n);
+    }
+
+    const addLabel = (text) => {
+      const l = document.createElement('div');
+      l.className = 'group-label';
+      l.textContent = text;
+      container.appendChild(l);
+    };
+
+    const waiting = open.concat(snoozed).sort((a, b) => new Date(b.time) - new Date(a.time));
+    ['Heute', 'Gestern', 'Älter'].forEach(g => {
+      const items = waiting.filter(t => dayGroup(t.time) === g);
+      if(!items.length) return;
+      addLabel(g);
+      items.forEach(t => container.appendChild(buildCard(t)));
+    });
+
+    if(kept.length){
+      addLabel('Behalten');
+      kept.forEach(t => container.appendChild(buildCard(t)));
+    }
+
+    if(!open.length && !snoozed.length && !kept.length){
+      const calm = document.createElement('div');
+      calm.className = 'empty-state compact';
+      calm.innerHTML = '<div class="display">Alles losgelassen.</div><div>Gerade wartet nichts auf dich.</div>';
+      container.appendChild(calm);
+    }
+
+    if(done.length){
+      const tog = document.createElement('button');
+      tog.className = 'group-toggle' + (doneExpanded ? ' open' : '');
+      tog.innerHTML = `<span>Losgelassen (${done.length})</span><span class="chev" aria-hidden="true">›</span>`;
+      tog.setAttribute('aria-expanded', doneExpanded ? 'true' : 'false');
+      tog.addEventListener('click', () => { doneExpanded = !doneExpanded; renderReview(); });
+      container.appendChild(tog);
+      if(doneExpanded){
+        done.sort((a, b) => new Date(b.doneAt || b.time) - new Date(a.doneAt || a.time))
+            .forEach(t => container.appendChild(buildCard(t)));
+        const purge = document.createElement('button');
+        purge.className = 'chip danger';
+        purge.textContent = 'Alle losgelassenen löschen';
+        purge.addEventListener('click', purgeDone);
+        container.appendChild(purge);
+      }
+    }
+
+    // sanfter Sicherungs-Hinweis
+    const days = settings.lastBackup ? (now() - new Date(settings.lastBackup).getTime()) / 86400000 : Infinity;
+    if(list.length >= 5 && days > 21){
+      const nudge = document.createElement('div');
+      nudge.className = 'backup-nudge';
+      const s = document.createElement('span');
+      s.textContent = settings.lastBackup ? `Letzte Sicherung vor ${Math.floor(days)} Tagen.` : 'Noch keine Sicherung deiner Gedanken.';
+      const b = document.createElement('button');
+      b.textContent = 'Jetzt sichern';
+      b.addEventListener('click', exportBackup);
+      nudge.append(s, b);
+      container.appendChild(nudge);
+    }
+  }
+
+  function purgeDone(){
+    const list = loadThoughts();
+    const done = list.filter(t => t.status === 'done');
+    if(!done.length){ toast('Nichts zu löschen.'); return; }
+    haptic();
+    saveThoughts(list.filter(t => t.status !== 'done'));
+    updateCounts();
+    if(current === 'review') renderReview();
+    renderSettings();
+    toast(done.length === 1 ? '1 Gedanke gelöscht.' : `${done.length} Gedanken gelöscht.`, () => {
+      const cur = loadThoughts();
+      const ids = new Set(cur.map(t => t.id));
+      saveThoughts(cur.concat(done.filter(t => !ids.has(t.id))).sort((a, b) => new Date(b.time) - new Date(a.time)));
+      updateCounts();
+      if(current === 'review') renderReview();
+      renderSettings();
+    });
+  }
+
+  $('openReview').addEventListener('click', () => { renderReview(); show('review'); });
+  $('closeReview').addEventListener('click', () => show('home'));
+
+  // ---------- Abendritual ----------
+  const stage = $('ritualStage');
+  let ritual = null;
+
+  function startRitual(from){
+    const queue = loadThoughts().filter(isOpen).sort((a, b) => new Date(a.time) - new Date(b.time));
+    if(!queue.length){ renderReview(); show('review'); return; }
+    ritual = { from, queue, idx: 0, history: [], stats: { done:0, keep:0, later:0 }, busy:false };
+    hideToast();
+    $('ritualEnd').classList.remove('show');
+    $('ritualControls').style.display = '';
+    stage.style.display = '';
+    show('ritual');
+    renderRitual();
+  }
+
+  function makeRCard(t, behind){
+    const c = document.createElement('div');
+    c.className = 'r-card' + (behind ? ' behind' : '');
+    c.innerHTML = '<span class="r-label up">Loslassen</span><span class="r-label right">Behalten</span><span class="r-label left">Morgen</span><div class="r-time"></div><div class="r-text"></div>';
+    c.querySelector('.r-time').textContent = fmtTime(t.time);
+    c.querySelector('.r-text').textContent = t.text;
+    if(behind) c.setAttribute('aria-hidden', 'true');
+    return c;
+  }
+
+  function renderRitual(){
+    stage.innerHTML = '';
+    $('ritualUndo').classList.toggle('show', ritual.history.length > 0);
+    if(ritual.idx >= ritual.queue.length){ endRitual(); return; }
+    $('ritualCount').textContent = `${ritual.idx + 1} von ${ritual.queue.length}`;
+    const next = ritual.queue[ritual.idx + 1];
+    if(next) stage.appendChild(makeRCard(next, true));
+    const card = makeRCard(ritual.queue[ritual.idx], false);
+    stage.appendChild(card);
+    attachSwipe(card);
+  }
+
+  function attachSwipe(card){
+    let sx = 0, sy = 0, dx = 0, dy = 0, dragging = false, pid = null;
+    const labels = {
+      up: card.querySelector('.r-label.up'),
+      right: card.querySelector('.r-label.right'),
+      left: card.querySelector('.r-label.left')
+    };
+    const setLabels = () => {
+      labels.up.style.opacity = Math.min(1, Math.max(0, -dy - Math.abs(dx)) / 110);
+      labels.right.style.opacity = Math.min(1, Math.max(0, dx - Math.max(0, -dy)) / 110);
+      labels.left.style.opacity = Math.min(1, Math.max(0, -dx - Math.max(0, -dy)) / 110);
+    };
+    card.addEventListener('pointerdown', (e) => {
+      if(ritual.busy) return;
+      dragging = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY; dx = dy = 0;
+      card.classList.remove('animate');
+      try{ card.setPointerCapture(pid); }catch(err){}
+    });
+    card.addEventListener('pointermove', (e) => {
+      if(!dragging || e.pointerId !== pid) return;
+      dx = e.clientX - sx; dy = e.clientY - sy;
+      card.style.transform = `translateY(-50%) translate(${dx}px, ${Math.min(dy, 60)}px) rotate(${dx/22}deg)`;
+      setLabels();
+    });
+    const end = (e) => {
+      if(!dragging || e.pointerId !== pid) return;
+      dragging = false;
+      const T = 90;
+      if(-dy > T && -dy > Math.abs(dx)) act('done', card);
+      else if(dx > T) act('keep', card);
+      else if(dx < -T) act('later', card);
+      else {
+        card.classList.add('animate');
+        card.style.transform = '';
+        Object.values(labels).forEach(l => l.style.opacity = 0);
+      }
+    };
+    card.addEventListener('pointerup', end);
+    card.addEventListener('pointercancel', end);
+  }
+
+  function act(action, card){
+    if(!ritual || ritual.busy || ritual.idx >= ritual.queue.length) return;
+    card = card || stage.querySelector('.r-card:not(.behind)');
+    if(!card) return;
+    ritual.busy = true;
+    haptic();
+    const t = ritual.queue[ritual.idx];
+    const before = action === 'later'
+      ? updateThought(t.id, { status:'open', snoozeUntil: startOfTomorrow(), doneAt: undefined })
+      : setStatus(t.id, action);
+    ritual.history.push({ id: t.id, before, action });
+    ritual.stats[action]++;
+
+    const lbl = card.querySelector('.r-label.' + (action === 'done' ? 'up' : action === 'keep' ? 'right' : 'left'));
+    if(lbl) lbl.style.opacity = 1;
+    card.classList.add('animate');
+    if(action === 'done'){
+      const r = card.getBoundingClientRect();
+      card.style.transform = 'translateY(-50%) translateY(-70vh) scale(0.5)';
+      card.style.opacity = '0';
+      spawnStar($('ritual'), innerWidth/2, r.top + r.height/2);
+    } else {
+      const dir = action === 'keep' ? 1 : -1;
+      card.style.transform = `translateY(-50%) translateX(${dir * innerWidth * 1.1}px) rotate(${dir*18}deg)`;
+      card.style.opacity = '0';
+    }
+    setTimeout(() => {
+      ritual.idx++;
+      ritual.busy = false;
+      renderRitual();
+    }, reducedMotion.matches ? 60 : 340);
+  }
+
+  function undoRitual(){
+    if(!ritual || ritual.busy || !ritual.history.length) return;
+    haptic();
+    const h = ritual.history.pop();
+    const b = h.before || {};
+    updateThought(h.id, { status: b.status || 'open', snoozeUntil: b.snoozeUntil, doneAt: b.doneAt });
+    ritual.stats[h.action]--;
+    ritual.idx--;
+    $('ritualEnd').classList.remove('show');
+    $('ritualControls').style.display = '';
+    stage.style.display = '';
+    renderRitual();
+  }
+
+  function endRitual(){
+    $('ritualCount').textContent = '';
+    $('ritualControls').style.display = 'none';
+    stage.style.display = 'none';
+    const s = ritual.stats;
+    const parts = [];
+    if(s.done) parts.push(`${s.done} losgelassen`);
+    if(s.keep) parts.push(`${s.keep} behalten`);
+    if(s.later) parts.push(`${s.later} auf morgen`);
+    $('ritualEndTitle').textContent = s.done && !s.keep && !s.later ? 'Alles losgelassen.' : 'Alles abgelegt.';
+    const hour = new Date().getHours();
+    const night = hour >= 17 || hour < 4;
+    $('ritualEndSummary').textContent = parts.join(' · ') + (night ? '\nSchlaf gut.' : '');
+    $('ritualDone').textContent = night ? 'Gute Nacht' : 'Fertig';
+    $('ritualEnd').classList.add('show');
+  }
+
+  function closeRitual(){
+    const from = ritual ? ritual.from : 'home';
+    ritual = null;
+    if(from === 'review'){ renderReview(); show('review'); } else show('home');
+  }
+
+  document.querySelectorAll('.r-btn').forEach(b => b.addEventListener('click', () => act(b.dataset.act)));
+  $('ritualUndo').addEventListener('click', undoRitual);
+  $('closeRitual').addEventListener('click', closeRitual);
+  $('ritualDone').addEventListener('click', () => { haptic(); if(ritual) ritual.from = 'home'; closeRitual(); });
+  $('eveningCta').addEventListener('click', () => { haptic(); startRitual('home'); });
+
+  // ---------- Einstellungen ----------
+  function fmtDate(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'}) + ', ' + d.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) + ' Uhr';
+  }
+  function renderSettings(){
+    $('setReminder').checked = !!settings.reminder;
+    $('setReminderTime').value = settings.reminderTime || '19:00';
+    $('setReminderTime').disabled = !settings.reminder;
+    $('setDiscreet').checked = !!settings.discreet;
+    $('lastBackupInfo').textContent = settings.lastBackup ? 'Zuletzt: ' + fmtDate(settings.lastBackup) : 'Noch nie gesichert';
+    const nDone = loadThoughts().filter(t => t.status === 'done').length;
+    $('purgeInfo').textContent = nDone ? (nDone === 1 ? '1 Gedanke' : nDone + ' Gedanken') : 'Keine vorhanden';
+  }
+  $('openSettings').addEventListener('click', () => { renderSettings(); show('settings'); });
+  $('closeSettings').addEventListener('click', () => show('home'));
+  $('setReminder').addEventListener('change', (e) => { settings.reminder = e.target.checked; saveSettings(); renderSettings(); });
+  $('setReminderTime').addEventListener('change', (e) => { if(e.target.value){ settings.reminderTime = e.target.value; saveSettings(); } });
+  $('setDiscreet').addEventListener('change', (e) => { settings.discreet = e.target.checked; saveSettings(); });
+  $('showIntro').addEventListener('click', () => { if (ldOnb) ldOnb.show(); });
+  $('purgeDone').addEventListener('click', purgeDone);
+
+  // ---------- Export / Import ----------
+  function stamp(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  function markBackup(){ settings.lastBackup = new Date().toISOString(); saveSettings(); renderSettings(); if(current === 'review') renderReview(); }
+
+  function buildReadable(){
+    const list = loadThoughts();
+    if(!list.length) return '';
+    const sect = (title, items) => items.length
+      ? `${title}\n` + items.map(t => `• ${fmtTime(t.time)}\n  ${t.text.replace(/\n/g, '\n  ')}`).join('\n') + '\n'
+      : '';
+    return [
+      `LosDenkWahr – Stand ${new Date().toLocaleDateString('de-DE')}\n`,
+      sect('Offen', list.filter(t => t.status === 'open')),
+      sect('Behalten', list.filter(t => t.status === 'keep')),
+      sect('Losgelassen', list.filter(t => t.status === 'done'))
+    ].filter(Boolean).join('\n');
+  }
+
+  function downloadBlob(blob, name){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  async function exportText(){
+    const text = buildReadable();
+    if(!text){ toast('Noch keine Gedanken vorhanden.'); return; }
+    if(navigator.share){
+      try{ await navigator.share({ title: 'LosDenkWahr', text }); return; }
+      catch(e){ if(e && e.name === 'AbortError') return; }
+    }
+    try{ await navigator.clipboard.writeText(text); toast('In die Zwischenablage kopiert.'); }
+    catch(e){ downloadBlob(new Blob([text], {type:'text/plain'}), `LosDenkWahr-${stamp()}.txt`); }
+  }
+
+  async function exportBackup(){
+    const list = loadThoughts();
+    if(!list.length){ toast('Noch keine Gedanken vorhanden.'); return; }
+    const data = JSON.stringify({ app: 'LosDenkWahr', version: 1, exported: new Date().toISOString(), thoughts: list }, null, 2);
+    const name = `LosDenkWahr-Sicherung-${stamp()}.json`;
+    try{
+      const file = new File([data], name, { type: 'application/json' });
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({ files: [file], title: 'LosDenkWahr-Sicherung' });
+        markBackup();
+        toast('Sicherung erstellt.');
+        return;
+      }
+    }catch(e){ if(e && e.name === 'AbortError') return; }
+    downloadBlob(new Blob([data], {type:'application/json'}), name);
+    markBackup();
+    toast('Sicherung gespeichert.');
+  }
+
+  function importFile(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      let incoming;
+      try{
+        const parsed = JSON.parse(reader.result);
+        incoming = Array.isArray(parsed) ? parsed : parsed.thoughts;
+        if(!Array.isArray(incoming)) throw new Error('format');
+      }catch(e){ toast('Diese Datei ist keine LosDenkWahr-Sicherung.'); return; }
+      const list = loadThoughts();
+      const ids = new Set(list.map(t => t.id));
+      let added = 0;
+      incoming.forEach(t => {
+        if(!t || typeof t.text !== 'string' || !t.text.trim()) return;
+        const id = Number(t.id) || newId();
+        if(ids.has(id)) return;
+        const time = t.time && !isNaN(new Date(t.time).getTime()) ? t.time : new Date().toISOString();
+        const status = ['open','keep','done'].includes(t.status) ? t.status : 'open';
+        const item = { id, text: t.text.trim(), time, status };
+        if(t.doneAt) item.doneAt = t.doneAt;
+        if(Number(t.snoozeUntil)) item.snoozeUntil = Number(t.snoozeUntil);
+        list.push(item); ids.add(id); added++;
+        if(id > lastId) lastId = id;
+      });
+      list.sort((a, b) => new Date(b.time) - new Date(a.time));
+      saveThoughts(list);
+      updateCounts(); renderSettings();
+      toast(added ? (added === 1 ? '1 Gedanke importiert.' : `${added} Gedanken importiert.`) : 'Alles war schon vorhanden.');
+    };
+    reader.onerror = () => toast('Datei konnte nicht gelesen werden.');
+    reader.readAsText(file);
+  }
+
+  $('exportText').addEventListener('click', exportText);
+  $('exportBackup').addEventListener('click', exportBackup);
+  $('importBackup').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if(f) importFile(f);
+    e.target.value = '';
+  });
+
+  // ---------- Rechtliches ----------
+  $('closeLegal').addEventListener('click', () => show('home'));
+  document.querySelectorAll('.legal-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.legal-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.legal-section').forEach(s=>s.classList.remove('active'));
+      tab.classList.add('active');
+      $('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Aktualisieren beim Zurückkehren in die App ----------
+  document.addEventListener('visibilitychange', () => {
+    updateStarMotion();
+    if(!document.hidden){
+      updateCounts();
+      if(current === 'review') renderReview();
+    } else if(micBtn.classList.contains('listening')){
+      stopListening();
+    }
+  });
+  setInterval(updateCounts, 60000);
+
+  // ---------- Init ----------
+  lastId = loadThoughts().reduce((m, t) => Math.max(m, Number(t.id) || 0), 0);
+  updateCounts();
+
+  // ---------- Erster Start ----------
+  // Einheitliche Einführung der WahrZentrale (wz-onboarding.js)
+  ldOnb = (typeof wzOnboarding === 'function') ? wzOnboarding({
+    key: K.onboarded,
+    slides: [{
+      iconHtml: '<img src="ld-icon-192.png" alt="" style="width:100%;height:100%;border-radius:inherit;display:block">',
+      title: 'Willkommen bei LosDenkWahr',
+      html: '<p>Tippe auf den Mond und sprich einen Gedanken. Er wird weggeparkt – ohne Antwort, ohne Bewertung.</p>'
+          + '<p style="margin-top:10px">Abends gehst du deine Gedanken einzeln durch: nach oben wischen lässt los, zur Seite behältst du sie oder schiebst sie auf morgen.</p>'
+    }]
+  }) : null;
+
+  // ---------- Installations-Hinweis ----------
+  (function(){
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    const hint = $('iosHint');
+    if(isIos && !isStandalone && !lsGet(K.iosHint)) hint.classList.add('show');
+    $('dismissIosHint').addEventListener('click', () => {
+      hint.classList.remove('show');
+      lsSet(K.iosHint, '1');
+    });
+  })();
+
+  // ---------- Übergabe aus der Schnelleingabe der Startseite ----------
+  const wzH = window.wzScanHandoff && wzScanHandoff(['gedanke']);
+  if (wzH && wzH.text) openEntry('new', String(wzH.text).slice(0, 2000));
+
+  // ---------- Service Worker ----------
+
+})();
+</script>
+</body>
+</html>
